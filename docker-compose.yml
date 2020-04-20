@@ -1,0 +1,55 @@
+# Inspired by https://medium.com/@xiaolishen/develop-in-docker-a-node-backend-and-a-react-front-end-talking-to-each-other-5c522156f634
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx-conf/nginx-${ENV}.conf:/etc/nginx/nginx.conf
+      - ./letsencrypt-site:/var/www/html
+    networks:
+      - app-network
+  server:
+    env_file: .env
+    container_name: rolocha-server
+    expose:
+      - 3000
+    ports:
+      - '3000:3000'
+    networks:
+      - app-network
+    depends_on:
+      - db
+  client:
+    env_file: .env
+    container_name: rolocha-client
+    expose:
+      - 4000
+      - 6006
+    ports:
+      - 4000:4000
+      - 6006:6006
+    networks:
+      - app-network
+  db:
+    env_file: .env
+    container_name: db
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    volumes:
+      - dbdata:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:

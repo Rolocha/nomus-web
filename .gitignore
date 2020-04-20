@@ -1,0 +1,8 @@
+/data
+/.todelete
+/build
+/node_modules
+
+# All .env files
+**/.env
+**/.env.*

@@ -1,0 +1,159 @@
+---
+kind: pipeline
+type: docker
+name: client
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: publish staging to ECR
+  image: plugins/ecr
+  settings:
+    access_key:
+      from_secret: AWS_ACCESS_KEY_ID
+    build_args:
+    - ENV=staging
+    context: ./client
+    dockerfile: ./client/Dockerfile
+    region: us-east-1
+    registry: 074552482398.dkr.ecr.us-east-1.amazonaws.com
+    repo: rolocha/client
+    secret_key:
+      from_secret: AWS_SECRET_ACCESS_KEY
+    tags:
+    - staging-latest
+  when:
+    branch:
+    - ${ROLOCHA_DEPLOY_BRANCH}
+    event:
+    - custom
+
+- name: publish production to ECR
+  image: plugins/ecr
+  settings:
+    access_key:
+      from_secret: AWS_ACCESS_KEY_ID
+    build_args:
+    - ENV=production
+    context: ./client
+    dockerfile: ./client/Dockerfile
+    region: us-east-1
+    registry: 074552482398.dkr.ecr.us-east-1.amazonaws.com
+    repo: rolocha/client
+    secret_key:
+      from_secret: AWS_SECRET_ACCESS_KEY
+    tags:
+    - production-latest
+  when:
+    branch:
+    - production
+
+---
+kind: pipeline
+type: docker
+name: server
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: publish staging to ECR
+  image: plugins/ecr
+  settings:
+    access_key:
+      from_secret: AWS_ACCESS_KEY_ID
+    build_args:
+    - ENV=staging
+    context: ./server
+    dockerfile: ./server/Dockerfile
+    region: us-east-1
+    registry: 074552482398.dkr.ecr.us-east-1.amazonaws.com
+    repo: rolocha/server
+    secret_key:
+      from_secret: AWS_SECRET_ACCESS_KEY
+    tags:
+    - staging-latest
+  when:
+    branch:
+    - ${ROLOCHA_DEPLOY_BRANCH}
+    event:
+    - custom
+
+- name: publish production to ECR
+  image: plugins/ecr
+  settings:
+    access_key:
+      from_secret: AWS_ACCESS_KEY_ID
+    build_args:
+    - ENV=production
+    context: ./server
+    dockerfile: ./server/Dockerfile
+    region: us-east-1
+    registry: 074552482398.dkr.ecr.us-east-1.amazonaws.com
+    repo: rolocha/server
+    secret_key:
+      from_secret: AWS_SECRET_ACCESS_KEY
+    tags:
+    - production-latest
+  when:
+    branch:
+    - production
+
+---
+kind: pipeline
+type: docker
+name: deploy
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: deploy staging
+  image: appleboy/drone-ssh
+  settings:
+    envs:
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_DEFAULT_REGION
+    host: ec2-52-20-46-100.compute-1.amazonaws.com
+    key:
+      from_secret: rolocha_ssh_key
+    port: 22
+    script:
+    - cd ~/code/RoloCha
+    - make deploy
+    username: ubuntu
+  when:
+    branch:
+    - ${ROLOCHA_DEPLOY_BRANCH}
+    event:
+    - custom
+
+- name: deploy production
+  image: appleboy/drone-ssh
+  settings:
+    envs:
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_DEFAULT_REGION
+    host: ec2-34-194-213-141.compute-1.amazonaws.com
+    key:
+      from_secret: rolocha_ssh_key
+    port: 22
+    script:
+    - cd ~/code/RoloCha
+    - make deploy
+    username: ubuntu
+  when:
+    branch:
+    - production
+
+depends_on:
+- client
+- server
+
+...

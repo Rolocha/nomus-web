@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  nginx:
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+  server:
+    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/server:production-latest
+    restart: always
+    command: yarn serve
+  client:
+    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/client:production-latest
+    restart: always
+    command: yarn serve
+  db:
+    restart: always

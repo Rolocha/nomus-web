@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "lib": ["es2016", "esnext.asynciterable"],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "pretty": true,
+    "outDir": "dist/",
+    "baseUrl": ".",
+    "paths": {
+      "src": ["src"]
+    },
+    "typeRoots": ["node_modules/@types", "src/@types"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "compileOnSave": false,
+  "lib": ["es2015"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
