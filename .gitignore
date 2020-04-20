@@ -6,3 +6,4 @@
 # All .env files
 **/.env
 **/.env.*
+.drone.yml
