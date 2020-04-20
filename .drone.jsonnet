@@ -3,6 +3,7 @@ local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 
+
 local publish(app, env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
