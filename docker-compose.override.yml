@@ -2,6 +2,8 @@ version: '3'
 
 services:
   nginx:
+    volumes:
+      - .devops/nginx-conf/nginx-development.conf:/etc/nginx/nginx.conf
     ports:
       - 1234:80
       - 1235:443
