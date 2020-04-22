@@ -16,9 +16,7 @@ const LoginPage = () => {
             last
           }
           email
-          phoneNumber {
-            cell
-          }
+          phoneNumber
         }
       }
     `,

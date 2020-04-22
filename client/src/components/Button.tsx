@@ -6,6 +6,7 @@ import theme from 'styles/theme'
 type ButtonProps = {
   variant?: keyof typeof styleVariants
   width?: keyof typeof widthVariants
+  as?: string
 }
 
 const styleVariants = {
@@ -48,6 +49,10 @@ const Button = styled<'button', ButtonProps>('button')(
     fontSize: '18px',
     fontWeight: 'bold',
     cursor: 'pointer',
+    a: {
+      textDecoration: 'none',
+      color: 'unset',
+    },
   },
   variant({
     variants: styleVariants,
