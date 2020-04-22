@@ -6,9 +6,6 @@ services:
     image: nginx:latest
     container_name: nginx
     restart: always
-    volumes:
-      - ./nginx-conf/nginx-${ENV}.conf:/etc/nginx/nginx.conf
-      - ./letsencrypt-site:/var/www/html
     networks:
       - app-network
   server:
