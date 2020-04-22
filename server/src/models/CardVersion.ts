@@ -5,7 +5,7 @@ import { ObjectType, Field } from 'type-graphql'
 import { validateEmail } from 'src/models/utils'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName, Address } from 'src/models/subschemas'
-import { UserRoute } from 'src/models'
+import { UserRoute, User } from 'src/models'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
@@ -16,16 +16,19 @@ class CardVersion {
   @Field((type) => UUIDScalar)
   readonly _id: UUIDType
 
+  @prop()
+  @Field({ nullable: true })
+  cardSlug: string
+
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
   name: Ref<PersonName>
 
   @prop({ match: /^\d{10,11}$/ })
   @Field()
-  cardPhoneNumber: string
+  phoneNumber: string
 
   @prop({
-    required: true,
     trim: true,
     lowercase: true,
     unique: true,
@@ -46,13 +49,42 @@ class CardVersion {
   @Field()
   vcfNotes: string
 
-  @prop({ _id: false, required: true })
+  @prop({ _id: false })
   @Field(() => Address, { nullable: false })
   address: Ref<Address>
+
+  @prop({ required: true })
+  @Field()
+  imageUrl: string
+
+  @prop({ required: true })
+  @Field()
+  vcfUrl: string
 
   @prop({ _id: false, required: true })
   @Field(() => UserRoute, { nullable: false })
   userRoute: Ref<UserRoute>
+
+  @prop({ _id: false, required: true, ref: 'User' })
+  @Field(() => User, { nullable: false })
+  user: UUIDType
+
+  static async findBySlugOrId(
+    this: ReturnModelType<typeof CardVersion>,
+    slugOrId: string,
+    username?: string
+  ) {
+    if (username) {
+      const userWithThatUsername = await User.mongo.findOne({ username })
+      const cardVersion = await this.findOne({
+        cardSlug: slugOrId,
+        user: MUUID.from(userWithThatUsername._id),
+      })
+      return cardVersion
+    }
+
+    return await this.findOne({ _id: slugOrId })
+  }
 }
 
 // Attach the mongoose model onto the core model itself

@@ -18,10 +18,6 @@ class Card {
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
-  @prop({ required: true })
-  @Field()
-  imageUrl: string
-
   @prop({ _id: false, required: true })
   @Field(() => User, { nullable: false })
   user: Ref<User>

@@ -12,6 +12,7 @@ import {
 import { ObjectType, Field } from 'type-graphql'
 
 import { authTokenPrivateKey } from 'src/config'
+import { CardVersion } from 'src/models'
 import { validateEmail } from 'src/models/utils'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
@@ -56,6 +57,18 @@ class User {
 
   @prop({ required: true })
   password: string
+
+  @prop()
+  @Field(() => CardVersion)
+  defaultCardVersion: UUIDType
+
+  public static async getDefaultCardVersionForUsername(
+    this: ReturnModelType<typeof User>,
+    username: string
+  ) {
+    const user = await this.findOne({ username })
+    return await CardVersion.mongo.findById(MUUID.from(user.defaultCardVersion))
+  }
 
   public static async findByCredentials(
     this: ReturnModelType<typeof User>,
