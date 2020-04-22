@@ -11,16 +11,8 @@ app_name=rolocha-web
 # Run the box init script (basic installations and working dir setup)
 ssh $boxid 'sudo bash -s' < ./init_box_remote.sh
 
-# Transfer the docker-composes 
-scp ../docker-compose.yml $boxid:~/$app_name/docker-compose.yml
-scp ./docker-compose.$boxenv.yml $boxid:~/$app_name/docker-compose.override.yml
+# Transfer the env-specific files
+scp ./$boxenv/* $boxid:~/$app_name
 
-# Transfer the deployment Makefile
+# Transfer the env-agnostic Makefile
 scp ./Makefile $boxid:~/$app_name/Makefile
-
-# Transfer the nginx configuration
-ssh $boxid "mkdir -p ~/$app_name/nginx-conf"
-scp ./nginx-conf/nginx-$boxenv.conf $boxid:~/$app_name/nginx-conf/nginx-$boxenv.conf
-
-# Transfer the appropriate .env file over
-scp ../.env.$2 $1:~/$app_name/.env
