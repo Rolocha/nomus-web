@@ -3,6 +3,5 @@
 /build
 /node_modules
 
-# All .env files
-**/.env
-**/.env.*
+# Non-development .env files
+.devops/**/.env
