@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "rolocha",
+  "devDependencies": {
+    "apollo": "^2.27.3"
+  },
+  "scripts": {
+    "types:watch": "apollo client:codegen --watch --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types",
+    "types:gen": "apollo client:codegen --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types"
+  },
+  "workspaces": [
+    "client/",
+    "server/"
+  ]
+}

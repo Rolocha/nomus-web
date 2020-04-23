@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   nginx:
@@ -18,11 +18,8 @@ services:
     command: yarn dev
     volumes:
       # Mirror local code but not node_modules
-      - ./server/src:/server/src
-      - ./server/package.json:/server/package.json
-      - ./server/yarn.lock:/server/yarn.lock
-      - ./server/tsconfig.json:/server/tsconfig.json
-      - ./server/webpack.config.js:/server/webpack.config.js
+      - /server/node_modules/
+      - ./server:/server
   client:
     build:
       context: ./client
@@ -32,15 +29,5 @@ services:
     command: yarn dev
     volumes:
       # Mirror local code but not node_modules
-      - ./client/src:/client/src
-      - ./client/public:/client/public
-      - ./client/scripts:/client/scripts
-      - ./client/config:/client/config
-      - ./client/package.json:/client/package.json
-      - ./client/yarn.lock:/client/yarn.lock
-  db:
-    env_file: .env
-
-volumes:
-  server_node_modules:
-  client_node_modules:
+      - /client/node_modules/
+      - ./client:/client

@@ -3,6 +3,8 @@ import { css } from '@emotion/core'
 import { useHistory } from 'react-router-dom'
 
 import { useLazyQuery, useMutation, gql } from 'apollo'
+import { login, loginVariables } from 'apollo/types/login'
+import { signup, signupVariables } from 'apollo/types/signup'
 import { AUTH_TOKEN_KEY } from 'config'
 import { Body, Link } from 'components/Text'
 import Container from 'components/Container'
@@ -12,20 +14,6 @@ import Input from 'components/Form/Input'
 import Logo from 'components/Logo'
 import { LoginSquiggle } from 'components/SVG'
 
-interface LogInResponse {
-  login: {
-    token: string
-  }
-}
-
-interface SignUpResponse {
-  signup: {
-    token: string
-    // TODO: need better model typing soon
-    user: any
-  }
-}
-
 const LoginPage = () => {
   const [mode, setMode] = React.useState<'login' | 'signup'>('login')
   const [email, setEmail] = React.useState('')
@@ -34,7 +22,7 @@ const LoginPage = () => {
   const [password, setPassword] = React.useState('')
   const history = useHistory()
 
-  const [logIn, logInReqMeta] = useLazyQuery<LogInResponse>(
+  const [logIn, logInReqMeta] = useLazyQuery<login, loginVariables>(
     gql`
       query login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
@@ -44,7 +32,7 @@ const LoginPage = () => {
     `,
   )
 
-  const [signUp, signUpReqMeta] = useMutation<SignUpResponse>(
+  const [signUp, signUpReqMeta] = useMutation<signup, signupVariables>(
     gql`
       mutation signup($data: SignupInput!) {
         signup(data: $data) {

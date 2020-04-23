@@ -1,5 +1,5 @@
 # Inspired by https://medium.com/@xiaolishen/develop-in-docker-a-node-backend-and-a-react-front-end-talking-to-each-other-5c522156f634
-version: '3'
+version: "3"
 
 services:
   nginx:
@@ -8,13 +8,16 @@ services:
     restart: always
     networks:
       - app-network
+    depends_on:
+      - client
+      - server
   server:
     env_file: .env
     container_name: rolocha-server
     expose:
       - 3000
     ports:
-      - '3000:3000'
+      - "3000:3000"
     networks:
       - app-network
     depends_on:
@@ -31,16 +34,13 @@ services:
     networks:
       - app-network
   db:
-    env_file: .env
-    container_name: db
     image: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    container_name: db
+    env_file: .env
     volumes:
       - dbdata:/data/db
     ports:
-      - '27017:27017'
+      - "27017:27017"
     networks:
       - app-network
 

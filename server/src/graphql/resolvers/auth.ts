@@ -8,7 +8,7 @@ class AuthSuccessResponse {
   token: string
 
   @Field((returns) => User)
-  user: typeof User
+  user: User
 }
 
 @InputType()
