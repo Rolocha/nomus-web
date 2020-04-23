@@ -23,7 +23,7 @@ const ContactInfoPage = () => {
   const { username, cardNameOrId }: UrlParams = useParams()
   const history = useHistory()
 
-  // If there's no card version id in the route, this is an invalid route, redirect to the landing page
+  // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
     history.push('/')
     return null
