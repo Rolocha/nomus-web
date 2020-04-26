@@ -105,8 +105,7 @@ export class User {
   public generateAccessToken() {
     const body = { _id: MUUID.from(this._id).toString(), roles: this.roles ?? [] }
     return jwt.sign(body, authTokenPrivateKey, {
-      // TODO: Change back to 15m, set to 1ms to test refresh tokens
-      expiresIn: '1',
+      expiresIn: '15m',
     })
   }
 
