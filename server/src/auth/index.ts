@@ -94,4 +94,35 @@ authRouter.post(
   }
 )
 
+export const authMiddleware = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  const authHeader = req.header('Authorization')
+  if (authHeader == null || authHeader.trim() === '') {
+    // Request not attempting authentication so let it through without attaching a user
+    // Query will automatically fail if a user/roles are required
+    next()
+    return
+  }
+
+  const token = authHeader.replace(/^Bearer /, '')
+  const userResult = await getUserFromToken(token)
+  if (!userResult.isSuccess) {
+    switch (userResult.error.name) {
+      case 'missing-token':
+      case 'no-matching-user':
+      case 'token-expired':
+        return res.status(401).end()
+      case 'jwt-error':
+      default:
+        return res.status(500).end()
+    }
+  }
+  const user = userResult.getValue()
+  req.user = user
+  next()
+}
+
 export default authRouter

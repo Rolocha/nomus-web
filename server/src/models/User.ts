@@ -11,7 +11,7 @@ import {
 } from '@typegoose/typegoose'
 import { ObjectType, Field, registerEnumType } from 'type-graphql'
 
-import { authTokenPrivateKey } from 'src/config'
+import { authTokenPrivateKey, accessTokenLifespan } from 'src/config'
 
 import CardVersion from './CardVersion'
 import Token from './Token'
@@ -105,7 +105,7 @@ export class User {
   public generateAccessToken() {
     const body = { _id: MUUID.from(this._id).toString(), roles: this.roles ?? [] }
     return jwt.sign(body, authTokenPrivateKey, {
-      expiresIn: '15m',
+      expiresIn: accessTokenLifespan,
     })
   }
 
