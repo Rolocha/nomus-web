@@ -19,9 +19,10 @@ import { PersonName } from './subschemas'
 import { validateEmail } from './utils'
 import { UUIDScalar, UUIDType } from './scalars'
 
+// Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
+  User = 'user',
+  Admin = 'admin',
 }
 registerEnumType(Role, {
   name: 'Role',
