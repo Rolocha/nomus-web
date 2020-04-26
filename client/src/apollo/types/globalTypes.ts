@@ -7,14 +7,6 @@
 // START Enums and Input Objects
 //==============================================================
 
-export interface SignupInput {
-  firstName: string
-  middleName?: string | null
-  lastName: string
-  email: string
-  password: string
-}
-
 //==============================================================
 // END Enums and Input Objects
 //==============================================================
