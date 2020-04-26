@@ -2,8 +2,9 @@ import MUUID from 'uuid-mongodb'
 import { prop, modelOptions, ReturnModelType, Ref, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
-import { UUIDScalar, UUIDType } from 'src/models/scalars'
-import { CardVersion, User } from 'src/models'
+import { UUIDScalar, UUIDType } from './scalars'
+import User from './User'
+import CardVersion from './CardVersion'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()

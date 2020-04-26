@@ -1,9 +1,10 @@
 import { IApolloContext } from 'src/graphql/types'
-import { Resolver, Query, Ctx } from 'type-graphql'
-import { User } from 'src/models'
+import { Resolver, Query, Ctx, Authorized } from 'type-graphql'
+import { User, Role } from 'src/models/User'
 
 @Resolver()
 class UserResolver {
+  @Authorized(Role.USER, Role.ADMIN)
   @Query(() => User)
   currentUser(@Ctx() context: IApolloContext) {
     if (context.user) {

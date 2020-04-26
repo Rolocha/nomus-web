@@ -9,13 +9,24 @@ import {
   Ref,
   getModelForClass,
 } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
+import { ObjectType, Field, registerEnumType } from 'type-graphql'
 
 import { authTokenPrivateKey } from 'src/config'
-import { CardVersion } from 'src/models'
-import { validateEmail } from 'src/models/utils'
-import { UUIDScalar, UUIDType } from 'src/models/scalars'
-import { PersonName } from 'src/models/subschemas'
+
+import CardVersion from './CardVersion'
+import Token from './Token'
+import { PersonName } from './subschemas'
+import { validateEmail } from './utils'
+import { UUIDScalar, UUIDType } from './scalars'
+
+export enum Role {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+registerEnumType(Role, {
+  name: 'Role',
+  description: 'User access control roles',
+})
 
 @pre<User>('save', async function (next) {
   if (this.isModified('password')) {
@@ -26,10 +37,10 @@ import { PersonName } from 'src/models/subschemas'
 })
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class User {
+export class User {
   static mongo: ReturnModelType<typeof User>
 
-  @prop({ required: true, default: () => MUUID.v4() })
+  @prop({ required: true, default: MUUID.v4 })
   @Field((type) => UUIDScalar)
   readonly _id: UUIDType
 
@@ -62,6 +73,10 @@ class User {
   @Field(() => CardVersion)
   defaultCardVersion: UUIDType
 
+  @prop({ default: ['user'], required: true })
+  @Field((type) => [Role])
+  roles: Role[]
+
   public static async getDefaultCardVersionForUsername(
     this: ReturnModelType<typeof User>,
     username: string
@@ -87,10 +102,17 @@ class User {
     return user
   }
 
-  public generateAuthToken() {
-    const body = { _id: MUUID.from(this._id).toString() }
-    // TODO: Attach expiration date field (exp)
-    return jwt.sign(body, authTokenPrivateKey)
+  public generateAccessToken() {
+    const body = { _id: MUUID.from(this._id).toString(), roles: this.roles ?? [] }
+    return jwt.sign(body, authTokenPrivateKey, {
+      // TODO: Change back to 15m, set to 1ms to test refresh tokens
+      expiresIn: '1',
+    })
+  }
+
+  public async generateRefreshToken() {
+    const refreshToken = await Token.mongo.create({ client: MUUID.from(this._id) })
+    return refreshToken.value
   }
 }
 
