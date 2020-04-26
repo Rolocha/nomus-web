@@ -1,24 +1,12 @@
 import mongoose from 'mongoose'
-
-const {
-  NODE_ENV,
-  MONGO_USERNAME,
-  MONGO_PASSWORD,
-  MONGO_HOSTNAME,
-  MONGO_PORT,
-  MONGO_DB_NAME,
-} = process.env
-
-/**
- * @typedef {Object} ObjectId
- */
+import { nodeEnv, mongoCredentials } from 'src/config'
 
 export function init() {
   // Only connect to the database for non-test environments
-  if (NODE_ENV !== 'test') {
-    const DB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOSTNAME}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin`
+  if (nodeEnv !== 'test') {
+    const dbUri = `mongodb://${mongoCredentials.username}:${mongoCredentials.password}@${mongoCredentials.hostname}:${mongoCredentials.port}/${mongoCredentials.dbName}?authSource=admin`
     mongoose
-      .connect(DB_URI, {
+      .connect(dbUri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
