@@ -107,7 +107,10 @@ export class AuthManager<
     })
 
     return {
-      ...this.makeUseAuthOutput(authData),
+      ...this.makeUseAuthOutput(
+        authData,
+        authData ? this.parseJWT(authData.accessToken) : null,
+      ),
       logIn: this.logIn,
       signUp: this.signUp,
       refreshToken: this.refreshToken,
