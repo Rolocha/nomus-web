@@ -1,12 +1,11 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { Global, css } from '@emotion/core'
 import { ThemeProvider } from 'emotion-theming'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
 import { client as apolloClient, ApolloProvider } from 'apollo'
-import pages from 'pages'
+import { PageRouter } from 'pages'
 import theme from 'styles/theme'
 
 AOS.init()
@@ -30,18 +29,7 @@ class App extends React.Component<PropsType, StateType> {
         />
         <ApolloProvider client={apolloClient}>
           <ThemeProvider theme={theme}>
-            <Router>
-              <Switch>
-                {pages.map(({ exact, path, component }) => (
-                  <Route
-                    key={path}
-                    exact={exact}
-                    path={path}
-                    component={component}
-                  />
-                ))}
-              </Switch>
-            </Router>
+            <PageRouter />
           </ThemeProvider>
         </ApolloProvider>
       </div>

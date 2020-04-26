@@ -1,16 +1,11 @@
-import ApolloClient from 'apollo-boost'
+import { ApolloClient } from 'apollo-client'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 
-import { AUTH_TOKEN_KEY } from 'config'
+import link from './links'
 
 export const client = new ApolloClient({
-  request: (operation) => {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY)
-    operation.setContext({
-      headers: {
-        authorization: token ? `Bearer ${token}` : '',
-      },
-    })
-  },
+  link,
+  cache: new InMemoryCache(),
 })
 
 export { gql } from 'apollo-boost'

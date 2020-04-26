@@ -16,6 +16,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
+  "files": ["src/types.d.ts"],
   "compileOnSave": false,
   "lib": ["es2015"],
   "include": ["src/**/*"],

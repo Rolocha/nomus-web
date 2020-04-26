@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
-import { useLazyQuery, useMutation, gql } from 'apollo'
-import { login, loginVariables } from 'apollo/types/login'
-import { signup, signupVariables } from 'apollo/types/signup'
-import { AUTH_TOKEN_KEY } from 'config'
+import { useAuth } from 'utils/auth'
 import { Body, Link } from 'components/Text'
 import Container from 'components/Container'
 import Button from 'components/Button'
@@ -20,45 +17,14 @@ const LoginPage = () => {
   const [firstName, setFirstName] = React.useState('')
   const [lastName, setLastName] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const { loggedIn, logIn, signUp } = useAuth()
   const history = useHistory()
+  const location = useLocation<{ from: Location }>()
 
-  const [logIn, logInReqMeta] = useLazyQuery<login, loginVariables>(
-    gql`
-      query login($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-          token
-        }
-      }
-    `,
-  )
-
-  const [signUp, signUpReqMeta] = useMutation<signup, signupVariables>(
-    gql`
-      mutation signup($data: SignupInput!) {
-        signup(data: $data) {
-          token
-        }
-      }
-    `,
-  )
-
-  const handleSuccess = (token: string) => {
-    localStorage.setItem(AUTH_TOKEN_KEY, token)
-    history.push('/profile')
-  }
-
-  // Handle a completed log-in flow
-  if (logInReqMeta.called && !logInReqMeta.loading) {
-    if (logInReqMeta.data) {
-      handleSuccess(logInReqMeta.data.login.token)
-    }
-  }
-
-  // Handle a completed sign-up flow
-  if (signUpReqMeta.called && !signUpReqMeta.loading) {
-    if (signUpReqMeta.data) {
-      handleSuccess(signUpReqMeta.data.signup.token)
-    }
+  if (loggedIn) {
+    // Redirect user to where they came from or, by default, /profile
+    history.replace(location.state?.from ?? { pathname: '/profile' })
+    return null
   }
 
   return (
@@ -99,7 +65,7 @@ const LoginPage = () => {
 
         <Box display="flex" flexDirection="column">
           {mode === 'signup' && [
-            <Box mb="20px">
+            <Box key="first" mb="20px">
               <Input
                 required
                 name="firstName"
@@ -110,7 +76,7 @@ const LoginPage = () => {
                 placeholder="John"
               />
             </Box>,
-            <Box mb="20px">
+            <Box key="last" mb="20px">
               <Input
                 required
                 name="lastName"
@@ -154,13 +120,8 @@ const LoginPage = () => {
             width="full"
             onClick={
               {
-                login: () => logIn({ variables: { email, password } }),
-                signup: () =>
-                  signUp({
-                    variables: {
-                      data: { email, password, firstName, lastName },
-                    },
-                  }),
+                login: () => logIn({ email, password }),
+                signup: () => signUp({ email, password, firstName, lastName }),
               }[mode]
             }
           >
@@ -188,8 +149,9 @@ const LoginPage = () => {
             }
           </Link>
           {mode === 'login' && [
-            <Body>or</Body>,
+            <Body key="body">or</Body>,
             <Button
+              key="button"
               width="full"
               variant="primary"
               onClick={() => setMode('signup')}
