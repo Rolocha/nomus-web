@@ -1,12 +1,23 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { css } from '@emotion/core'
 
 import Box from 'components/Box'
+import { InternalLink } from 'components/Link'
 import Logo from 'components/Logo'
 import * as SVG from 'components/SVG'
 
 interface Props {}
+
+const buttonStyles = css`
+  padding: 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  svg {
+    height: 1em;
+    margin-right: 5px;
+  }
+`
 
 const Navbar = (props: Props) => (
   <Box
@@ -19,18 +30,26 @@ const Navbar = (props: Props) => (
   >
     <Logo />
     <Box
+      display="flex"
       css={css`
-        & > * {
-          padding: 0 10px;
+        & > *:not(:last-child) {
+          margin-right: 10px;
         }
       `}
     >
-      <Link to="/cart">
-        <SVG.Cart />
-      </Link>
-      <Link to="/login">
-        <SVG.Profile />
-      </Link>
+      <InternalLink
+        to="/shop"
+        asButton
+        buttonStyle="primary"
+        css={buttonStyles}
+      >
+        <SVG.Cart color="white" />
+        Shop
+      </InternalLink>
+      <InternalLink to="/login" asButton buttonStyle="blue" css={buttonStyles}>
+        <SVG.Profile color="white" />
+        Sign in
+      </InternalLink>
     </Box>
   </Box>
 )

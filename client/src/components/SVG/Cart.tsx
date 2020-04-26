@@ -2,13 +2,7 @@ import * as React from 'react'
 import { SVGProps } from './types'
 
 const Cart = ({ color }: SVGProps) => (
-  <svg
-    width="35"
-    height="34"
-    viewBox="0 0 35 34"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 0 35 34" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g>
       <path
         d="M10.7162 21.0678C10.3852 21.0678 10.0895 20.8329 10.0262 20.498L6.38604 1.40265H0.704084C0.315077 1.40265 0 1.08881 0 0.701325C0 0.313843 0.315077 0 0.704084 0H6.97043C7.30839 0 7.59882 0.240204 7.66219 0.569826L11.4097 20.235C11.4818 20.6154 11.2319 20.9819 10.8499 21.0555C10.8042 21.0643 10.7602 21.0678 10.7162 21.0678Z"
