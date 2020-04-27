@@ -2,17 +2,14 @@ version: "3"
 
 services:
   nginx:
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 1234:80
       - 1235:443
   server:
     build:
       context: ./server
-      args:
-        - ENV
     ports:
+      - 3000:3000 # app server port
       - 9222:9222 # debugging port
     env_file: .env
     command: yarn dev
@@ -21,13 +18,21 @@ services:
       - /server/node_modules/
       - ./server:/server
   client:
+    container_name: rolocha-client
     build:
       context: ./client
       args:
         - ENV
     env_file: .env
+    ports:
+      - 4000:4000 # webpack server port
+    networks:
+      - app-network
     command: yarn dev
     volumes:
       # Mirror local code but not node_modules
       - /client/node_modules/
       - ./client:/client
+  db:
+    ports:
+      - 27017:27017
