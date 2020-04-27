@@ -22,7 +22,7 @@
     "build": "webpack --mode production",
     "build-dev": "webpack --progress --mode development",
     "dev": "webpack --watch --mode development",
-    "serve": "yarn build && node dist"
+    "serve": "node dist"
   },
   "eslintConfig": {
     "extends": "react-app"
