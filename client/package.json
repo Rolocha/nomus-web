@@ -91,11 +91,7 @@
   "scripts": {
     "dev": "PORT=4000 node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js",
-    "serve": "http-server build -p 4000",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "serve-storybook": "http-server storybook-static -p 6006"
+    "test": "node scripts/test.js"
   },
   "eslintConfig": {
     "extends": "react-app"
