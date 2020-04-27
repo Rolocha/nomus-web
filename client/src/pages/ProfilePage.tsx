@@ -1,8 +1,8 @@
 import * as React from 'react'
 
-import { useQuery, gql } from 'apollo'
-import Container from 'components/Container'
-import LoadingPage from 'pages/LoadingPage'
+import { useQuery, gql } from 'src/apollo'
+import Container from 'src/components/Container'
+import LoadingPage from 'src/pages/LoadingPage'
 
 interface UserResponse {}
 

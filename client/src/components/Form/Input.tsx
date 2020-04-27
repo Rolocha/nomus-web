@@ -21,9 +21,9 @@ import {
   LineHeightProps,
 } from 'styled-system'
 
-import Box from 'components/Box'
+import Box from 'src/components/Box'
 import Label from './Label'
-import theme from 'styles/theme'
+import theme from 'src/styles/theme'
 
 type InputElementProps = {
   as?: string

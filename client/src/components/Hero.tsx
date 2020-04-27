@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
 
-import { Heading, Body, Caption } from 'components/Text'
-import Box from 'components/Box'
-import Image from 'components/Image'
-import * as SVG from 'components/SVG'
-import Button from 'components/Button'
-import { colors } from 'styles'
+import { Heading, Body, Caption } from 'src/components/Text'
+import Box from 'src/components/Box'
+import Image from 'src/components/Image'
+import * as SVG from 'src/components/SVG'
+import Button from 'src/components/Button'
+import { colors } from 'src/styles'
 
-import heroImage from 'images/hero-image.png'
+import heroImage from 'src/images/hero-image.png'
 
 // There are two layouts for the Hero, split across the lg breakpoint
 // _: < .lg breakpoint - image over text

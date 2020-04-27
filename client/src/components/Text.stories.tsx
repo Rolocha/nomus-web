@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Text from 'components/Text'
+import * as Text from 'src/components/Text'
 
 export default {
   title: 'Text',

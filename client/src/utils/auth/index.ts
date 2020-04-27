@@ -1,5 +1,5 @@
 import { AuthManager, BaseAuthData, BaseJWTBody } from './auth-manager'
-import { AUTH_TOKEN_KEY } from 'config'
+import { AUTH_TOKEN_KEY } from 'src/config'
 
 // Needs to stay in sync with the enum at server/src/models/User.ts
 export enum Role {

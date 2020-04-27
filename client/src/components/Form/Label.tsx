@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 
-import theme from 'styles/theme'
+import theme from 'src/styles/theme'
 import { LabelHTMLAttributes } from 'react'
 
 export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {}

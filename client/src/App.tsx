@@ -4,9 +4,9 @@ import { ThemeProvider } from 'emotion-theming'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
-import { client as apolloClient, ApolloProvider } from 'apollo'
-import { PageRouter } from 'pages'
-import theme from 'styles/theme'
+import { client as apolloClient, ApolloProvider } from 'src/apollo'
+import { PageRouter } from 'src/pages'
+import theme from 'src/styles/theme'
 
 AOS.init()
 

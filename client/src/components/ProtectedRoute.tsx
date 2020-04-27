@@ -1,8 +1,8 @@
 import React from 'react'
 import { Route, Redirect, useLocation } from 'react-router-dom'
 
-import { AuthLevel } from 'config'
-import { useAuth } from 'utils/auth'
+import { AuthLevel } from 'src/config'
+import { useAuth } from 'src/utils/auth'
 
 interface Props {
   component: React.ElementType<any>

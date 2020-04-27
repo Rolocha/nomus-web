@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
 
-import { colors } from 'styles'
+import { colors } from 'src/styles'
 import { SVGProps } from './types'
 
 const NetworkIllustration = ({ color, color2 }: SVGProps) => (

@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Container from 'components/Container'
-import { Body } from 'components/Text'
+import Container from 'src/components/Container'
+import { Body } from 'src/components/Text'
 
 export default {
   title: 'Container',
