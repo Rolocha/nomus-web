@@ -6,8 +6,7 @@ services:
       - 1234:80
       - 1235:443
   server:
-    build:
-      context: ./server
+    build: ./server
     ports:
       - 3000:3000 # app server port
       - 9222:9222 # debugging port
@@ -19,10 +18,7 @@ services:
       - ./server:/server
   client:
     container_name: rolocha-client
-    build:
-      context: ./client
-      args:
-        - ENV
+    build: ./client
     env_file: .env
     ports:
       - 4000:4000 # webpack server port

@@ -1,5 +1,4 @@
 FROM node:12
-ARG ENV
 
 WORKDIR /client
 
@@ -10,7 +9,4 @@ RUN yarn --production=false
 
 COPY . .
 
-RUN if [ $ENV = "staging" ] || [ $ENV = "production" ]; \
-  then yarn global add http-server; \
-  yarn build;  \
-  fi
+CMD ["yarn", "dev"]
