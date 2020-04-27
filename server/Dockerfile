@@ -17,7 +17,7 @@ COPY . .
 # during image build time so that we're not doing it at
 # container startup (which would cause significant down-time)
 RUN if [ $ENV = "staging" ] || [ $ENV = "production" ]; \
-  yarn build;  \
+  then yarn build;  \
   fi
 
 CMD ["yarn", "serve"]
