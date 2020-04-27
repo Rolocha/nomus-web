@@ -86,12 +86,12 @@ export class AuthManager<
     this.expirationHeadstart = expirationHeadstart ? ms(expirationHeadstart) : 0
   }
 
-  public async getToken() {
+  public getToken = async () => {
     await this.refreshTokenIfNeeded()
     return localStorage.getItem(this.tokenStorageKey)
   }
 
-  public useAuth() {
+  public useAuth = () => {
     const [authData, setAuthData] = useState<AuthData | null>(this.authData)
 
     // Configure a React effect that will update the hook consumer with new authData
