@@ -1,10 +1,10 @@
 local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
-// local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
-local STAGING_DEPLOY_CONDITION = { "branch": ["generic-authmanager"] };
+local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
+local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 
-local publish(app, env, when) = {
+local publishDockerImage(app, env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
   "when": when,
@@ -21,7 +21,7 @@ local publish(app, env, when) = {
       "from_secret": "AWS_SECRET_ACCESS_KEY"
     },
     "region": "us-east-1",
-    "registry": "074552482398.dkr.ecr.us-east-1.amazonaws.com",
+    "registry": ECR_REGISTRY,
     "repo": "rolocha/" + app,
     "tags": [
       env + "-latest"
@@ -29,7 +29,7 @@ local publish(app, env, when) = {
   },
 };
 
-local deploy(env, host, when) = {
+local deployEC2(env, host, when) = {
   "name": "deploy " + env,
   "image": "appleboy/drone-ssh",
   "when": when,
@@ -64,7 +64,7 @@ local buildClient(when) = {
   ]
 };
 
-local deployClient(when) = {
+local syncToBucket(when) = {
   "name": "deploy client to S3",
   "image": "plugins/s3-sync:1",
   "when": when,
@@ -76,7 +76,7 @@ local deployClient(when) = {
     "secret_key": {
       "from_secret": "AWS_SECRET_ACCESS_KEY",
     },
-    "source": "client/public",
+    "source": "client/build",
     "target": "/",
     "delete": true
   },
@@ -90,11 +90,18 @@ local deployClient(when) = {
     "type": "docker",
     "name": "client",
     "steps": [
-      // publish("client", "staging", STAGING_DEPLOY_CONDITION),
-      // publish("client", "production", PRODUCTION_DEPLOY_CONDITION)
-      // buildClient(STAGING_DEPLOY_CONDITION),
-      deployClient(STAGING_DEPLOY_CONDITION)
+      buildClient(STAGING_DEPLOY_CONDITION),
+      syncToBucket(STAGING_DEPLOY_CONDITION)
+    ],
+  },
+
+  {
+    "kind": "pipeline",
+    "type": "docker",
+    "name": "server",
+    "steps": [
+      publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
+      deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
     ],
   }
-
 ]
