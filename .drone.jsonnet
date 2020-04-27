@@ -66,7 +66,7 @@ local buildClient(when) = {
 
 local deployClient(when) = {
   "name": "deploy client to S3",
-  "image": "plugins/s3",
+  "image": "plugins/s3-sync:1",
   "when": when,
   "settings": {
     "bucket": "stage.rolocha.com",
@@ -76,8 +76,9 @@ local deployClient(when) = {
     "secret_key": {
       "from_secret": "AWS_SECRET_ACCESS_KEY",
     },
-    "source": "client/build",
-    "target": "/"
+    "source": "client/public",
+    "target": "/",
+    "delete": true
   },
 };
 
@@ -91,7 +92,7 @@ local deployClient(when) = {
     "steps": [
       // publish("client", "staging", STAGING_DEPLOY_CONDITION),
       // publish("client", "production", PRODUCTION_DEPLOY_CONDITION)
-      buildClient(STAGING_DEPLOY_CONDITION),
+      // buildClient(STAGING_DEPLOY_CONDITION),
       deployClient(STAGING_DEPLOY_CONDITION)
     ],
   }
