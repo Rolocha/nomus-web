@@ -111,8 +111,8 @@ export class AuthManager<
         authData,
         authData ? this.parseJWT(authData.accessToken) : null,
       ),
-      logIn: this.logIn,
-      signUp: this.signUp,
+      logIn: this.logInAndSaveAuth,
+      signUp: this.signUpAndSaveAuth,
       refreshToken: this.refreshToken,
     }
   }
@@ -147,6 +147,16 @@ export class AuthManager<
 
   private notifyListeners(authData: AuthData | null) {
     this.listeners.forEach((l) => l(authData))
+  }
+
+  private logInAndSaveAuth = async (args: LoginArgs) => {
+    const response = await this.logIn(args)
+    this.updateAuthData(response)
+  }
+
+  private signUpAndSaveAuth = async (args: LoginArgs) => {
+    const response = await this.logIn(args)
+    this.updateAuthData(response)
   }
 
   private isExpired(token: AccessTokenBody) {
