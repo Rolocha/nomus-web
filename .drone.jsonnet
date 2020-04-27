@@ -59,6 +59,7 @@ local buildClient(when) = {
   "commands": [
     "yarn --version",
     "cd client",
+    "yarn install --production=false",
     "yarn build"
   ]
 };
