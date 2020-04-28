@@ -1,6 +1,8 @@
 import * as express from 'express'
+import jwt from 'jsonwebtoken'
 
 import { User, Token } from 'src/models'
+import { Role } from 'src/models/User'
 import { getUserFromToken } from './util'
 
 const authRouter = express.Router()
@@ -11,9 +13,33 @@ interface ServerErrorResponse {
 
 type Failable<T> = T | ServerErrorResponse
 
+interface TokenBody {
+  exp: number
+  roles: Role[]
+}
+
 interface AuthResponse {
-  accessToken: string
-  refreshToken: string
+  tokenExp: number
+  roles: Role[]
+}
+
+const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
+const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
+
+const getPublicResponseForAccessToken = (accessToken: string) => {
+  const accessTokenBody = jwt.decode(accessToken) as TokenBody
+  return {
+    tokenExp: accessTokenBody.exp,
+    roles: accessTokenBody.roles,
+  }
+}
+
+const setCookies = (res: express.Response, accessToken: string, refreshToken?: string) => {
+  // TODO: Add secure: true once we have HTTPS set up
+  res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, { httpOnly: true })
+  if (refreshToken) {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, { httpOnly: true, path: '/auth/refresh' })
+  }
 }
 
 authRouter.post('/login', async (req, res: express.Response<Failable<AuthResponse>>) => {
@@ -22,10 +48,9 @@ authRouter.post('/login', async (req, res: express.Response<Failable<AuthRespons
     const user = await User.mongo.findByCredentials(email, password)
     const accessToken = user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
-    res.json({
-      accessToken,
-      refreshToken,
-    })
+
+    setCookies(res, accessToken, refreshToken)
+    res.json(getPublicResponseForAccessToken(accessToken))
   } catch (err) {
     console.log(err)
     res.status(500).end()
@@ -46,68 +71,61 @@ authRouter.post('/signup', async (req, res: express.Response<Failable<AuthRespon
     })
     const accessToken = user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
-    res.json({
-      accessToken,
-      refreshToken,
-    })
+
+    setCookies(res, accessToken, refreshToken)
+    res.json(getPublicResponseForAccessToken(accessToken))
   } catch (err) {
     console.log(err)
     res.status(500).end()
   }
 })
 
-authRouter.post(
-  '/refresh',
-  async (req, res: express.Response<Failable<{ accessToken: string }>>) => {
-    const { refreshToken } = req.body
-
-    // Find the user from the token
-    const authHeader = req.header('Authorization')
-    if (authHeader == null || authHeader.trim() === '' || !authHeader.startsWith('Bearer ')) {
-      res.status(401).end()
-      return
-    }
-    const token = authHeader.replace(/^Bearer /, '')
-    // Ignoring expiration here because we expect it to be expired -- that's why they're refreshing
-    const userResult = await getUserFromToken(token, { ignoreExpiration: true })
-    if (!userResult.isSuccess) {
-      res.status(500).end()
-      return
-    }
-    const user = userResult.getValue()
-
-    let tokenObject: Token
-    try {
-      // Verify there exists a valid refresh token for this user matching the one they just sent
-      tokenObject = await Token.mongo.findOne({ value: refreshToken, client: user._id })
-      if (!tokenObject.isValid()) {
-        throw new Error()
-      }
-    } catch (err) {
-      res.status(400).json({
-        message: 'Invalid refresh token',
-      })
-    }
-
-    const accessToken = user.generateAccessToken()
-    res.json({ accessToken })
+authRouter.post('/refresh', async (req, res: express.Response<Failable<AuthResponse>>) => {
+  const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
+  const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
+  if (token == null || token.trim() === '' || refreshToken == null || refreshToken.trim() === '') {
+    res.status(401).end()
+    return
   }
-)
+  // Find the user from the token
+  // Ignoring expiration here because we expect it to be expired -- that's why they're refreshing
+  const userResult = await getUserFromToken(token, { ignoreExpiration: true })
+  if (!userResult.isSuccess) {
+    res.status(500).end()
+    return
+  }
+  const user = userResult.getValue()
+
+  let tokenObject: Token
+  try {
+    // Verify there exists a valid refresh token for this user matching the one they just sent
+    tokenObject = await Token.mongo.findOne({ value: refreshToken, client: user._id })
+    if (!tokenObject.isValid()) {
+      throw new Error()
+    }
+  } catch (err) {
+    res.status(400).json({
+      message: 'Invalid refresh token',
+    })
+  }
+
+  const accessToken = user.generateAccessToken()
+  setCookies(res, accessToken)
+  res.json(getPublicResponseForAccessToken(accessToken))
+})
 
 export const authMiddleware = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const authHeader = req.header('Authorization')
-  if (authHeader == null || authHeader.trim() === '') {
+  const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
+  if (token == null || token.trim() === '') {
     // Request not attempting authentication so let it through without attaching a user
     // Query will automatically fail if a user/roles are required
     next()
     return
   }
-
-  const token = authHeader.replace(/^Bearer /, '')
   const userResult = await getUserFromToken(token)
   if (!userResult.isSuccess) {
     switch (userResult.error.name) {
