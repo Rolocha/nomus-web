@@ -1,13 +1,7 @@
 import * as React from 'react'
 import { render, act } from '@testing-library/react'
-import jwt from 'jsonwebtoken'
 
-import {
-  AuthManager,
-  AuthManagerOptions,
-  BaseAuthData,
-  BaseJWTBody,
-} from './auth-manager'
+import { AuthManager, AuthManagerOptions, BaseAuthData } from './auth-manager'
 
 enum Role {
   User = 'user',
@@ -31,25 +25,22 @@ interface UseAuthOutput {
   userRoles: Role[] | null
 }
 
-interface JWTBody extends BaseJWTBody {
-  _id: string
+interface AuthData extends BaseAuthData {
   roles: Role[]
 }
 
-const JWT_SECRET_KEY = 'whatever'
-const makeMockAuthData = (exp?: string) => ({
-  accessToken: jwt.sign(
-    {
-      _id: 'fakeId',
-      roles: ['user'],
-    },
-    JWT_SECRET_KEY,
-    { expiresIn: exp ?? '15m' },
-  ),
-  refreshToken: 'fakeRefreshToken',
-})
+const AUTH_DATA_KEY = 'AUTH_DATA'
 
-const TOKEN_STORAGE_KEY = 'authData'
+const makeExpTimeInSeconds = (secondsFromNow: number) =>
+  (Date.now() + secondsFromNow * 1000) / 1000
+
+const makeMockAuthData = ({
+  tokenExp,
+  roles,
+}: Partial<AuthData> = {}): AuthData => ({
+  tokenExp: tokenExp ?? makeExpTimeInSeconds(15 * 60), // in 15 minutes
+  roles: roles ?? [Role.User],
+})
 
 const setup = (useAuth: () => any) => {
   const returnVal = {}
@@ -68,25 +59,13 @@ const makeTestManager = ({
   makeUseAuthOutput,
   expirationHeadstart,
 }: Partial<
-  AuthManagerOptions<
-    LoginArgs,
-    SignupArgs,
-    UseAuthOutput,
-    BaseAuthData,
-    JWTBody
-  >
+  AuthManagerOptions<LoginArgs, SignupArgs, UseAuthOutput, AuthData>
 > = {}) => {
   const mockAuthData = makeMockAuthData()
-  return new AuthManager<
-    LoginArgs,
-    SignupArgs,
-    UseAuthOutput,
-    BaseAuthData,
-    JWTBody
-  >({
+  return new AuthManager<LoginArgs, SignupArgs, UseAuthOutput, AuthData>({
     expirationHeadstart: expirationHeadstart ?? '0',
-    tokenStorageKey: TOKEN_STORAGE_KEY,
-    refreshToken: refreshToken ?? jest.fn().mockResolvedValue(''),
+    authDataKey: AUTH_DATA_KEY,
+    refreshToken: refreshToken ?? jest.fn().mockResolvedValue(mockAuthData),
     logIn: logIn ?? jest.fn().mockResolvedValue(mockAuthData),
     signUp: signUp ?? jest.fn().mockResolvedValue(mockAuthData),
     makeUseAuthOutput: makeUseAuthOutput ?? jest.fn().mockReturnValue({}),
@@ -191,7 +170,7 @@ describe('AuthManager', () => {
 
     it('passes the data you specify in makeUseAuthOutput through useAuth', () => {
       const am = makeTestManager({
-        makeUseAuthOutput: (authData, parsedJWT) => ({
+        makeUseAuthOutput: (authData) => ({
           userRoles: [Role.User],
         }),
       })
@@ -200,51 +179,56 @@ describe('AuthManager', () => {
       >
 
       const useAuthResult = useAuthResultGetter()
-      expect(useAuthResult.userRoles).toContain('user')
+      expect(useAuthResult.userRoles).toContain(Role.User)
     })
   })
 
-  describe('getToken', () => {
-    it('returns null when no token present locally', async () => {
+  describe('getAuthData', () => {
+    it('returns null when no auth data present locally', async () => {
       const am = makeTestManager({
         logIn: jest.fn(),
       })
 
-      const token = await am.getToken()
+      const token = await am.getAuthData()
       expect(token).toBeNull()
     })
 
-    it("returns the token without doing a refresh when it exists and isn't about to expire", async () => {
+    it("returns the data without doing a refresh when it exists and isn't about to expire", async () => {
       const mockAuthData = makeMockAuthData()
-      localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(mockAuthData))
+      localStorage.setItem(AUTH_DATA_KEY, JSON.stringify(mockAuthData))
 
+      const refreshToken = jest.fn()
       const am = makeTestManager({
         logIn: jest.fn(),
+        refreshToken,
       })
 
-      const token = await am.getToken()
-      expect(am['refreshToken']).not.toHaveBeenCalled()
-      expect(token).toBe(mockAuthData.accessToken)
+      const authData = await am.getAuthData()
+      expect(refreshToken).not.toHaveBeenCalled()
+      expect(authData).toMatchObject(mockAuthData)
     })
 
-    it('returns the token after doing a refresh when it exists but is about to expire', async () => {
+    it('returns the data after doing a refresh when it exists but is about to expire', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
-      const mockAuthDataThatExpiresSoon = makeMockAuthData('9s')
+      const mockAuthDataThatExpiresSoon = makeMockAuthData({
+        tokenExp: makeExpTimeInSeconds(9),
+      })
       localStorage.setItem(
-        TOKEN_STORAGE_KEY,
+        AUTH_DATA_KEY,
         JSON.stringify(mockAuthDataThatExpiresSoon),
       )
 
-      const refreshToken = jest.fn().mockResolvedValue('newAccessToken')
+      const newAuthData = makeMockAuthData()
+      const refreshToken = jest.fn().mockResolvedValue(newAuthData)
       const am = makeTestManager({
         logIn: jest.fn(),
         refreshToken,
         expirationHeadstart: '10s',
       })
 
-      const token = await am.getToken()
+      const authData = await am.getAuthData()
       expect(refreshToken).toHaveBeenCalled()
-      expect(token).toBe('newAccessToken')
+      expect(authData).toMatchObject(newAuthData)
     })
   })
 })

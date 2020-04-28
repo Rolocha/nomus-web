@@ -1,5 +1,5 @@
-import { AuthManager, BaseAuthData, BaseJWTBody } from './auth-manager'
-import { AUTH_TOKEN_KEY } from 'src/config'
+import { AuthManager, BaseAuthData } from './auth-manager'
+import { AUTH_DATA_KEY } from 'src/config'
 
 // Needs to stay in sync with the enum at server/src/models/User.ts
 export enum Role {
@@ -25,58 +25,47 @@ export interface UseAuthOutput {
   userRoles: Role[] | null
 }
 
-export interface JWTBody extends BaseJWTBody {
-  _id: string
+export interface AuthData extends BaseAuthData {
   roles: Role[]
 }
 
-const jsonFetch = async (
-  method: string,
-  route: string,
-  body: object,
-  token?: string,
-) => {
-  const headers: { [key: string]: string } = {
-    'Content-Type': 'application/json',
-  }
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-  const res = await fetch(route, {
+const jsonFetch = async (method: string, route: string, body?: object) => {
+  const options: any = {
     method,
-    body: JSON.stringify(body),
-    headers,
-  })
-  return await res.json()
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+  if (body) {
+    options.body = JSON.stringify(body)
+  }
+  const res = await fetch(route, options)
+  if (res.status === 200) {
+    return await res.json()
+  } else {
+    throw new Error(`${method.toUpperCase()} ${route} failed`)
+  }
 }
 
 const authManager = new AuthManager<
   LoginArgs,
   SignupArgs,
   UseAuthOutput,
-  BaseAuthData,
-  JWTBody
+  AuthData
 >({
   expirationHeadstart: '10s',
-  tokenStorageKey: AUTH_TOKEN_KEY,
-  refreshToken: async ({ accessToken, refreshToken }): Promise<string> => {
-    const response = await jsonFetch(
-      'post',
-      '/auth/refresh',
-      { refreshToken },
-      accessToken,
-    )
-    return response.accessToken
-  },
+  authDataKey: AUTH_DATA_KEY,
+  refreshToken: () => jsonFetch('post', '/auth/refresh'),
   logIn: (args: LoginArgs) => jsonFetch('post', '/auth/login', args),
   signUp: (args: SignupArgs) => jsonFetch('post', '/auth/signup', args),
-  makeUseAuthOutput: (authData, parsedToken) => {
+  makeUseAuthOutput: (authData) => {
     return {
       loggedIn: authData != null,
-      userRoles: parsedToken ? parsedToken.roles : null,
+      userRoles: authData ? authData.roles : null,
     }
   },
 })
 
 export const useAuth = authManager.useAuth
-export const getToken = authManager.getToken
+export const getAuthData = authManager.getAuthData
+export const ensureActiveToken = authManager.ensureActiveToken
