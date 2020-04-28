@@ -120,6 +120,14 @@ local ALWAYS_CONDITION = {};
       build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket(STAGING_DEPLOY_CONDITION)
     ],
+    "trigger": {
+      "event": {
+        "include": [
+          "push",
+          "custom"
+        ]
+      },
+    },
   },
 
   {
@@ -130,5 +138,13 @@ local ALWAYS_CONDITION = {};
       publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
     ],
+    "trigger": {
+      "event": {
+        "include": [
+          "push",
+          "custom"
+        ]
+      },
+    },
   }
 ]
