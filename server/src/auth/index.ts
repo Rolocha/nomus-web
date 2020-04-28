@@ -84,27 +84,20 @@ authRouter.post('/refresh', async (req, res: express.Response<Failable<AuthRespo
   const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
   if (token == null || token.trim() === '' || refreshToken == null || refreshToken.trim() === '') {
-    res.status(401).end()
-    return
+    return res.status(401).end()
   }
   // Find the user from the token
   // Ignoring expiration here because we expect it to be expired -- that's why they're refreshing
   const userResult = await getUserFromToken(token, { ignoreExpiration: true })
   if (!userResult.isSuccess) {
-    res.status(500).end()
-    return
+    return res.status(500).end()
   }
   const user = userResult.getValue()
 
-  let tokenObject: Token
-  try {
-    // Verify there exists a valid refresh token for this user matching the one they just sent
-    tokenObject = await Token.mongo.findOne({ value: refreshToken, client: user._id })
-    if (!tokenObject.isValid()) {
-      throw new Error()
-    }
-  } catch (err) {
-    res.status(400).json({
+  // Check if the specified refresh token exists and belongs to this user
+  const isTokenValid = await Token.mongo.verify(refreshToken, user._id)
+  if (!isTokenValid) {
+    return res.status(400).json({
       message: 'Invalid refresh token',
     })
   }
