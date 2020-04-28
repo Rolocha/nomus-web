@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
 
-import Box from 'components/Box'
-import { InternalLink } from 'components/Link'
-import Logo from 'components/Logo'
-import * as SVG from 'components/SVG'
+import Box from 'src/components/Box'
+import { InternalLink } from 'src/components/Link'
+import Logo from 'src/components/Logo'
+import * as SVG from 'src/components/SVG'
 
 interface Props {}
 

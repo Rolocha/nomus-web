@@ -19,10 +19,10 @@
     "uuid-mongodb": "^2.1.3"
   },
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "webpack --mode none",
     "build-dev": "webpack --progress --mode development",
     "dev": "webpack --watch --mode development",
-    "serve": "yarn build && node dist"
+    "serve": "node dist"
   },
   "eslintConfig": {
     "extends": "react-app"

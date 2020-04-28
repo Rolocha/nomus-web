@@ -1,9 +1,10 @@
+// Constants
+
 local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
-local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
-local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
 
-local publish(app, env, when) = {
+local publishDockerImage(app, env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
   "when": when,
@@ -20,7 +21,7 @@ local publish(app, env, when) = {
       "from_secret": "AWS_SECRET_ACCESS_KEY"
     },
     "region": "us-east-1",
-    "registry": "074552482398.dkr.ecr.us-east-1.amazonaws.com",
+    "registry": ECR_REGISTRY,
     "repo": "rolocha/" + app,
     "tags": [
       env + "-latest"
@@ -28,7 +29,7 @@ local publish(app, env, when) = {
   },
 };
 
-local deploy(env, host, when) = {
+local deployEC2(env, host, when) = {
   "name": "deploy " + env,
   "image": "appleboy/drone-ssh",
   "when": when,
@@ -51,6 +52,61 @@ local deploy(env, host, when) = {
   },
 };
 
+local installNodeModules(app, when) = {
+  "name": "install dependencies",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn install --production=false",
+  ],
+};
+
+local test(app, when) = {
+  "name": "test",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn test"
+  ],
+};
+
+local build(app, when) = {
+  "name": "build client",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn install --production=false",
+    "yarn build"
+  ]
+};
+
+local syncToBucket(when) = {
+  "name": "deploy client to S3",
+  "image": "plugins/s3-sync:1",
+  "when": when,
+  "settings": {
+    "bucket": "stage.rolocha.com",
+    "access_key": {
+      "from_secret": "AWS_ACCESS_KEY_ID"
+    },
+    "secret_key": {
+      "from_secret": "AWS_SECRET_ACCESS_KEY",
+    },
+    "source": "client/build",
+    "target": "/",
+    "delete": true
+  },
+};
+
+// Deployment conditionals
+local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
+local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local ALWAYS_CONDITION = {};
+
+
 // Pipelines begin here
 
 [
@@ -59,9 +115,19 @@ local deploy(env, host, when) = {
     "type": "docker",
     "name": "client",
     "steps": [
-      publish("client", "staging", STAGING_DEPLOY_CONDITION),
-      publish("client", "production", PRODUCTION_DEPLOY_CONDITION)
+      installNodeModules("client", ALWAYS_CONDITION),
+      test("client", ALWAYS_CONDITION),
+      build("client", STAGING_DEPLOY_CONDITION),
+      syncToBucket(STAGING_DEPLOY_CONDITION)
     ],
+    "trigger": {
+      "event": {
+        "include": [
+          "push",
+          "custom"
+        ]
+      },
+    },
   },
 
   {
@@ -69,22 +135,16 @@ local deploy(env, host, when) = {
     "type": "docker",
     "name": "server",
     "steps": [
-      publish("server", "staging", STAGING_DEPLOY_CONDITION),
-      publish("server", "production", PRODUCTION_DEPLOY_CONDITION)
+      publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
+      deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
     ],
-  },
-
-  {
-    "kind": "pipeline",
-    "type": "docker",
-    "name": "deploy",
-    "depends_on": [
-      "client",
-      "server"
-    ],
-    "steps": [
-      deploy("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
-      deploy("production", PRODUCTION_EC2_HOST, PRODUCTION_DEPLOY_CONDITION)
-    ],
+    "trigger": {
+      "event": {
+        "include": [
+          "push",
+          "custom"
+        ]
+      },
+    },
   }
 ]

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Box from 'components/Box'
-import Spinner from 'components/Spinner'
+import Box from 'src/components/Box'
+import Spinner from 'src/components/Spinner'
 
 interface Props {
   className?: string

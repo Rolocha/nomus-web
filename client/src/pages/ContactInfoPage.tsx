@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
-import { useQuery, gql } from 'apollo'
-import LoadingPage from 'pages/LoadingPage'
+import { useQuery, gql } from 'src/apollo'
+import LoadingPage from 'src/pages/LoadingPage'
 import {
   ContactPageQuery,
   ContactPageQueryVariables,
-} from 'apollo/types/ContactPageQuery'
-import Container from 'components/Container'
-import Box from 'components/Box'
-import Button from 'components/Button'
-import Image from 'components/Image'
-import Navbar from 'components/Navbar'
-import { downloadFile } from 'utils/download'
+} from 'src/apollo/types/ContactPageQuery'
+import Container from 'src/components/Container'
+import Box from 'src/components/Box'
+import Button from 'src/components/Button'
+import Image from 'src/components/Image'
+import Navbar from 'src/components/Navbar'
+import { downloadFile } from 'src/utils/download'
 
 interface UrlParams {
   username?: string

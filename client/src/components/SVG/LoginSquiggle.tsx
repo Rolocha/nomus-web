@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { SVGProps } from './types'
-import { colors } from 'styles'
+import { colors } from 'src/styles'
 
 const LoginSquiggle = ({ color, className }: SVGProps) => (
   <svg

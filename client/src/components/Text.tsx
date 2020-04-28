@@ -16,7 +16,7 @@ import {
   variant,
 } from 'styled-system'
 
-import theme from 'styles/theme'
+import theme from 'src/styles/theme'
 
 export type TextProps = {
   variant?: keyof typeof theme.textStyles

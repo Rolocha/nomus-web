@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { colors } from 'styles'
-import { SVGProps } from 'components/SVG/types'
+import { colors } from 'src/styles'
+import { SVGProps } from 'src/components/SVG/types'
 
 const Logo = ({ className, width }: SVGProps) => (
   <svg

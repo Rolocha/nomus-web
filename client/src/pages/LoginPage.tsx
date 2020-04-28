@@ -2,14 +2,14 @@ import * as React from 'react'
 import { css } from '@emotion/core'
 import { useHistory, useLocation } from 'react-router-dom'
 
-import { useAuth } from 'utils/auth'
-import { Body, Link } from 'components/Text'
-import Container from 'components/Container'
-import Button from 'components/Button'
-import Box from 'components/Box'
-import Input from 'components/Form/Input'
-import Logo from 'components/Logo'
-import { LoginSquiggle } from 'components/SVG'
+import { useAuth } from 'src/utils/auth'
+import { Body, Link } from 'src/components/Text'
+import Container from 'src/components/Container'
+import Button from 'src/components/Button'
+import Box from 'src/components/Box'
+import Input from 'src/components/Form/Input'
+import Logo from 'src/components/Logo'
+import { LoginSquiggle } from 'src/components/SVG'
 
 const LoginPage = () => {
   const [mode, setMode] = React.useState<'login' | 'signup'>('login')

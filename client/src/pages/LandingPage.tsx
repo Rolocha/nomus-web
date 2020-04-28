@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
 
-import Box from 'components/Box'
-import Image from 'components/Image'
-import Button from 'components/Button'
-import Navbar from 'components/Navbar'
-import Hero from 'components/Hero'
-import SplitRowContent, { bp } from 'components/SplitRowContent'
-import { Heading, Body } from 'components/Text'
-import * as SVG from 'components/SVG'
-import profilePagePreview1 from 'images/profile-page-preview-1.png'
-import profilePagePreview2 from 'images/profile-page-preview-2.png'
-import { mq } from 'styles/breakpoints'
+import Box from 'src/components/Box'
+import Image from 'src/components/Image'
+import Button from 'src/components/Button'
+import Navbar from 'src/components/Navbar'
+import Hero from 'src/components/Hero'
+import SplitRowContent, { bp } from 'src/components/SplitRowContent'
+import { Heading, Body } from 'src/components/Text'
+import * as SVG from 'src/components/SVG'
+import profilePagePreview1 from 'src/images/profile-page-preview-1.png'
+import profilePagePreview2 from 'src/images/profile-page-preview-2.png'
+import { mq } from 'src/styles/breakpoints'
 
 const LandingPage = () => {
   return (

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { colors, animations } from 'styles'
+import { colors, animations } from 'src/styles'
 
 const Spinner = styled.div`
   width: 50px;

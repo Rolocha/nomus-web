@@ -4,7 +4,7 @@ import { User, Role } from 'src/models/User'
 
 @Resolver()
 class UserResolver {
-  @Authorized(Role.USER, Role.ADMIN)
+  @Authorized(Role.User, Role.Admin)
   @Query(() => User)
   currentUser(@Ctx() context: IApolloContext) {
     if (context.user) {

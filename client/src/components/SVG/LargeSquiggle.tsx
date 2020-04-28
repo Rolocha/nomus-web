@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { SVGProps } from './types'
-import { colors } from 'styles'
+import { colors } from 'src/styles'
 
 const LargeSquiggle = ({ color, className }: SVGProps) => (
   <svg

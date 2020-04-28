@@ -2,8 +2,8 @@ import styled from '@emotion/styled'
 import { variant } from 'styled-system'
 import { Link as ReactRouterLink } from 'react-router-dom'
 
-import * as buttonlikeStyles from 'styles/components/buttonlike'
-import theme from 'styles/theme'
+import * as buttonlikeStyles from 'src/styles/components/buttonlike'
+import theme from 'src/styles/theme'
 
 const linkBaseStyles = {
   textDecoration: 'underline',

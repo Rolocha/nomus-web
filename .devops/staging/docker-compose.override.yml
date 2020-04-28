@@ -6,17 +6,11 @@ services:
     ports:
       - 80:80
       - 443:443
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+
   server:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/server:staging-latest
     restart: always
     command: yarn serve
-  client:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/client:staging-latest
-    restart: always
-    command: yarn serve
+
   db:
     restart: always

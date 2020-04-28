@@ -5,8 +5,8 @@ import {
   baseButtonStyles,
   styleVariants,
   widthVariants,
-} from 'styles/components/buttonlike'
-import theme from 'styles/theme'
+} from 'src/styles/components/buttonlike'
+import theme from 'src/styles/theme'
 
 type ButtonProps = {
   variant?: keyof typeof styleVariants

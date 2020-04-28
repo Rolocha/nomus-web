@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Switch, BrowserRouter as Router, Route } from 'react-router-dom'
 
-import { AuthLevel } from 'config'
-import { Role } from 'utils/auth'
-import ProtectedRoute from 'components/ProtectedRoute'
+import { AuthLevel } from 'src/config'
+import { Role } from 'src/utils/auth'
+import ProtectedRoute from 'src/components/ProtectedRoute'
 
-import LandingPage from 'pages/LandingPage'
-import ProfilePage from 'pages/ProfilePage'
-import LoginPage from 'pages/LoginPage'
-import ContactInfoPage from 'pages/ContactInfoPage'
-import AdminPanel from 'pages/AdminPanel'
+import LandingPage from 'src/pages/LandingPage'
+import ProfilePage from 'src/pages/ProfilePage'
+import LoginPage from 'src/pages/LoginPage'
+import ContactInfoPage from 'src/pages/ContactInfoPage'
+import AdminPanel from 'src/pages/AdminPanel'
 
 interface PageType {
   name: string

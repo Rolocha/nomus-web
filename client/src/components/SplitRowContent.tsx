@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-import Box from 'components/Box'
-import Container from 'components/Container'
+import Box from 'src/components/Box'
+import Container from 'src/components/Container'
 
 interface ISplitRow {
   key: string

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 
 import { variant } from 'styled-system'
-import Box from 'components/Box'
+import Box from 'src/components/Box'
 
 type ContainerProps = {
   variant?: 'default' | 'full' | 'fullVertical' | 'small'
