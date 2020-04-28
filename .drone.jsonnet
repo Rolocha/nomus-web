@@ -52,13 +52,22 @@ local deployEC2(env, host, when) = {
   },
 };
 
+local installNodeModules(app, when) = {
+  "name": "install dependencies",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn install --production=false",
+  ],
+};
+
 local test(app, when) = {
   "name": "test",
   "image": "node:12",
   "when": when,
   "commands": [
     "cd " + app,
-    "yarn install --production=false",
     "yarn test"
   ],
 };
@@ -106,6 +115,7 @@ local ALWAYS_CONDITION = {};
     "type": "docker",
     "name": "client",
     "steps": [
+      installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
       build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket(STAGING_DEPLOY_CONDITION)
