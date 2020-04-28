@@ -12,7 +12,7 @@ export interface BaseAuthData {
   refreshToken: string
 }
 
-interface AuthManagerOptions<
+export interface AuthManagerOptions<
   LoginArgs,
   SignupArgs,
   UseAuthOutput,
@@ -84,14 +84,18 @@ export class AuthManager<
     this.tokenStorageKey = tokenStorageKey
     this.makeUseAuthOutput = makeUseAuthOutput
     this.expirationHeadstart = expirationHeadstart ? ms(expirationHeadstart) : 0
+
+    this.getToken = this.getToken.bind(this)
+    this.useAuth = this.useAuth.bind(this)
   }
 
-  public getToken = async () => {
+  public async getToken() {
     await this.refreshTokenIfNeeded()
-    return localStorage.getItem(this.tokenStorageKey)
+    const authData = this.authData
+    return authData ? authData.accessToken : null
   }
 
-  public useAuth = () => {
+  public useAuth() {
     const [authData, setAuthData] = useState<AuthData | null>(this.authData)
 
     // Configure a React effect that will update the hook consumer with new authData
@@ -111,6 +115,7 @@ export class AuthManager<
         authData,
         authData ? this.parseJWT(authData.accessToken) : null,
       ),
+      loggedIn: authData != null,
       logIn: this.logInAndSaveAuth,
       signUp: this.signUpAndSaveAuth,
       refreshToken: this.refreshToken,
@@ -154,8 +159,8 @@ export class AuthManager<
     this.updateAuthData(response)
   }
 
-  private signUpAndSaveAuth = async (args: LoginArgs) => {
-    const response = await this.logIn(args)
+  private signUpAndSaveAuth = async (args: SignupArgs) => {
+    const response = await this.signUp(args)
     this.updateAuthData(response)
   }
 

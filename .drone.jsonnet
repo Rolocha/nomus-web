@@ -1,8 +1,8 @@
+// Constants
+
 local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
-local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
-local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 
 local publishDockerImage(app, env, when) = {
   "name": "publish " + env + " to ECR",
@@ -52,13 +52,23 @@ local deployEC2(env, host, when) = {
   },
 };
 
-local buildClient(when) = {
+local test(app, when) = {
+  "name": "test",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn install --production=false",
+    "yarn test"
+  ],
+};
+
+local build(app, when) = {
   "name": "build client",
   "image": "node:12",
   "when": when,
   "commands": [
-    "yarn --version",
-    "cd client",
+    "cd " + app,
     "yarn install --production=false",
     "yarn build"
   ]
@@ -82,6 +92,12 @@ local syncToBucket(when) = {
   },
 };
 
+// Deployment conditionals
+local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
+local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local ALWAYS_CONDITION = {};
+
+
 // Pipelines begin here
 
 [
@@ -90,7 +106,8 @@ local syncToBucket(when) = {
     "type": "docker",
     "name": "client",
     "steps": [
-      buildClient(STAGING_DEPLOY_CONDITION),
+      test("client", ALWAYS_CONDITION),
+      build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket(STAGING_DEPLOY_CONDITION)
     ],
   },
