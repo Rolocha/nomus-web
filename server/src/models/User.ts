@@ -103,16 +103,18 @@ export class User {
     return user
   }
 
-  public generateAccessToken() {
+  public generateAccessToken(): string {
     const body = { _id: MUUID.from(this._id).toString(), roles: this.roles ?? [] }
     return jwt.sign(body, authTokenPrivateKey, {
       expiresIn: accessTokenLifespan,
     })
   }
 
-  public async generateRefreshToken() {
-    const refreshToken = await Token.mongo.create({ client: MUUID.from(this._id) })
-    return refreshToken.value
+  public async generateRefreshToken(): Promise<string> {
+    // Get the PRE-hashed refresh token since this is the generation step where we need
+    // to send it to the client
+    const { preHashToken } = await Token.mongo.createNewTokenForUser(MUUID.from(this._id))
+    return preHashToken
   }
 }
 

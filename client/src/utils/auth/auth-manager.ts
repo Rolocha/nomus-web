@@ -3,96 +3,89 @@
 import { useEffect, useState } from 'react'
 import ms from 'ms'
 
-export interface BaseJWTBody {
-  exp?: number
-}
-
 export interface BaseAuthData {
-  accessToken: string
-  refreshToken: string
+  tokenExp: number
 }
 
 export interface AuthManagerOptions<
   LoginArgs,
   SignupArgs,
   UseAuthOutput,
-  AuthData extends BaseAuthData = BaseAuthData,
-  AccessTokenBody extends BaseJWTBody = BaseJWTBody
+  AuthData extends BaseAuthData = BaseAuthData
 > {
   // Specifies in zeit/ms (https://www.npmjs.com/package/ms) time how much earlier than true expiration time
   // to deem an access token expired. This value can be useful in preventing the infrequent but non-neglible
   // possibility of the token expiring between client sending the request and server processing it
   expirationHeadstart: string
   // The key in localStorage under which to store the auth data
-  tokenStorageKey: string
+  authDataKey: string
   // An async function that hits your login endpoint and responds with auth data
   logIn: (args: LoginArgs) => Promise<AuthData>
   // An async function that hits your signup endpoint and responds with auth data
   signUp: (args: SignupArgs) => Promise<AuthData>
   // An async function that hits your refresh endpoint and responds with a new access token
-  refreshToken: (authData: AuthData) => Promise<string>
+  refreshToken: (authData: AuthData) => Promise<AuthData>
   // A function for converting your auth data into the object you want useAuth to return
   // The auth manager will also include your logIn, signUp, and refreshToken methods in
   // the useAuth output, in addition to what you specify in this function
-  makeUseAuthOutput: (
-    authData: AuthData | null,
-    parsedToken: AccessTokenBody | null,
-  ) => UseAuthOutput
+  makeUseAuthOutput: (authData: AuthData | null) => UseAuthOutput
 }
 
 export class AuthManager<
   LoginArgs,
   SignupArgs,
   UseAuthOutput,
-  AuthData extends BaseAuthData = BaseAuthData,
-  AccessTokenBody extends BaseJWTBody = BaseJWTBody
+  AuthData extends BaseAuthData = BaseAuthData
 > {
   // Consumer supplied configuration via constructor
   private logIn: (args: LoginArgs) => Promise<AuthData>
   private signUp: (args: SignupArgs) => Promise<AuthData>
-  private refreshToken: (args: AuthData) => Promise<string>
-  private makeUseAuthOutput: (
-    authData: AuthData | null,
-    parsedToken: AccessTokenBody | null,
-  ) => UseAuthOutput
-  private tokenStorageKey: string
+  private refreshToken: (args: AuthData) => Promise<AuthData>
+  private makeUseAuthOutput: (authData: AuthData | null) => UseAuthOutput
+  private authDataKey: string
   private expirationHeadstart: number
+  private refreshRequestInFlight: boolean = false
 
   private listeners: Array<(newData: AuthData | null) => void> = []
   private get authData(): AuthData | null {
-    const authDataRaw = localStorage.getItem(this.tokenStorageKey)
+    const authDataRaw = localStorage.getItem(this.authDataKey)
     return authDataRaw != null ? JSON.parse(authDataRaw) : null
   }
 
   constructor({
-    tokenStorageKey,
+    authDataKey,
     logIn,
     signUp,
     refreshToken,
     makeUseAuthOutput,
     expirationHeadstart,
-  }: AuthManagerOptions<
-    LoginArgs,
-    SignupArgs,
-    UseAuthOutput,
-    AuthData,
-    AccessTokenBody
-  >) {
+  }: AuthManagerOptions<LoginArgs, SignupArgs, UseAuthOutput, AuthData>) {
     this.logIn = logIn
     this.signUp = signUp
     this.refreshToken = refreshToken
-    this.tokenStorageKey = tokenStorageKey
+    this.authDataKey = authDataKey
     this.makeUseAuthOutput = makeUseAuthOutput
     this.expirationHeadstart = expirationHeadstart ? ms(expirationHeadstart) : 0
 
-    this.getToken = this.getToken.bind(this)
+    this.ensureActiveToken = this.ensureActiveToken.bind(this)
     this.useAuth = this.useAuth.bind(this)
   }
 
-  public async getToken() {
-    await this.refreshTokenIfNeeded()
+  // Resolves to whether an active token exists by the time this function is awaited
+  public async ensureActiveToken(): Promise<boolean> {
     const authData = this.authData
-    return authData ? authData.accessToken : null
+    if (!authData) {
+      return false
+    }
+
+    // We have auth data, now check if it is non-expired
+    if (!this.tokenHasExpired(authData)) {
+      return true
+    }
+
+    // Looks like the token expired, try refreshing it
+    const wasTokenRefreshed = await this._refreshToken(authData)
+    return wasTokenRefreshed
   }
 
   public useAuth() {
@@ -111,32 +104,11 @@ export class AuthManager<
     })
 
     return {
-      ...this.makeUseAuthOutput(
-        authData,
-        authData ? this.parseJWT(authData.accessToken) : null,
-      ),
+      ...this.makeUseAuthOutput(authData),
       loggedIn: authData != null,
       logIn: this.logInAndSaveAuth,
       signUp: this.signUpAndSaveAuth,
       refreshToken: this.refreshToken,
-    }
-  }
-
-  public parseJWT(jwt: string): AccessTokenBody | null {
-    if (!(typeof jwt === 'string')) {
-      return null
-    }
-
-    const split = jwt.split('.')
-
-    if (split.length < 2) {
-      return null
-    }
-
-    try {
-      return JSON.parse(atob(jwt.split('.')[1]))
-    } catch (e) {
-      return null
     }
   }
 
@@ -164,31 +136,31 @@ export class AuthManager<
     this.updateAuthData(response)
   }
 
-  private isExpired(token: AccessTokenBody) {
+  private tokenHasExpired(authData: AuthData) {
     // Date.now() uses ms, token.exp uses s
-    return token.exp && Date.now() > token.exp * 1000 - this.expirationHeadstart
+    return (
+      authData.tokenExp != null &&
+      Date.now() > authData.tokenExp * 1000 - this.expirationHeadstart
+    )
   }
 
-  private async refreshTokenIfNeeded() {
-    const authData = this.authData
-    if (authData) {
-      const maybeExpiredAccessToken = this.parseJWT(authData.accessToken)
-      if (maybeExpiredAccessToken && this.isExpired(maybeExpiredAccessToken)) {
-        const accessToken = await this.refreshToken(authData)
-        this.updateAuthData({
-          ...authData,
-          accessToken,
-        })
-      }
+  // Resolves to a boolean specifying whether the token was refreshed
+  private async _refreshToken(authData: AuthData): Promise<boolean> {
+    try {
+      const newAuthData = await this.refreshToken(authData)
+      this.updateAuthData(newAuthData)
+      return true
+    } catch (err) {
+      return false
     }
   }
 
   private async updateAuthData(authData: AuthData | null) {
     // Update localStorage with new auth data
     if (authData) {
-      localStorage.setItem(this.tokenStorageKey, JSON.stringify(authData))
+      localStorage.setItem(this.authDataKey, JSON.stringify(authData))
     } else {
-      localStorage.removeItem(this.tokenStorageKey)
+      localStorage.removeItem(this.authDataKey)
     }
 
     // Notify subscribed listeners

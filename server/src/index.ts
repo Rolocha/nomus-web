@@ -3,6 +3,7 @@ import 'reflect-metadata'
 
 import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 
 import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
@@ -12,6 +13,7 @@ import { appServerPort, graphqlPath } from 'src/config'
 db.init()
 
 const app = express()
+app.use(cookieParser())
 
 app.get('/ping', async (req: Request, res: Response) => {
   res.send('pong')
