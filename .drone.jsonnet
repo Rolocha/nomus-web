@@ -101,6 +101,24 @@ local syncToBucket(when) = {
   },
 };
 
+local updateDeployConfig(env, host, when) = {
+  "name": "update deployment config",
+  "image": "node:12",
+  "when": when,
+  "environment": {
+    "SSH_KEY": {
+      "from_secret": "rolocha_ssh_key"
+    },
+  },
+  "commands": [
+    "mkdir ~/.ssh",
+    "echo \"$${SSH_KEY}\" > ~/.ssh/id_rsa",
+    "chmod 600 ~/.ssh/id_rsa",
+    "scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa .devops/" + env + "/* ubuntu@" + host + ":~/rolocha-web",
+    "rm ~/.ssh/id_rsa"
+  ],
+};
+
 // Deployment conditionals
 local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
@@ -136,6 +154,7 @@ local ALWAYS_CONDITION = {};
     "name": "server",
     "steps": [
       publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
+      updateDeployConfig("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
     ],
     "trigger": {
