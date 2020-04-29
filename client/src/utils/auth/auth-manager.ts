@@ -71,18 +71,24 @@ export class AuthManager<
     this.useAuth = this.useAuth.bind(this)
   }
 
-  public async ensureActiveToken() {
-    await this.refreshTokenIfNeeded()
-  }
+  // Resolves to whether an active token exists by the time this function is awaited
+  public async ensureActiveToken(): Promise<boolean> {
+    const authData = this.authData
+    if (!authData) {
+      return false
+    }
 
-  public async getAuthData() {
-    await this.refreshTokenIfNeeded()
-    return this.authData
+    // We have auth data, now check if it is non-expired
+    if (!this.tokenHasExpired(authData)) {
+      return true
+    }
+
+    // Looks like the token expired, try refreshing it
+    const wasTokenRefreshed = await this._refreshToken(authData)
+    return wasTokenRefreshed
   }
 
   public useAuth() {
-    // Trigger refresh if necessary but don't await it
-    this.refreshTokenIfNeeded()
     const [authData, setAuthData] = useState<AuthData | null>(this.authData)
 
     // Configure a React effect that will update the hook consumer with new authData
@@ -138,19 +144,14 @@ export class AuthManager<
     )
   }
 
-  private async refreshTokenIfNeeded() {
-    const authData = this.authData
-    if (authData) {
-      if (this.tokenHasExpired(authData) && !this.refreshRequestInFlight) {
-        this.refreshRequestInFlight = true
-        try {
-          const newAuthData = await this.refreshToken(authData)
-          this.updateAuthData(newAuthData)
-          this.refreshRequestInFlight = false
-        } catch (err) {
-          console.error('Failed to refresh token: ', err)
-        }
-      }
+  // Resolves to a boolean specifying whether the token was refreshed
+  private async _refreshToken(authData: AuthData): Promise<boolean> {
+    try {
+      const newAuthData = await this.refreshToken(authData)
+      this.updateAuthData(newAuthData)
+      return true
+    } catch (err) {
+      return false
     }
   }
 

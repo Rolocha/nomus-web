@@ -6,6 +6,6 @@ import { ensureActiveToken } from 'src/utils/auth'
 export default setContext(async (_, { headers }) => {
   // Request the auth manager to ensure that an active token is present,
   // triggering a token refresh if necessary. The token travels in an
-  // httpOnly cookie so setting it here isn't necessary
+  // httpOnly cookie so setting it on a header here isn't necessary
   await ensureActiveToken()
 })

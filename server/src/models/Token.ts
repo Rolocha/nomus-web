@@ -56,12 +56,15 @@ class Token {
     associatedUser: UUIDType
   ): Promise<boolean> {
     try {
-      const tokensForThisUser = await this.mongo.find({ client: associatedUser })
+      const tokensForThisUser = await this.find({ client: associatedUser })
       for (const token of tokensForThisUser) {
         const tokenMatches = await bcrypt.compare(proposedToken, token.value)
-        const tokenNotExpired = this.expiresAt > Date.now()
-        if (tokenMatches && tokenNotExpired && !token.forceInvalidated) {
-          return true
+        if (tokenMatches) {
+          const tokenNotExpired = token.expiresAt > Date.now()
+          if (tokenNotExpired && !token.forceInvalidated) {
+            return true
+          }
+          return false
         }
       }
       return false

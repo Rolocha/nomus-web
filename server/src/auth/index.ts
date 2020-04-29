@@ -90,7 +90,7 @@ authRouter.post('/refresh', async (req, res: express.Response<Failable<AuthRespo
   // Ignoring expiration here because we expect it to be expired -- that's why they're refreshing
   const userResult = await getUserFromToken(token, { ignoreExpiration: true })
   if (!userResult.isSuccess) {
-    return res.status(500).end()
+    return res.status(400).end()
   }
   const user = userResult.getValue()
 
@@ -122,11 +122,13 @@ export const authMiddleware = async (
   const userResult = await getUserFromToken(token)
   if (!userResult.isSuccess) {
     switch (userResult.error.name) {
-      case 'missing-token':
-      case 'no-matching-user':
       case 'token-expired':
         return res.status(401).end()
+      case 'missing-token':
+      case 'no-matching-user':
+        return res.status(400).end()
       case 'jwt-error':
+      case 'unknown-error':
       default:
         return res.status(500).end()
     }

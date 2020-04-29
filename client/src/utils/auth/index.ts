@@ -67,5 +67,4 @@ const authManager = new AuthManager<
 })
 
 export const useAuth = authManager.useAuth
-export const getAuthData = authManager.getAuthData
 export const ensureActiveToken = authManager.ensureActiveToken

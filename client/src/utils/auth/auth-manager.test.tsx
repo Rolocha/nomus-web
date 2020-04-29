@@ -183,17 +183,17 @@ describe('AuthManager', () => {
     })
   })
 
-  describe('getAuthData', () => {
-    it('returns null when no auth data present locally', async () => {
+  describe('ensureActiveToken', () => {
+    it('returns false when no auth data present locally', async () => {
       const am = makeTestManager({
         logIn: jest.fn(),
       })
 
-      const token = await am.getAuthData()
-      expect(token).toBeNull()
+      const activeTokenExists = await am.ensureActiveToken()
+      expect(activeTokenExists).toBe(false)
     })
 
-    it("returns the data without doing a refresh when it exists and isn't about to expire", async () => {
+    it('returns true without invoking a refresh if auth data exists and is not about to expire', async () => {
       const mockAuthData = makeMockAuthData()
       localStorage.setItem(AUTH_DATA_KEY, JSON.stringify(mockAuthData))
 
@@ -203,12 +203,12 @@ describe('AuthManager', () => {
         refreshToken,
       })
 
-      const authData = await am.getAuthData()
+      const activeTokenExists = await am.ensureActiveToken()
       expect(refreshToken).not.toHaveBeenCalled()
-      expect(authData).toMatchObject(mockAuthData)
+      expect(activeTokenExists).toBe(true)
     })
 
-    it('returns the data after doing a refresh when it exists but is about to expire', async () => {
+    it('returns true after invoking a refresh if auth data exists and is about to expire', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
       const mockAuthDataThatExpiresSoon = makeMockAuthData({
         tokenExp: makeExpTimeInSeconds(9),
@@ -226,9 +226,31 @@ describe('AuthManager', () => {
         expirationHeadstart: '10s',
       })
 
-      const authData = await am.getAuthData()
+      const activeTokenExists = await am.ensureActiveToken()
       expect(refreshToken).toHaveBeenCalled()
-      expect(authData).toMatchObject(newAuthData)
+      expect(activeTokenExists).toBe(true)
+    })
+
+    it('returns false after invoking a refresh if auth data exists and is about to expire but refresh failed', async () => {
+      // expires in 9 seconds (just below the 10s expiration headstart we use below)
+      const mockAuthDataThatExpiresSoon = makeMockAuthData({
+        tokenExp: makeExpTimeInSeconds(9),
+      })
+      localStorage.setItem(
+        AUTH_DATA_KEY,
+        JSON.stringify(mockAuthDataThatExpiresSoon),
+      )
+
+      const refreshToken = jest.fn().mockRejectedValue(new Error('failed!'))
+      const am = makeTestManager({
+        logIn: jest.fn(),
+        refreshToken,
+        expirationHeadstart: '10s',
+      })
+
+      const activeTokenExists = await am.ensureActiveToken()
+      expect(refreshToken).toHaveBeenCalled()
+      expect(activeTokenExists).toBe(false)
     })
   })
 })
