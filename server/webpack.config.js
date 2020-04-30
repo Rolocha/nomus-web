@@ -1,6 +1,7 @@
 const path = require('path')
 const NodemonPlugin = require('nodemon-webpack-plugin')
 const WebpackModules = require('webpack-modules')
+const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   entry: './src/index.ts',
@@ -43,4 +44,5 @@ module.exports = {
     net: 'empty',
     module: 'empty',
   },
+  externals: [nodeExternals()],
 }
