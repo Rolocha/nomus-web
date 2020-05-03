@@ -77,11 +77,17 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Attach to server",
-      "port": 9222,
+      "name": "[server] Attach",
+      "port": 9229,
       "skipFiles": ["<node_internals>/**"],
-      "localRoot": "${workspaceFolder}/server/dist",
-      "remoteRoot": "~/rolocha-web/server/dist"
+      "localRoot": "${workspaceFolder}/server",
+      "remoteRoot": "/server",
+      "sourceMaps": true,
+      "trace": true,
+      "protocol": "inspector",
+      "sourceMapPathOverrides": {
+        "/*": "${workspaceRoot}/*"
+      }
     }
   ]
 }
