@@ -8,14 +8,13 @@ export const initDB = async () => {
       useCreateIndex: true,
       useFindAndModify: false,
     })
-    console.log('Connected to test DB')
   } catch (err) {
     console.log('Failed to connect to MongoDB')
     console.log(err)
   }
 }
 
-async function dropAllCollections() {
+export async function dropAllCollections() {
   const collections = Object.keys(mongoose.connection.collections)
   for (const collectionName of collections) {
     const collection = mongoose.connection.collections[collectionName]
@@ -24,11 +23,11 @@ async function dropAllCollections() {
     } catch (error) {
       // This error happens when you try to drop a collection that's already dropped. Happens infrequently.
       // Safe to ignore.
-      if (error.message === 'ns not found') return
+      if (error.message === 'ns not found') continue
 
       // This error happens when you use it.todo.
       // Safe to ignore.
-      if (error.message.includes('a background operation is currently running')) return
+      if (error.message.includes('a background operation is currently running')) continue
 
       console.log(error.message)
     }

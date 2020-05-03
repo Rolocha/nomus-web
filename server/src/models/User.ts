@@ -49,8 +49,18 @@ export class User {
   static mongo: ReturnModelType<typeof User>
 
   @prop({ required: true, default: MUUID.v4 })
-  @Field((type) => UUIDScalar)
   _id: UUIDType
+
+  // Override the 'id' virtual property getters/setters since Mongoose doesn't
+  // know how to handle our custom MUUID implementation
+  @Field() // Expose the pretty underscore-less string version on GraphQL schema
+  get id(): string {
+    return MUUID.from(this._id).toString()
+  }
+
+  set id(id: string) {
+    this._id = MUUID.from(id)
+  }
 
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
