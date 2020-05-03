@@ -1,16 +1,15 @@
 import * as React from 'react'
 
 import { useQuery, gql } from 'src/apollo'
+import { ProfilePageQuery } from 'src/apollo/types/ProfilePageQuery'
 import Container from 'src/components/Container'
 import LoadingPage from 'src/pages/LoadingPage'
 
-interface UserResponse {}
-
-const LoginPage = () => {
-  const { loading, data } = useQuery<UserResponse>(
+const ProfilePage = () => {
+  const { loading, data } = useQuery<ProfilePageQuery>(
     gql`
-      query currentUser {
-        currentUser {
+      query ProfilePageQuery {
+        user {
           name {
             first
             last
@@ -34,9 +33,9 @@ const LoginPage = () => {
       bg="white"
       position="relative"
     >
-      {JSON.stringify(data)}
+      {JSON.stringify(data.user)}
     </Container>
   )
 }
 
-export default LoginPage
+export default ProfilePage

@@ -17,5 +17,6 @@
     "baseUrl": ".",
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/apollo/types/globalTypes.ts"]
 }
