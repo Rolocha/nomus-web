@@ -1,5 +1,4 @@
 const path = require('path')
-const NodemonPlugin = require('nodemon-webpack-plugin')
 const WebpackModules = require('webpack-modules')
 const nodeExternals = require('webpack-node-externals')
 
@@ -31,12 +30,7 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  plugins: [
-    new NodemonPlugin({
-      nodeArgs: ['--inspect=9222', '-r', 'source-map-support/register'],
-    }),
-    new WebpackModules(),
-  ],
+  plugins: [new WebpackModules()],
   node: {
     dns: 'empty',
     tls: 'empty',

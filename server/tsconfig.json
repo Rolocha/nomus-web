@@ -16,9 +16,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "files": ["src/types.d.ts"],
   "compileOnSave": false,
   "lib": ["es2015"],
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "ts-node": {
+    "files": true
+  }
 }
