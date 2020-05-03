@@ -1,7 +1,12 @@
-import type { User } from 'src/models/User'
-
-declare module 'express-serve-static-core' {
+declare namespace Express {
   interface Request {
-    user?: User
+    user?: import('src/models/User').User
+  }
+}
+
+declare module NodeJS {
+  interface Global {
+    __MONGO_URI__: string
+    __MONGO_DB_NAME__: string
   }
 }

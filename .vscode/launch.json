@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest All",
+      "name": "[client] Jest All",
       "program": "${workspaceFolder}/client/node_modules/.bin/jest",
       "args": [
         "--runInBand",
@@ -23,7 +23,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current File",
+      "name": "[client] Jest Current File",
       "program": "${workspaceFolder}/client/node_modules/.bin/jest",
       "args": [
         "${fileBasenameNoExtension}",
@@ -35,6 +35,44 @@
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}/client",
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "[server] Jest All",
+      "program": "${workspaceFolder}/client/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/server/package.json"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/server",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/server/node_modules/**/*"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "[server] Jest Current File",
+      "program": "${workspaceFolder}/server/node_modules/.bin/jest",
+      "args": [
+        "${fileBasenameNoExtension}",
+        "--config",
+        "${workspaceFolder}/server/package.json"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/server",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/server/node_modules/**/*"
+      ]
     },
     {
       "type": "node",

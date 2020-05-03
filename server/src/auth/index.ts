@@ -60,7 +60,7 @@ authRouter.post('/login', async (req, res: express.Response<Failable<AuthRespons
 authRouter.post('/signup', async (req, res: express.Response<Failable<AuthResponse>>) => {
   const { firstName, middleName, lastName, email, password } = req.body
   try {
-    const user = await User.mongo.create({
+    const user = await User.mongo.newUser({
       name: {
         first: firstName,
         middle: middleName,
@@ -80,7 +80,7 @@ authRouter.post('/signup', async (req, res: express.Response<Failable<AuthRespon
   }
 })
 
-authRouter.post('/refresh', async (req, res: express.Response<Failable<AuthResponse>>) => {
+const refreshToken = async (req, res: express.Response<Failable<AuthResponse>>) => {
   const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
   if (token == null || token.trim() === '' || refreshToken == null || refreshToken.trim() === '') {
@@ -105,7 +105,10 @@ authRouter.post('/refresh', async (req, res: express.Response<Failable<AuthRespo
   const accessToken = user.generateAccessToken()
   setCookies(res, accessToken)
   res.json(getPublicResponseForAccessToken(accessToken))
-})
+}
+
+authRouter.post('/refresh', refreshToken)
+authRouter.get('/refresh', refreshToken)
 
 export const authMiddleware = async (
   req: express.Request,

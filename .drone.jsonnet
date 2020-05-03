@@ -153,6 +153,8 @@ local ALWAYS_CONDITION = {};
     "type": "docker",
     "name": "server",
     "steps": [
+      installNodeModules("server", ALWAYS_CONDITION),
+      test("server", ALWAYS_CONDITION),
       publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
       updateDeployConfig("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),

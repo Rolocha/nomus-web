@@ -6,7 +6,7 @@ import {
   prop,
   modelOptions,
   ReturnModelType,
-  Ref,
+  DocumentType,
   getModelForClass,
 } from '@typegoose/typegoose'
 import { ObjectType, Field, registerEnumType } from 'type-graphql'
@@ -18,6 +18,13 @@ import Token from './Token'
 import { PersonName } from './subschemas'
 import { validateEmail } from './utils'
 import { UUIDScalar, UUIDType } from './scalars'
+
+export interface UserCreatePayload {
+  _id?: UUIDType
+  name: PersonName
+  email: string
+  password: string
+}
 
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
@@ -43,14 +50,14 @@ export class User {
 
   @prop({ required: true, default: MUUID.v4 })
   @Field((type) => UUIDScalar)
-  readonly _id: UUIDType
+  _id: UUIDType
 
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
-  name: Ref<PersonName>
+  name: PersonName
 
   @prop({ match: /^\d{10,11}$/ })
-  @Field()
+  @Field({ nullable: true })
   phoneNumber: string
 
   @prop({
@@ -60,7 +67,7 @@ export class User {
     unique: true,
     validate: validateEmail,
   })
-  @Field()
+  @Field({ nullable: true })
   email: string
 
   @prop()
@@ -71,12 +78,20 @@ export class User {
   password: string
 
   @prop()
-  @Field(() => CardVersion)
+  @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: UUIDType
 
   @prop({ default: ['user'], required: true })
-  @Field((type) => [Role])
+  @Field((type) => [Role], { nullable: false })
   roles: Role[]
+
+  public static async newUser(
+    this: ReturnModelType<typeof User>,
+    userInfo: UserCreatePayload
+  ): Promise<DocumentType<User>> {
+    const user = await this.create(userInfo)
+    return user
+  }
 
   public static async getDefaultCardVersionForUsername(
     this: ReturnModelType<typeof User>,
@@ -119,6 +134,7 @@ export class User {
 }
 
 // Attach the mongoose model onto the core model itself
-User.mongo = getModelForClass(User)
+export const UserModel = getModelForClass(User)
+User.mongo = UserModel
 
 export default User
