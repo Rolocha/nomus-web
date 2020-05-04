@@ -8,17 +8,17 @@ import { User, Role } from 'src/models/User'
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
   @Field({ nullable: true })
-  firstName: string
-  @Field({ nullable: false })
+  firstName?: string
+  @Field({ nullable: true })
   middleName?: string
   @Field({ nullable: true })
-  lastName: string
+  lastName?: string
 
   @Field({ nullable: true })
-  phoneNumber: string
+  phoneNumber?: string
 
   @Field({ nullable: true })
-  email: string
+  email?: string
 }
 
 @Resolver()
@@ -61,7 +61,7 @@ class UserResolver {
     return await context.user.save()
   }
 
-  @Authorized(Role.User)
+  @Authorized(Role.User, Role.Admin)
   @Mutation((type) => User)
   async updateProfile(
     @Arg('userId', { nullable: true }) userId: string | null,
@@ -80,19 +80,19 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
-    const keysToUpdate = ['name', 'email', 'phoneNumber'] as const
-    for (const key of keysToUpdate) {
-      // Typescript isn't smart enough to know that the same value type (e.g. name: PersonName) will
-      // get transferred from userUpdatePayload to userBeingUpdated
-      // @ts-ignore
-      userBeingUpdated[key] = userUpdatePayload[key]
-    }
+    userBeingUpdated.name.first = userUpdatePayload.firstName
+    userBeingUpdated.name.middle = userUpdatePayload.middleName
+    userBeingUpdated.name.last = userUpdatePayload.lastName
+
+    userBeingUpdated.email = userUpdatePayload.email
+    userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber
+
     return await userBeingUpdated.save()
   }
 
-  @Authorized(Role.User)
+  @Authorized(Role.User, Role.Admin)
   @Mutation((type) => String)
-  async deleteAccount(
+  async deleteUser(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
   ): Promise<string> {
@@ -104,7 +104,7 @@ class UserResolver {
     }
 
     await User.mongo.deleteOne({ _id: MUUID.from(requestedUserId) })
-    return requestedUserId
+    return MUUID.from(requestedUserId).toString()
   }
 }
 export default UserResolver
