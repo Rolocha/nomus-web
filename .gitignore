@@ -4,4 +4,4 @@
 /node_modules
 
 # Non-development .env files
-.devops/**/.env
+.env
