@@ -19,10 +19,10 @@ describe('UserResolver', () => {
     await dropAllCollections()
   })
   describe('user', () => {
-    const INSUFFICIENT_PERMISSIONS_MSG = 'Insufficient permissions to request a specific user'
+    const UNAUTHORIZED_MSG = 'Access denied! You need to be authorized to perform this action!'
     it('when the userId is provided and context.user is an admin, gets the requested user', async () => {
       const user = await createMockUser()
-      const { data } = await execQuery({
+      const response = await execQuery({
         source: `
           query GetUserTestQuery($userId: String) {
             user(userId: $userId) {
@@ -36,8 +36,8 @@ describe('UserResolver', () => {
         },
         asAdmin: true,
       })
-      expect(data?.user?.id).toBe(user.id)
-      expect(data?.user?.email).toBe(user.email)
+      expect(response.data?.user?.id).toBe(user.id)
+      expect(response.data?.user?.email).toBe(user.email)
     })
 
     it('when the userId is provided and context.user is not an admin, errors', async () => {
@@ -54,7 +54,7 @@ describe('UserResolver', () => {
           userId: 'shouldntmatter',
         },
       })
-      expect(errors[0].message).toBe(INSUFFICIENT_PERMISSIONS_MSG)
+      expect(errors[0].message).toBe(UNAUTHORIZED_MSG)
       expect(data).toBeNull()
     })
 
@@ -163,7 +163,7 @@ describe('UserResolver', () => {
   })
 
   describe('updateProfile', () => {
-    it.only('updates the specified properties on the context user', async () => {
+    it('updates the specified properties on the context user', async () => {
       const user = await createMockUser({
         name: {
           first: 'A',
