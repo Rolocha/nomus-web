@@ -13,11 +13,11 @@ import { ObjectType, Field, registerEnumType } from 'type-graphql'
 
 import { authTokenPrivateKey, accessTokenLifespan } from 'src/config'
 
-import CardVersion from './CardVersion'
+import { CardVersion } from './CardVersion'
 import Token from './Token'
 import { PersonName } from './subschemas'
 import { validateEmail } from './utils'
-import { UUIDScalar, UUIDType } from './scalars'
+import { UUIDType, Ref } from './scalars'
 
 export interface UserCreatePayload {
   _id?: UUIDType
@@ -87,11 +87,11 @@ export class User {
   @prop({ required: true })
   password: string
 
-  @prop()
+  @prop({ type: Buffer, ref: 'CardVersion' })
   @Field(() => CardVersion, { nullable: true })
-  defaultCardVersion: UUIDType
+  defaultCardVersion: Ref<CardVersion>
 
-  @prop({ default: ['user'], required: true })
+  @prop({ default: [Role.User], required: true })
   @Field((type) => [Role], { nullable: false })
   roles: Role[]
 
@@ -108,7 +108,7 @@ export class User {
     username: string
   ) {
     const user = await this.findOne({ username })
-    return await CardVersion.mongo.findById(MUUID.from(user.defaultCardVersion))
+    return await CardVersion.mongo.findById(MUUID.from(user.defaultCardVersion as UUIDType))
   }
 
   public static async findByCredentials(
