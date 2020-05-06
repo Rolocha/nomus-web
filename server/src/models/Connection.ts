@@ -1,12 +1,12 @@
 import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, Ref, getModelForClass } from '@typegoose/typegoose'
+import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
-import { UUIDScalar, UUIDType } from './scalars'
+import { UUIDScalar, UUIDType, Ref } from './scalars'
 import { User } from './User'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class Connection {
+export class Connection {
   static mongo: ReturnModelType<typeof Connection>
 
   @prop({ required: true, default: MUUID.v4 })
@@ -33,9 +33,15 @@ class Connection {
   @prop({ required: true, ref: 'User', type: Buffer })
   @Field(() => User, { nullable: false })
   to: Ref<User>
+
+  //Notes on meeting this User
+  @prop({ required: true })
+  @Field({ nullable: true })
+  notes: string
 }
 
 // Attach the mongoose model onto the core model itself
-Connection.mongo = getModelForClass(Connection)
+export const ConnectionModel = getModelForClass(Connection)
+Connection.mongo = ConnectionModel
 
 export default Connection
