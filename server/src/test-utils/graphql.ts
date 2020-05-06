@@ -37,7 +37,7 @@ export const execQuery = async ({
         (await createMockUser({
           name: { first: 'Context', last: 'User' },
           email: 'iamthecaptain@now.com',
-          roles: [asAdmin ? Role.Admin : Role.User],
+          roles: [Role.User, asAdmin ? Role.Admin : null].filter(Boolean),
         })),
     },
   })

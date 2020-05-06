@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Ctx, Authorized, Arg, InputType, Field } fro
 import MUUID from 'uuid-mongodb'
 import bcrypt from 'bcryptjs'
 
+import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { User, Role } from 'src/models/User'
 
@@ -23,7 +24,8 @@ class ProfileUpdateInput implements Partial<User> {
 
 @Resolver()
 class UserResolver {
-  @Authorized(Role.User, Role.Admin)
+  @Authorized(Role.User)
+  @AdminOnlyArgs('userId')
   @Query(() => User)
   async user(
     @Arg('userId', { nullable: true }) userId: string | null,
@@ -31,11 +33,6 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-
-    if (requestedUserId !== requestingUserId && !context.user.roles.includes(Role.Admin)) {
-      throw new Error('Insufficient permissions to request a specific user')
-    }
-
     return await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
   }
 
@@ -61,7 +58,8 @@ class UserResolver {
     return await context.user.save()
   }
 
-  @Authorized(Role.User, Role.Admin)
+  @Authorized(Role.User)
+  @AdminOnlyArgs('userId')
   @Mutation((type) => User)
   async updateProfile(
     @Arg('userId', { nullable: true }) userId: string | null,
@@ -70,10 +68,6 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-
-    if (requestedUserId !== requestingUserId && !context.user.roles.includes(Role.Admin)) {
-      throw new Error('Insufficient permissions to delete a specific user')
-    }
 
     const userBeingUpdated =
       requestedUserId === context.user._id
@@ -90,7 +84,7 @@ class UserResolver {
     return await userBeingUpdated.save()
   }
 
-  @Authorized(Role.User, Role.Admin)
+  @Authorized(Role.User)
   @Mutation((type) => String)
   async deleteUser(
     @Arg('userId', { nullable: true }) userId: string | null,
@@ -98,10 +92,6 @@ class UserResolver {
   ): Promise<string> {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-
-    if (requestedUserId !== requestingUserId && !context.user.roles.includes(Role.Admin)) {
-      throw new Error('Insufficient permissions to delete a specific user')
-    }
 
     await User.mongo.deleteOne({ _id: MUUID.from(requestedUserId) })
     return MUUID.from(requestedUserId).toString()
