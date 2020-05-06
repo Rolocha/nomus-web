@@ -1,7 +1,10 @@
+import { DocumentType } from '@typegoose/typegoose'
 import { GraphQLScalarType, Kind } from 'graphql'
-import MUUID from 'uuid-mongodb'
+import MUUID, { MUUID as MUUIDType } from 'uuid-mongodb'
 
-export type UUIDType = ReturnType<typeof MUUID.v4>
+export type UUIDType = MUUIDType
+
+export type Ref<T> = UUIDType | DocumentType<T>
 
 export const UUIDScalar = new GraphQLScalarType({
   name: 'MUUID',

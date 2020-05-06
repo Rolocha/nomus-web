@@ -1,21 +1,31 @@
 import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, Ref, getModelForClass } from '@typegoose/typegoose'
+import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
 import { validateEmail } from './utils'
-import { UUIDScalar, UUIDType } from './scalars'
+import { UUIDScalar, UUIDType, Ref } from './scalars'
 import { PersonName, Address } from './subschemas'
-import UserRoute from './UserRoute'
 import User from './User'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class CardVersion {
+export class CardVersion {
   static mongo: ReturnModelType<typeof CardVersion>
 
-  @prop({ required: true, default: () => MUUID.v4() })
+  @prop({ required: true, default: MUUID.v4 })
   @Field((type) => UUIDScalar)
-  readonly _id: UUIDType
+  _id: UUIDType
+
+  // Override the 'id' virtual property getters/setters since Mongoose doesn't
+  // know how to handle our custom MUUID implementation
+  @Field() // Expose the pretty underscore-less string version on GraphQL schema
+  get id(): string {
+    return MUUID.from(this._id).toString()
+  }
+
+  set id(id: string) {
+    this._id = MUUID.from(id)
+  }
 
   @prop()
   @Field({ nullable: true })
@@ -23,7 +33,7 @@ class CardVersion {
 
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
-  name: Ref<PersonName>
+  name: PersonName
 
   @prop({ match: /^\d{10,11}$/ })
   @Field()
@@ -32,7 +42,6 @@ class CardVersion {
   @prop({
     trim: true,
     lowercase: true,
-    unique: true,
     validate: validateEmail,
   })
   @Field()
@@ -62,13 +71,9 @@ class CardVersion {
   @Field()
   vcfUrl: string
 
-  @prop({ _id: false, required: true })
-  @Field(() => UserRoute, { nullable: false })
-  userRoute: Ref<UserRoute>
-
-  @prop({ _id: false, required: true, ref: 'User' })
+  @prop({ required: true, ref: 'User', type: Buffer })
   @Field(() => User, { nullable: false })
-  user: UUIDType
+  user: Ref<User>
 
   static async findBySlugOrId(
     this: ReturnModelType<typeof CardVersion>,
@@ -89,6 +94,7 @@ class CardVersion {
 }
 
 // Attach the mongoose model onto the core model itself
-CardVersion.mongo = getModelForClass(CardVersion)
+export const CardVersionModel = getModelForClass(CardVersion)
+CardVersion.mongo = CardVersionModel
 
 export default CardVersion
