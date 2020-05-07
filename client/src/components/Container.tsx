@@ -14,8 +14,6 @@ const Container = styled<typeof Box, ContainerProps>(Box)(
   variant({
     variants: {
       default: {
-        paddingTop: '25px',
-        paddingBottom: '25px',
         paddingLeft: `max(calc((100vw - ${CONTAINER_MAX_WIDTH}) / 2), ${MIN_PADDING})`,
         paddingRight: `max(calc((100vw - ${CONTAINER_MAX_WIDTH}) / 2), ${MIN_PADDING})`,
       },

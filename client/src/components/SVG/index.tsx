@@ -1,5 +1,8 @@
 export { default as Cart } from './Cart'
 export { default as Profile } from './Profile'
+export { default as Cards } from './Cards'
+export { default as Contacts } from './Contacts'
+export { default as Settings } from './Settings'
 export { default as Squiggle } from './Squiggle'
 export { default as LargeSquiggle } from './LargeSquiggle'
 export { default as LoginSquiggle } from './LoginSquiggle'

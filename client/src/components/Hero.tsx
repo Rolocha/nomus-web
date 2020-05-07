@@ -51,10 +51,10 @@ const Hero = () => (
         pr={{ _: '30px', lg: '50px' }}
         width={{ _: '100%', lg: `calc(100% - ${SM_IMAGE_WIDTH})` }}
       >
-        <Heading mt="0" color="offWhite">
+        <Heading mt="0" color="bgBeige">
           Tap. Connect. Network with purpose.
         </Heading>
-        <Body color="offWhite">
+        <Body color="bgBeige">
           Your personalized NFC card with the Rolocha app, built for accessing,
           managing, and expanding your network.
         </Body>

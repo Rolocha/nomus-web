@@ -1,20 +1,22 @@
 import styled from '@emotion/styled'
+import isPropValid from '@emotion/is-prop-valid'
 import { variant } from 'styled-system'
 import { Link as ReactRouterLink } from 'react-router-dom'
 
 import * as buttonlikeStyles from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
 
-const linkBaseStyles = {
-  textDecoration: 'underline',
+const linkBaseStyles = (props: LinkProps) => ({
+  textDecoration: props.noUnderline ? 'none' : 'underline',
   color: theme.colors.primaryTeal,
   fontFamily: theme.textStyles.body.fontFamily,
-}
+})
 
 interface LinkProps {
   asButton?: boolean
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
   width?: keyof typeof buttonlikeStyles.widthVariants
+  noUnderline?: boolean
   as?: any
 }
 
@@ -26,7 +28,7 @@ const args = [
   (props: LinkProps) =>
     props.asButton
       ? { ...buttonlikeStyles.baseButtonStyles, textDecoration: 'none' }
-      : linkBaseStyles,
+      : linkBaseStyles(props),
   variant({
     // Mimic button variants with a "button-" prefix
     prop: 'buttonStyle',
@@ -38,9 +40,12 @@ interface InternalLinkProps
   extends React.ComponentProps<typeof Link>,
     LinkProps {}
 
-const Link = styled<'a', LinkProps>('a')(...args)
+const Link = styled<'a', LinkProps>('a', {
+  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'noUnderline',
+})(...args)
 const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
   ReactRouterLink,
+  { shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'noUnderline' },
 )(...args)
 
 export { Link as ExternalLink, InternalLink }

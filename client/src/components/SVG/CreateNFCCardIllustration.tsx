@@ -160,7 +160,7 @@ const CreateNFCCardIllustration = ({ color, color2 }: SVGProps) => (
 )
 
 CreateNFCCardIllustration.defaultProps = {
-  color: colors.offWhite,
+  color: colors.bgBeige,
   color2: colors.terraCotta,
 }
 

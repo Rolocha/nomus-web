@@ -22,8 +22,8 @@ const LoginPage = () => {
   const location = useLocation<{ from: Location }>()
 
   if (loggedIn) {
-    // Redirect user to where they came from or, by default, /profile
-    history.replace(location.state?.from ?? { pathname: '/profile' })
+    // Redirect user to where they came from or, by default, /dashboard
+    history.replace(location.state?.from ?? { pathname: '/dashboard' })
     return null
   }
 

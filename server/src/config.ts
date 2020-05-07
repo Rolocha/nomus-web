@@ -1,3 +1,5 @@
+import ms from 'ms'
+
 export const authTokenPrivateKey = process.env.AUTH_TOKEN_PRIVATE_KEY
 export const mongoCredentials = {
   username: process.env.MONGO_USERNAME,
@@ -11,6 +13,6 @@ export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
 
 // Internal Config (not sourced from env vars)
 export const graphqlPath = '/graphql'
-export const refreshTokenLifespanInMilliseconds = 30 * 24 * 60 * 60 * 1000 // 30 days
-export const accessTokenLifespan = '15m'
+export const refreshTokenLifespan = ms('30 days')
+export const accessTokenLifespan = ms('15m')
 export const qrCodeBucketName = 'rolocha-qr-codes'

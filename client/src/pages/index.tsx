@@ -6,7 +6,7 @@ import { Role } from 'src/utils/auth'
 import ProtectedRoute from 'src/components/ProtectedRoute'
 
 import LandingPage from 'src/pages/LandingPage'
-import ProfilePage from 'src/pages/ProfilePage'
+import UserControlPanel from 'src/pages/UserControlPanel'
 import LoginPage from 'src/pages/LoginPage'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import AdminPanel from 'src/pages/AdminPanel'
@@ -33,10 +33,9 @@ export const pages: Array<PageType> = [
     component: LoginPage,
   },
   {
-    name: 'profile',
-    exact: true,
-    path: '/profile',
-    component: ProfilePage,
+    name: 'dashboard',
+    path: '/dashboard',
+    component: UserControlPanel,
     requiredAuthLevel: Role.User,
   },
   {
