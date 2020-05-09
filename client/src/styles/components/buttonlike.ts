@@ -6,7 +6,7 @@ export const styleVariants = {
   primary: {
     backgroundColor: theme.colors.validGreen,
     borderColor: theme.colors.validGreen,
-    color: theme.colors.offWhite,
+    color: theme.colors.bgBeige,
   },
   secondary: {
     backgroundColor: 'transparent',
@@ -15,13 +15,13 @@ export const styleVariants = {
   },
   secondaryLight: {
     backgroundColor: 'transparent',
-    borderColor: theme.colors.offWhite,
-    color: theme.colors.offWhite,
+    borderColor: theme.colors.bgBeige,
+    color: theme.colors.bgBeige,
   },
   blue: {
     backgroundColor: theme.colors.primaryTeal,
     borderColor: theme.colors.primaryTeal,
-    color: theme.colors.offWhite,
+    color: theme.colors.bgBeige,
   },
 } as const
 

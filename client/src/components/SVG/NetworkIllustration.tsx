@@ -179,7 +179,7 @@ const NetworkIllustration = ({ color, color2 }: SVGProps) => (
 )
 
 NetworkIllustration.defaultProps = {
-  color: colors.offWhite,
+  color: colors.bgBeige,
   color2: colors.terraCotta,
 }
 

@@ -150,7 +150,7 @@ const SaveContactIllustration = ({ color, color2 }: SVGProps) => (
 )
 
 SaveContactIllustration.defaultProps = {
-  color: colors.offWhite,
+  color: colors.bgBeige,
   color2: colors.terraCotta,
 }
 

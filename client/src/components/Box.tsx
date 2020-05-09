@@ -15,6 +15,8 @@ import {
   FlexboxProps,
   grid,
   GridProps,
+  shadow,
+  ShadowProps,
 } from 'styled-system'
 
 type BoxProps = { as?: string } & SpaceProps &
@@ -23,7 +25,8 @@ type BoxProps = { as?: string } & SpaceProps &
   BorderProps &
   LayoutProps &
   FlexboxProps &
-  GridProps
+  GridProps &
+  ShadowProps
 
 const Box = styled<'div', BoxProps>('div')(
   {
@@ -37,6 +40,7 @@ const Box = styled<'div', BoxProps>('div')(
   layout,
   flexbox,
   grid,
+  shadow,
 )
 
 export default Box

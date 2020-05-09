@@ -23,6 +23,13 @@ const textStyles: {
     fontFamily: fontFamilies.lato,
     color: colors.textGray,
   },
+  pageHeader: {
+    fontWeight: 400,
+    fontSize: [28, 32, 36, 36],
+    lineHeight: ['32px', '36px', '56px', '48px'],
+    fontFamily: fontFamilies.rubik,
+    color: colors.textGray,
+  },
   body: {
     fontSize: [15, 16, 18, 20],
     lineHeight: ['20px', '22px', '24px', '27px'],

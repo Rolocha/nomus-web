@@ -170,7 +170,7 @@ const TapCardIllustration = ({ color, color2 }: SVGProps) => (
 )
 
 TapCardIllustration.defaultProps = {
-  color: colors.offWhite,
+  color: colors.bgBeige,
   color2: colors.terraCotta,
 }
 

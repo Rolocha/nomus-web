@@ -24,7 +24,7 @@ const Button = styled<'button', ButtonProps>('button')(
 )
 
 Button.defaultProps = {
-  color: theme.colors.offWhite,
+  color: theme.colors.bgBeige,
   variant: 'primary',
   width: 'auto',
 }

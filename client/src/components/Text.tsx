@@ -50,6 +50,13 @@ export const Heading = (props: React.ComponentProps<typeof Text>) => (
     {props.children}
   </Text>
 )
+
+export const PageHeader = (props: React.ComponentProps<typeof Text>) => (
+  <Text as="h2" variant="pageHeader" {...props}>
+    {props.children}
+  </Text>
+)
+
 export const Body = (props: React.ComponentProps<typeof Text>) => (
   <Text as="p" variant="body" {...props}>
     {props.children}
