@@ -35,7 +35,7 @@ export class Connection {
   to: Ref<User>
 
   //Notes on meeting this User
-  @prop({ required: true })
+  @prop({ required: false })
   @Field({ nullable: true })
   notes: string
 }

@@ -7,7 +7,7 @@ export const createMockUser = async (userOverride: Partial<User> = {}) => {
       middle: 'Quincy',
       last: 'Adams',
     },
-    email: 'jqadams@usa.com',
+    email: `jqadams-${Math.random()}@usa.com`,
     password: 'give-me-liberty-or-give-me-death',
     ...userOverride,
   }

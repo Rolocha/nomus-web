@@ -91,6 +91,10 @@ export class User {
   @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
+  @prop({ required: false })
+  @Field()
+  vcfUrl: string
+
   @prop({ default: [Role.User], required: true })
   @Field((type) => [Role], { nullable: false })
   roles: Role[]

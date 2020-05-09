@@ -7,6 +7,7 @@ export class PersonName {
   @Field()
   first: string
 
+  @prop({ required: false })
   @Field({ nullable: true })
   middle?: string
 

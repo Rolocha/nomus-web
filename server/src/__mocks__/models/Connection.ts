@@ -1,16 +1,13 @@
 import { ConnectionModel, Connection } from 'src/models/Connection'
-import { User } from 'src/models/User'
+import { createMockUser } from './User'
 
-export const createMockConnection = async (
-  user_from: Partial<User>,
-  user_to: Partial<User>,
-  connectionOverride: Partial<Connection> = {}
-) => {
+export const createMockConnection = async (connectionOverride: Partial<Connection> = {}) => {
+  const from = connectionOverride.from ?? (await createMockUser())
+  const to = connectionOverride.to ?? (await createMockUser())
   const newConnectionPayload: Partial<Connection> = {
-    from: user_from._id,
-    to: user_to._id,
-    notes: 'Notes!',
     ...connectionOverride,
+    from,
+    to,
   }
   return await ConnectionModel.create(newConnectionPayload)
 }

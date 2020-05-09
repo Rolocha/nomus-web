@@ -6,42 +6,35 @@ import { IApolloContext } from 'src/graphql/types'
 import User, { Role } from 'src/models/User'
 import Connection from 'src/models/Connection'
 import { PersonName } from 'src/models/subschemas'
-import { Ref } from 'src/models/scalars'
-import { ConnectorDefinitionVersion } from 'aws-sdk/clients/greengrass'
+import { UUIDScalar, UUIDType } from 'src/models/scalars'
+import { CardVersion } from 'src/models/CardVersion'
 
 @ObjectType()
 class Contact {
-  // @Field()
-  // uid: string
+  @Field((type) => UUIDScalar)
+  id: UUIDType
 
-  // @Field((type) => PersonName)
-  // name: Ref<PersonName>
+  @Field((type) => PersonName)
+  name: PersonName
 
-  // @Field({ nullable: true })
-  // phoneNumber: string
+  @Field({ nullable: true })
+  phoneNumber: string
 
-  // @Field({ nullable: true })
-  // email: string
+  @Field({ nullable: true })
+  email: string
 
   @Field({ nullable: true })
   notes: string
 
-  // // @Field({ nullable: true })
-  // // cardImageUrl: string
+  @Field({ nullable: true })
+  cardImageUrl: string
 
-  // @Field({ nullable: true })
-  // vcfUrl: string
+  @Field({ nullable: true })
+  vcfUrl: string
 }
 
 @Resolver()
 class ContactsResolver {
-  // async contactFromConnection (connection: Connection): Promise<Contact> {
-  //   const user = await User.mongo.find({ _id: connection.to})
-  //   return new Contact (
-  //     uid: user.id,
-  //   )
-  // }
-
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Contact])
@@ -52,21 +45,26 @@ class ContactsResolver {
     const requesterUserId = context.user._id
     const requestedUserId = userId ?? requesterUserId
 
-    try {
-      const connections = await Connection.mongo.find({ from: requestedUserId })
-      return connections.map((connection) => ({
+    const connections = await Connection.mongo
+      .find({ from: MUUID.from(requestedUserId) })
+      .populate({
+        path: 'to',
+        populate: {
+          path: 'defaultCardVersion',
+        },
+      })
+
+    return connections.map((connection) => {
+      return {
+        id: (connection.to as User)._id,
+        name: (connection.to as User).name,
+        phoneNumber: (connection.to as User).phoneNumber,
+        email: (connection.to as User).email,
+        vcfUrl: (connection.to as User).vcfUrl,
+        cardImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)?.imageUrl,
         notes: connection.notes,
-      }))
-    } catch (error) {
-      const lol: Contact = new Contact()
-      lol.notes = 'lol'
-      const jk: Contact = new Contact()
-      jk.notes = 'nah'
-      return [lol, jk]
-    }
-    // const newlist =  connections.map((connection) => {
-    //   return
-    // })
+      }
+    })
   }
 }
 
