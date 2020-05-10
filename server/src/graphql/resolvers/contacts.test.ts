@@ -18,8 +18,8 @@ describe('ContactsResolver', () => {
     await dropAllCollections()
   })
 
-  describe('connection', () => {
-    it.only("gets a user's connections", async () => {
+  describe('contacts query', () => {
+    it("Happy Path - get's user's connections", async () => {
       const user_from = await createMockUser()
       const user_to = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
@@ -33,7 +33,7 @@ describe('ContactsResolver', () => {
         query ContactsTestQuery {
           contacts {
             id
-            name{
+            name {
               first
               middle
               last
@@ -56,11 +56,59 @@ describe('ContactsResolver', () => {
           notes: connection.notes ?? null,
           phoneNumber: user_to.phoneNumber ?? null,
           email: user_to.email,
+          cardImageUrl: null,
           vcfUrl: user_to.vcfUrl ?? null,
         },
       ]
 
       expect(response.data?.contacts).toMatchObject(expectedData)
+    })
+  })
+  describe('contact query', () => {
+    it('Gets a user contact where connection exists and not admin', async () => {
+      const user_from = await createMockUser()
+      const user_to = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      const connection = await createMockConnection({ from: user_from._id, to: user_to._id })
+
+      const response = await execQuery({
+        source: `
+        query ContactTestQuery($contactId: String!) {
+          contact(contactId: $contactId) {
+            id
+            name {
+              first
+              middle
+              last
+            }
+            phoneNumber
+            email
+            notes
+            cardImageUrl
+            vcfUrl
+          }
+        }
+        `,
+        variableValues: {
+          contactId: user_to.id,
+        },
+        contextUser: user_from,
+      })
+
+      const expectedData = {
+        id: user_to.id,
+        name: (user_to.name as DocumentType<PersonName>).toObject(),
+        notes: connection.notes ?? null,
+        phoneNumber: user_to.phoneNumber ?? null,
+        email: user_to.email,
+        cardImageUrl: null,
+        vcfUrl: user_to.vcfUrl ?? null,
+      }
+
+      expect(response.data?.contact).toMatchObject(expectedData)
     })
   })
 })

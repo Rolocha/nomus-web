@@ -67,7 +67,6 @@ class ContactsResolver {
     })
   }
 
-  @Authorized(Role.User, Role.Admin)
   @Query(() => Contact)
   async contact(
     @Arg('contactId', { nullable: false }) contactId: string,
@@ -88,9 +87,8 @@ class ContactsResolver {
         notes: null,
       }
     } else {
-      const connection = (
-        await Connection.mongo.findOne({ from: context.user._id, to: MUUID.from(contactId) })
-      )
+      const connection = await Connection.mongo
+        .findOne({ from: context.user._id, to: MUUID.from(contactId) })
         .populate({
           path: 'from',
           populate: {
