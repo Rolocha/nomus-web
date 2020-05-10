@@ -66,6 +66,55 @@ class ContactsResolver {
       }
     })
   }
+
+  @Authorized(Role.User, Role.Admin)
+  @Query(() => Contact)
+  async contact(
+    @Arg('contactId', { nullable: false }) contactId: string,
+    @Ctx() context: IApolloContext
+  ): Promise<Contact> {
+    if (context.user.roles.includes(Role.Admin)) {
+      const requestedUser = await User.mongo
+        .findOne({ _id: MUUID.from(contactId) })
+        .populate({ path: 'defaultCardVersion' })
+
+      return {
+        id: requestedUser._id,
+        name: requestedUser.name,
+        phoneNumber: requestedUser.phoneNumber,
+        email: requestedUser.email,
+        vcfUrl: requestedUser.vcfUrl,
+        cardImageUrl: (requestedUser.defaultCardVersion as CardVersion | null)?.imageUrl,
+        notes: null,
+      }
+    } else {
+      const connection = (
+        await Connection.mongo.findOne({ from: context.user._id, to: MUUID.from(contactId) })
+      )
+        .populate({
+          path: 'from',
+          populate: {
+            path: 'defaultCardVersion',
+          },
+        })
+        .populate({
+          path: 'to',
+          populate: {
+            path: 'defaultCardVersion',
+          },
+        })
+
+      return {
+        id: (connection.to as User)._id,
+        name: (connection.to as User).name,
+        phoneNumber: (connection.to as User).phoneNumber,
+        email: (connection.to as User).email,
+        vcfUrl: (connection.to as User).vcfUrl,
+        cardImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)?.imageUrl,
+        notes: connection.notes,
+      }
+    }
+  }
 }
 
 export default ContactsResolver
