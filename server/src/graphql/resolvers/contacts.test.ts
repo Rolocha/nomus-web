@@ -92,7 +92,7 @@ describe('ContactsResolver', () => {
       expect(response.data?.contacts?.length).toBe(0)
     })
 
-    it("doesn't let non-admins query", async () => {
+    it("doesn't let non-admins query a specific userId", async () => {
       const user_from = await createMockUser()
       const user_to = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
@@ -127,7 +127,7 @@ describe('ContactsResolver', () => {
     })
 
     it("lets admins query other user's connections", async () => {
-      const user_admin = await createMockUser({ roles: [Role.Admin] })
+      const user_admin = await createMockUser({ roles: [Role.User, Role.Admin] })
       const user_from = await createMockUser({
         name: { first: 'Annie', middle: 'Allison', last: 'Edison' },
         email: 'goody2shoes@greendale.com',
@@ -225,7 +225,7 @@ describe('ContactsResolver', () => {
 
       expect(response.data?.contact).toMatchObject(expectedData)
     })
-    it('fails if no connectin exists', async () => {
+    it('fails if no connection exists', async () => {
       const user_from = await createMockUser()
       const user_to = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },

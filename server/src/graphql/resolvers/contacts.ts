@@ -3,7 +3,7 @@ import MUUID from 'uuid-mongodb'
 
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
-import User from 'src/models/User'
+import User, { Role } from 'src/models/User'
 import Connection from 'src/models/Connection'
 import { PersonName } from 'src/models/subschemas'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
@@ -11,7 +11,7 @@ import { CardVersion } from 'src/models/CardVersion'
 
 @ObjectType()
 class Contact {
-  //id of the user who's contact is being queried
+  //id of the user whose contact is being queried
   @Field((type) => UUIDScalar)
   id: UUIDType
 
@@ -40,7 +40,7 @@ class ContactsResolver {
   // The `contacts` query is for a list of contacts that
   // the querying user has as connections. This returns a list of all
   // contacts the querying user has.
-  @Authorized()
+  @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Contact])
   async contacts(

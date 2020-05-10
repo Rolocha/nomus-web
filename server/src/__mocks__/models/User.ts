@@ -1,4 +1,4 @@
-import { UserModel, User } from 'src/models/User'
+import { UserModel, User, Role } from 'src/models/User'
 
 export const createMockUser = async (userOverride: Partial<User> = {}) => {
   const newUserPayload: Partial<User> = {
@@ -9,6 +9,7 @@ export const createMockUser = async (userOverride: Partial<User> = {}) => {
     },
     email: `jqadams-${Math.random()}@usa.com`,
     password: 'give-me-liberty-or-give-me-death',
+    roles: [Role.User],
     ...userOverride,
   }
 
