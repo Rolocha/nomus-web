@@ -74,6 +74,7 @@ class ContactsResolver {
 
   // The contact query returns a specific user's contact information
   // It checks that the user is actually connected before returning the information
+  @Authorized(Role.User)
   @Query(() => Contact)
   async contact(
     @Arg('contactId', { nullable: false }) contactId: string,
