@@ -44,29 +44,23 @@ Text.defaultProps = {
   variant: 'body',
 }
 
+const semanticallyStyledText = (
+  as: string,
+  variant: keyof typeof theme.textStyles,
+) => (props: React.ComponentProps<typeof Text>) => (
+  <Text as={as} variant={variant} {...props}>
+    {props.children}
+  </Text>
+)
+
 // Custom text variants ready to be used with 'as' baked in
-export const Heading = (props: React.ComponentProps<typeof Text>) => (
-  <Text as="h1" variant="heading" {...props}>
-    {props.children}
-  </Text>
-)
+export const Heading = semanticallyStyledText('h1', 'heading')
+export const PageHeader = semanticallyStyledText('h2', 'pageHeader')
+export const SectionHeader = semanticallyStyledText('h3', 'sectionHeader')
+export const SectionSubheader = semanticallyStyledText('h4', 'sectionSubheader')
 
-export const PageHeader = (props: React.ComponentProps<typeof Text>) => (
-  <Text as="h2" variant="pageHeader" {...props}>
-    {props.children}
-  </Text>
-)
-
-export const Body = (props: React.ComponentProps<typeof Text>) => (
-  <Text as="p" variant="body" {...props}>
-    {props.children}
-  </Text>
-)
-export const Caption = (props: React.ComponentProps<typeof Text>) => (
-  <Text as="p" variant="caption" {...props}>
-    {props.children}
-  </Text>
-)
+export const Body = semanticallyStyledText('p', 'body')
+export const Caption = semanticallyStyledText('p', 'caption')
 
 export const Link = styled(Text.withComponent('a'))`
   cursor: pointer;

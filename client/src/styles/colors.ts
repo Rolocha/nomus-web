@@ -8,8 +8,9 @@ const colors = {
   textMediumGray: '#8B8B8B',
   textOlive: '#A9A591',
   bgBeige: '#FBF9F0',
+  white: '#FFFFFF',
   bostonBlue: '#3C98C0',
   validGreen: '#73A230',
-}
+} as const
 
 export default colors

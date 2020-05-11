@@ -46,7 +46,12 @@ const Navbar = (props: Props) => (
         <SVG.Cart color="white" />
         Shop
       </InternalLink>
-      <InternalLink to="/login" asButton buttonStyle="blue" css={buttonStyles}>
+      <InternalLink
+        to="/login"
+        asButton
+        buttonStyle="primary"
+        css={buttonStyles}
+      >
         <SVG.Profile color="white" />
         Sign in
       </InternalLink>

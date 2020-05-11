@@ -1,30 +1,63 @@
 import * as React from 'react'
 import { css } from '@emotion/core'
 import { useHistory, useLocation } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
 
 import { useAuth } from 'src/utils/auth'
 import { Body, Link } from 'src/components/Text'
 import Container from 'src/components/Container'
 import Button from 'src/components/Button'
 import Box from 'src/components/Box'
-import Input from 'src/components/Form/Input'
+import * as Form from 'src/components/Form'
 import Logo from 'src/components/Logo'
 import { LoginSquiggle } from 'src/components/SVG'
 
+interface LoginFormData {
+  email: string
+  password: string
+}
+
+interface SignupFormData extends LoginFormData {
+  firstName: string
+  middleName?: string | null
+  lastName: string
+}
+
+type FormData = LoginFormData | SignupFormData
+
+const showRequiredError = (
+  fieldKey: string,
+  fieldName: string,
+  errors: Record<string, any>,
+) =>
+  fieldKey in errors && errors[fieldKey] ? (
+    <Body color="terraCotta" m={1}>
+      {`${fieldName} is required`}
+    </Body>
+  ) : null
+
 const LoginPage = () => {
   const [mode, setMode] = React.useState<'login' | 'signup'>('login')
-  const [email, setEmail] = React.useState('')
-  const [firstName, setFirstName] = React.useState('')
-  const [lastName, setLastName] = React.useState('')
-  const [password, setPassword] = React.useState('')
   const { loggedIn, logIn, signUp } = useAuth()
   const history = useHistory()
   const location = useLocation<{ from: Location }>()
+  const { register, handleSubmit, errors } = useForm<FormData>()
 
   if (loggedIn) {
     // Redirect user to where they came from or, by default, /dashboard
     history.replace(location.state?.from ?? { pathname: '/dashboard' })
     return null
+  }
+
+  const onSubmit = (formData: FormData) => {
+    switch (mode) {
+      case 'login':
+        logIn(formData as LoginFormData)
+        break
+      case 'signup':
+        signUp(formData as SignupFormData)
+        break
+    }
   }
 
   return (
@@ -64,50 +97,67 @@ const LoginPage = () => {
         </Body>
 
         <Box display="flex" flexDirection="column">
-          {mode === 'signup' && [
-            <Box key="first" mb="20px">
-              <Input
-                required
-                name="firstName"
-                label="First name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+          <Form.Form onSubmit={handleSubmit(onSubmit)}>
+            {mode === 'signup' && [
+              <Box key="first" mb="20px">
+                <Form.Input
+                  required
+                  name="firstName"
+                  label="First name"
+                  ref={register({ required: true })}
+                  type="text"
+                  placeholder="John"
+                  autoComplete="given-name"
+                />
+                {showRequiredError('firstName', 'First name', errors)}
+              </Box>,
+              <Box key="middle" mb="20px">
+                <Form.Input
+                  required
+                  name="middleName"
+                  label="Middle Name"
+                  ref={register({ required: false })}
+                  type="text"
+                  placeholder="David"
+                  autoComplete="additional-name"
+                />
+              </Box>,
+              <Box key="last" mb="20px">
+                <Form.Input
+                  required
+                  name="lastName"
+                  label="Last name"
+                  ref={register({ required: true })}
+                  type="text"
+                  placeholder="Appleseed"
+                  autoComplete="family-name"
+                />
+                {showRequiredError('lastName', 'Last name', errors)}
+              </Box>,
+            ]}
+            <Box mb="20px">
+              <Form.Input
+                name="email"
+                label="Email"
+                ref={register({ required: true })}
                 type="text"
-                placeholder="John"
+                placeholder="Enter your email address"
+                autoComplete="email"
               />
-            </Box>,
-            <Box key="last" mb="20px">
-              <Input
-                required
-                name="lastName"
-                label="Last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                type="text"
-                placeholder="Appleseed"
+              {showRequiredError('email', 'Email', errors)}
+            </Box>
+            <Box mb="20px">
+              <Form.Input
+                name="password"
+                label="Password"
+                ref={register({ required: true })}
+                type="password"
+                placeholder="Enter your password"
+                autoComplete="current-password"
               />
-            </Box>,
-          ]}
-          <Box mb="20px">
-            <Input
-              name="email"
-              label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="text"
-              placeholder="Enter your email address"
-            />
-          </Box>
-          <Box mb="20px">
-            <Input
-              name="password"
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder="Enter your password"
-            />
-          </Box>
+              {showRequiredError('password', 'Password', errors)}
+            </Box>
+          </Form.Form>
         </Box>
         <Box
           mt="10px"
@@ -116,14 +166,10 @@ const LoginPage = () => {
           alignItems="center"
         >
           <Button
-            variant="blue"
+            type="submit"
+            variant="primary"
             width="full"
-            onClick={
-              {
-                login: () => logIn({ email, password }),
-                signup: () => signUp({ email, password, firstName, lastName }),
-              }[mode]
-            }
+            onClick={handleSubmit(onSubmit)}
           >
             {
               {

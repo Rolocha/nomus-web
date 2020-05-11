@@ -14,7 +14,7 @@ export interface LoginArgs {
 
 export interface SignupArgs {
   firstName: string
-  middleName?: string
+  middleName?: string | null
   lastName: string
   email: string
   password: string
