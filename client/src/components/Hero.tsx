@@ -68,7 +68,7 @@ const Hero = () => (
           `}
         >
           <Button variant="primary">Customize NFC card</Button>
-          <Button variant="secondaryLight">Sign up</Button>
+          <Button variant="light">Sign up</Button>
         </Box>
         <SVG.Squiggle />
       </Box>

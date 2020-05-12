@@ -1,4 +1,5 @@
 import React from 'react'
+import Box from 'src/components/Box'
 
 import * as Text from 'src/components/Text'
 
@@ -7,6 +8,13 @@ export default {
   component: Text,
 }
 
-export const Heading = () => <Text.Heading>This is a heading.</Text.Heading>
-export const Body = () => <Text.Body>This is body text.</Text.Body>
-export const Caption = () => <Text.Caption>This is caption text.</Text.Caption>
+export const Typography = () => (
+  <Box>
+    <Text.Heading>Heading</Text.Heading>
+    <Text.PageHeader>Page Header</Text.PageHeader>
+    <Text.SectionHeader>Section Header</Text.SectionHeader>
+    <Text.SectionSubheader>Section Subheader</Text.SectionSubheader>
+    <Text.Body>Body</Text.Body>
+    <Text.Caption>Caption</Text.Caption>
+  </Box>
+)

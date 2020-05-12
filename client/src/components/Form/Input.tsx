@@ -19,6 +19,8 @@ import {
   FontSizeProps,
   lineHeight,
   LineHeightProps,
+  typography,
+  TypographyProps,
 } from 'styled-system'
 
 import Box from 'src/components/Box'
@@ -35,7 +37,8 @@ type InputElementProps = {
   FlexboxProps &
   GridProps &
   FontSizeProps &
-  LineHeightProps
+  LineHeightProps &
+  TypographyProps
 
 const InputElement = styled<'input', InputElementProps>('input')(
   {
@@ -55,6 +58,7 @@ const InputElement = styled<'input', InputElementProps>('input')(
   grid,
   fontSize,
   lineHeight,
+  typography,
 )
 
 InputElement.defaultProps = {
@@ -65,13 +69,22 @@ InputElement.defaultProps = {
 interface InputProps extends React.ComponentProps<typeof InputElement> {
   name?: string
   label?: string
+  autocomplete?: string
 }
 
-const Input = ({ name, label, as, ...inputProps }: InputProps) => (
-  <Box display="flex" flexDirection="column">
-    {label && <Label htmlFor={name}>{label}</Label>}
-    <InputElement name={name} {...inputProps} />
-  </Box>
+const Input = React.forwardRef(
+  (
+    { name, label, as, ...inputProps }: InputProps,
+    ref: React.Ref<HTMLInputElement>,
+  ) =>
+    label ? (
+      <Box display="flex" flexDirection="column">
+        <Label htmlFor={name}>{label}</Label>
+        <InputElement ref={ref} name={name} {...inputProps} />
+      </Box>
+    ) : (
+      <InputElement ref={ref} name={name} {...inputProps} />
+    ),
 )
 
 export default Input

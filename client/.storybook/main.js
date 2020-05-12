@@ -7,12 +7,33 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/preset-typescript',
   ],
-  webpackFinal: async config => {
+  webpackFinal: async (config) => {
     // do mutation to the config
     config.resolve.modules = [
       ...(config.resolve.modules || []),
-      path.resolve('./src'),
+      path.resolve('./'),
     ]
+    config.module.rules[0].use[0].options.presets = [
+      require.resolve('@babel/preset-react'),
+      require.resolve('@babel/preset-env'),
+      // Emotion preset must run BEFORE reacts preset to properly convert css-prop.
+      // Babel preset-ordering runs reversed (from last to first). Emotion has to be after React preset.
+      require.resolve('@emotion/babel-preset-css-prop'),
+    ]
+    config.module.rules.push({
+      test: /\.(ts|tsx)$/,
+      loader: require.resolve('babel-loader'),
+      options: {
+        presets: [
+          ['react-app', { flow: false, typescript: true }],
+          // Emotion preset must run BEFORE reacts preset to properly convert css-prop.
+          // Babel preset-ordering runs reversed (from last to first). Emotion has to be after React preset.
+          require.resolve('@emotion/babel-preset-css-prop'),
+        ],
+        // other plugins here...
+      },
+    })
+
     return config
   },
 }

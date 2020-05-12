@@ -5,7 +5,7 @@ const fontFamilies = {
   rubik: 'Rubik, Helvetica, sans-serif',
 }
 
-interface TextStyle {
+export interface TextStyle {
   fontWeight?: 400 | 700 | 'medium'
   fontSize?: number | number[]
   lineHeight?: string | string[]
@@ -26,7 +26,21 @@ const textStyles: {
   pageHeader: {
     fontWeight: 400,
     fontSize: [28, 32, 36, 36],
-    lineHeight: ['32px', '36px', '56px', '48px'],
+    lineHeight: '1.35',
+    fontFamily: fontFamilies.rubik,
+    color: colors.textGray,
+  },
+  sectionHeader: {
+    fontWeight: 400,
+    fontSize: [18, 20, 26, 36],
+    lineHeight: '1.35',
+    fontFamily: fontFamilies.rubik,
+    color: colors.textGray,
+  },
+  sectionSubheader: {
+    fontWeight: 'medium',
+    fontSize: [14, 16, 18, 20],
+    lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     color: colors.textGray,
   },
@@ -52,8 +66,8 @@ const textStyles: {
     color: colors.textGray,
   },
   label: {
-    fontSize: [15, 16, 18, 24],
-    lineHeight: ['20px', '22px', '24px', '32px'],
+    fontSize: [14, 14, 14, 14],
+    lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     fontWeight: 700,
     color: colors.primaryOlive,

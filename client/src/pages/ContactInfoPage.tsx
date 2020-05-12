@@ -84,7 +84,7 @@ const ContactInfoPage = () => {
         >
           Save contact
         </Button>
-        <Button variant="blue">
+        <Button variant="primary">
           <Link
             to={`/save/${username}${cardNameOrId ? `/>${cardNameOrId}` : ''}`}
           >

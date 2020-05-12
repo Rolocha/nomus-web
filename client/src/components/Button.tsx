@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { variant } from 'styled-system'
+import { space, SpaceProps, variant } from 'styled-system'
 
 import {
   baseButtonStyles,
@@ -12,7 +12,7 @@ type ButtonProps = {
   variant?: keyof typeof styleVariants
   width?: keyof typeof widthVariants
   as?: string
-}
+} & SpaceProps
 
 const Button = styled<'button', ButtonProps>('button')(
   baseButtonStyles,
@@ -21,6 +21,7 @@ const Button = styled<'button', ButtonProps>('button')(
     prop: 'width',
     variants: widthVariants,
   }),
+  space,
 )
 
 Button.defaultProps = {
@@ -30,3 +31,4 @@ Button.defaultProps = {
 }
 
 export default Button
+export { styleVariants }
