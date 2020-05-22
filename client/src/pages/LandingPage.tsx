@@ -152,7 +152,7 @@ const LandingPage = () => {
                   Congrats! You’re on your way to creating and expanding an
                   authentic network. Hooray!
                 </Body>
-                <Button variant="primary">Sign up for Rolocha</Button>
+                <Button variant="primary">Sign up for Nomus</Button>
               </Box>
             ),
           },

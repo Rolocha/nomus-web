@@ -1,6 +1,6 @@
 #! /bin/bash
 
-app_name=rolocha-web
+app_name=nomus-web
 
 # Install make
 sudo apt install make

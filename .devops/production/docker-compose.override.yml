@@ -11,11 +11,11 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
   server:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/server:production-latest
+    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:production-latest
     restart: always
     command: yarn serve
   client:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/client:production-latest
+    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/client:production-latest
     restart: always
     command: yarn serve
   db:

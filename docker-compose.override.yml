@@ -17,7 +17,7 @@ services:
       - /server/node_modules/
       - ./server:/server
   client:
-    container_name: rolocha-client
+    container_name: nomus-client
     build: ./client
     env_file: .env
     ports:
