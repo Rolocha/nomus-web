@@ -88,7 +88,7 @@ const ContactInfoPage = () => {
           <Link
             to={`/save/${username}${cardNameOrId ? `/>${cardNameOrId}` : ''}`}
           >
-            Save to Rolocha
+            Save to Nomus
           </Link>
         </Button>
       </Container>

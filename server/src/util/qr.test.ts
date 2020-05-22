@@ -9,12 +9,12 @@ describe('qr module', () => {
       })
       AWSMock.mock('S3', 'putObject', putObjectMock)
 
-      const TEST_URL = 'https://rolocha.com'
+      const TEST_URL = 'https://nomus.me'
       const TEST_QR_KEY = 'this-is-the-s3-reference'
       const result = await urlToQRImageUrl(TEST_URL, {}, TEST_QR_KEY)
 
       expect(result.isSuccess).toBe(true)
-      expect(putObjectMock.mock.calls[0][0].Key).toBe(TEST_QR_KEY)
+      expect(putObjectMock.mock.calls[0][0].Key).toContain(TEST_QR_KEY)
 
       // The internals of the URL may change, but verify it at least
       // looks like a URL and has the specified S3 object key

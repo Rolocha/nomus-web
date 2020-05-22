@@ -8,7 +8,7 @@ services:
       - 443:443
 
   server:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/rolocha/server:staging-latest
+    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:staging-latest
     restart: always
     command: yarn serve
 

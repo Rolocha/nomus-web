@@ -55,7 +55,7 @@ const Hero = () => (
           Tap. Connect. Network with purpose.
         </Heading>
         <Body color="bgBeige">
-          Your personalized NFC card with the Rolocha app, built for accessing,
+          Your personalized NFC card with the Nomus app, built for accessing,
           managing, and expanding your network.
         </Body>
         <Box

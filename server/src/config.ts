@@ -15,4 +15,4 @@ export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
 export const graphqlPath = '/graphql'
 export const refreshTokenLifespan = ms('30 days')
 export const accessTokenLifespan = ms('15m')
-export const qrCodeBucketName = 'rolocha-qr-codes'
+export const s3BucketName = 'nomus-assets'

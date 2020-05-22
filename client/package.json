@@ -1,5 +1,5 @@
 {
-  "name": "rolocha-client",
+  "name": "nomus-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -140,7 +140,7 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "modulePaths": [
-      "/Users/bibek/Developer/RoloCha/client/src"
+      "<rootDir>/src"
     ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",

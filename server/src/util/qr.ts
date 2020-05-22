@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import qrcode, { QRCodeToDataURLOptions } from 'qrcode'
 
-import { qrCodeBucketName } from 'src/config'
+import { s3BucketName } from 'src/config'
 import { Result } from './error'
 
 export const generateQR = async (url: string, options: QRCodeToDataURLOptions = {}) => {
@@ -30,9 +30,10 @@ export const urlToQRImageUrl = async (
     }
 
     const buf = Buffer.from(qrCodeAsDataUrl.replace(/^data:image\/\w+;base64,/, ''), 'base64')
+    const Key = s3BucketName + '/' + qrKey
     const params = {
-      Bucket: qrCodeBucketName,
-      Key: qrKey,
+      Bucket: s3BucketName,
+      Key,
       Body: buf,
       ContentEncoding: 'base64',
       ContentType: 'image/png',
@@ -45,7 +46,7 @@ export const urlToQRImageUrl = async (
         throw new Error('failed-s3-upload')
       })
 
-    return Result.ok(`https://${qrCodeBucketName}.s3.amazonaws.com/${qrKey}`)
+    return Result.ok(`https://${s3BucketName}.s3.amazonaws.com/${Key}`)
   } catch (err) {
     return Result.fail(err.message)
   }

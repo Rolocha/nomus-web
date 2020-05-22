@@ -1,7 +1,7 @@
 module.exports = {
   client: {
     service: {
-      name: "rolocha-server",
+      name: "nomus-server",
       url: "http://localhost:3000/graphql",
     },
     includes: ["client/src/**/*.{ts,tsx,js,jsx,graphql}"],

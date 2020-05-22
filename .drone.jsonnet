@@ -46,7 +46,7 @@ local deployEC2(env, host, when) = {
       "AWS_DEFAULT_REGION"
     ],
     "script": [
-      "cd ~/rolocha-web",
+      "cd ~/nomus-web",
       "make deploy"
     ],
   },
@@ -88,7 +88,7 @@ local syncToBucket(when) = {
   "image": "plugins/s3-sync:1",
   "when": when,
   "settings": {
-    "bucket": "stage.rolocha.com",
+    "bucket": "stage.nomus.me",
     "access_key": {
       "from_secret": "AWS_ACCESS_KEY_ID"
     },
@@ -114,13 +114,13 @@ local updateDeployConfig(env, host, when) = {
     "mkdir ~/.ssh",
     "echo \"$${SSH_KEY}\" > ~/.ssh/id_rsa",
     "chmod 600 ~/.ssh/id_rsa",
-    "scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa .devops/" + env + "/* ubuntu@" + host + ":~/rolocha-web",
+    "scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa .devops/" + env + "/* ubuntu@" + host + ":~/nomus-web",
     "rm ~/.ssh/id_rsa"
   ],
 };
 
 // Deployment conditionals
-local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${ROLOCHA_DEPLOY_BRANCH}" };
+local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${NOMUS_DEPLOY_BRANCH}" };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 local ALWAYS_CONDITION = {};
 

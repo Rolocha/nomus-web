@@ -14,7 +14,7 @@ services:
       - server
 
   server:
-    container_name: rolocha-server
+    container_name: nomus-server
     restart: always
     env_file: .env
     networks:
