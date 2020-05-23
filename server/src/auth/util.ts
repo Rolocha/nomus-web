@@ -4,10 +4,7 @@ import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 import User from 'src/models/User'
 import { authTokenPrivateKey } from 'src/config'
 import { Result } from 'src/util/error'
-
-interface TokenData {
-  _id: string
-}
+import { TokenBody } from './types'
 
 interface Options {
   ignoreExpiration: boolean
@@ -32,7 +29,7 @@ export const getUserFromToken = async (
     }
     const data = jwt.verify(token, authTokenPrivateKey, {
       ignoreExpiration: _options.ignoreExpiration,
-    }) as TokenData
+    }) as TokenBody
     const user = await User.mongo.findOne({ _id: MUUID.from(data._id) })
     if (!user) {
       return Result.fail('no-matching-user')

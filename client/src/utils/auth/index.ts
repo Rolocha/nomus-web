@@ -26,6 +26,7 @@ export interface UseAuthOutput {
 }
 
 export interface AuthData extends BaseAuthData {
+  id: string
   roles: Role[]
 }
 
@@ -55,7 +56,10 @@ const authManager = new AuthManager<
 >({
   expirationHeadstart: '10s',
   authDataKey: AUTH_DATA_KEY,
-  refreshToken: () => jsonFetch('post', '/auth/refresh'),
+  refreshToken: (authData: AuthData) =>
+    jsonFetch('post', '/auth/refresh', {
+      id: authData.id,
+    }),
   logIn: (args: LoginArgs) => jsonFetch('post', '/auth/login', args),
   signUp: (args: SignupArgs) => jsonFetch('post', '/auth/signup', args),
   makeUseAuthOutput: (authData) => {

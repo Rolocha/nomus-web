@@ -72,14 +72,14 @@ export class AuthManager<
   }
 
   // Resolves to whether an active token exists by the time this function is awaited
-  public async ensureActiveToken(): Promise<boolean> {
+  public async ensureActiveToken(forceRefresh = false): Promise<boolean> {
     const authData = this.authData
     if (!authData) {
       return false
     }
 
     // We have auth data, now check if it is non-expired
-    if (!this.tokenHasExpired(authData)) {
+    if (!forceRefresh && !this.tokenHasExpired(authData)) {
       return true
     }
 

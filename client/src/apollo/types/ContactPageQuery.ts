@@ -7,22 +7,22 @@
 // GraphQL query operation: ContactPageQuery
 // ====================================================
 
-export interface ContactPageQuery_contactInfo_name {
+export interface ContactPageQuery_publicContact_name {
   __typename: 'PersonName'
   first: string
   middle: string | null
   last: string
 }
 
-export interface ContactPageQuery_contactInfo {
+export interface ContactPageQuery_publicContact {
   __typename: 'CardVersion'
-  imageUrl: string
+  frontImageUrl: string
   vcfUrl: string
-  name: ContactPageQuery_contactInfo_name | null
+  name: ContactPageQuery_publicContact_name | null
 }
 
 export interface ContactPageQuery {
-  contactInfo: ContactPageQuery_contactInfo
+  publicContact: ContactPageQuery_publicContact
 }
 
 export interface ContactPageQueryVariables {

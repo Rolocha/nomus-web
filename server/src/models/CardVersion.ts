@@ -63,11 +63,15 @@ export class CardVersion {
   @Field(() => Address, { nullable: false })
   address: Ref<Address>
 
-  @prop({ required: true })
+  @prop({ required: false })
   @Field()
-  imageUrl: string
+  frontImageUrl: string
 
-  @prop({ required: true })
+  @prop({ required: false })
+  @Field()
+  backImageUrl: string
+
+  @prop({ required: false })
   @Field()
   vcfUrl: string
 

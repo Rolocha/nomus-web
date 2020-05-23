@@ -1,11 +1,12 @@
 import * as express from 'express'
 import jwt from 'jsonwebtoken'
-import ms from 'ms'
+import MUUID from 'uuid-mongodb'
 
 import { User, Token } from 'src/models'
 import { Role } from 'src/models/User'
 import { getUserFromToken } from './util'
 import { accessTokenLifespan, refreshTokenLifespan } from 'src/config'
+import { TokenBody } from './types'
 
 const authRouter = express.Router()
 
@@ -14,11 +15,6 @@ interface ServerErrorResponse {
 }
 
 type Failable<T> = T | ServerErrorResponse
-
-interface TokenBody {
-  exp: number
-  roles: Role[]
-}
 
 interface AuthResponse {
   tokenExp: number
@@ -33,6 +29,7 @@ const getPublicResponseForAccessToken = (accessToken: string) => {
   return {
     tokenExp: accessTokenBody.exp,
     roles: accessTokenBody.roles,
+    id: accessTokenBody._id,
   }
 }
 
@@ -86,24 +83,26 @@ authRouter.post('/signup', async (req, res: express.Response<Failable<AuthRespon
   }
 })
 
-const refreshToken = async (req, res: express.Response<Failable<AuthResponse>>) => {
-  const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
+const refreshToken = async (
+  req: express.Request,
+  res: express.Response<Failable<AuthResponse>>
+) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
-  if (token == null || token.trim() === '' || refreshToken == null || refreshToken.trim() === '') {
+  const userId = req.body.id
+
+  if (userId == null || refreshToken == null || refreshToken.trim() === '') {
     return res.status(401).end()
   }
-  // Find the user from the token
-  // Ignoring expiration here because we expect it to be expired -- that's why they're refreshing
-  const userResult = await getUserFromToken(token, { ignoreExpiration: true })
-  if (!userResult.isSuccess) {
-    return res.status(400).end()
+
+  const user = await User.mongo.findById(MUUID.from(userId))
+  if (user == null) {
+    return res.status(401).end()
   }
-  const user = userResult.getValue()
 
   // Check if the specified refresh token exists and belongs to this user
   const isTokenValid = await Token.mongo.verify(refreshToken, user._id)
   if (!isTokenValid) {
-    return res.status(400).json({
+    return res.status(401).json({
       message: 'Invalid refresh token',
     })
   }
@@ -123,10 +122,7 @@ export const authMiddleware = async (
 ) => {
   const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
   if (token == null || token.trim() === '') {
-    // Request not attempting authentication so let it through without attaching a user
-    // Query will automatically fail if a user/roles are required
-    next()
-    return
+    return res.status(401).end()
   }
   const userResult = await getUserFromToken(token)
   if (!userResult.isSuccess) {
