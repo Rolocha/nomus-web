@@ -7,7 +7,6 @@ import {
   ContactPageQuery,
   ContactPageQueryVariables,
 } from 'src/apollo/types/ContactPageQuery'
-import Container from 'src/components/Container'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import Image from 'src/components/Image'
@@ -67,7 +66,8 @@ const ContactInfoPage = () => {
   return data ? (
     <Box>
       <Navbar />
-      <Container
+      <Box
+        container
         display="flex"
         flexDirection="column"
         alignItems="stretch"
@@ -91,7 +91,7 @@ const ContactInfoPage = () => {
             Save to Nomus
           </Link>
         </Button>
-      </Container>
+      </Box>
     </Box>
   ) : null
 }

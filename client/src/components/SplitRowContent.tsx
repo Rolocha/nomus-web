@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import Box from 'src/components/Box'
-import Container from 'src/components/Container'
 
 interface ISplitRow {
   key: string
@@ -46,7 +45,7 @@ const SplitRowContent = ({
   imageProps,
   contentProps,
 }: SplitRowContentProps) => (
-  <Container>
+  <Box container={true}>
     <Box
       display="flex"
       flexDirection="column"
@@ -86,7 +85,7 @@ const SplitRowContent = ({
         </Box>
       ))}
     </Box>
-  </Container>
+  </Box>
 )
 
 SplitRowContent.defaultProps = {

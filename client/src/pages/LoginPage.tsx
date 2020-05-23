@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 
 import { useAuth } from 'src/utils/auth'
 import { Body, Link } from 'src/components/Text'
-import Container from 'src/components/Container'
 import Button from 'src/components/Button'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
@@ -61,7 +60,8 @@ const LoginPage = () => {
   }
 
   return (
-    <Container
+    <Box
+      container
       display="flex"
       justifyContent="center"
       minHeight="100vh"
@@ -207,7 +207,7 @@ const LoginPage = () => {
           ]}
         </Box>
       </Box>
-    </Container>
+    </Box>
   )
 }
 
