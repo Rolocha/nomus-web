@@ -16,7 +16,9 @@ export interface UCPProfileSectionQuery_user_name {
 
 export interface UCPProfileSectionQuery_user {
   __typename: 'User'
+  username: string | null
   name: UCPProfileSectionQuery_user_name | null
+  profilePicUrl: string | null
   headline: string | null
   phoneNumber: string | null
   email: string | null

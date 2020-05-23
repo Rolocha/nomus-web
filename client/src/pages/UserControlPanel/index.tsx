@@ -105,7 +105,7 @@ const ProfilePage = () => {
         }}
       >
         {data.user.name && (
-          <Box overflow="auto" display={{ _: 'none', [bp]: 'block' }}>
+          <Box overflow="auto" my={4} display={{ _: 'none', [bp]: 'block' }}>
             <Text.PageHeader>
               {`Welcome back, ${formatName(data.user.name)}`}
             </Text.PageHeader>
@@ -120,6 +120,7 @@ const ProfilePage = () => {
           <Box
             display="flex"
             flexDirection={{ _: 'row', [bp]: 'column' }}
+            flexShrink={0}
             minWidth={{ [bp]: 200 }}
             bg={theme.colors.secondaryTeal}
             borderTopLeftRadius={{ _: 0, [bp]: 3 }}
@@ -180,7 +181,8 @@ const ProfilePage = () => {
             flexGrow={1}
             boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
             bg="white"
-            padding={5}
+            p={{ _: 4, [bp]: 5 }}
+            // py={{ _: 4, [bp]: 5 }}
             borderTopRightRadius={{ [bp]: 3 }}
             borderBottomRightRadius={{ [bp]: 3 }}
             borderBottomLeftRadius={{ [bp]: 3 }}

@@ -4,6 +4,19 @@ const { textStyles } = typography
 
 // Defining button styles centrally here since both <a /> and <button /> will consume them
 
+export const baseButtonStyles = {
+  padding: '8px 16px',
+  borderRadius: '6px',
+  borderWidth: '2px',
+  borderStyle: 'solid',
+  fontFamily: textStyles.body.fontFamily,
+  fontSize: '18px',
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.25)',
+  textAlign: 'center',
+} as const
+
 export const styleVariants = {
   primary: {
     backgroundColor: colors.primaryTeal,
@@ -70,6 +83,21 @@ export const styleVariants = {
     borderColor: colors.bgBeige,
     color: colors.bgBeige,
   },
+
+  plainButLightOnHover: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    color: colors.primaryTeal,
+    boxShadow: 'none',
+    transition:
+      '0.3s ease background-color, 0.3s ease border-color, 0.3s ease color, 0.3s ease boxShadow',
+    '&:hover': {
+      backgroundColor: colors.bgBeige,
+      borderColor: colors.bgBeige,
+      color: colors.primaryTeal,
+      boxShadow: baseButtonStyles.boxShadow,
+    },
+  },
 } as const
 
 export const widthVariants = {
@@ -78,14 +106,3 @@ export const widthVariants = {
   },
   auto: {},
 }
-
-export const baseButtonStyles = {
-  padding: '10px 20px',
-  borderRadius: '6px',
-  borderWidth: '2px',
-  borderStyle: 'solid',
-  fontFamily: textStyles.body.fontFamily,
-  fontSize: '18px',
-  fontWeight: 'bold',
-  cursor: 'pointer',
-} as const

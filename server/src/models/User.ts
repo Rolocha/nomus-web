@@ -66,6 +66,18 @@ export class User {
   @Field(() => PersonName, { nullable: true })
   name: PersonName
 
+  @prop()
+  @Field({ nullable: true })
+  headline: string
+
+  @prop()
+  @Field({ nullable: true })
+  bio: string
+
+  @prop()
+  @Field({ nullable: true })
+  profilePicUrl: string
+
   @prop({ match: /^\d{10,11}$/ })
   @Field({ nullable: true })
   phoneNumber: string
