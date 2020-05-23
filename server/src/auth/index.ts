@@ -122,7 +122,7 @@ export const authMiddleware = async (
 ) => {
   const token = req.cookies[ACCESS_TOKEN_COOKIE_NAME]
   if (token == null || token.trim() === '') {
-    return res.status(401).end()
+    return next()
   }
   const userResult = await getUserFromToken(token)
   if (!userResult.isSuccess) {

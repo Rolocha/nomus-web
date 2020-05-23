@@ -18,9 +18,11 @@ export default onError(
     }
 
     if (
-      networkError &&
-      'statusCode' in networkError &&
-      networkError.statusCode === 401
+      (networkError &&
+        'statusCode' in networkError &&
+        networkError.statusCode === 401) ||
+      (graphQLErrors &&
+        graphQLErrors.some((err) => err.message.startsWith('Access denied!')))
     ) {
       // Outgoing request got 401'd by the server
       return new Observable((observer) => {
