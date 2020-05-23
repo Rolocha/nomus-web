@@ -29,11 +29,27 @@ class Contact {
   notes: string
 
   @Field({ nullable: true })
-  cardImageUrl: string
+  cardFrontImageUrl: string
+
+  @Field({ nullable: true })
+  cardBackImageUrl: string
 
   @Field({ nullable: true })
   vcfUrl: string
 }
+
+const connectionToContact = (connection: Connection) => ({
+  id: (connection.to as User)._id,
+  name: (connection.to as User).name,
+  phoneNumber: (connection.to as User).phoneNumber,
+  email: (connection.to as User).email,
+  vcfUrl: (connection.to as User).vcfUrl,
+  cardFrontImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)
+    ?.frontImageUrl,
+  cardBackImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)
+    ?.backImageUrl,
+  notes: connection.notes,
+})
 
 @Resolver()
 class ContactsResolver {
@@ -59,17 +75,7 @@ class ContactsResolver {
         },
       })
 
-    return connections.map((connection) => {
-      return {
-        id: (connection.to as User)._id,
-        name: (connection.to as User).name,
-        phoneNumber: (connection.to as User).phoneNumber,
-        email: (connection.to as User).email,
-        vcfUrl: (connection.to as User).vcfUrl,
-        cardImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)?.imageUrl,
-        notes: connection.notes,
-      }
-    })
+    return connections.map(connectionToContact)
   }
 
   // The contact query returns a specific user's contact information
@@ -93,15 +99,7 @@ class ContactsResolver {
       throw new Error('No connection exists between current user and queried user')
     }
 
-    return {
-      id: (connection.to as User)._id,
-      name: (connection.to as User).name,
-      phoneNumber: (connection.to as User).phoneNumber,
-      email: (connection.to as User).email,
-      vcfUrl: (connection.to as User).vcfUrl,
-      cardImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)?.imageUrl,
-      notes: connection.notes,
-    }
+    return connectionToContact(connection)
   }
 
   @Query(() => CardVersion)

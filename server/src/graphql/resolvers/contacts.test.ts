@@ -42,7 +42,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
@@ -57,7 +58,8 @@ describe('ContactsResolver', () => {
           notes: connection.notes ?? null,
           phoneNumber: user_to.phoneNumber ?? null,
           email: user_to.email,
-          cardImageUrl: null,
+          cardFrontImageUrl: null,
+          cardBackImageUrl: null,
           vcfUrl: user_to.vcfUrl ?? null,
         },
       ]
@@ -81,7 +83,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
@@ -113,7 +116,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
@@ -153,7 +157,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
@@ -171,7 +176,8 @@ describe('ContactsResolver', () => {
           notes: connection.notes ?? null,
           phoneNumber: user_to.phoneNumber ?? null,
           email: user_to.email,
-          cardImageUrl: null,
+          cardFrontImageUrl: null,
+          cardBackImageUrl: null,
           vcfUrl: user_to.vcfUrl ?? null,
         },
       ]
@@ -202,7 +208,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
@@ -219,7 +226,8 @@ describe('ContactsResolver', () => {
         notes: connection.notes ?? null,
         phoneNumber: user_to.phoneNumber ?? null,
         email: user_to.email,
-        cardImageUrl: null,
+        cardFrontImageUrl: null,
+        cardBackImageUrl: null,
         vcfUrl: user_to.vcfUrl ?? null,
       }
 
@@ -246,7 +254,8 @@ describe('ContactsResolver', () => {
             phoneNumber
             email
             notes
-            cardImageUrl
+            cardFrontImageUrl
+            cardBackImageUrl
             vcfUrl
           }
         }
