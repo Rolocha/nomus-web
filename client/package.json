@@ -10,7 +10,7 @@
     "@emotion/styled": "^10.0.27",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^10.0.3",
+    "@testing-library/react": "^10.0.4",
     "@testing-library/user-event": "^7.1.2",
     "@types/aos": "^3.0.3",
     "@types/jest": "^24.0.0",
@@ -141,7 +141,7 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "modulePaths": [
-      "<rootDir>/src"
+      "<rootDir>/"
     ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
@@ -180,12 +180,14 @@
     "@storybook/addons": "^5.3.18",
     "@storybook/preset-typescript": "^3.0.0",
     "@storybook/react": "^5.3.18",
+    "@types/react-test-renderer": "^16.9.2",
     "@types/styled-system": "^5.1.9",
     "babel-plugin-emotion": "^10.0.29",
     "husky": "^4.2.5",
     "jsonwebtoken": "^8.5.1",
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
+    "react-test-renderer": "^16.13.1",
     "storybook-addon-emotion-theme": "^2.1.1"
   },
   "husky": {

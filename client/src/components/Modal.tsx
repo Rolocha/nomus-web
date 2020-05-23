@@ -22,7 +22,7 @@ interface Props {
   onClose: (confirmed?: boolean) => void
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
-  children: JSX.Element
+  children: React.ReactNode
   width?: string
   height?: string
   confirmClose?: () => boolean
@@ -106,6 +106,8 @@ const Modal = ({
         <Box p={{ _: 3, md: 4 }} overflowX="auto">
           {children}
           <Box
+            role="button"
+            ariaLabel="Close Modal"
             onClick={tryToClose}
             p="inherit"
             position="absolute"
