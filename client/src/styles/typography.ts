@@ -5,17 +5,7 @@ const fontFamilies = {
   rubik: 'Rubik, Helvetica, sans-serif',
 }
 
-export interface TextStyle {
-  fontWeight?: 400 | 700 | 'medium'
-  fontSize?: number | number[]
-  lineHeight?: string | string[]
-  fontFamily?: string
-  color?: string
-}
-
-const textStyles: {
-  [key: string]: TextStyle
-} = {
+const textStyles: Record<string, any> = {
   heading: {
     fontWeight: 400,
     fontSize: [28, 32, 52, 44],
@@ -32,7 +22,7 @@ const textStyles: {
   },
   sectionHeader: {
     fontWeight: 400,
-    fontSize: [18, 20, 26, 36],
+    fontSize: [24, 24, 32, 32],
     lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     color: colors.textGray,
@@ -45,7 +35,7 @@ const textStyles: {
     color: colors.textGray,
   },
   body: {
-    fontSize: [15, 16, 18, 20],
+    fontSize: [14, 14, 16, 16],
     lineHeight: ['20px', '22px', '24px', '27px'],
     fontFamily: fontFamilies.rubik,
     fontWeight: 400,
@@ -66,6 +56,7 @@ const textStyles: {
     color: colors.textGray,
   },
   label: {
+    marginBottom: 1,
     fontSize: [14, 14, 14, 14],
     lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
