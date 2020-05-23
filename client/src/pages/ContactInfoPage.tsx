@@ -36,8 +36,8 @@ const ContactInfoPage = () => {
   >(
     gql`
       query ContactPageQuery($username: String!, $cardNameOrId: String) {
-        contactInfo(username: $username, cardNameOrId: $cardNameOrId) {
-          imageUrl
+        publicContact(username: $username, cardNameOrId: $cardNameOrId) {
+          frontImageUrl
           vcfUrl
           name {
             first
@@ -76,11 +76,11 @@ const ContactInfoPage = () => {
         bg="white"
         position="relative"
       >
-        <Image src={data.contactInfo.imageUrl} alt="business card" />
+        <Image src={data.publicContact.frontImageUrl} alt="business card" />
         <Button
           variant="primary"
           type="submit"
-          onClick={() => downloadFile(data.contactInfo.vcfUrl)}
+          onClick={() => downloadFile(data.publicContact.vcfUrl)}
         >
           Save contact
         </Button>
