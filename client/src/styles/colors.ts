@@ -6,6 +6,7 @@ const colors = {
   terraCotta: '#E86B5A',
   textGray: '#444444',
   textMediumGray: '#8B8B8B',
+  superlightGray: '#E5E5E5',
   textOlive: '#A9A591',
   bgBeige: '#FBF9F0',
   white: '#FFFFFF',
