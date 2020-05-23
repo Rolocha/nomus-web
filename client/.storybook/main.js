@@ -6,6 +6,23 @@ module.exports = {
     '@storybook/addon-actions',
     '@storybook/addon-links',
     '@storybook/preset-typescript',
+    {
+      name: '@storybook/addon-storysource',
+      options: {
+        loaderOptions: {
+          parser: 'typescript',
+          prettierConfig: {
+            singleQuote: true,
+            semi: false,
+            printWidth: 80,
+            tabWidth: 2,
+            arrowParens: 'always',
+            trailingComma: 'all',
+            bracketSpacing: true,
+          },
+        },
+      },
+    },
   ],
   webpackFinal: async (config) => {
     // do mutation to the config

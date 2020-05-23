@@ -17,6 +17,7 @@ import {
 } from 'styled-system'
 
 import theme from 'src/styles/theme'
+import { baseTextStyles } from 'src/styles/typography'
 
 export type TextProps = {
   variant?: keyof typeof theme.textStyles | null
@@ -29,6 +30,7 @@ export type TextProps = {
   SpaceProps
 
 const Text = styled<'p', TextProps>('p')(
+  baseTextStyles,
   variant({
     variants: theme.textStyles,
   }),

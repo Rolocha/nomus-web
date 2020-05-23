@@ -5,6 +5,11 @@ const fontFamilies = {
   rubik: 'Rubik, Helvetica, sans-serif',
 }
 
+export const baseTextStyles = {
+  margin: 0,
+  fontFamily: fontFamilies.rubik,
+}
+
 const textStyles: Record<string, any> = {
   heading: {
     fontWeight: 400,
@@ -74,5 +79,6 @@ const textStyles: Record<string, any> = {
 
 export default {
   fontFamilies,
+  baseTextStyles,
   textStyles,
 }

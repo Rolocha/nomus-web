@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Modal /> renders a modal with the specified content 1`] = `
+<aside
+  className="css-16lu7ni-Box e1gi27mm0"
+  display="flex"
+  height="100vh"
+  onClick={[Function]}
+  width="100vw"
+>
+  <div
+    className="css-c3ev9i-Box e1gi27mm0"
+    display="flex"
+  >
+    <div
+      className="css-q4rbdj-Box e1gi27mm0"
+    >
+      <h2
+        className="css-10tfo6t-Text e1pb1ozb0"
+      >
+        Test Modal
+      </h2>
+      <p
+        className="css-h555zl-Text e1pb1ozb0"
+      >
+        Some content
+      </p>
+      <div
+        className="css-1qehuvj-Box-Modal e1gi27mm0"
+        onClick={[Function]}
+        role="button"
+      >
+        <p
+          className="css-jvuolr-Text e1pb1ozb0"
+          fontSize={24}
+        >
+          X
+        </p>
+      </div>
+    </div>
+  </div>
+</aside>
+`;

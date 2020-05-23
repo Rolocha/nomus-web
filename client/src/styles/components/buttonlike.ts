@@ -98,6 +98,13 @@ export const styleVariants = {
       boxShadow: baseButtonStyles.boxShadow,
     },
   },
+
+  plain: {
+    color: colors.textGray,
+    boxShadow: 'none',
+    borderRadius: 0,
+    border: 'none',
+  },
 } as const
 
 export const widthVariants = {
