@@ -22,6 +22,7 @@ const buttonStyles = css`
 const Navbar = (props: Props) => (
   <Box
     p={35}
+    bg="white"
     width="100%"
     display="flex"
     flexDirection="row"

@@ -19,7 +19,7 @@ import {
 import theme from 'src/styles/theme'
 
 export type TextProps = {
-  variant?: keyof typeof theme.textStyles
+  variant?: keyof typeof theme.textStyles | null
   as?: string
 } & FontSizeProps &
   ColorProps &
@@ -46,7 +46,7 @@ Text.defaultProps = {
 
 const semanticallyStyledText = (
   as: string,
-  variant: keyof typeof theme.textStyles,
+  variant?: keyof typeof theme.textStyles | null,
 ) => (props: React.ComponentProps<typeof Text>) => (
   <Text as={as} variant={variant} {...props}>
     {props.children}
@@ -61,6 +61,7 @@ export const SectionSubheader = semanticallyStyledText('h4', 'sectionSubheader')
 
 export const Body = semanticallyStyledText('p', 'body')
 export const Caption = semanticallyStyledText('p', 'caption')
+export const Plain = semanticallyStyledText('p', null)
 
 export const Link = styled(Text.withComponent('a'))`
   cursor: pointer;

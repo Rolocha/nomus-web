@@ -11,19 +11,36 @@ import {
 import { useQuery, gql } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
 import theme from 'src/styles/theme'
+import { mq } from 'src/styles/breakpoints'
 import LoadingPage from 'src/pages/LoadingPage'
 import { formatName } from 'src/utils/name'
 
 import { InternalLink } from 'src/components/Link'
-import { PageHeader, Body } from 'src/components/Text'
+import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
 import Box from 'src/components/Box'
-import Container from 'src/components/Container'
 import Navbar from 'src/components/Navbar'
 import ProfileSection from './ProfileSection'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
 import SettingsSection from './SettingsSection'
+
+const bp = 'md'
+const POINTY_TAB_INDICATOR = css`
+  ${mq[bp]} {
+    &:after {
+      content: ' ';
+      display: block;
+      width: 1rem;
+      height: 1rem;
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      background-color: ${theme.colors.primaryTeal};
+    }
+  }
+`
 
 const ProfilePage = () => {
   const { loading, data } = useQuery<UserControlPanelSkeletonQuery>(
@@ -55,7 +72,7 @@ const ProfilePage = () => {
     },
     {
       path: 'cards',
-      label: 'Card Management',
+      label: 'Cards',
       Icon: SVG.Cards,
       Component: CardsSection,
     },
@@ -74,69 +91,83 @@ const ProfilePage = () => {
   ]
 
   return (
-    <Box bg="white" position="relative">
+    <Box
+      bg={theme.colors.bgBeige}
+      minHeight={{ [bp]: '100vh' }}
+      position="relative"
+    >
       <Navbar />
-      <Container bg={theme.colors.bgBeige} pb={4}>
+      <Box
+        pb={{ [bp]: 4 }}
+        container={{
+          _: false,
+          [bp]: true,
+        }}
+      >
         {data.user.name && (
-          <Box overflow="auto">
-            <PageHeader>
+          <Box overflow="auto" display={{ _: 'none', [bp]: 'block' }}>
+            <Text.PageHeader>
               {`Welcome back, ${formatName(data.user.name)}`}
-            </PageHeader>
+            </Text.PageHeader>
           </Box>
         )}
-        <Box display="flex" flexDirection="row">
+        <Box
+          display="flex"
+          flexDirection={{ _: 'column', [bp]: 'row' }}
+          alignItems={{ [bp]: 'flex-start' }}
+        >
           {/* Menu for selecting dashboard section */}
-          <Box>
+          <Box
+            display="flex"
+            flexDirection={{ _: 'row', [bp]: 'column' }}
+            minWidth={{ [bp]: 200 }}
+            bg={theme.colors.secondaryTeal}
+            borderTopLeftRadius={{ _: 0, [bp]: 3 }}
+            borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
+            // Needed to match the border-radius of selected item
+            overflow="hidden"
+          >
             {controlPanelSections.map(({ path, Icon, label }, index) => {
               const sectionPath = `${routeMatch.url}/${path}`
               const isCurrentSection = location.pathname === sectionPath
               return (
                 <Box
                   key={path}
-                  bg={
-                    isCurrentSection
-                      ? theme.colors.primaryTeal
-                      : theme.colors.secondaryTeal
-                  }
+                  bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
                   p={3}
-                  flexBasis="content"
+                  flexBasis={{
+                    _: `${100 / controlPanelSections.length}%`,
+                    [bp]: 'auto',
+                  }}
                   position="relative"
-                  borderTopLeftRadius={index === 0 ? '24px' : '0'}
-                  borderBottomLeftRadius={
-                    index === controlPanelSections.length - 1 ? '24px' : '0'
-                  }
-                  css={
-                    isCurrentSection
-                      ? css`
-                          // Render the little pointy current-tab indicator
-                          // It's just a 1rem x 1rem box rotated 45º
-                          &:after {
-                            content: ' ';
-                            display: block;
-                            width: 1rem;
-                            height: 1rem;
-                            position: absolute;
-                            top: 50%;
-                            left: 100%;
-                            transform: translate(-50%, -50%) rotate(45deg);
-                            background-color: ${theme.colors.primaryTeal};
-                          }
-                        `
-                      : null
-                  }
+                  css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
                 >
                   <InternalLink noUnderline to={sectionPath}>
-                    <Box display="flex" flexDirection="row" alignItems="center">
+                    <Box
+                      display="flex"
+                      flexDirection={{ _: 'column', [bp]: 'row' }}
+                      alignItems="center"
+                    >
                       <Icon
                         color="white"
                         css={css`
                           height: 1.5em;
-                          margin-right: 0.7em;
+
+                          // Margin below in mobile; on right in desktop
+                          margin-bottom: 0.5em;
+                          ${mq[bp]} {
+                            margin-right: 0.7em;
+                          }
                         `}
                       />
-                      <Body m={0} color="white">
+                      <Text.Plain
+                        m={0}
+                        color="white"
+                        fontSize={{ _: 10, [bp]: 16 }}
+                        fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+                      >
                         {label}
-                      </Body>
+                      </Text.Plain>
                     </Box>
                   </InternalLink>
                 </Box>
@@ -147,11 +178,14 @@ const ProfilePage = () => {
           {/* Content for selected section */}
           <Box
             flexGrow={1}
-            boxShadow="0px 0px 4px rgba(0, 0, 0, 0.25)"
+            boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
             bg="white"
             padding={5}
+            borderTopRightRadius={{ [bp]: 3 }}
+            borderBottomRightRadius={{ [bp]: 3 }}
+            borderBottomLeftRadius={{ [bp]: 3 }}
             // Just for now
-            minHeight="100vh"
+            minHeight="50vh"
           >
             <Switch>
               {controlPanelSections.map(({ path, Component }) => (
@@ -168,7 +202,7 @@ const ProfilePage = () => {
             </Switch>
           </Box>
         </Box>
-      </Container>
+      </Box>
     </Box>
   )
 }
