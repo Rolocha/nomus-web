@@ -65,7 +65,7 @@ const textStyles: Record<string, any> = {
     fontSize: [14, 14, 14, 14],
     lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
-    fontWeight: 700,
+    fontWeight: 500,
     color: colors.primaryOlive,
   },
   input: {

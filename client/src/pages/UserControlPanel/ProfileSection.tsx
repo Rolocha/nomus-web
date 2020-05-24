@@ -1,48 +1,27 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
-import { useQuery, gql } from 'src/apollo'
+import * as React from 'react'
+import { gql, useQuery } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
-
-import Image from 'src/components/Image'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
+import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
-import LoadingPage from 'src/pages/LoadingPage'
 import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
-import { formatName } from 'src/utils/name'
+import LoadingPage from 'src/pages/LoadingPage'
 import { mq } from 'src/styles/breakpoints'
+import { formatName } from 'src/utils/name'
+import NameplateEditor from './NameplateEditor'
+import ProfileEditor from './ProfileEditor'
 
 const bp = 'lg'
 
-type EditButtonProps = {
-  onClick?: (event: React.SyntheticEvent<any>) => void
-}
-const EditButton = ({ onClick }: EditButtonProps) => (
-  <Button onClick={onClick} variant="plainButLightOnHover">
-    <Box display="flex" flexDirection="row" alignItems="center">
-      <SVG.Pen
-        css={css`
-          width: 20px;
-          ${mq[bp]} {
-            margin-right: 8px;
-          }
-        `}
-      />
-      <Box display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Plain fontSize="14px" fontWeight="bold" color="primaryTeal">
-          Edit
-        </Text.Plain>
-      </Box>
-    </Box>
-  </Button>
-)
-
 export default () => {
+  // const [isEditingProfile, setIsEditingProfile] = React.useState(false)
+
   const { loading, data } = useQuery<UCPProfileSectionQuery>(
     gql`
       query UCPProfileSectionQuery {
         user {
+          id
           username
           name {
             first
@@ -113,26 +92,40 @@ export default () => {
       </Box>
 
       <Box gridArea="editName" alignSelf="center">
-        <EditButton />
+        <NameplateEditor
+          editIconOnlyBp={bp}
+          defaultValues={{
+            firstName: data?.user?.name?.first ?? '',
+            middleName: data?.user?.name?.middle ?? '',
+            lastName: data?.user?.name?.last ?? '',
+            headline: data?.user?.headline ?? '',
+          }}
+        />
       </Box>
 
-      <Box
-        gridArea="cards"
-        display="flex"
-        flexDirection={{ _: 'row', [bp]: 'column' }}
-        alignItems={{ _: 'center', [bp]: 'flex-end' }}
-        pr={3}
-        flexShrink={0}
-      >
-        {/* Front of business card */}
-        <Box width={{ _: '50%', [bp]: '100%' }} mb={2}>
-          <Image width="100%" src={data.cardVersion.frontImageUrl} />
+      {data.cardVersion && (
+        <Box
+          gridArea="cards"
+          display="flex"
+          flexDirection={{ _: 'row', [bp]: 'column' }}
+          alignItems={{ _: 'center', [bp]: 'flex-end' }}
+          pr={3}
+          flexShrink={0}
+        >
+          {/* Front of business card */}
+          {data.cardVersion.frontImageUrl && (
+            <Box width={{ _: '50%', [bp]: '100%' }} mb={2}>
+              <Image width="100%" src={data.cardVersion.frontImageUrl} />
+            </Box>
+          )}
+          {data.cardVersion.backImageUrl && (
+            <Box width={{ _: '50%', [bp]: '100%' }}>
+              {/* Back of business card */}
+              <Image width="100%" src={data.cardVersion.backImageUrl} />
+            </Box>
+          )}
         </Box>
-        <Box width={{ _: '50%', [bp]: '100%' }}>
-          {/* Back of business card */}
-          <Image width="100%" src={data.cardVersion.backImageUrl} />
-        </Box>
-      </Box>
+      )}
 
       <Box gridArea="profileInfo">
         <Box mb={3}>
@@ -167,7 +160,14 @@ export default () => {
       </InternalLink>
 
       <Box gridArea="editProfile">
-        <EditButton />
+        <ProfileEditor
+          editIconOnlyBp={bp}
+          defaultValues={{
+            phoneNumber: data?.user.phoneNumber ?? '',
+            email: data?.user.email ?? '',
+            bio: data?.user.bio ?? '',
+          }}
+        />
       </Box>
     </Box>
   )

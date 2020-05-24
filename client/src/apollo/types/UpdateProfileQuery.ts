@@ -3,22 +3,24 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { ProfileUpdateInput } from './globalTypes'
+
 // ====================================================
-// GraphQL query operation: UCPProfileSectionQuery
+// GraphQL mutation operation: UpdateProfileQuery
 // ====================================================
 
-export interface UCPProfileSectionQuery_user_name {
+export interface UpdateProfileQuery_updateProfile_name {
   __typename: 'PersonName'
   first: string
   middle: string | null
   last: string
 }
 
-export interface UCPProfileSectionQuery_user {
+export interface UpdateProfileQuery_updateProfile {
   __typename: 'User'
   id: string
   username: string | null
-  name: UCPProfileSectionQuery_user_name | null
+  name: UpdateProfileQuery_updateProfile_name | null
   profilePicUrl: string | null
   headline: string | null
   phoneNumber: string | null
@@ -26,13 +28,10 @@ export interface UCPProfileSectionQuery_user {
   bio: string | null
 }
 
-export interface UCPProfileSectionQuery_cardVersion {
-  __typename: 'CardVersion'
-  frontImageUrl: string
-  backImageUrl: string
+export interface UpdateProfileQuery {
+  updateProfile: UpdateProfileQuery_updateProfile
 }
 
-export interface UCPProfileSectionQuery {
-  user: UCPProfileSectionQuery_user
-  cardVersion: UCPProfileSectionQuery_cardVersion | null
+export interface UpdateProfileQueryVariables {
+  updatedUser: ProfileUpdateInput
 }

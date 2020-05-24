@@ -1,10 +1,9 @@
-import { Resolver, Query, Mutation, Ctx, Authorized, Arg, InputType, Field } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
 import bcrypt from 'bcryptjs'
-
-import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
-import { User, Role } from 'src/models/User'
+import { Role, User } from 'src/models/User'
+import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import MUUID from 'uuid-mongodb'
+import { AdminOnlyArgs } from '../auth'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -20,6 +19,12 @@ class ProfileUpdateInput implements Partial<User> {
 
   @Field({ nullable: true })
   email?: string
+
+  @Field({ nullable: true })
+  headline?: string
+
+  @Field({ nullable: true })
+  bio?: string
 }
 
 @Resolver()
@@ -74,12 +79,14 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
-    userBeingUpdated.name.first = userUpdatePayload.firstName
-    userBeingUpdated.name.middle = userUpdatePayload.middleName
-    userBeingUpdated.name.last = userUpdatePayload.lastName
+    userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first
+    userBeingUpdated.name.middle = userUpdatePayload.middleName ?? userBeingUpdated.name.middle
+    userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last
+    userBeingUpdated.headline = userUpdatePayload.headline ?? userBeingUpdated.headline
 
-    userBeingUpdated.email = userUpdatePayload.email
-    userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber
+    userBeingUpdated.email = userUpdatePayload.email ?? userBeingUpdated.email
+    userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber ?? userBeingUpdated.phoneNumber
+    userBeingUpdated.bio = userUpdatePayload.bio ?? userBeingUpdated.bio
 
     return await userBeingUpdated.save()
   }
