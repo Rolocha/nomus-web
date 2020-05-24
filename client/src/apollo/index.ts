@@ -1,6 +1,5 @@
-import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-
+import { ApolloClient } from 'apollo-client'
 import link from './links'
 
 export const client = new ApolloClient({
@@ -8,10 +7,10 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-export { gql } from 'apollo-boost'
 export {
-  useQuery,
+  ApolloProvider,
   useLazyQuery,
   useMutation,
-  ApolloProvider,
+  useQuery,
 } from '@apollo/react-hooks'
+export { gql } from 'apollo-boost'

@@ -22,7 +22,7 @@ class CardVersionStats {
 class CardVersionResolver {
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
-  @Query(() => CardVersion)
+  @Query(() => CardVersion, { nullable: true })
   async cardVersion(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Arg('cardVersionId', { nullable: true }) cardVersionId: string | null,
@@ -37,7 +37,7 @@ class CardVersionResolver {
         .findById(MUUID.from(requestedUserId))
         .populate('defaultCardVersion')
 
-      return user.defaultCardVersion as CardVersion
+      return (user.defaultCardVersion as CardVersion) || null
     } else {
       return await CardVersion.mongo.findById(MUUID.from(cardVersionId))
     }

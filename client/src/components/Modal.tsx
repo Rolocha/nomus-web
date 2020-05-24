@@ -1,11 +1,16 @@
-import * as React from 'react'
-import { css } from '@emotion/core'
+import { css, Global } from '@emotion/core'
+import * as CSS from 'csstype'
 import { rgba } from 'polished'
-
-import * as Text from 'src/components/Text'
+import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
+import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
+import {
+  RequiredTheme,
+  ResponsiveValue,
+  TLengthStyledSystem,
+} from 'styled-system'
 
 interface Action {
   text: string
@@ -23,8 +28,14 @@ interface Props {
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
   children: React.ReactNode
-  width?: string
-  height?: string
+  width?: ResponsiveValue<
+    CSS.MaxWidthProperty<TLengthStyledSystem>,
+    RequiredTheme
+  >
+  height?: ResponsiveValue<
+    CSS.MaxHeightProperty<TLengthStyledSystem>,
+    RequiredTheme
+  >
   confirmClose?: () => boolean
   actions?: Actions
   allowCloseWithOutsideClick?: boolean
@@ -40,6 +51,7 @@ const Modal = ({
   actions,
   allowCloseWithOutsideClick = true,
 }: Props) => {
+  const lastIsOpen = React.useRef(isOpen)
   const modalCardRef = React.useRef<HTMLDivElement>(null)
   const [confirmingClose, setConfirmingClose] = React.useState(false)
 
@@ -48,6 +60,7 @@ const Modal = ({
       allowCloseWithOutsideClick &&
       !confirmingClose &&
       modalCardRef.current &&
+      // @ts-ignore
       !modalCardRef.current.contains(event.target)
     ) {
       tryToClose()
@@ -71,10 +84,22 @@ const Modal = ({
     setConfirmingClose(false)
   }, [setConfirmingClose])
 
+  // Disable scroll when modal gets opened
+  React.useEffect(() => {
+    if (isOpen !== lastIsOpen.current) {
+      if (isOpen) {
+        document.querySelector('html')?.classList.add('scroll-lock')
+      } else {
+        document.querySelector('html')?.classList.remove('scroll-lock')
+      }
+      lastIsOpen.current = isOpen
+    }
+  }, [isOpen, lastIsOpen])
+
   return isOpen ? (
     <Box
       as="aside"
-      ariaModal
+      aria-modal
       position="fixed"
       top="0"
       left="0"
@@ -88,15 +113,22 @@ const Modal = ({
       bg={rgba(colors.primaryTeal, 0.8)}
       onClick={handleOutsideClick}
     >
+      <Global
+        styles={css`
+          .scroll-lock {
+            overflow: hidden;
+          }
+        `}
+      />
       <Box
         ref={modalCardRef}
         position="relative"
         zIndex={20}
         maxWidth={width ?? { _: '95%', md: '80%' }}
-        maxHeight={height ?? { _: '95%', md: '60%' }}
-        minWidth="400px"
+        maxHeight={height ?? { _: '95%', md: '80%' }}
+        minWidth="calc(min(80vw, 400px))"
         bg="white"
-        borderRadius={3}
+        borderRadius={2}
         boxShadow={0}
         display="flex"
         flexDirection="column"
@@ -107,7 +139,7 @@ const Modal = ({
           {children}
           <Box
             role="button"
-            ariaLabel="Close Modal"
+            aria-label="Close Modal"
             onClick={tryToClose}
             p="inherit"
             position="absolute"

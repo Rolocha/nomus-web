@@ -1,23 +1,22 @@
-import * as React from 'react'
 import styled from '@emotion/styled'
+import * as React from 'react'
+import theme from 'src/styles/theme'
+import { baseTextStyles } from 'src/styles/typography'
 import {
-  fontSize,
-  FontSizeProps,
+  color,
+  ColorProps,
   fontFamily,
   FontFamilyProps,
+  fontSize,
+  FontSizeProps,
   fontWeight,
   FontWeightProps,
   lineHeight,
   LineHeightProps,
-  color,
-  ColorProps,
   space,
   SpaceProps,
   variant,
 } from 'styled-system'
-
-import theme from 'src/styles/theme'
-import { baseTextStyles } from 'src/styles/typography'
 
 export type TextProps = {
   variant?: keyof typeof theme.textStyles | null

@@ -1,15 +1,14 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
-import { useHistory, useLocation } from 'react-router-dom'
+import * as React from 'react'
 import { useForm } from 'react-hook-form'
-
-import { useAuth } from 'src/utils/auth'
-import { Body, Link } from 'src/components/Text'
-import Button from 'src/components/Button'
+import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Logo from 'src/components/Logo'
 import { LoginSquiggle } from 'src/components/SVG'
+import { Body, Link } from 'src/components/Text'
+import { useAuth } from 'src/utils/auth'
 
 interface LoginFormData {
   email: string
@@ -96,67 +95,67 @@ const LoginPage = () => {
           Sign in to manage your connections and build your digital presence.
         </Body>
 
-        <Box display="flex" flexDirection="column">
+        <Box display="flex" flexDirection="column" mt={4}>
           <Form.Form onSubmit={handleSubmit(onSubmit)}>
             {mode === 'signup' && [
-              <Box key="first" mb="20px">
+              <Form.Item key="first" mb="20px">
+                <Form.Label htmlFor="firstName">FIRST NAME</Form.Label>
                 <Form.Input
                   required
                   name="firstName"
-                  label="First name"
                   ref={register({ required: true })}
                   type="text"
                   placeholder="John"
                   autoComplete="given-name"
                 />
                 {showRequiredError('firstName', 'First name', errors)}
-              </Box>,
-              <Box key="middle" mb="20px">
+              </Form.Item>,
+              <Form.Item key="middle" mb="20px">
+                <Form.Label htmlFor="middleName">MIDDLE NAME</Form.Label>
                 <Form.Input
                   required
                   name="middleName"
-                  label="Middle Name"
                   ref={register({ required: false })}
                   type="text"
                   placeholder="David"
                   autoComplete="additional-name"
                 />
-              </Box>,
-              <Box key="last" mb="20px">
+              </Form.Item>,
+              <Form.Item key="last" mb="20px">
+                <Form.Label htmlFor="lastName">LAST NAME</Form.Label>
                 <Form.Input
                   required
                   name="lastName"
-                  label="Last name"
                   ref={register({ required: true })}
                   type="text"
                   placeholder="Appleseed"
                   autoComplete="family-name"
                 />
                 {showRequiredError('lastName', 'Last name', errors)}
-              </Box>,
+              </Form.Item>,
             ]}
-            <Box mb="20px">
+            <Form.Item mb="20px">
+              <Form.Label htmlFor="email">EMAIL</Form.Label>
               <Form.Input
                 name="email"
-                label="Email"
                 ref={register({ required: true })}
                 type="text"
                 placeholder="Enter your email address"
                 autoComplete="email"
               />
               {showRequiredError('email', 'Email', errors)}
-            </Box>
-            <Box mb="20px">
+            </Form.Item>
+            <Form.Item mb="20px">
+              <Form.Label htmlFor="password">PASSWORD</Form.Label>
               <Form.Input
                 name="password"
-                label="Password"
                 ref={register({ required: true })}
                 type="password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
               />
               {showRequiredError('password', 'Password', errors)}
-            </Box>
+            </Form.Item>
           </Form.Form>
         </Box>
         <Box
@@ -199,7 +198,7 @@ const LoginPage = () => {
             <Button
               key="button"
               width="full"
-              variant="primary"
+              variant="primaryOutline"
               onClick={() => setMode('signup')}
             >
               Create an account

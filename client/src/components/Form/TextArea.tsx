@@ -23,7 +23,7 @@ import {
   TypographyProps,
 } from 'styled-system'
 
-type InputProps = {
+type TextAreaProps = {
   as?: string
 } & SpaceProps &
   PositionProps &
@@ -36,7 +36,7 @@ type InputProps = {
   LineHeightProps &
   TypographyProps
 
-const Input = styled<'input', InputProps>('input')(
+const TextArea = styled<'textarea', TextAreaProps>('textarea')(
   {
     boxShadow: 'inset 0px 0px 4px rgba(0, 0, 0, 0.25)',
     borderRadius: '6px',
@@ -57,9 +57,8 @@ const Input = styled<'input', InputProps>('input')(
   typography,
 )
 
-Input.defaultProps = {
+TextArea.defaultProps = {
   fontSize: theme.textStyles.body.fontSize,
-  lineHeight: theme.textStyles.input.lineHeight,
 }
 
-export default Input
+export default TextArea

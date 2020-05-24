@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
-import MUUID from 'uuid-mongodb'
-
-import { initDB, cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { UserModel } from 'src/models/User'
+import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { UserModel } from 'src/models/User'
+import MUUID from 'uuid-mongodb'
 
 beforeAll(async () => {
   await initDB()
@@ -174,9 +173,12 @@ describe('UserResolver', () => {
       })
       const updatePayload = {
         firstName: 'B',
+        middleName: 'M',
         lastName: 'G',
+        headline: 'CEO at TestWriting, Inc.',
         email: 'newone@gmail.com',
         phoneNumber: '1234567890',
+        bio: 'this is my new bio',
       }
       const response = await execQuery({
         source: `
@@ -185,10 +187,13 @@ describe('UserResolver', () => {
             id
             name {
               first
+              middle
               last
             }
+            headline
             email
             phoneNumber
+            bio
           }
         }
         `,
@@ -202,10 +207,13 @@ describe('UserResolver', () => {
       const updatedUser = await UserModel.findById(MUUID.from(response.data.updateProfile.id))
       for (const userObject of [updatedUser, response.data.updateProfile]) {
         expect(userObject.name.first).toBe(updatePayload.firstName)
-        expect(userObject.name.middle == null).toBe(true)
+        expect(userObject.name.middle).toBe(updatePayload.middleName)
         expect(userObject.name.last).toBe(updatePayload.lastName)
+        expect(userObject.headline).toBe(updatePayload.headline)
+
         expect(userObject.email).toBe(updatePayload.email)
         expect(userObject.phoneNumber).toBe(updatePayload.phoneNumber)
+        expect(userObject.bio).toBe(updatePayload.bio)
       }
     })
   })
