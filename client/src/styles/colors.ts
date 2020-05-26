@@ -33,6 +33,10 @@ const colors = {
   hoverBlue: '#F0F7FF',
   activeBlue: '#E5F1FF',
   outlineBlue: '#B2D6FF',
+
+  hoverRed: '#FFF0F7',
+  activeRed: '#FFE5F1',
+  outlineRed: '#FFB2D6',
 } as const
 
 export default colors

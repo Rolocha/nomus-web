@@ -9,6 +9,9 @@ import { Role } from 'src/util/enums'
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
   @Field({ nullable: true })
+  username?: string
+
+  @Field({ nullable: true })
   firstName?: string
   @Field({ nullable: true })
   middleName?: string
@@ -80,6 +83,7 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
+    userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
     userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first
     userBeingUpdated.name.middle = userUpdatePayload.middleName ?? userBeingUpdated.name.middle
     userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last

@@ -102,6 +102,31 @@ export const styleVariants = {
     },
   },
 
+  quaternary: {
+    ...baseButtonStyles,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderColor: colors.invalidRed,
+    color: colors.invalidRed,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverRed,
+    },
+    '&:active': {
+      backgroundColor: colors.activeRed,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineRed}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: 'transparent',
+      color: colors.invalidRed,
+      borderColor: colors.invalidRed,
+    },
+  },
+
   unstyled: {},
 } as const
 
