@@ -1,16 +1,18 @@
+import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
-
-import { validateEmail } from './utils'
-import { UUIDScalar, UUIDType, Ref } from './scalars'
-import { PersonName, Address } from './subschemas'
+import { Ref, UUIDScalar, UUIDType } from './scalars'
+import { Address, PersonName } from './subschemas'
 import User from './User'
+import { validateEmail } from './utils'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 export class CardVersion {
   static mongo: ReturnModelType<typeof CardVersion>
+
+  @Field()
+  createdAt: Date
 
   @prop({ required: true, default: MUUID.v4 })
   @Field((type) => UUIDScalar)

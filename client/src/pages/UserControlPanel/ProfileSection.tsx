@@ -15,8 +15,6 @@ import ProfileEditor from './ProfileEditor'
 const bp = 'lg'
 
 export default () => {
-  // const [isEditingProfile, setIsEditingProfile] = React.useState(false)
-
   const { loading, data } = useQuery<UCPProfileSectionQuery>(
     gql`
       query UCPProfileSectionQuery {

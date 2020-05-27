@@ -1,23 +1,21 @@
-import MUUID from 'uuid-mongodb'
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
 import {
-  pre,
-  prop,
-  modelOptions,
-  ReturnModelType,
   DocumentType,
   getModelForClass,
+  modelOptions,
+  pre,
+  prop,
+  ReturnModelType,
 } from '@typegoose/typegoose'
-import { ObjectType, Field, registerEnumType } from 'type-graphql'
-
-import { authTokenPrivateKey, accessTokenLifespan } from 'src/config'
-
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import { accessTokenLifespan, authTokenPrivateKey } from 'src/config'
+import { Field, ObjectType, registerEnumType } from 'type-graphql'
+import MUUID from 'uuid-mongodb'
 import { CardVersion } from './CardVersion'
-import Token from './Token'
+import { Ref, UUIDScalar, UUIDType } from './scalars'
 import { PersonName } from './subschemas'
+import Token from './Token'
 import { validateEmail } from './utils'
-import { UUIDType, Ref } from './scalars'
 
 export interface UserCreatePayload {
   _id?: UUIDType
@@ -100,7 +98,7 @@ export class User {
   password: string
 
   @prop({ type: Buffer, ref: 'CardVersion' })
-  @Field(() => CardVersion, { nullable: true })
+  @Field(() => UUIDScalar, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
   @prop({ required: false })
