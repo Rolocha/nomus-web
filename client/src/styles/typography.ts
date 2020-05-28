@@ -33,8 +33,8 @@ const textStyles: Record<string, any> = {
     color: colors.textGray,
   },
   sectionSubheader: {
-    fontWeight: 'medium',
-    fontSize: [14, 16, 18, 20],
+    fontWeight: 500,
+    fontSize: 20,
     lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     color: colors.textGray,
@@ -42,6 +42,13 @@ const textStyles: Record<string, any> = {
   body: {
     fontSize: [14, 14, 16, 16],
     lineHeight: ['20px', '22px', '24px', '27px'],
+    fontFamily: fontFamilies.rubik,
+    fontWeight: 400,
+    color: colors.textGray,
+  },
+  bodyTertiary: {
+    fontSize: [12, 12, 12, 12],
+    lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     fontWeight: 400,
     color: colors.textGray,

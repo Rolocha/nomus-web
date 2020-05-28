@@ -61,6 +61,7 @@ export const SectionHeader = semanticallyStyledText('h3', 'sectionHeader')
 export const SectionSubheader = semanticallyStyledText('h4', 'sectionSubheader')
 
 export const Body = semanticallyStyledText('p', 'body')
+export const Body3 = semanticallyStyledText('p', 'bodyTertiary')
 export const Caption = semanticallyStyledText('p', 'caption')
 export const Label = semanticallyStyledText('p', 'label')
 export const Plain = semanticallyStyledText('p', null)

@@ -1,9 +1,8 @@
-import { Model, Document } from 'mongoose'
-import { buildSchemaSync, MiddlewareFn } from 'type-graphql'
 import { getClassForDocument } from '@typegoose/typegoose'
-
-import resolvers from 'src/graphql/resolvers'
+import { Document, Model } from 'mongoose'
 import { schemaAuthChecker } from 'src/graphql/auth'
+import resolvers from 'src/graphql/resolvers'
+import { buildSchemaSync, MiddlewareFn } from 'type-graphql'
 
 const typegooseMiddleware: MiddlewareFn = async (_, next) => {
   const result = await next()
@@ -31,6 +30,7 @@ export const createSchema = () => {
     resolvers,
     authChecker: schemaAuthChecker,
     globalMiddlewares: [typegooseMiddleware],
+    dateScalarMode: 'timestamp', // "timestamp" or "isoDate"
   })
   return schema
 }
