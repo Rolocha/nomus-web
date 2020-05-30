@@ -1,28 +1,26 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
+import * as React from 'react'
 import {
   Redirect,
   Route,
   Switch,
-  useRouteMatch,
   useLocation,
+  useRouteMatch,
 } from 'react-router-dom'
-
-import { useQuery, gql } from 'src/apollo'
+import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
-import theme from 'src/styles/theme'
-import { mq } from 'src/styles/breakpoints'
-import LoadingPage from 'src/pages/LoadingPage'
-import { formatName } from 'src/utils/name'
-
-import { InternalLink } from 'src/components/Link'
-import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
 import Box from 'src/components/Box'
+import { InternalLink } from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
-import ProfileSection from './ProfileSection'
+import * as SVG from 'src/components/SVG'
+import * as Text from 'src/components/Text'
+import LoadingPage from 'src/pages/LoadingPage'
+import { mq } from 'src/styles/breakpoints'
+import theme from 'src/styles/theme'
+import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
+import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
 
 const bp = 'md'
@@ -130,7 +128,7 @@ const ProfilePage = () => {
           >
             {controlPanelSections.map(({ path, Icon, label }, index) => {
               const sectionPath = `${routeMatch.url}/${path}`
-              const isCurrentSection = location.pathname === sectionPath
+              const isCurrentSection = location.pathname.startsWith(sectionPath)
               return (
                 <Box
                   key={path}

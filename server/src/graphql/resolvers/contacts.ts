@@ -1,19 +1,21 @@
-import { Resolver, Query, Ctx, Authorized, Arg, ObjectType, Field } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
-
-import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
-import User, { Role } from 'src/models/User'
-import Connection from 'src/models/Connection'
-import { PersonName } from 'src/models/subschemas'
-import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { CardVersion } from 'src/models/CardVersion'
+import Connection from 'src/models/Connection'
+import { UUIDScalar, UUIDType } from 'src/models/scalars'
+import { PersonName } from 'src/models/subschemas'
+import User, { Role } from 'src/models/User'
+import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql'
+import MUUID from 'uuid-mongodb'
+import { AdminOnlyArgs } from '../auth'
 
 @ObjectType()
 class Contact {
   //id of the user whose contact is being queried
   @Field((type) => UUIDScalar)
   id: UUIDType
+
+  @Field()
+  username: string
 
   @Field((type) => PersonName)
   name: PersonName
@@ -23,6 +25,15 @@ class Contact {
 
   @Field({ nullable: true })
   email: string
+
+  @Field({ nullable: true })
+  headline: string
+
+  @Field({ nullable: true })
+  bio: string
+
+  @Field({ nullable: true })
+  profilePic: string
 
   //unique to the connections, notes taken by the user querying
   @Field({ nullable: true })
@@ -38,18 +49,23 @@ class Contact {
   vcfUrl: string
 }
 
-const connectionToContact = (connection: Connection) => ({
-  id: (connection.to as User)._id,
-  name: (connection.to as User).name,
-  phoneNumber: (connection.to as User).phoneNumber,
-  email: (connection.to as User).email,
-  vcfUrl: (connection.to as User).vcfUrl,
-  cardFrontImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)
-    ?.frontImageUrl,
-  cardBackImageUrl: ((connection.to as User).defaultCardVersion as CardVersion | null)
-    ?.backImageUrl,
-  notes: connection.notes,
-})
+const connectionToContact = (connection: Connection): Contact => {
+  const connectionUser = connection.to as User
+  return {
+    id: connectionUser._id,
+    name: connectionUser.name,
+    phoneNumber: connectionUser.phoneNumber,
+    email: connectionUser.email,
+    vcfUrl: connectionUser.vcfUrl,
+    cardFrontImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.frontImageUrl,
+    cardBackImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.backImageUrl,
+    notes: connection.notes,
+    bio: connectionUser.bio,
+    headline: connectionUser.headline,
+    profilePic: connectionUser.profilePicUrl,
+    username: connectionUser.username,
+  }
+}
 
 @Resolver()
 class ContactsResolver {
