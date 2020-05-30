@@ -22,7 +22,7 @@ local publishDockerImage(app, env, when) = {
     },
     "region": "us-east-1",
     "registry": ECR_REGISTRY,
-    "repo": "rolocha/" + app,
+    "repo": "nomus/" + app,
     "tags": [
       env + "-latest"
     ],
