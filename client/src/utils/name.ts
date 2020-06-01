@@ -1,6 +1,6 @@
 interface IName {
   first: string
-  middle: string | null
+  middle?: string | null
   last: string
 }
 
