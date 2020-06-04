@@ -75,7 +75,8 @@ const ProfilePage = () => {
       Component: CardsSection,
     },
     {
-      path: 'contacts',
+      linkPath: 'contacts',
+      matchPath: 'contacts/:viewMode?/:usernameOrId?',
       label: 'Contacts',
       Icon: SVG.Contacts,
       Component: ContactsSection,
@@ -126,52 +127,56 @@ const ProfilePage = () => {
             // Needed to match the border-radius of selected item
             overflow="hidden"
           >
-            {controlPanelSections.map(({ path, Icon, label }, index) => {
-              const sectionPath = `${routeMatch.url}/${path}`
-              const isCurrentSection = location.pathname.startsWith(sectionPath)
-              return (
-                <Box
-                  key={path}
-                  bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
-                  p={3}
-                  flexBasis={{
-                    _: `${100 / controlPanelSections.length}%`,
-                    [bp]: 'auto',
-                  }}
-                  position="relative"
-                  css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
-                >
-                  <InternalLink noUnderline to={sectionPath}>
-                    <Box
-                      display="flex"
-                      flexDirection={{ _: 'column', [bp]: 'row' }}
-                      alignItems="center"
-                    >
-                      <Icon
-                        color="white"
-                        css={css`
-                          height: 1.5em;
-
-                          // Margin below in mobile; on right in desktop
-                          margin-bottom: 0.5em;
-                          ${mq[bp]} {
-                            margin-right: 0.7em;
-                          }
-                        `}
-                      />
-                      <Text.Plain
-                        m={0}
-                        color="white"
-                        fontSize={{ _: 10, [bp]: 16 }}
-                        fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+            {controlPanelSections.map(
+              ({ linkPath, path, Icon, label }, index) => {
+                const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
+                const isCurrentSection = location.pathname.startsWith(
+                  sectionPath,
+                )
+                return (
+                  <Box
+                    key={path}
+                    bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
+                    p={3}
+                    flexBasis={{
+                      _: `${100 / controlPanelSections.length}%`,
+                      [bp]: 'auto',
+                    }}
+                    position="relative"
+                    css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
+                  >
+                    <InternalLink noUnderline to={sectionPath}>
+                      <Box
+                        display="flex"
+                        flexDirection={{ _: 'column', [bp]: 'row' }}
+                        alignItems="center"
                       >
-                        {label}
-                      </Text.Plain>
-                    </Box>
-                  </InternalLink>
-                </Box>
-              )
-            })}
+                        <Icon
+                          color="white"
+                          css={css`
+                            height: 1.5em;
+
+                            // Margin below in mobile; on right in desktop
+                            margin-bottom: 0.5em;
+                            ${mq[bp]} {
+                              margin-right: 0.7em;
+                            }
+                          `}
+                        />
+                        <Text.Plain
+                          m={0}
+                          color="white"
+                          fontSize={{ _: 10, [bp]: 16 }}
+                          fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+                        >
+                          {label}
+                        </Text.Plain>
+                      </Box>
+                    </InternalLink>
+                  </Box>
+                )
+              },
+            )}
           </Box>
 
           {/* Content for selected section */}
@@ -188,15 +193,21 @@ const ProfilePage = () => {
             minHeight="50vh"
           >
             <Switch>
-              {controlPanelSections.map(({ path, Component }) => (
-                <Route key={path} path={`${routeMatch.url}/${path}`}>
+              {controlPanelSections.map(({ matchPath, path, Component }) => (
+                <Route
+                  key={path}
+                  path={`${routeMatch.url}/${matchPath ?? path}`}
+                >
                   <Component />
                 </Route>
               ))}
               {/* If user lands on a route that doesn't match any, redirect to the first one */}
               <Route>
                 <Redirect
-                  to={`${routeMatch.url}/${controlPanelSections[0].path}`}
+                  to={`${routeMatch.url}/${
+                    controlPanelSections[0].linkPath ??
+                    controlPanelSections[0].path
+                  }`}
                 />
               </Route>
             </Switch>

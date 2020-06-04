@@ -7,8 +7,6 @@ const { textStyles } = typography
 export const baseButtonStyles = {
   padding: '8px 16px',
   borderRadius: '6px',
-  borderWidth: '2px',
-  borderStyle: 'solid',
   fontFamily: textStyles.body.fontFamily,
   fontSize: '14px',
   fontWeight: 500,
@@ -19,72 +17,98 @@ export const baseButtonStyles = {
 
 export const styleVariants = {
   primary: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.primaryTeal,
     borderColor: colors.primaryTeal,
     color: colors.bgBeige,
   },
   primaryOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.primaryTeal,
     color: colors.primaryTeal,
   },
 
   secondary: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.secondaryTeal,
     borderColor: colors.secondaryTeal,
     color: colors.bgBeige,
   },
   secondaryOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.secondaryTeal,
     color: colors.secondaryTeal,
   },
 
   success: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.validGreen,
     borderColor: colors.validGreen,
     color: colors.bgBeige,
   },
   successOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.validGreen,
     color: colors.validGreen,
   },
 
   warning: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.primaryGold,
     borderColor: colors.primaryGold,
     color: colors.bgBeige,
   },
   warningOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.primaryGold,
     color: colors.primaryGold,
   },
 
   danger: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.terraCotta,
     borderColor: colors.terraCotta,
     color: colors.bgBeige,
   },
   dangerOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.terraCotta,
     color: colors.terraCotta,
   },
 
   light: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: colors.bgBeige,
     borderColor: colors.bgBeige,
     color: colors.textGray,
   },
   lightOutline: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: colors.bgBeige,
     color: colors.bgBeige,
   },
 
   plainButLightOnHover: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
     backgroundColor: 'transparent',
     borderColor: 'transparent',
     color: colors.primaryTeal,
@@ -105,6 +129,7 @@ export const styleVariants = {
     borderRadius: 0,
     border: 'none',
   },
+  unstyled: {},
 } as const
 
 export const widthVariants = {

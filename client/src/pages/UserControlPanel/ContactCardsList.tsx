@@ -5,10 +5,11 @@ import { InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
-import { getMonthString } from 'src/utils/date'
+import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 
 interface Props {
+  selectedContactUsernameOrId?: string
   contacts: Contact[]
   searchQuery: string
   viewMode: 'grid' | 'linear'
@@ -18,15 +19,9 @@ interface Props {
   sortByDirection: 'normal' | 'reverse'
 }
 
-const formatDate = (date: Date | number) => {
-  const dateObj = new Date(date)
-  return `${getMonthString(
-    dateObj.getMonth(),
-  )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
-}
-
 const ContactCardsList = ({
   contacts,
+  selectedContactUsernameOrId,
   searchQuery,
   groupBy,
   sortGroupsDirection,
@@ -36,19 +31,21 @@ const ContactCardsList = ({
 }: Props) => {
   const makeContactSortKey = (c: Contact) =>
     ({
-      meetingDate: c.meetingDate ? formatDate(c.meetingDate) : 'zzzzzz',
+      meetingDate: c.meetingDate
+        ? getFormattedFullDate(c.meetingDate)
+        : 'zzzzzz',
       fullName: formatName(c.name),
     }[sortBy])
   const groupedContacts = contacts
     .filter(
       (contact) =>
         formatName(contact.name).includes(searchQuery) ||
-        contact.username.includes(searchQuery),
+        (contact.username && contact.username.includes(searchQuery)),
     )
     .reduce<Record<string, Contact[]>>((acc, contact) => {
       const groupKey = {
         meetingDate: contact.meetingDate
-          ? formatDate(contact.meetingDate)
+          ? getFormattedFullDate(contact.meetingDate)
           : 'Unknown Date',
         firstInitial: contact.name.first[0],
         lastInitial: contact.name.last[0],
@@ -99,39 +96,54 @@ const ContactCardsList = ({
                   } as const)[viewMode]
                 }
                 flexWrap={viewMode === 'grid' ? 'wrap' : 'nowrap'}
-                mx={-2}
+                mx={{ _: -2, lg: 0 }}
               >
-                {groupedContacts[groupKey].map((contact) => (
-                  <Box
-                    key={contact.id}
-                    display="inline-block"
-                    width={viewMode === 'grid' ? '25%' : '100%'}
-                    p={2}
-                  >
-                    <InternalLink
-                      to={`/dashboard/contacts/detail/${
-                        contact.username ?? contact.id
-                      }`}
-                      noUnderline
+                {groupedContacts[groupKey].map((contact) => {
+                  const isSelectedContact =
+                    contact.username === selectedContactUsernameOrId ||
+                    contact.id === selectedContactUsernameOrId
+                  return (
+                    <Box
+                      key={contact.id}
+                      display="inline-block"
+                      width={viewMode === 'grid' ? '25%' : '100%'}
+                      borderRadius={1}
+                      p={2}
+                      bg={
+                        viewMode === 'linear' && isSelectedContact
+                          ? colors.primaryGold
+                          : undefined
+                      }
                     >
-                      <Box
-                        display="flex"
-                        flexDirection="row"
-                        alignItems="center"
+                      <InternalLink
+                        to={`/dashboard/contacts/detail/${
+                          contact.username ?? contact.id
+                        }`}
+                        noUnderline
                       >
-                        <Image
-                          src={contact.cardFrontImageUrl}
-                          w={viewMode === 'grid' ? '100%' : '40px'}
-                        />
-                        {viewMode === 'linear' && contact.name && (
-                          <Box ml={2}>
-                            <Text.Body>{formatName(contact.name)}</Text.Body>
-                          </Box>
-                        )}
-                      </Box>
-                    </InternalLink>
-                  </Box>
-                ))}
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          alignItems="center"
+                        >
+                          <Image
+                            src={contact.cardFrontImageUrl}
+                            w={viewMode === 'grid' ? '100%' : '40px'}
+                          />
+                          {viewMode === 'linear' && contact.name && (
+                            <Box ml={2}>
+                              <Text.Body
+                                fontWeight={isSelectedContact ? 500 : undefined}
+                              >
+                                {formatName(contact.name)}
+                              </Text.Body>
+                            </Box>
+                          )}
+                        </Box>
+                      </InternalLink>
+                    </Box>
+                  )
+                })}
               </Box>
             </Box>
           )

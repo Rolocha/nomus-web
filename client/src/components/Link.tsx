@@ -18,6 +18,7 @@ interface LinkProps {
   noUnderline?: boolean
   color?: string
   as?: any
+  overrideStyles?: any
 }
 
 // We export both an internal and external link from this file
@@ -34,6 +35,7 @@ const args = [
     prop: 'buttonStyle',
     variants: buttonlikeStyles.styleVariants,
   }),
+  (props: LinkProps) => props.overrideStyles,
 ] as const
 
 interface InternalLinkProps

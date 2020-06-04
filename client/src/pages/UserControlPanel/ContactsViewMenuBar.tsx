@@ -1,25 +1,28 @@
 import { css } from '@emotion/core'
+import 'css.gg/icons/css/external.css'
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import TabSelector, { TabActionType } from 'src/components/TabSelector'
+import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { Contact } from 'src/types/contact'
 
 interface Props {
-  contact?: Contact
+  selectedViewMode?: string
+  selectedContactUsernameOrId?: string
   searchQueryValue?: string | null
   onChangeSearchQueryValue: (newValue: string) => void
 }
 
 const ContactCardsList = ({
-  contact,
+  selectedViewMode,
+  selectedContactUsernameOrId,
   searchQueryValue,
   onChangeSearchQueryValue,
 }: Props) => {
-  const history = useHistory()
   const handleChangeSearchQueryValue = (event: React.SyntheticEvent<any>) => {
     // @ts-ignore
     onChangeSearchQueryValue(event.target.value)
@@ -42,6 +45,7 @@ const ContactCardsList = ({
       }}
       gridColumnGap={2}
       gridRowGap={{ _: 3, lg: 0 }}
+      alignItems={{ _: undefined, lg: 'center' }}
     >
       <Box gridArea="search" position="relative">
         <Form.Input
@@ -95,12 +99,35 @@ const ContactCardsList = ({
         </Box>
       </Box>
 
+      <Box gridArea="userPageLink" placeSelf="stretch start">
+        {selectedContactUsernameOrId && (
+          <InternalLink
+            asButton
+            to={`/u/${selectedContactUsernameOrId}`}
+            buttonStyle="unstyled"
+            overrideStyles={{
+              display: 'flex',
+              height: '100%',
+              border: `1px solid ${colors.bostonBlue}`,
+              padding: '0px 16px',
+            }}
+          >
+            <Box display="flex" flexDirection="row" alignItems="center">
+              <Text.Body mr={3} color={colors.bostonBlue}>
+                nomus.me/u/{selectedContactUsernameOrId}
+              </Text.Body>
+              <Box>
+                <Icon color={colors.bostonBlue} size={0.8} icon="external" />
+              </Box>
+            </Box>
+          </InternalLink>
+        )}
+      </Box>
+
       <Box
         gridArea="viewMode"
         width={{ _: '100%', lg: undefined }}
-        css={css`
-          place-self: end;
-        `}
+        justifySelf="end"
       >
         <TabSelector
           tabs={[
@@ -119,7 +146,7 @@ const ContactCardsList = ({
               linkTo: '/dashboard/contacts/detail',
             },
           ]}
-          selectedTabId={history.location.pathname.split('/').reverse()[0]}
+          selectedTabId={selectedViewMode}
           unselectedBg={colors.white}
           unselectedColor={colors.primaryTeal}
           selectedBg={colors.primaryTeal}

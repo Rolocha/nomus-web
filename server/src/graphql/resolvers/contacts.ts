@@ -33,11 +33,7 @@ class Contact {
   bio: string
 
   @Field({ nullable: true })
-  profilePic: string
-
-  //unique to the connections, notes taken by the user querying
-  @Field({ nullable: true })
-  notes: string
+  profilePicUrl: string
 
   @Field({ nullable: true })
   cardFrontImageUrl: string
@@ -47,6 +43,16 @@ class Contact {
 
   @Field({ nullable: true })
   vcfUrl: string
+
+  //unique to the connections, notes taken by the user querying
+  @Field({ nullable: true })
+  notes: string
+
+  @Field({ nullable: true })
+  meetingPlace: string
+
+  @Field({ nullable: true })
+  meetingDate: Date
 }
 
 const connectionToContact = (connection: Connection): Contact => {
@@ -59,11 +65,14 @@ const connectionToContact = (connection: Connection): Contact => {
     vcfUrl: connectionUser.vcfUrl,
     cardFrontImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.frontImageUrl,
     cardBackImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.backImageUrl,
-    notes: connection.notes,
     bio: connectionUser.bio,
     headline: connectionUser.headline,
-    profilePic: connectionUser.profilePicUrl,
+    profilePicUrl: connectionUser.profilePicUrl,
     username: connectionUser.username,
+
+    meetingPlace: connection.meetingPlace,
+    meetingDate: connection.meetingDate,
+    notes: connection.notes,
   }
 }
 

@@ -23,7 +23,7 @@ interface TabConfig {
 }
 
 interface Props {
-  selectedTabId: string | number
+  selectedTabId?: string
   tabs: TabConfig[]
   unselectedBg?: string
   unselectedColor?: string

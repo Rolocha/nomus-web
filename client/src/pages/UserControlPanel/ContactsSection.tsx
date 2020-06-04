@@ -1,9 +1,8 @@
 import * as React from 'react'
 import {
   Redirect,
-  Route,
-  Switch,
   useHistory,
+  useParams,
   useRouteMatch,
 } from 'react-router-dom'
 // import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
@@ -13,6 +12,11 @@ import { Contact } from 'src/types/contact'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
+
+interface ParamsType {
+  viewMode?: string
+  usernameOrId?: string
+}
 
 const bp = 'lg'
 
@@ -31,12 +35,14 @@ const data: {
       email: 'nomus@me.com',
       headline: 'COO at Place',
       bio: 'hi it me',
-      profilePic: 'http://via.placeholder.com/300x300',
+      profilePicUrl: 'http://via.placeholder.com/300x300',
 
       cardFrontImageUrl: 'http://via.placeholder.com/500x300',
       cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      notes: 'he seemed cool',
       vcfUrl: 'http://via.placeholder.com/500x300',
+
+      meetingPlace: 'Somewhere',
+      notes: 'they seemed cool',
       meetingDate: new Date('2020-05-21T04:05:25.850Z'),
     },
     {
@@ -50,13 +56,15 @@ const data: {
       email: 'nomus@me.com',
       headline: 'CEO at Place',
       bio: 'hi it me',
-      profilePic: 'http://via.placeholder.com/300x300',
+      profilePicUrl: 'http://via.placeholder.com/300x300',
 
       cardFrontImageUrl: 'http://via.placeholder.com/500x300',
       cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      notes: 'he seemed cool',
       vcfUrl: 'http://via.placeholder.com/500x300',
-      meetingDate: new Date('2020-05-21T04:06:25.850Z'),
+
+      meetingPlace: 'Somewhere',
+      notes: 'they seemed cool',
+      meetingDate: new Date('2020-05-21T04:05:25.850Z'),
     },
     {
       id: '3',
@@ -69,12 +77,14 @@ const data: {
       email: 'nomus@me.com',
       headline: 'Chief Aardvark',
       bio: 'hi it me',
-      profilePic: 'http://via.placeholder.com/300x300',
+      profilePicUrl: 'http://via.placeholder.com/300x300',
 
       cardFrontImageUrl: 'http://via.placeholder.com/500x300',
       cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      notes: 'he seemed cool',
       vcfUrl: 'http://via.placeholder.com/500x300',
+
+      meetingPlace: 'Somewhere',
+      notes: 'they seemed cool',
       meetingDate: new Date('2020-05-21T04:06:25.850Z'),
     },
     {
@@ -88,12 +98,14 @@ const data: {
       email: 'nomus@me.com',
       headline: 'CDO at Place',
       bio: 'hi it me',
-      profilePic: 'http://via.placeholder.com/300x300',
+      profilePicUrl: 'http://via.placeholder.com/300x300',
 
       cardFrontImageUrl: 'http://via.placeholder.com/500x300',
       cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      notes: 'he seemed cool',
       vcfUrl: 'http://via.placeholder.com/500x300',
+
+      meetingPlace: 'Somewhere',
+      notes: 'they seemed cool',
       meetingDate: new Date('2020-05-20T04:06:25.850Z'),
     },
   ],
@@ -110,11 +122,13 @@ function nextChar(c: string) {
 for (let i = 0; i < 20; i += 1) {
   const lastContact = data.contacts[data.contacts.length - 1]
   const newMeetingDate = new Date(
+    // @ts-ignore
     lastContact.meetingDate.getTime() + 1000 * 60 * 60 * 4,
   )
   data.contacts.push({
     ...lastContact,
     id: lastContact.id,
+    // @ts-ignore
     username: lastContact.username.split('').map(nextChar).join(''),
     name: {
       first: lastContact.name.first.split('').map(nextChar).join(''),
@@ -126,6 +140,7 @@ for (let i = 0; i < 20; i += 1) {
 }
 
 export default () => {
+  const params = useParams<ParamsType>()
   const routeMatch = useRouteMatch()
   const history = useHistory()
   //   const { loading } = useQuery(
@@ -174,6 +189,8 @@ export default () => {
     <Box>
       <Box mb={3}>
         <ContactsViewMenuBar
+          selectedViewMode={params.viewMode}
+          selectedContactUsernameOrId={params.usernameOrId}
           searchQueryValue={contactSearchQuery}
           onChangeSearchQueryValue={(newValue) => {
             history.replace(
@@ -184,23 +201,25 @@ export default () => {
           }}
         />
       </Box>
-      <Switch>
-        <Route path={`${routeMatch.url}/glance`}>
-          <ContactsGlanceView
-            contacts={data.contacts}
-            searchQueryValue={contactSearchQuery}
-          />
-        </Route>
-        <Route path={`${routeMatch.url}/detail/:usernameOrId?`}>
-          <ContactsDetailView
-            contacts={data.contacts}
-            searchQueryValue={contactSearchQuery}
-          />
-        </Route>
-        <Route>
-          <Redirect to={`${routeMatch.url}/glance`} />
-        </Route>
-      </Switch>
+      {params.viewMode === 'glance' || params.viewMode === 'detail' ? (
+        {
+          glance: (
+            <ContactsGlanceView
+              contacts={data.contacts}
+              searchQueryValue={contactSearchQuery}
+            />
+          ),
+          detail: (
+            <ContactsDetailView
+              selectedContactUsernameOrId={params.usernameOrId}
+              contacts={data.contacts}
+              searchQueryValue={contactSearchQuery}
+            />
+          ),
+        }[params.viewMode]
+      ) : (
+        <Redirect to={`${routeMatch.url}/glance`} />
+      )}
     </Box>
   )
 }

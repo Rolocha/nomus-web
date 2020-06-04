@@ -29,3 +29,10 @@ export const getMonthString = (month: number) =>
     'November',
     'December',
   ][month] || null
+
+export const getFormattedFullDate = (date: Date | number) => {
+  const dateObj = new Date(date)
+  return `${getMonthString(
+    dateObj.getMonth(),
+  )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
+}
