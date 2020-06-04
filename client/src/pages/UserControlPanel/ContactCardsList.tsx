@@ -39,8 +39,11 @@ const ContactCardsList = ({
   const groupedContacts = contacts
     .filter(
       (contact) =>
-        formatName(contact.name).includes(searchQuery) ||
-        (contact.username && contact.username.includes(searchQuery)),
+        formatName(contact.name)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (contact.username &&
+          contact.username.toLowerCase().includes(searchQuery.toLowerCase())),
     )
     .reduce<Record<string, Contact[]>>((acc, contact) => {
       const groupKey = {

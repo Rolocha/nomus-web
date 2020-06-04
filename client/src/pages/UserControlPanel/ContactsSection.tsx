@@ -18,8 +18,6 @@ interface ParamsType {
   usernameOrId?: string
 }
 
-const bp = 'lg'
-
 const data: {
   contacts: Contact[]
 } = {
