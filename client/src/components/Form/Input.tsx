@@ -38,10 +38,9 @@ type InputProps = {
 
 const Input = styled<'input', InputProps>('input')(
   {
-    boxShadow: 'inset 0px 0px 4px rgba(0, 0, 0, 0.25)',
     borderRadius: '6px',
-    padding: '12px',
-    border: 'none',
+    padding: '4px 8px',
+    border: `1px solid ${theme.colors.textOlive}`,
     fontFamily: theme.textStyles.body.fontFamily,
     fontWeight: 400,
   },

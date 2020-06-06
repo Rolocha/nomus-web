@@ -1,24 +1,23 @@
 import styled from '@emotion/styled'
-
 import {
-  space,
-  SpaceProps,
-  position,
-  PositionProps,
-  color,
-  ColorProps,
   border,
   BorderProps,
-  layout,
-  LayoutProps,
+  color,
+  ColorProps,
   flexbox,
   FlexboxProps,
   grid,
   GridProps,
+  layout,
+  LayoutProps,
+  position,
+  PositionProps,
+  ResponsiveValue,
   shadow,
   ShadowProps,
+  space,
+  SpaceProps,
   system,
-  ResponsiveValue,
   ThemeValue,
 } from 'styled-system'
 
@@ -33,6 +32,8 @@ const isContainerPropBoolean = (cp: ContainerProp | Boolean): cp is Boolean =>
 type BoxProps = {
   as?: string
   container?: ResponsiveValue<ThemeValue<'container', any>>
+  placeSelf?: ResponsiveValue<ThemeValue<'placeSelf', any>>
+  justifySelf?: ResponsiveValue<ThemeValue<'justifySelf', any>>
 } & SpaceProps &
   PositionProps &
   ColorProps &
@@ -63,6 +64,12 @@ const Box = styled<'div', BoxProps>('div')(
           return `max(calc((100vw - ${maxWidth}) / 2), ${minPadding})`
         }
       },
+    },
+    placeSelf: {
+      property: 'placeSelf',
+    },
+    justifySelf: {
+      property: 'justifySelf',
     },
   }),
   space,

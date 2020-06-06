@@ -1,10 +1,10 @@
-import { initDB, cleanUpDB, dropAllCollections } from 'src/test-utils/db'
-import { execQuery } from 'src/test-utils/graphql'
-import { createMockUser } from 'src/__mocks__/models/User'
-import { createMockConnection } from 'src/__mocks__/models/Connection'
-import { PersonName } from 'src/models/subschemas'
 import { DocumentType } from '@typegoose/typegoose'
+import { PersonName } from 'src/models/subschemas'
 import { Role } from 'src/models/User'
+import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
+import { execQuery } from 'src/test-utils/graphql'
+import { createMockConnection } from 'src/__mocks__/models/Connection'
+import { createMockUser } from 'src/__mocks__/models/User'
 
 beforeAll(async () => {
   await initDB()
@@ -115,10 +115,14 @@ describe('ContactsResolver', () => {
             }
             phoneNumber
             email
-            notes
+
             cardFrontImageUrl
             cardBackImageUrl
             vcfUrl
+
+            meetingDate
+            meetingPlace
+            notes
           }
         }
         `,
@@ -156,10 +160,14 @@ describe('ContactsResolver', () => {
             }
             phoneNumber
             email
-            notes
+            
             cardFrontImageUrl
             cardBackImageUrl
             vcfUrl
+
+            meetingDate
+            meetingPlace
+            notes
           }
         }
         `,
@@ -193,7 +201,14 @@ describe('ContactsResolver', () => {
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const connection = await createMockConnection({ from: user_from._id, to: user_to._id })
+      const meetingDate = new Date()
+      const connection = await createMockConnection({
+        from: user_from._id,
+        to: user_to._id,
+        meetingDate,
+        meetingPlace: 'there',
+        notes: 'foo',
+      })
 
       const response = await execQuery({
         source: `
@@ -207,10 +222,14 @@ describe('ContactsResolver', () => {
             }
             phoneNumber
             email
-            notes
+            
             cardFrontImageUrl
             cardBackImageUrl
             vcfUrl
+
+            meetingDate
+            meetingPlace
+            notes
           }
         }
         `,
@@ -223,12 +242,14 @@ describe('ContactsResolver', () => {
       const expectedData = {
         id: user_to.id,
         name: (user_to.name as DocumentType<PersonName>).toObject(),
-        notes: connection.notes ?? null,
         phoneNumber: user_to.phoneNumber ?? null,
         email: user_to.email,
         cardFrontImageUrl: null,
         cardBackImageUrl: null,
         vcfUrl: user_to.vcfUrl ?? null,
+        notes: connection.notes ?? null,
+        meetingDate: meetingDate.getTime(),
+        meetingPlace: connection.meetingPlace,
       }
 
       expect(response.data?.contact).toMatchObject(expectedData)
@@ -253,10 +274,14 @@ describe('ContactsResolver', () => {
             }
             phoneNumber
             email
-            notes
+            
             cardFrontImageUrl
             cardBackImageUrl
             vcfUrl
+
+            meetingDate
+            meetingPlace
+            notes
           }
         }
         `,

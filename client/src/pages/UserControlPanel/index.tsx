@@ -1,28 +1,26 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
+import * as React from 'react'
 import {
   Redirect,
   Route,
   Switch,
-  useRouteMatch,
   useLocation,
+  useRouteMatch,
 } from 'react-router-dom'
-
-import { useQuery, gql } from 'src/apollo'
+import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
-import theme from 'src/styles/theme'
-import { mq } from 'src/styles/breakpoints'
-import LoadingPage from 'src/pages/LoadingPage'
-import { formatName } from 'src/utils/name'
-
-import { InternalLink } from 'src/components/Link'
-import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
 import Box from 'src/components/Box'
+import { InternalLink } from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
-import ProfileSection from './ProfileSection'
+import * as SVG from 'src/components/SVG'
+import * as Text from 'src/components/Text'
+import LoadingPage from 'src/pages/LoadingPage'
+import { mq } from 'src/styles/breakpoints'
+import theme from 'src/styles/theme'
+import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
+import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
 
 const bp = 'md'
@@ -77,7 +75,8 @@ const ProfilePage = () => {
       Component: CardsSection,
     },
     {
-      path: 'contacts',
+      linkPath: 'contacts',
+      matchPath: 'contacts/:viewMode?/:usernameOrId?',
       label: 'Contacts',
       Icon: SVG.Contacts,
       Component: ContactsSection,
@@ -128,52 +127,56 @@ const ProfilePage = () => {
             // Needed to match the border-radius of selected item
             overflow="hidden"
           >
-            {controlPanelSections.map(({ path, Icon, label }, index) => {
-              const sectionPath = `${routeMatch.url}/${path}`
-              const isCurrentSection = location.pathname === sectionPath
-              return (
-                <Box
-                  key={path}
-                  bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
-                  p={3}
-                  flexBasis={{
-                    _: `${100 / controlPanelSections.length}%`,
-                    [bp]: 'auto',
-                  }}
-                  position="relative"
-                  css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
-                >
-                  <InternalLink noUnderline to={sectionPath}>
-                    <Box
-                      display="flex"
-                      flexDirection={{ _: 'column', [bp]: 'row' }}
-                      alignItems="center"
-                    >
-                      <Icon
-                        color="white"
-                        css={css`
-                          height: 1.5em;
-
-                          // Margin below in mobile; on right in desktop
-                          margin-bottom: 0.5em;
-                          ${mq[bp]} {
-                            margin-right: 0.7em;
-                          }
-                        `}
-                      />
-                      <Text.Plain
-                        m={0}
-                        color="white"
-                        fontSize={{ _: 10, [bp]: 16 }}
-                        fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+            {controlPanelSections.map(
+              ({ linkPath, path, Icon, label }, index) => {
+                const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
+                const isCurrentSection = location.pathname.startsWith(
+                  sectionPath,
+                )
+                return (
+                  <Box
+                    key={path}
+                    bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
+                    p={3}
+                    flexBasis={{
+                      _: `${100 / controlPanelSections.length}%`,
+                      [bp]: 'auto',
+                    }}
+                    position="relative"
+                    css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
+                  >
+                    <InternalLink noUnderline to={sectionPath}>
+                      <Box
+                        display="flex"
+                        flexDirection={{ _: 'column', [bp]: 'row' }}
+                        alignItems="center"
                       >
-                        {label}
-                      </Text.Plain>
-                    </Box>
-                  </InternalLink>
-                </Box>
-              )
-            })}
+                        <Icon
+                          color="white"
+                          css={css`
+                            height: 1.5em;
+
+                            // Margin below in mobile; on right in desktop
+                            margin-bottom: 0.5em;
+                            ${mq[bp]} {
+                              margin-right: 0.7em;
+                            }
+                          `}
+                        />
+                        <Text.Plain
+                          m={0}
+                          color="white"
+                          fontSize={{ _: 10, [bp]: 16 }}
+                          fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+                        >
+                          {label}
+                        </Text.Plain>
+                      </Box>
+                    </InternalLink>
+                  </Box>
+                )
+              },
+            )}
           </Box>
 
           {/* Content for selected section */}
@@ -181,7 +184,7 @@ const ProfilePage = () => {
             flexGrow={1}
             boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
             bg="white"
-            p={{ _: 4, [bp]: 5 }}
+            p={{ _: 3, [bp]: 5 }}
             // py={{ _: 4, [bp]: 5 }}
             borderTopRightRadius={{ [bp]: 3 }}
             borderBottomRightRadius={{ [bp]: 3 }}
@@ -190,15 +193,21 @@ const ProfilePage = () => {
             minHeight="50vh"
           >
             <Switch>
-              {controlPanelSections.map(({ path, Component }) => (
-                <Route key={path} path={`${routeMatch.url}/${path}`}>
+              {controlPanelSections.map(({ matchPath, path, Component }) => (
+                <Route
+                  key={path}
+                  path={`${routeMatch.url}/${matchPath ?? path}`}
+                >
                   <Component />
                 </Route>
               ))}
               {/* If user lands on a route that doesn't match any, redirect to the first one */}
               <Route>
                 <Redirect
-                  to={`${routeMatch.url}/${controlPanelSections[0].path}`}
+                  to={`${routeMatch.url}/${
+                    controlPanelSections[0].linkPath ??
+                    controlPanelSections[0].path
+                  }`}
                 />
               </Route>
             </Switch>

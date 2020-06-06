@@ -1,10 +1,9 @@
-import React from 'react'
-import { Global, css } from '@emotion/core'
-import { ThemeProvider } from 'emotion-theming'
+import { css, Global } from '@emotion/core'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-
-import { client as apolloClient, ApolloProvider } from 'src/apollo'
+import { ThemeProvider } from 'emotion-theming'
+import React from 'react'
+import { ApolloProvider, client as apolloClient } from 'src/apollo'
 import { PageRouter } from 'src/pages'
 import theme from 'src/styles/theme'
 
@@ -24,6 +23,12 @@ class App extends React.Component<PropsType, StateType> {
           styles={css`
             body {
               margin: 0;
+            }
+
+            *,
+            *:after,
+            *:before {
+              box-sizing: border-box;
             }
 
             h1,

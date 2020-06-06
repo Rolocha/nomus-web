@@ -1,7 +1,7 @@
+import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
-import { UUIDScalar, UUIDType, Ref } from './scalars'
+import { Ref, UUIDScalar, UUIDType } from './scalars'
 import { User } from './User'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
@@ -33,6 +33,14 @@ export class Connection {
   @prop({ required: true, ref: 'User', type: Buffer })
   @Field(() => User, { nullable: false })
   to: Ref<User>
+
+  @prop({ required: false })
+  @Field({ nullable: true })
+  meetingPlace: string
+
+  @prop({ required: false })
+  @Field({ nullable: true })
+  meetingDate: Date
 
   //Notes on meeting this User
   @prop({ required: false })

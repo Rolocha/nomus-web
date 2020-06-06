@@ -8,8 +8,8 @@ services:
   server:
     build: ./server
     ports:
-      - 3000:3000 # app server port
-      - 9229:9229 # debugging port
+      - 3000 # app server port
+      - 9229 # debugging port
     env_file: .env
     command: yarn dev
     volumes:
@@ -21,7 +21,7 @@ services:
     build: ./client
     env_file: .env
     ports:
-      - 4000:4000 # webpack server port
+      - 4000 # webpack server port
     networks:
       - app-network
     command: yarn dev
@@ -31,4 +31,4 @@ services:
       - ./client:/client
   db:
     ports:
-      - 27017:27017
+      - 27017

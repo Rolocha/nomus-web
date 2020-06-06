@@ -73,7 +73,8 @@ const textStyles: Record<string, any> = {
     lineHeight: '1.35',
     fontFamily: fontFamilies.rubik,
     fontWeight: 500,
-    color: colors.primaryOlive,
+    color: colors.textOlive,
+    textTransform: 'uppercase',
   },
   input: {
     fontSize: [15, 16, 18, 24],

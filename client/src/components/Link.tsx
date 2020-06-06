@@ -1,14 +1,13 @@
-import styled from '@emotion/styled'
 import isPropValid from '@emotion/is-prop-valid'
-import { variant } from 'styled-system'
+import styled from '@emotion/styled'
 import { Link as ReactRouterLink } from 'react-router-dom'
-
 import * as buttonlikeStyles from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
+import { variant } from 'styled-system'
 
 const linkBaseStyles = (props: LinkProps) => ({
   textDecoration: props.noUnderline ? 'none' : 'underline',
-  color: theme.colors.primaryTeal,
+  color: props.color ?? theme.colors.primaryTeal,
   fontFamily: theme.textStyles.body.fontFamily,
 })
 
@@ -17,7 +16,9 @@ interface LinkProps {
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
   width?: keyof typeof buttonlikeStyles.widthVariants
   noUnderline?: boolean
+  color?: string
   as?: any
+  overrideStyles?: any
 }
 
 // We export both an internal and external link from this file
@@ -34,6 +35,7 @@ const args = [
     prop: 'buttonStyle',
     variants: buttonlikeStyles.styleVariants,
   }),
+  (props: LinkProps) => props.overrideStyles,
 ] as const
 
 interface InternalLinkProps

@@ -2,7 +2,7 @@
   "private": true,
   "name": "nomus",
   "devDependencies": {
-    "apollo": "^2.27.3"
+    "apollo": "^2.28.0"
   },
   "scripts": {
     "types:watch": "apollo client:codegen --watch --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types",
