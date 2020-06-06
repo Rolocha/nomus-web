@@ -27,6 +27,10 @@ const ContactCardsList = ({
     // @ts-ignore
     onChangeSearchQueryValue(event.target.value)
   }
+
+  const hideSearchBarInMobile =
+    selectedViewMode === 'detail' && selectedContactUsernameOrId != null
+
   return (
     <Box
       display="grid"
@@ -47,7 +51,11 @@ const ContactCardsList = ({
       gridRowGap={{ _: 3, lg: 0 }}
       alignItems={{ _: undefined, lg: 'center' }}
     >
-      <Box gridArea="search" position="relative">
+      <Box
+        display={{ _: hideSearchBarInMobile ? 'none' : 'block', lg: 'block' }}
+        gridArea="search"
+        position="relative"
+      >
         <Form.Input
           width="100%"
           value={searchQueryValue || ''}
@@ -68,9 +76,9 @@ const ContactCardsList = ({
       </Box>
 
       <Box
+        display={{ _: hideSearchBarInMobile ? 'none' : 'flex', lg: 'flex' }}
         gridArea="searchActions"
         placeSelf={{ _: 'center end', lg: 'center start' }}
-        display="flex"
         alignItems="center"
         justifyContent="flex-start"
         mx={-1}
