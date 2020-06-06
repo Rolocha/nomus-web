@@ -17,7 +17,7 @@ interface Props {
   searchQueryValue: string
 }
 
-const bp = 'lg'
+const bp = 'md'
 
 const ContactsDetailView = ({
   selectedContactUsernameOrId,
@@ -34,18 +34,25 @@ const ContactsDetailView = ({
       : null
   return (
     <Box
-      display="grid"
-      maxHeight="500px"
-      gridTemplateAreas={`
+      display={{ _: undefined, [bp]: 'grid' }}
+      maxHeight={{ _: undefined, [bp]: '500px' }}
+      gridTemplateAreas={{
+        _: undefined,
+        [bp]: `
       "list selectedContact"
-      `}
+      `,
+      }}
       gridTemplateColumns="4fr 8fr"
       gridColumnGap={3}
     >
       <Box
+        display={{
+          _: selectedContactUsernameOrId ? 'none' : 'block',
+          [bp]: 'block',
+        }}
         gridArea="list"
         placeSelf="stretch"
-        maxHeight="500px"
+        maxHeight="inherit"
         overflow="auto"
       >
         <ContactCardsList
@@ -62,31 +69,35 @@ const ContactsDetailView = ({
       {selectedContact && (
         <Box
           gridArea="selectedContact"
-          p={3}
+          p={{ _: 1, [bp]: 3 }}
           display="grid"
           gridTemplateColumns={{
-            _: '4fr 6fr 2fr',
+            _: '4fr 8fr',
             [bp]: '2fr 6fr',
           }}
-          gridTemplateRows={{
-            _: '',
-            [bp]: 'auto 1fr',
-          }}
+          // gridTemplateRows={{
+          //   _: '',
+          //   [bp]: 'auto 1fr',
+          // }}
           gridTemplateAreas={{
             _: `
-            "profilePic keyInfo"
-            "cards cards cards"
-            "profileInfo profileInfo editProfile"
-            "previewButton previewButton previewButton"
+            "profilePic nameplate"
+            "cards cards"
+            "contactInfo contactInfo"
+            "bio bio"
+            "notes notes"
           `,
             [bp]: `
-              "profilePic keyInfo"
+              "profilePic nameplate"
+              "profilePic contactInfo"
               "cards bio"
               "notes notes"
             `,
           }}
           gridColumnGap={3}
           gridRowGap={3}
+          maxHeight="inherit"
+          overflowX="hidden"
           overflowY="auto"
         >
           <Box gridArea="profilePic">
@@ -100,33 +111,53 @@ const ContactsDetailView = ({
             />
           </Box>
 
-          <Box gridArea="keyInfo" alignSelf={{ _: 'start', md: 'center' }}>
+          <Box gridArea="nameplate" alignSelf={{ _: 'start', md: 'center' }}>
             <Text.SectionHeader mb={1} mt={0}>
               {formatName(selectedContact.name)}
             </Text.SectionHeader>
-
-            <Text.Body mb={3}>{selectedContact.headline}</Text.Body>
-
-            <Box display="flex" flexDirection="row" mx={-3}>
-              {selectedContact.phoneNumber && (
-                <Box px={3}>
-                  <Text.Label>Phone</Text.Label>
-                  <Text.Body>{selectedContact.phoneNumber}</Text.Body>
-                </Box>
-              )}
-              {selectedContact.email && (
-                <Box px={3}>
-                  <Text.Label>Email</Text.Label>
-                  <Text.Body>{selectedContact.email}</Text.Body>
-                </Box>
-              )}
-            </Box>
+            <Text.Body>{selectedContact.headline}</Text.Body>
+          </Box>
+          <Box
+            gridArea="contactInfo"
+            alignSelf="start"
+            display="flex"
+            flexDirection="row"
+            mx={-3}
+          >
+            {selectedContact.email && (
+              <Box px={3}>
+                <Text.Label>Email</Text.Label>
+                <Text.Body>{selectedContact.email}</Text.Body>
+              </Box>
+            )}
+            {selectedContact.phoneNumber && (
+              <Box px={3}>
+                <Text.Label>Phone Number</Text.Label>
+                <Text.Body>{selectedContact.phoneNumber}</Text.Body>
+              </Box>
+            )}
           </Box>
 
-          {/* Front of business card */}
-          {selectedContact.cardFrontImageUrl && (
-            <Box gridArea="cards" width={{ _: '50%', [bp]: '100%' }} mb={2}>
-              <Image width="100%" src={selectedContact.cardFrontImageUrl} />
+          {(selectedContact.cardFrontImageUrl ||
+            selectedContact.cardBackImageUrl) && (
+            <Box
+              gridArea="cards"
+              width={{ _: '100%', [bp]: '100%' }}
+              mx={{ _: -1, [bp]: 0 }}
+              my={{ _: 0, [bp]: -1 }}
+              display="flex"
+              flexDirection={{ _: 'row', [bp]: 'column' }}
+            >
+              {selectedContact.cardFrontImageUrl && (
+                <Box px={{ _: 1, [bp]: 0 }} py={{ _: 0, [bp]: 1 }}>
+                  <Image width="100%" src={selectedContact.cardFrontImageUrl} />
+                </Box>
+              )}
+              {selectedContact.cardBackImageUrl && (
+                <Box px={{ _: 1, [bp]: 0 }} py={{ _: 0, [bp]: 1 }}>
+                  <Image width="100%" src={selectedContact.cardBackImageUrl} />
+                </Box>
+              )}
             </Box>
           )}
 

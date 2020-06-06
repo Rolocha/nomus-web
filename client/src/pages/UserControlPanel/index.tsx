@@ -184,7 +184,7 @@ const ProfilePage = () => {
             flexGrow={1}
             boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
             bg="white"
-            p={{ _: 4, [bp]: 5 }}
+            p={{ _: 3, [bp]: 5 }}
             // py={{ _: 4, [bp]: 5 }}
             borderTopRightRadius={{ [bp]: 3 }}
             borderBottomRightRadius={{ [bp]: 3 }}

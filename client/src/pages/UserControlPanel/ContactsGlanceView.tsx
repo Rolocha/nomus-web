@@ -10,7 +10,7 @@ interface Props {
 
 const ContactsGlanceView = ({ contacts, searchQueryValue }: Props) => {
   return (
-    <Box maxHeight="500px" overflow="auto">
+    <Box maxHeight={{ _: undefined, lg: '500px' }} overflowY="auto">
       <ContactCardsList
         contacts={contacts}
         searchQuery={searchQueryValue}

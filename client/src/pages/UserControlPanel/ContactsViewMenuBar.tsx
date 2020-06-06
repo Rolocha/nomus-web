@@ -99,7 +99,11 @@ const ContactCardsList = ({
         </Box>
       </Box>
 
-      <Box gridArea="userPageLink" placeSelf="stretch start">
+      <Box
+        display={{ _: 'none', lg: 'block' }}
+        gridArea="userPageLink"
+        placeSelf="stretch start"
+      >
         {selectedContactUsernameOrId && (
           <InternalLink
             asButton
