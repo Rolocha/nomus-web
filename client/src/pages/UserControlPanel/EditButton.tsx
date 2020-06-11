@@ -11,7 +11,7 @@ type EditButtonProps = {
   iconOnlyBp?: string | null
 }
 const EditButton = ({ iconOnlyBp, onClick }: EditButtonProps) => (
-  <Button onClick={onClick} variant="plainButLightOnHover">
+  <Button onClick={onClick} variant="tertiary">
     <Box display="flex" flexDirection="row" alignItems="center">
       <SVG.Pen
         css={css`
@@ -25,7 +25,7 @@ const EditButton = ({ iconOnlyBp, onClick }: EditButtonProps) => (
       <Box
         display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
       >
-        <Text.Plain fontSize="14px" fontWeight="bold" color="primaryTeal">
+        <Text.Plain fontSize="14px" fontWeight="bold" color="nomusBlue">
           Edit
         </Text.Plain>
       </Box>

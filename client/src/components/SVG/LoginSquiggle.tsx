@@ -1,7 +1,6 @@
 import * as React from 'react'
-
-import { SVGProps } from './types'
 import { colors } from 'src/styles'
+import { SVGProps } from './types'
 
 const LoginSquiggle = ({ color, className }: SVGProps) => (
   <svg
@@ -24,7 +23,7 @@ const LoginSquiggle = ({ color, className }: SVGProps) => (
 )
 
 LoginSquiggle.defaultProps = {
-  color: colors.primaryGold,
+  color: colors.gold,
 }
 
 export default LoginSquiggle

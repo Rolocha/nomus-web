@@ -1,14 +1,13 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
-
+import * as React from 'react'
 import Box from 'src/components/Box'
-import Image from 'src/components/Image'
 import Button from 'src/components/Button'
-import Navbar from 'src/components/Navbar'
 import Hero from 'src/components/Hero'
+import Image from 'src/components/Image'
+import Navbar from 'src/components/Navbar'
 import SplitRowContent, { bp } from 'src/components/SplitRowContent'
-import { Heading, Body } from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
+import { Body, BrandHeader } from 'src/components/Text'
 import profilePagePreview1 from 'src/images/profile-page-preview-1.png'
 import profilePagePreview2 from 'src/images/profile-page-preview-2.png'
 import { mq } from 'src/styles/breakpoints'
@@ -37,7 +36,7 @@ const LandingPage = () => {
         {[
           {
             key: 'get started',
-            title: <Heading color="terraCotta">Get started</Heading>,
+            title: <BrandHeader color="brightCoral">Get started</BrandHeader>,
             image: (
               <Box
                 data-aos="slide-right"
@@ -107,7 +106,9 @@ const LandingPage = () => {
           {
             key: 'manage',
             title: (
-              <Heading color="terraCotta">Manage and grow your network</Heading>
+              <BrandHeader color="brightCoral">
+                Manage and grow your network
+              </BrandHeader>
             ),
             image: (
               <Box

@@ -1,12 +1,12 @@
 import styled from '@emotion/styled'
-import { colors, animations } from 'src/styles'
+import { animations, colors } from 'src/styles'
 
 const Spinner = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
   border: 4px solid transparent;
-  border-top: 4px solid ${colors.primaryTeal};
+  border-top: 4px solid ${colors.nomusBlue};
   animation: ${animations.rotate360} 1s ease infinite;
 `
 

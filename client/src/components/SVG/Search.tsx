@@ -19,7 +19,7 @@ const Search = ({ color, className }: SVGProps) => (
 )
 
 Search.defaultProps = {
-  color: colors.textOlive,
+  color: colors.africanElephant,
 }
 
 export default Search

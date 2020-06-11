@@ -1,87 +1,96 @@
 import colors from './colors'
 
 const fontFamilies = {
-  lato: 'Lato, Helvetica, sans-serif',
   rubik: 'Rubik, Helvetica, sans-serif',
 }
 
 export const baseTextStyles = {
   margin: 0,
   fontFamily: fontFamilies.rubik,
+  letterSpacing: '0.02em',
 }
 
 const textStyles: Record<string, any> = {
-  heading: {
+  // <h* />
+  h1: {
     fontWeight: 400,
-    fontSize: [28, 32, 52, 44],
-    lineHeight: ['32px', '36px', '56px', '48px'],
-    fontFamily: fontFamilies.lato,
-    color: colors.textGray,
+    fontSize: [40, 40, 48, 48],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
   },
-  pageHeader: {
-    fontWeight: 400,
-    fontSize: [28, 32, 36, 36],
-    lineHeight: '1.35',
-    fontFamily: fontFamilies.rubik,
-    color: colors.textGray,
+  h2: {
+    fontWeight: 300,
+    fontSize: [32, 32, 40, 40],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
   },
-  sectionHeader: {
-    fontWeight: 400,
+  h3: {
+    fontWeight: 300,
     fontSize: [24, 24, 32, 32],
-    lineHeight: '1.35',
-    fontFamily: fontFamilies.rubik,
-    color: colors.textGray,
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
   },
-  sectionSubheader: {
+  h4: {
+    fontWeight: 300,
+    fontSize: [20, 20, 24, 24],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
+  },
+  h5: {
     fontWeight: 500,
-    fontSize: 20,
-    lineHeight: '1.35',
-    fontFamily: fontFamilies.rubik,
-    color: colors.textGray,
+    fontSize: [20, 20, 24, 24],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
+  },
+  h6: {
+    fontWeight: 400,
+    fontSize: [20, 20, 24, 24],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    letterSpacing: ['0.02em', '0.02em', '0.08em', '0.08em'],
+    color: colors.midnightGray,
+  },
+
+  // <p />
+  bigBody: {
+    fontWeight: 400,
+    fontSize: [20, 20, 20, 20],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
   },
   body: {
+    fontWeight: 400,
+    fontSize: [16, 16, 16, 16],
+    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    color: colors.midnightGray,
+  },
+  body2: {
+    fontWeight: 400,
     fontSize: [14, 14, 16, 16],
-    lineHeight: ['20px', '22px', '24px', '27px'],
-    fontFamily: fontFamilies.rubik,
+    lineHeight: [1.5, 1.5, 1.5, 1.5],
+    color: colors.midnightGray,
+  },
+  body3: {
     fontWeight: 400,
-    color: colors.textGray,
+    fontSize: [12, 12, 14, 14],
+    lineHeight: [1.5, 1.5, 1.5, 1.5],
+    color: colors.midnightGray,
   },
-  bodyTertiary: {
-    fontSize: [12, 12, 12, 12],
-    lineHeight: '1.35',
-    fontFamily: fontFamilies.rubik,
-    fontWeight: 400,
-    color: colors.textGray,
-  },
-  link: {
-    fontSize: [15, 16, 18, 20],
-    lineHeight: ['20px', '22px', '24px', '27px'],
-    fontFamily: fontFamilies.rubik,
-    fontWeight: 'medium',
-    color: colors.bostonBlue,
-  },
-  caption: {
-    fontSize: [15, 16, 18, 24],
-    lineHeight: ['20px', '22px', '24px', '32px'],
-    fontFamily: fontFamilies.lato,
-    fontWeight: 700,
-    color: colors.textGray,
-  },
+
+  // Other
   label: {
+    ...baseTextStyles,
     marginBottom: 1,
     fontSize: [14, 14, 14, 14],
-    lineHeight: '1.35',
-    fontFamily: fontFamilies.rubik,
+    letterSpacing: '0.08em',
     fontWeight: 500,
-    color: colors.textOlive,
+    color: colors.africanElephant,
     textTransform: 'uppercase',
   },
   input: {
-    fontSize: [15, 16, 18, 24],
-    lineHeight: ['20px', '22px', '24px', '32px'],
-    fontFamily: fontFamilies.rubik,
+    ...baseTextStyles,
+    fontSize: [16, 16, 16, 16],
     fontWeight: 400,
-    color: colors.textGray,
+    color: colors.midnightGray,
   },
 }
 

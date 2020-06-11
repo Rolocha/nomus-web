@@ -7,7 +7,7 @@ import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Logo from 'src/components/Logo'
 import { LoginSquiggle } from 'src/components/SVG'
-import { Body, Link } from 'src/components/Text'
+import { Body } from 'src/components/Text'
 import { useAuth } from 'src/utils/auth'
 
 interface LoginFormData {
@@ -29,7 +29,7 @@ const showRequiredError = (
   errors: Record<string, any>,
 ) =>
   fieldKey in errors && errors[fieldKey] ? (
-    <Body color="terraCotta" m={1}>
+    <Body color="brightCoral" m={1}>
       {`${fieldName} is required`}
     </Body>
   ) : null
@@ -177,7 +177,8 @@ const LoginPage = () => {
               }[mode]
             }
           </Button>
-          <Link
+          <Button
+            variant="tertiary"
             mt={1}
             onClick={
               {
@@ -192,13 +193,13 @@ const LoginPage = () => {
                 signup: 'Already have an account? Sign in.',
               }[mode]
             }
-          </Link>
+          </Button>
           {mode === 'login' && [
             <Body key="body">or</Body>,
             <Button
               key="button"
               width="full"
-              variant="primaryOutline"
+              variant="secondary"
               onClick={() => setMode('signup')}
             >
               Create an account

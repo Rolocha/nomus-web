@@ -35,7 +35,7 @@ const POINTY_TAB_INDICATOR = css`
       top: 50%;
       left: 100%;
       transform: translate(-50%, -50%) rotate(45deg);
-      background-color: ${theme.colors.primaryTeal};
+      background-color: ${theme.colors.nomusBlue};
     }
   }
 `
@@ -91,7 +91,7 @@ const ProfilePage = () => {
 
   return (
     <Box
-      bg={theme.colors.bgBeige}
+      bg={theme.colors.ivory}
       minHeight={{ [bp]: '100vh' }}
       position="relative"
     >
@@ -121,7 +121,7 @@ const ProfilePage = () => {
             flexDirection={{ _: 'row', [bp]: 'column' }}
             flexShrink={0}
             minWidth={{ [bp]: 200 }}
-            bg={theme.colors.secondaryTeal}
+            bg={theme.colors.twilight}
             borderTopLeftRadius={{ _: 0, [bp]: 3 }}
             borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
             // Needed to match the border-radius of selected item
@@ -136,7 +136,7 @@ const ProfilePage = () => {
                 return (
                   <Box
                     key={path}
-                    bg={isCurrentSection ? theme.colors.primaryTeal : undefined}
+                    bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
                     p={3}
                     flexBasis={{
                       _: `${100 / controlPanelSections.length}%`,

@@ -71,7 +71,7 @@ const ContactCardsList = ({
             transform: translateY(-50%);
             height: 1.3rem;
           `}
-          color={colors.textOlive}
+          color={colors.africanElephant}
         />
       </Box>
 
@@ -116,20 +116,19 @@ const ContactCardsList = ({
           <InternalLink
             asButton
             to={`/u/${selectedContactUsernameOrId}`}
-            buttonStyle="unstyled"
+            buttonStyle="secondary"
             overrideStyles={{
               display: 'flex',
               height: '100%',
-              border: `1px solid ${colors.bostonBlue}`,
               padding: '0px 16px',
             }}
           >
             <Box display="flex" flexDirection="row" alignItems="center">
-              <Text.Body mr={3} color={colors.bostonBlue}>
+              <Text.Body mr={3} color="inherit">
                 nomus.me/u/{selectedContactUsernameOrId}
               </Text.Body>
               <Box>
-                <Icon color={colors.bostonBlue} size={0.8} icon="external" />
+                <Icon color="inherit" size={0.8} icon="external" />
               </Box>
             </Box>
           </InternalLink>
@@ -160,8 +159,8 @@ const ContactCardsList = ({
           ]}
           selectedTabId={selectedViewMode}
           unselectedBg={colors.white}
-          unselectedColor={colors.primaryTeal}
-          selectedBg={colors.primaryTeal}
+          unselectedColor={colors.nomusBlue}
+          selectedBg={colors.nomusBlue}
           selectedColor={colors.white}
         />
       </Box>

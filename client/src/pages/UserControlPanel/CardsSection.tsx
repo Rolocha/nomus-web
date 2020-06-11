@@ -108,7 +108,7 @@ export default () => {
                     <Button variant="primary">Reorder card</Button>
                   </Box>
                   <Box px={1}>
-                    <Button variant="primaryOutline">Modify card</Button>
+                    <Button variant="secondary">Modify card</Button>
                   </Box>
                 </Box>
               </Box>

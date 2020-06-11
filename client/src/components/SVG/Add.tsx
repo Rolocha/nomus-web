@@ -19,7 +19,7 @@ const Add = ({ color, className }: SVGProps) => (
 )
 
 Add.defaultProps = {
-  color: colors.textOlive,
+  color: colors.africanElephant,
 }
 
 export default Add

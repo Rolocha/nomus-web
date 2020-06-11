@@ -152,7 +152,7 @@ export default () => {
         `}
         to={`/u/${data.user.username}`}
         asButton
-        buttonStyle="secondaryOutline"
+        buttonStyle="secondary"
       >
         Preview public profile
       </InternalLink>
