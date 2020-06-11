@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from './types'
 import { colors } from 'src/styles'
+import { SVGProps } from './types'
 
 const LargeSquiggle = ({ color, className }: SVGProps) => (
   <svg
@@ -23,7 +23,7 @@ const LargeSquiggle = ({ color, className }: SVGProps) => (
 )
 
 LargeSquiggle.defaultProps = {
-  color: colors.primaryGold,
+  color: colors.gold,
 }
 
 export default LargeSquiggle

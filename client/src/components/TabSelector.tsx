@@ -99,10 +99,10 @@ const TabSelector = ({
 
 TabSelector.defaultProps = {
   unselectedBg: colors.white,
-  unselectedColor: colors.primaryTeal,
-  selectedBg: colors.primaryTeal,
+  unselectedColor: colors.nomusBlue,
+  selectedBg: colors.nomusBlue,
   selectedColor: colors.white,
-  borderColor: colors.primaryTeal,
+  borderColor: colors.nomusBlue,
 }
 
 export default TabSelector

@@ -110,7 +110,7 @@ const Modal = ({
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      bg={rgba(colors.primaryTeal, 0.8)}
+      bg={rgba(colors.nomusBlue, 0.8)}
       onClick={handleOutsideClick}
     >
       <Global
@@ -164,7 +164,7 @@ const Modal = ({
             <Box p={3}>
               {actions.secondary && (
                 <Button
-                  variant="secondaryOutline"
+                  variant="secondary"
                   mr={2}
                   onClick={actions.secondary.handler}
                 >

@@ -54,21 +54,30 @@ const semanticallyStyledText = (
   </Text>
 )
 
-// Custom text variants ready to be used with 'as' baked in
-export const Heading = semanticallyStyledText('h1', 'heading')
-export const PageHeader = semanticallyStyledText('h2', 'pageHeader')
-export const SectionHeader = semanticallyStyledText('h3', 'sectionHeader')
-export const SectionSubheader = semanticallyStyledText('h4', 'sectionSubheader')
+// Custom text variants with styles & semantically correct tagnames baked in
+export const H1 = semanticallyStyledText('h1', 'h1')
+export const BrandHeader = H1
 
+export const H2 = semanticallyStyledText('h2', 'h2')
+export const PageHeader = H2
+
+export const H3 = semanticallyStyledText('h3', 'h3')
+export const SectionHeader = H3
+
+export const H4 = semanticallyStyledText('h4', 'h4')
+export const CardHeader = H4
+
+export const H5 = semanticallyStyledText('h5', 'h5')
+export const SectionSubheader = H5
+
+export const H6 = semanticallyStyledText('h6', 'h6')
+export const MainNav = H6
+
+export const BigBody = semanticallyStyledText('p', 'bigBody')
 export const Body = semanticallyStyledText('p', 'body')
-export const Body3 = semanticallyStyledText('p', 'bodyTertiary')
-export const Caption = semanticallyStyledText('p', 'caption')
+export const Body2 = semanticallyStyledText('p', 'body2')
+export const Body3 = semanticallyStyledText('p', 'body3')
+
 export const Label = semanticallyStyledText('p', 'label')
 export const Plain = semanticallyStyledText('p', null)
-
-export const Link = styled(Text.withComponent('a'))`
-  cursor: pointer;
-`
-Link.defaultProps = {
-  ...theme.textStyles.link,
-}
+export const Custom = Plain

@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
-
+import * as React from 'react'
 import { colors } from 'src/styles'
 import { SVGProps } from './types'
 
@@ -170,8 +169,8 @@ const TapCardIllustration = ({ color, color2 }: SVGProps) => (
 )
 
 TapCardIllustration.defaultProps = {
-  color: colors.bgBeige,
-  color2: colors.terraCotta,
+  color: colors.ivory,
+  color2: colors.brightCoral,
 }
 
 export default TapCardIllustration

@@ -7,13 +7,13 @@ import { variant } from 'styled-system'
 
 const linkBaseStyles = (props: LinkProps) => ({
   textDecoration: props.noUnderline ? 'none' : 'underline',
-  color: props.color ?? theme.colors.primaryTeal,
-  fontFamily: theme.textStyles.body.fontFamily,
+  color: props.color ?? theme.colors.nomusBlue,
 })
 
 interface LinkProps {
   asButton?: boolean
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
+  buttonSize?: keyof typeof buttonlikeStyles.sizeVariants
   width?: keyof typeof buttonlikeStyles.widthVariants
   noUnderline?: boolean
   color?: string
@@ -27,13 +27,15 @@ interface LinkProps {
 // the styled component definition args are identical
 const args = [
   (props: LinkProps) =>
-    props.asButton
-      ? { ...buttonlikeStyles.baseButtonStyles, textDecoration: 'none' }
-      : linkBaseStyles(props),
+    props.asButton ? { textDecoration: 'none' } : linkBaseStyles(props),
+  // Mimic button variants with a "button-" prefix
   variant({
-    // Mimic button variants with a "button-" prefix
     prop: 'buttonStyle',
     variants: buttonlikeStyles.styleVariants,
+  }),
+  variant({
+    prop: 'buttonSize',
+    variants: buttonlikeStyles.sizeVariants,
   }),
   (props: LinkProps) => props.overrideStyles,
 ] as const

@@ -16,7 +16,7 @@ const ExternalLink = ({ color, className }: SVGProps) => (
 )
 
 ExternalLink.defaultProps = {
-  color: colors.primaryTeal,
+  color: colors.nomusBlue,
 }
 
 export default ExternalLink

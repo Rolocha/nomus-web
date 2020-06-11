@@ -117,7 +117,7 @@ const ContactCardsList = ({
                       p={2}
                       bg={
                         viewMode === 'linear' && isSelectedContact
-                          ? colors.primaryGold
+                          ? colors.gold
                           : undefined
                       }
                     >

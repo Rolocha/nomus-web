@@ -3,7 +3,7 @@
 exports[`<Modal /> renders a modal with the specified content 1`] = `
 <aside
   aria-modal={true}
-  className="css-16lu7ni-Box e1gi27mm0"
+  className="css-f0vs8s-Box e1gi27mm0"
   display="flex"
   height="100vh"
   onClick={[Function]}
@@ -17,12 +17,12 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
       className="css-q4rbdj-Box e1gi27mm0"
     >
       <h2
-        className="css-10tfo6t-Text e1pb1ozb0"
+        className="css-aaj9al-Text e1pb1ozb0"
       >
         Test Modal
       </h2>
       <p
-        className="css-h555zl-Text e1pb1ozb0"
+        className="css-1ra243m-Text e1pb1ozb0"
       >
         Some content
       </p>
@@ -33,7 +33,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
         role="button"
       >
         <p
-          className="css-jvuolr-Text e1pb1ozb0"
+          className="css-1wk8sqf-Text e1pb1ozb0"
           fontSize={24}
         >
           X

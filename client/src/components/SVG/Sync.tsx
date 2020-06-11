@@ -21,7 +21,7 @@ const Sync = ({ color, className }: SVGProps) => (
 )
 
 Sync.defaultProps = {
-  color: colors.primaryTeal,
+  color: colors.nomusBlue,
 }
 
 export default Sync

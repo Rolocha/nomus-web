@@ -1,17 +1,38 @@
+// Some colors appear more than once to provide useful alternate aliases
 const colors = {
-  primaryTeal: '#005C75',
-  secondaryTeal: '#003C4C',
-  primaryGold: '#EEB941',
-  primaryOlive: '#67705A',
-  terraCotta: '#E86B5A',
-  textGray: '#444444',
-  textMediumGray: '#8B8B8B',
+  // Primary
+  nomusBlue: '#295689',
+  primaryBlue: '#295689',
+  gold: '#EEB941',
+
+  // Secondary
+  twilight: '#14355A',
+  secondaryBlue: '#14355A',
+  brightCoral: '#FF7057',
+  cyanProcess: '#02ABE8',
+
+  // Text
+  midnightGray: '#444444',
+  africanElephant: '#A9A591',
+
+  // Some grays
   superlightGray: '#E5E5E5',
-  textOlive: '#A9A591',
-  bgBeige: '#FBF9F0',
   white: '#FFFFFF',
-  bostonBlue: '#3C98C0',
-  validGreen: '#73A230',
+
+  // States
+  linkBlue: '#3C98C0',
+  invalidRed: '#B91600',
+  validGreen: '#62AD00',
+  disabledBlue: '#8598AD',
+
+  // Backgrounds
+  ivory: '#FBF9F0',
+  offWhite: '#FDFCF7',
+
+  // Buttons
+  hoverBlue: '#F0F7FF',
+  activeBlue: '#E5F1FF',
+  outlineBlue: '#B2D6FF',
 } as const
 
 export default colors

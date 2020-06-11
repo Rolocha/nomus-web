@@ -40,9 +40,7 @@ const Input = styled<'input', InputProps>('input')(
   {
     borderRadius: '6px',
     padding: '4px 8px',
-    border: `1px solid ${theme.colors.textOlive}`,
-    fontFamily: theme.textStyles.body.fontFamily,
-    fontWeight: 400,
+    border: `1px solid ${theme.colors.africanElephant}`,
   },
   space,
   position,
@@ -57,8 +55,7 @@ const Input = styled<'input', InputProps>('input')(
 )
 
 Input.defaultProps = {
-  fontSize: theme.textStyles.body.fontSize,
-  lineHeight: theme.textStyles.input.lineHeight,
+  ...theme.textStyles.input,
 }
 
 export default Input

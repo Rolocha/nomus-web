@@ -1,9 +1,8 @@
 import { css } from '@emotion/core'
 import React from 'react'
-
-import { Body } from 'src/components/Text'
 import Box from 'src/components/Box'
 import * as SVG from 'src/components/SVG'
+import { Body } from 'src/components/Text'
 import { colors } from 'src/styles'
 
 export default {
@@ -18,7 +17,7 @@ export const AllIcons = () => {
       py={3}
       px={4}
       css={css`
-        background: ${colors.primaryTeal};
+        background: ${colors.nomusBlue};
       `}
     >
       <table

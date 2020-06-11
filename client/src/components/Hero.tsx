@@ -1,14 +1,12 @@
-import * as React from 'react'
 import { css } from '@emotion/core'
-
-import { Heading, Body, Caption } from 'src/components/Text'
+import * as React from 'react'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
 import Image from 'src/components/Image'
 import * as SVG from 'src/components/SVG'
-import Button from 'src/components/Button'
-import { colors } from 'src/styles'
-
+import { Body, BrandHeader } from 'src/components/Text'
 import heroImage from 'src/images/hero-image.png'
+import { colors } from 'src/styles'
 
 // There are two layouts for the Hero, split across the lg breakpoint
 // _: < .lg breakpoint - image over text
@@ -18,7 +16,7 @@ const SM_IMAGE_WIDTH = '60%'
 
 const Hero = () => (
   <Box>
-    <Box mt="30px" pb="50px" width="100%" position="relative" bg="primaryTeal">
+    <Box mt="30px" pb="50px" width="100%" position="relative" bg="nomusBlue">
       <Box
         position={{ _: 'relative', lg: 'absolute' }}
         top={{ _: '-30px', lg: '-30px' }}
@@ -51,10 +49,10 @@ const Hero = () => (
         pr={{ _: '30px', lg: '50px' }}
         width={{ _: '100%', lg: `calc(100% - ${SM_IMAGE_WIDTH})` }}
       >
-        <Heading mt="0" color="bgBeige">
+        <BrandHeader mt="0" color="ivory">
           Tap. Connect. Network with purpose.
-        </Heading>
-        <Body color="bgBeige">
+        </BrandHeader>
+        <Body color="ivory">
           Your personalized NFC card with the Nomus app, built for accessing,
           managing, and expanding your network.
         </Body>
@@ -68,7 +66,7 @@ const Hero = () => (
           `}
         >
           <Button variant="primary">Customize NFC card</Button>
-          <Button variant="light">Sign up</Button>
+          <Button variant="tertiary">Sign up</Button>
         </Box>
         <SVG.Squiggle />
       </Box>
@@ -85,12 +83,12 @@ const Hero = () => (
           0deg,
           transparent 50%,
           50%,
-          ${colors.primaryTeal}
+          ${colors.nomusBlue}
         );
       `}
     >
       <Box
-        bg="primaryGold"
+        bg="gold"
         px="20px"
         maxWidth="85vw"
         borderTopLeftRadius="50px"
@@ -137,7 +135,7 @@ const Hero = () => (
               px={{ _: '10px', lg: '20px' }}
             >
               <ImageComponent />
-              <Caption>{text}</Caption>
+              <Body>{text}</Body>
             </Box>
           ))}
         </Box>

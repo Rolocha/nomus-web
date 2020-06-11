@@ -1,10 +1,9 @@
-import React from 'react'
 import { css } from '@emotion/core'
 import { action } from '@storybook/addon-actions'
-
-import { SectionHeader } from 'src/components/Text'
+import React from 'react'
 import Box from 'src/components/Box'
 import Button, { styleVariants } from 'src/components/Button'
+import * as Text from 'src/components/Text'
 
 export default {
   title: 'Button',
@@ -17,13 +16,7 @@ export const actionsData = {
 }
 
 export const AllVariants = () => {
-  const allVariants = Object.keys(
-    styleVariants,
-  ) as (keyof typeof styleVariants)[]
-  const solidVariants = allVariants.filter((v) => !v.includes('Outline'))
-  const outlineVariants = allVariants.filter((v) => v.includes('Outline'))
-
-  const renderButton = (variant: keyof typeof styleVariants) => (
+  const renderButton = (variant: any, enabled: boolean, size: string) => (
     <Button
       css={css`
         text-transform: capitalize;
@@ -31,24 +24,63 @@ export const AllVariants = () => {
       m={1}
       key={variant}
       variant={variant}
+      size={size}
+      disabled={!enabled}
     >
-      {variant
-        .split(/(?=[A-Z])/)
-        .map((s) => s.toLowerCase())
-        .join(' ')}
+      {variant}
     </Button>
   )
 
+  const combinatorics = [
+    { enabled: true, size: 'normal' },
+    { enabled: false, size: 'normal' },
+    { enabled: true, size: 'big' },
+    { enabled: false, size: 'big' },
+  ]
+
+  const cellStyles = css({
+    textAlign: 'center',
+    textTransform: 'capitalize',
+  })
+
   return (
     <Box>
-      <Box>
-        <SectionHeader>Solid Variants</SectionHeader>
-        {solidVariants.map(renderButton)}
-      </Box>
-      <Box>
-        <SectionHeader>Outline Variants</SectionHeader>
-        {outlineVariants.map(renderButton)}
-      </Box>
+      <table>
+        <thead>
+          <tr>
+            <th />
+            {Object.keys(styleVariants).map((variant) => (
+              <th css={cellStyles}>
+                <Text.Body fontWeight="bold">{variant}</Text.Body>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {combinatorics.map((combinatoric) => (
+            <tr>
+              <td css={cellStyles}>
+                <Text.Body>
+                  {[
+                    combinatoric.size,
+                    combinatoric.enabled ? 'Enabled' : 'Disabled',
+                  ].join(' ')}
+                </Text.Body>
+              </td>
+              {Object.keys(styleVariants).map((variant) => (
+                <td css={cellStyles}>
+                  {renderButton(
+                    variant,
+                    combinatoric.enabled,
+                    combinatoric.size,
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+          <tr></tr>
+        </tbody>
+      </table>
     </Box>
   )
 }

@@ -1,7 +1,6 @@
 import * as React from 'react'
-
-import { SVGProps } from './types'
 import { colors } from 'src/styles'
+import { SVGProps } from './types'
 
 const Pen = ({ color, className }: SVGProps) => (
   <svg
@@ -24,7 +23,7 @@ const Pen = ({ color, className }: SVGProps) => (
 )
 
 Pen.defaultProps = {
-  color: colors.primaryTeal,
+  color: colors.nomusBlue,
 }
 
 export default Pen
