@@ -7,6 +7,7 @@ const { fontFamilies } = typography
 export const baseButtonStyles = {
   padding: '8px 16px',
   fontFamily: fontFamilies.rubik,
+  letterSpacing: '0.02em',
   fontWeight: 500,
   cursor: 'pointer',
   border: 'none',
