@@ -3,10 +3,10 @@ import jwt from 'jsonwebtoken'
 import MUUID from 'uuid-mongodb'
 
 import { User, Token } from 'src/models'
-import { Role } from 'src/models/User'
 import { getUserFromToken } from './util'
 import { accessTokenLifespan, refreshTokenLifespan } from 'src/config'
 import { TokenBody } from './types'
+import { Role } from 'src/util/enums'
 
 const authRouter = express.Router()
 

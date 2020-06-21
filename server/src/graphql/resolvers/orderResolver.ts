@@ -1,7 +1,7 @@
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
-import User, { Role } from 'src/models/User'
+import { User } from 'src/models/User'
 import {
   Arg,
   Authorized,
@@ -15,7 +15,7 @@ import {
 } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
-import { OrderState } from 'src/util/enums'
+import { OrderState, Role } from 'src/util/enums'
 
 @InputType({ description: 'Input to generate new Order object' })
 class OrderGenerationInput implements Partial<Order> {

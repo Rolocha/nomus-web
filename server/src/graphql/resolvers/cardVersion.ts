@@ -4,7 +4,8 @@ import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
-import { User, Role } from 'src/models/User'
+import { User } from 'src/models/User'
+import { Role } from 'src/util/enums'
 
 @ObjectType()
 class CardVersionStats {

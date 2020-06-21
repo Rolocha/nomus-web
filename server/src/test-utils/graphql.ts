@@ -3,8 +3,9 @@ import { graphql, GraphQLSchema } from 'graphql'
 import Maybe from 'graphql/tsutils/Maybe'
 
 import { createSchema } from 'src/graphql/schema'
-import { User, Role } from 'src/models/User'
+import { User } from 'src/models/User'
 import { createMockUser } from 'src/__mocks__/models/User'
+import { Role } from 'src/util/enums'
 
 interface Options {
   source: string

@@ -15,3 +15,14 @@ registerEnumType(OrderState, {
   name: 'OrderState',
   description: 'foo',
 })
+
+// Needs to stay in sync with the enum at client/src/utils/auth/index.ts
+export enum Role {
+  User = 'user',
+  Admin = 'admin',
+}
+
+registerEnumType(Role, {
+  name: 'Role',
+  description: 'User access control roles',
+})
