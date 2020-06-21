@@ -19,6 +19,8 @@ interface Props {
   sortByDirection: 'normal' | 'reverse'
 }
 
+const bp = 'md'
+
 const ContactCardsList = ({
   contacts,
   selectedContactUsernameOrId,
@@ -99,8 +101,8 @@ const ContactCardsList = ({
                   } as const)[viewMode]
                 }
                 flexWrap={viewMode === 'grid' ? 'wrap' : 'nowrap'}
-                overflowX={{ _: 'hidden', lg: 'auto' }}
-                mx={{ _: -2, lg: 0 }}
+                overflowX={{ _: 'hidden', [bp]: 'auto' }}
+                mx={{ _: -2, [bp]: 0 }}
               >
                 {groupedContacts[groupKey].map((contact) => {
                   const isSelectedContact =
@@ -111,7 +113,7 @@ const ContactCardsList = ({
                       key={contact.id}
                       display="inline-block"
                       width={
-                        viewMode === 'grid' ? { _: '50%', lg: '25%' } : '100%'
+                        viewMode === 'grid' ? { _: '50%', [bp]: '25%' } : '100%'
                       }
                       borderRadius={1}
                       p={2}

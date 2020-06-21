@@ -12,7 +12,7 @@ import { formatName } from 'src/utils/name'
 import NameplateEditor from './NameplateEditor'
 import ProfileEditor from './ProfileEditor'
 
-const bp = 'lg'
+const bp = 'md'
 
 export default () => {
   const { loading, data } = useQuery<UCPProfileSectionQuery>(

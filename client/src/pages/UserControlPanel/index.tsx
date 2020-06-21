@@ -15,7 +15,7 @@ import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
-import { mq } from 'src/styles/breakpoints'
+import breakpoints, { mq } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
@@ -93,6 +93,7 @@ const ProfilePage = () => {
     <Box
       bg={theme.colors.ivory}
       minHeight={{ [bp]: '100vh' }}
+      minWidth={{ _: '0', [bp]: breakpoints.lg }}
       position="relative"
     >
       <Navbar />
@@ -127,56 +128,52 @@ const ProfilePage = () => {
             // Needed to match the border-radius of selected item
             overflow="hidden"
           >
-            {controlPanelSections.map(
-              ({ linkPath, path, Icon, label }, index) => {
-                const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
-                const isCurrentSection = location.pathname.startsWith(
-                  sectionPath,
-                )
-                return (
-                  <Box
-                    key={path}
-                    bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
-                    p={3}
-                    flexBasis={{
-                      _: `${100 / controlPanelSections.length}%`,
-                      [bp]: 'auto',
-                    }}
-                    position="relative"
-                    css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
-                  >
-                    <InternalLink noUnderline to={sectionPath}>
-                      <Box
-                        display="flex"
-                        flexDirection={{ _: 'column', [bp]: 'row' }}
-                        alignItems="center"
-                      >
-                        <Icon
-                          color="white"
-                          css={css`
-                            height: 1.5em;
+            {controlPanelSections.map(({ linkPath, path, Icon, label }) => {
+              const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
+              const isCurrentSection = location.pathname.startsWith(sectionPath)
+              return (
+                <Box
+                  key={path}
+                  bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
+                  p={3}
+                  flexBasis={{
+                    _: `${100 / controlPanelSections.length}%`,
+                    [bp]: 'auto',
+                  }}
+                  position="relative"
+                  css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
+                >
+                  <InternalLink noUnderline to={sectionPath}>
+                    <Box
+                      display="flex"
+                      flexDirection={{ _: 'column', [bp]: 'row' }}
+                      alignItems="center"
+                    >
+                      <Icon
+                        color="white"
+                        css={css`
+                          height: 1.5em;
 
-                            // Margin below in mobile; on right in desktop
-                            margin-bottom: 0.5em;
-                            ${mq[bp]} {
-                              margin-right: 0.7em;
-                            }
-                          `}
-                        />
-                        <Text.Plain
-                          m={0}
-                          color="white"
-                          fontSize={{ _: 10, [bp]: 16 }}
-                          fontWeight={isCurrentSection ? 'bold' : 'undefined'}
-                        >
-                          {label}
-                        </Text.Plain>
-                      </Box>
-                    </InternalLink>
-                  </Box>
-                )
-              },
-            )}
+                          // Margin below in mobile; on right in desktop
+                          margin-bottom: 0.5em;
+                          ${mq[bp]} {
+                            margin-right: 0.7em;
+                          }
+                        `}
+                      />
+                      <Text.Plain
+                        m={0}
+                        color="white"
+                        fontSize={{ _: 10, [bp]: 16 }}
+                        fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+                      >
+                        {label}
+                      </Text.Plain>
+                    </Box>
+                  </InternalLink>
+                </Box>
+              )
+            })}
           </Box>
 
           {/* Content for selected section */}
