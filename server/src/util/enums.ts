@@ -1,3 +1,7 @@
+import { registerEnumType } from 'type-graphql'
+
+//Current State in Order Tracking State Machine
+//https://www.notion.so/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 export enum OrderState {
   Captured = 'captured',
   Paid = 'paid',
@@ -6,3 +10,8 @@ export enum OrderState {
   Enroute = 'enroute',
   Fulfilled = 'fulfilled',
 }
+
+registerEnumType(OrderState, {
+  name: 'OrderState',
+  description: 'foo',
+})

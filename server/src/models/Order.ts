@@ -8,6 +8,7 @@ import {
 import { Card, CardVersion, User } from 'src/models'
 import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
+import { OrderState } from '../util/enums'
 import { Ref, UUIDScalar, UUIDType } from './scalars'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
@@ -57,12 +58,10 @@ class Order {
   @Field(() => [Card], { nullable: true })
   cards: Array<Ref<Card>>
 
-  //Current State in Order Tracking State Machine
-  //https://www.notion.so/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
   //This correlates with OrderState at server/src/util/enums.ts
   @prop({ required: true })
-  @Field({ nullable: false })
-  state: string
+  @Field((type) => OrderState, { nullable: false })
+  state: OrderState
 
   //Tracking Number for USPS
   @prop({ required: false })
