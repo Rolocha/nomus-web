@@ -16,7 +16,11 @@ export const actionsData = {
 }
 
 export const AllVariants = () => {
-  const renderButton = (variant: any, enabled: boolean, size: string) => (
+  const renderButton = (
+    variant: any,
+    enabled: boolean,
+    size: 'normal' | 'big',
+  ) => (
     <Button
       css={css`
         text-transform: capitalize;

@@ -10,6 +10,7 @@ import { space, SpaceProps, variant } from 'styled-system'
 type ButtonProps = {
   variant?: keyof typeof styleVariants
   width?: keyof typeof widthVariants
+  size?: keyof typeof sizeVariants
   as?: string
 } & SpaceProps
 
