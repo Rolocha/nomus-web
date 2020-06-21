@@ -35,7 +35,7 @@ export const AllVariants = () => {
     </Button>
   )
 
-  const combinatorics = [
+  const combinatorics: Array<{ enabled: boolean; size: 'big' | 'normal' }> = [
     { enabled: true, size: 'normal' },
     { enabled: false, size: 'normal' },
     { enabled: true, size: 'big' },
