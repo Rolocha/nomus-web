@@ -58,19 +58,19 @@ export class CardVersion {
   company: string
 
   @prop()
-  @Field()
+  @Field({ nullable: true })
   vcfNotes: string
 
   @prop({ _id: false })
   @Field(() => Address, { nullable: false })
-  address: Ref<Address>
+  address: Address
 
   @prop({ required: false })
-  @Field()
+  @Field({ nullable: true })
   frontImageUrl: string
 
   @prop({ required: false })
-  @Field()
+  @Field({ nullable: true })
   backImageUrl: string
 
   @prop({ required: false })
@@ -80,6 +80,10 @@ export class CardVersion {
   @prop({ required: true, ref: 'User', type: Buffer })
   @Field(() => User, { nullable: false })
   user: Ref<User>
+
+  @prop({ required: false })
+  @Field({ nullable: true })
+  templateId: string
 
   static async findBySlugOrId(
     this: ReturnModelType<typeof CardVersion>,

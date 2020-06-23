@@ -1,7 +1,7 @@
 import { UnauthorizedError, AuthChecker, createMethodDecorator } from 'type-graphql'
 
 import { IApolloContext } from './types'
-import { Role } from 'src/models/User'
+import { Role } from 'src/util/enums'
 
 export interface AuthDef {
   requiredRoles: Role[]

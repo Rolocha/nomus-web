@@ -1,4 +1,4 @@
-import { Role } from 'src/models/User'
+import { Role } from 'src/util/enums'
 
 export interface TokenBody {
   _id: string

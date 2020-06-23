@@ -1,10 +1,10 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { PersonName } from 'src/models/subschemas'
-import { Role } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { createMockUser } from 'src/__mocks__/models/User'
+import { Role } from 'src/util/enums'
 
 beforeAll(async () => {
   await initDB()

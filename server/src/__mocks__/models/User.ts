@@ -1,4 +1,5 @@
-import { UserModel, User, Role } from 'src/models/User'
+import { UserModel, User } from 'src/models/User'
+import { Role } from 'src/util/enums'
 
 export const createMockUser = async (userOverride: Partial<User> = {}) => {
   const newUserPayload: Partial<User> = {

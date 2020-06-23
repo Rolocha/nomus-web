@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs'
 import { IApolloContext } from 'src/graphql/types'
-import { Role, User } from 'src/models/User'
+import { User } from 'src/models/User'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
+import { Role } from 'src/util/enums'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
