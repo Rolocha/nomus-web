@@ -59,7 +59,7 @@ class Order {
   cards: Array<Ref<Card>>
 
   //This correlates with OrderState at server/src/util/enums.ts
-  @prop({ required: true, enum: OrderState, type: String })
+  @prop({ required: true })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 
