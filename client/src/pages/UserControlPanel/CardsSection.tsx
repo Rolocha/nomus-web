@@ -12,7 +12,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { getMonthAbbreviation } from 'src/utils/date'
 
-const bp = 'lg'
+const bp = 'md'
 
 const formatDate = (date: Date) => {
   const dateObject = new Date(date)
