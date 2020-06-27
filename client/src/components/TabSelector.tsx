@@ -86,6 +86,7 @@ const TabSelector = ({
                 key={tabConfig.id}
                 // @ts-ignore
                 to={tabConfig.linkTo}
+                onClick={tabConfig.onClick}
               >
                 {InnerContent}
               </InternalLink>

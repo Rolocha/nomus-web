@@ -7,35 +7,33 @@ import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
+import { ContactsSortOption } from './contact-sorting'
+
+type SortDirection = 'normal' | 'reverse'
 
 interface Props {
+  selectedContactSortOption: ContactsSortOption
   selectedContactUsernameOrId?: string
   contacts: Contact[]
   searchQuery: string
   viewMode: 'grid' | 'linear'
-  groupBy: 'meetingDate' | 'firstInitial' | 'lastInitial'
-  sortGroupsDirection: 'normal' | 'reverse'
-  sortBy: 'meetingDate' | 'fullName'
-  sortByDirection: 'normal' | 'reverse'
 }
 
 const ContactCardsList = ({
+  selectedContactSortOption,
   contacts,
   selectedContactUsernameOrId,
   searchQuery,
-  groupBy,
-  sortGroupsDirection,
-  sortBy,
-  sortByDirection,
   viewMode,
 }: Props) => {
   const makeContactSortKey = (c: Contact) =>
     ({
-      meetingDate: c.meetingDate
+      [ContactsSortOption.MeetingDate]: c.meetingDate
         ? getFormattedFullDate(c.meetingDate)
         : 'zzzzzz',
-      fullName: formatName(c.name),
-    }[sortBy])
+      [ContactsSortOption.Alphabetical]: formatName(c.name),
+      [ContactsSortOption.MeetingPlace]: c.meetingPlace ?? '',
+    }[selectedContactSortOption])
   const groupedContacts = contacts
     .filter(
       (contact) =>
@@ -47,12 +45,12 @@ const ContactCardsList = ({
     )
     .reduce<Record<string, Contact[]>>((acc, contact) => {
       const groupKey = {
-        meetingDate: contact.meetingDate
+        [ContactsSortOption.MeetingDate]: contact.meetingDate
           ? getFormattedFullDate(contact.meetingDate)
           : 'Unknown Date',
-        firstInitial: contact.name.first[0],
-        lastInitial: contact.name.last[0],
-      }[groupBy]
+        [ContactsSortOption.Alphabetical]: contact.name.first[0],
+        [ContactsSortOption.MeetingPlace]: contact.meetingPlace ?? '',
+      }[selectedContactSortOption]
 
       if (groupKey in acc) {
         acc[groupKey].push(contact)
@@ -61,6 +59,12 @@ const ContactCardsList = ({
       }
       return acc
     }, {})
+
+  const sortByDirection: SortDirection = {
+    [ContactsSortOption.Alphabetical]: 'normal' as SortDirection,
+    [ContactsSortOption.MeetingDate]: 'normal' as SortDirection,
+    [ContactsSortOption.MeetingPlace]: 'normal' as SortDirection,
+  }[selectedContactSortOption]
 
   // Sort (in-place) the grouped contacts based on sortBy and sortByDirection
   Object.keys(groupedContacts).forEach((groupKey) => {
@@ -73,6 +77,12 @@ const ContactCardsList = ({
       )
     })
   })
+
+  const sortGroupsDirection: SortDirection = {
+    [ContactsSortOption.Alphabetical]: 'normal' as SortDirection,
+    [ContactsSortOption.MeetingDate]: 'normal' as SortDirection,
+    [ContactsSortOption.MeetingPlace]: 'normal' as SortDirection,
+  }[selectedContactSortOption]
 
   return (
     <Box overflowX="hidden">

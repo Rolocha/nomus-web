@@ -9,6 +9,7 @@ import {
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
 import { Contact } from 'src/types/contact'
+import { ContactsSortOption } from './contact-sorting'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
@@ -139,6 +140,9 @@ for (let i = 0; i < 20; i += 1) {
 
 export default () => {
   const params = useParams<ParamsType>()
+  const [contactSortOption, setContactSortOption] = React.useState(
+    ContactsSortOption.Alphabetical,
+  )
   const routeMatch = useRouteMatch()
   const history = useHistory()
   //   const { loading } = useQuery(
@@ -187,6 +191,8 @@ export default () => {
     <Box>
       <Box mb={3}>
         <ContactsViewMenuBar
+          selectedContactSortOption={contactSortOption}
+          onSelectedContactSortOptionChange={setContactSortOption}
           selectedViewMode={params.viewMode}
           selectedContactUsernameOrId={params.usernameOrId}
           searchQueryValue={contactSearchQuery}
@@ -203,12 +209,14 @@ export default () => {
         {
           glance: (
             <ContactsGlanceView
+              selectedContactSortOption={contactSortOption}
               contacts={data.contacts}
               searchQueryValue={contactSearchQuery}
             />
           ),
           detail: (
             <ContactsDetailView
+              selectedContactSortOption={contactSortOption}
               selectedContactUsernameOrId={params.usernameOrId}
               contacts={data.contacts}
               searchQueryValue={contactSearchQuery}
