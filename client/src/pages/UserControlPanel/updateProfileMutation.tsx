@@ -15,6 +15,7 @@ export default gql`
       phoneNumber
       email
       bio
+      activated
     }
   }
 `

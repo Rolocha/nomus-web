@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs'
 import { IApolloContext } from 'src/graphql/types'
 import { User } from 'src/models/User'
+import { Role } from 'src/util/enums'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
-import { Role } from 'src/util/enums'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -29,6 +29,9 @@ class ProfileUpdateInput implements Partial<User> {
 
   @Field({ nullable: true })
   bio?: string
+
+  @Field({ nullable: true })
+  activated?: boolean
 }
 
 @Resolver()
@@ -92,6 +95,7 @@ class UserResolver {
     userBeingUpdated.email = userUpdatePayload.email ?? userBeingUpdated.email
     userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber ?? userBeingUpdated.phoneNumber
     userBeingUpdated.bio = userUpdatePayload.bio ?? userBeingUpdated.bio
+    userBeingUpdated.activated = userUpdatePayload.activated ?? userBeingUpdated.activated
 
     return await userBeingUpdated.save()
   }

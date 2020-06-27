@@ -83,6 +83,13 @@ authRouter.post('/signup', async (req, res: express.Response<Failable<AuthRespon
   }
 })
 
+authRouter.post('/logout', async (req, res: express.Response<boolean>) => {
+  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME)
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME)
+  Token.mongo.invalidate(req.cookies[REFRESH_TOKEN_COOKIE_NAME])
+  res.end()
+})
+
 const refreshToken = async (
   req: express.Request,
   res: express.Response<Failable<AuthResponse>>

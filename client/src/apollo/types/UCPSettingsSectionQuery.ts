@@ -20,6 +20,7 @@ export interface UCPSettingsSectionQuery_user {
   username: string | null
   name: UCPSettingsSectionQuery_user_name | null
   email: string | null
+  activated: boolean
 }
 
 export interface UCPSettingsSectionQuery {

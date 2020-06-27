@@ -72,6 +72,15 @@ class Token {
       return false
     }
   }
+
+  public static async invalidate(
+    this: ReturnModelType<typeof Token>,
+    tokenIdToInvalidate: string
+  ): Promise<boolean> {
+    const thisTokenToInvalidate = await this.findById(MUUID.from(tokenIdToInvalidate))
+    thisTokenToInvalidate.forceInvalidated = true
+    return true
+  }
 }
 
 // Attach the mongoose model onto the core model itself

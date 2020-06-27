@@ -11,12 +11,12 @@
  * foo
  */
 export enum OrderState {
-  Captured = "Captured",
-  Created = "Created",
-  Creating = "Creating",
-  Enroute = "Enroute",
-  Fulfilled = "Fulfilled",
-  Paid = "Paid",
+  Captured = 'Captured',
+  Created = 'Created',
+  Creating = 'Creating',
+  Enroute = 'Enroute',
+  Fulfilled = 'Fulfilled',
+  Paid = 'Paid',
 }
 
 /**
@@ -31,6 +31,7 @@ export interface ProfileUpdateInput {
   email?: string | null
   headline?: string | null
   bio?: string | null
+  activated?: boolean | null
 }
 
 //==============================================================

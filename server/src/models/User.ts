@@ -100,6 +100,10 @@ export class User {
   @Field((type) => [Role], { nullable: false })
   roles: Role[]
 
+  @prop({ default: true, required: true })
+  @Field({ nullable: false })
+  activated: boolean
+
   public static async newUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
