@@ -9,13 +9,14 @@ import {
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { accessTokenLifespan, authTokenPrivateKey } from 'src/config'
-import { Field, ObjectType, registerEnumType } from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { CardVersion } from './CardVersion'
 import { Ref, UUIDScalar, UUIDType } from './scalars'
 import { PersonName } from './subschemas'
 import Token from './Token'
 import { validateEmail } from './utils'
+import { Role } from 'src/util/enums'
 
 export interface UserCreatePayload {
   _id?: UUIDType
@@ -23,16 +24,6 @@ export interface UserCreatePayload {
   email: string
   password: string
 }
-
-// Needs to stay in sync with the enum at client/src/utils/auth/index.ts
-export enum Role {
-  User = 'user',
-  Admin = 'admin',
-}
-registerEnumType(Role, {
-  name: 'Role',
-  description: 'User access control roles',
-})
 
 @pre<User>('save', async function (next) {
   if (this.isModified('password')) {

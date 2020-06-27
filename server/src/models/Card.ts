@@ -1,8 +1,8 @@
 import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, Ref, getModelForClass } from '@typegoose/typegoose'
+import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
-import { UUIDScalar, UUIDType } from './scalars'
+import { UUIDScalar, UUIDType, Ref } from './scalars'
 import User from './User'
 import CardVersion from './CardVersion'
 

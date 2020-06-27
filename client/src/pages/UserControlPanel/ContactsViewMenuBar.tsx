@@ -21,6 +21,8 @@ interface Props {
   onChangeSearchQueryValue: (newValue: string) => void
 }
 
+const bp = 'md'
+
 const ContactCardsList = ({
   selectedContactSortOption,
   onSelectedContactSortOptionChange,
@@ -42,23 +44,23 @@ const ContactCardsList = ({
       display="grid"
       gridTemplateColumns={{
         _: '10fr 2fr',
-        lg: '3fr 1fr 5fr 3fr',
+        [bp]: '3fr 1fr 5fr 3fr',
       }}
       gridTemplateAreas={{
         _: `
         "viewMode viewMode"
         "search searchActions"
       `,
-        lg: `
+        [bp]: `
         "search searchActions userPageLink viewMode"
     `,
       }}
       gridColumnGap={2}
-      gridRowGap={{ _: 3, lg: 0 }}
-      alignItems={{ _: undefined, lg: 'center' }}
+      gridRowGap={{ _: 3, [bp]: 0 }}
+      alignItems={{ _: undefined, [bp]: 'center' }}
     >
       <Box
-        display={{ _: hideSearchBarInMobile ? 'none' : 'block', lg: 'block' }}
+        display={{ _: hideSearchBarInMobile ? 'none' : 'block', [bp]: 'block' }}
         gridArea="search"
         position="relative"
       >
@@ -82,9 +84,9 @@ const ContactCardsList = ({
       </Box>
 
       <Box
-        display={{ _: hideSearchBarInMobile ? 'none' : 'flex', lg: 'flex' }}
+        display={{ _: hideSearchBarInMobile ? 'none' : 'flex', [bp]: 'flex' }}
         gridArea="searchActions"
-        placeSelf={{ _: 'center end', lg: 'center start' }}
+        placeSelf={{ _: 'center end', [bp]: 'center start' }}
         alignItems="center"
         justifyContent="flex-start"
         mx={-1}
@@ -134,7 +136,7 @@ const ContactCardsList = ({
       </Box>
 
       <Box
-        display={{ _: 'none', lg: 'block' }}
+        display={{ _: 'none', [bp]: 'block' }}
         gridArea="userPageLink"
         placeSelf="stretch start"
       >
@@ -163,7 +165,7 @@ const ContactCardsList = ({
 
       <Box
         gridArea="viewMode"
-        width={{ _: '100%', lg: undefined }}
+        width={{ _: '100%', [bp]: undefined }}
         justifySelf="end"
       >
         <TabSelector

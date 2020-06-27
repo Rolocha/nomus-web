@@ -1,12 +1,14 @@
 import { IApolloContext } from 'src/graphql/types'
-import { CardVersion } from 'src/models/CardVersion'
+
 import Connection from 'src/models/Connection'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
-import User, { Role } from 'src/models/User'
+import { User } from 'src/models/User'
 import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
+import { CardVersion } from 'src/models/CardVersion'
+import { Role } from 'src/util/enums'
 
 @ObjectType()
 class Contact {

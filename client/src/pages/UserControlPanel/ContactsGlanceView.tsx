@@ -10,13 +10,15 @@ interface Props {
   searchQueryValue: string
 }
 
+const bp = 'md'
+
 const ContactsGlanceView = ({
   contacts,
   selectedContactSortOption,
   searchQueryValue,
 }: Props) => {
   return (
-    <Box maxHeight={{ _: undefined, lg: '500px' }} overflowY="auto">
+    <Box maxHeight={{ _: undefined, [bp]: '500px' }} overflowY="auto">
       <ContactCardsList
         selectedContactSortOption={selectedContactSortOption}
         contacts={contacts}

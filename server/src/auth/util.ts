@@ -1,7 +1,7 @@
 import MUUID from 'uuid-mongodb'
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 
-import User from 'src/models/User'
+import { User } from 'src/models/User'
 import { authTokenPrivateKey } from 'src/config'
 import { Result } from 'src/util/error'
 import { TokenBody } from './types'
