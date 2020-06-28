@@ -7,6 +7,7 @@ import { ResponsiveValue } from 'styled-system'
 export enum PopoverAnchorPoint {
   Top = 'Top',
   TopRight = 'TopRight',
+  TopLeft = 'TopLeft',
 }
 
 interface Props {
@@ -34,12 +35,19 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
       mt: 3,
       transform: 'unset',
     },
+    [PopoverAnchorPoint.TopLeft]: {
+      top: '100%',
+      left: '0%',
+      right: 'unset',
+      mt: 3,
+      transform: 'unset',
+    },
   }
 
   const anchorPointStyles =
-    anchorPoint && typeof anchorPoint === 'object'
+    anchorPoint != null
       ? // @ts-ignore
-        // @ts-ignore - weird TS bug where the ts-ignore from above doesn't do the trick
+        // @ts-ignore above one doesn't work bc it's not at front of line but prettier forces ? at front
         makeComplexResponsiveStyles(popoverStyles, anchorPoint)
       : null
 
@@ -69,12 +77,13 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen(!isOpen)}
         css={css`
           cursor: pointer;
+          &,
           svg {
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 2rem;
+            height: 2rem;
           }
         `}
       >

@@ -95,7 +95,7 @@ const ContactCardsList = ({
         <Popover
           anchorPoint={{
             _: PopoverAnchorPoint.TopRight,
-            lg: PopoverAnchorPoint.Top,
+            md: PopoverAnchorPoint.Top,
           }}
           icon={<SVG.Options />}
           popoverContents={

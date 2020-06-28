@@ -2,7 +2,7 @@ type StyleObject = { [k: string]: string | number }
 
 export function makeComplexResponsiveStyles<T extends string>(
   complexStyles: { [k in T]: StyleObject },
-  responsiveKeys: { [k: string]: T },
+  responsiveKeys: { [k: string]: T } | T | T[],
 ) {
   const styleKeysToApply = Array.from(
     new Set(
@@ -13,8 +13,15 @@ export function makeComplexResponsiveStyles<T extends string>(
   )
 
   return styleKeysToApply.reduce<{ [k in string]: any }>((acc, styleKey) => {
-    Object.keys(responsiveKeys).forEach((bp) => {
-      const point: T = responsiveKeys[bp]
+    const responsiveKeysToUse =
+      typeof responsiveKeys === 'object'
+        ? responsiveKeys
+        : { _: responsiveKeys }
+
+    Object.keys(responsiveKeysToUse).forEach((bp) => {
+      // @ts-ignore It doesn't like this line if responsiveKeysToUse is an array but it'll still
+      // work fine since the "keys" will be indices
+      const point: T = responsiveKeysToUse[bp]
 
       if (acc[styleKey] == null) {
         acc[styleKey] = {}
