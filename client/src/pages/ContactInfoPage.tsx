@@ -1,8 +1,6 @@
 import * as React from 'react'
-import { useParams, useHistory, Link } from 'react-router-dom'
-
-import { useQuery, gql } from 'src/apollo'
-import LoadingPage from 'src/pages/LoadingPage'
+import { Link, useHistory, useParams } from 'react-router-dom'
+import { gql, useQuery } from 'src/apollo'
 import {
   ContactPageQuery,
   ContactPageQueryVariables,
@@ -11,6 +9,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import Image from 'src/components/Image'
 import Navbar from 'src/components/Navbar'
+import LoadingPage from 'src/pages/LoadingPage'
 import { downloadFile } from 'src/utils/download'
 
 interface UrlParams {
@@ -76,7 +75,9 @@ const ContactInfoPage = () => {
         bg="white"
         position="relative"
       >
-        <Image src={data.publicContact.frontImageUrl} alt="business card" />
+        {data.publicContact.frontImageUrl && (
+          <Image src={data.publicContact.frontImageUrl} alt="business card" />
+        )}
         <Button
           variant="primary"
           type="submit"

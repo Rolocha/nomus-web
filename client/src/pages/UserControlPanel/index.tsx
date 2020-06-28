@@ -20,6 +20,7 @@ import theme from 'src/styles/theme'
 import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
+import OrdersSection from './OrdersSection'
 import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
 
@@ -80,6 +81,13 @@ const ProfilePage = () => {
       label: 'Contacts',
       Icon: SVG.Contacts,
       Component: ContactsSection,
+    },
+    {
+      linkPath: 'orders',
+      matchPath: 'orders',
+      label: 'Orders',
+      Icon: SVG.Orders,
+      Component: OrdersSection,
     },
     {
       path: 'settings',

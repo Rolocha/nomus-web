@@ -86,8 +86,8 @@ export default () => {
             >
               <Box display="inline-block">
                 <FlippableCard
-                  frontImageUrl={defaultCardVersion?.frontImageUrl}
-                  backImageUrl={defaultCardVersion?.backImageUrl}
+                  frontImageUrl={defaultCardVersion?.frontImageUrl || ''}
+                  backImageUrl={defaultCardVersion?.backImageUrl || ''}
                   width={{ _: '100%', [bp]: '300px' }}
                 />
                 <Box
@@ -150,8 +150,8 @@ export default () => {
                   px={2}
                 >
                   <FlippableCard
-                    frontImageUrl={cv.frontImageUrl}
-                    backImageUrl={cv.backImageUrl}
+                    frontImageUrl={cv.frontImageUrl || ''}
+                    backImageUrl={cv.backImageUrl || ''}
                     width={{ _: '60vw', [bp]: '300px' }}
                   />
                   <Text.Body3>
