@@ -5,6 +5,7 @@ import * as Text from 'src/components/Text'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
+import { ContactsSortOption } from './contact-sorting'
 import ContactCardsList from './ContactCardsList'
 
 interface ParamsType {
@@ -12,6 +13,7 @@ interface ParamsType {
 }
 
 interface Props {
+  selectedContactSortOption: ContactsSortOption
   selectedContactUsernameOrId?: string
   contacts: Contact[]
   searchQueryValue: string
@@ -20,6 +22,7 @@ interface Props {
 const bp = 'md'
 
 const ContactsDetailView = ({
+  selectedContactSortOption,
   selectedContactUsernameOrId,
   contacts,
   searchQueryValue,
@@ -57,13 +60,10 @@ const ContactsDetailView = ({
       >
         <ContactCardsList
           contacts={contacts}
+          selectedContactSortOption={selectedContactSortOption}
           selectedContactUsernameOrId={selectedContactUsernameOrId}
           searchQuery={searchQueryValue}
           viewMode="linear"
-          groupBy="firstInitial"
-          sortGroupsDirection="normal"
-          sortBy="fullName"
-          sortByDirection="normal"
         />
       </Box>
       {selectedContact && (
@@ -75,10 +75,6 @@ const ContactsDetailView = ({
             _: '4fr 8fr',
             [bp]: '2fr 6fr',
           }}
-          // gridTemplateRows={{
-          //   _: '',
-          //   [bp]: 'auto 1fr',
-          // }}
           gridTemplateAreas={{
             _: `
             "profilePic nameplate"

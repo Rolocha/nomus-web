@@ -9,6 +9,7 @@ import {
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
 import { Contact } from 'src/types/contact'
+import { ContactsSortOption } from './contact-sorting'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
@@ -137,10 +138,34 @@ for (let i = 0; i < 20; i += 1) {
   })
 }
 
+const isValidViewMode = (viewMode: string): viewMode is 'glance' | 'detail' => {
+  return viewMode === 'glance' || viewMode === 'detail'
+}
+
+const getDefaultSortOptionForViewMode = (viewMode: string | undefined) =>
+  viewMode && isValidViewMode(viewMode)
+    ? {
+        detail: ContactsSortOption.Alphabetical,
+        glance: ContactsSortOption.MeetingDate,
+      }[viewMode]
+    : ContactsSortOption.MeetingDate
+
 export default () => {
   const params = useParams<ParamsType>()
+  const { viewMode } = params
+  const lastViewMode = React.useRef(viewMode)
+  const [contactSortOption, setContactSortOption] = React.useState(
+    getDefaultSortOptionForViewMode(viewMode),
+  )
   const routeMatch = useRouteMatch()
   const history = useHistory()
+
+  React.useEffect(() => {
+    if (lastViewMode.current == null) {
+      setContactSortOption(getDefaultSortOptionForViewMode(viewMode))
+    }
+    lastViewMode.current = viewMode
+  }, [viewMode, lastViewMode])
   //   const { loading } = useQuery(
   //     gql`
   //       query UCPContactsSectionQuery {
@@ -187,6 +212,8 @@ export default () => {
     <Box>
       <Box mb={3}>
         <ContactsViewMenuBar
+          selectedContactSortOption={contactSortOption}
+          onSelectedContactSortOptionChange={setContactSortOption}
           selectedViewMode={params.viewMode}
           selectedContactUsernameOrId={params.usernameOrId}
           searchQueryValue={contactSearchQuery}
@@ -203,12 +230,14 @@ export default () => {
         {
           glance: (
             <ContactsGlanceView
+              selectedContactSortOption={contactSortOption}
               contacts={data.contacts}
               searchQueryValue={contactSearchQuery}
             />
           ),
           detail: (
             <ContactsDetailView
+              selectedContactSortOption={contactSortOption}
               selectedContactUsernameOrId={params.usernameOrId}
               contacts={data.contacts}
               searchQueryValue={contactSearchQuery}

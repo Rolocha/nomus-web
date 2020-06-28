@@ -5,12 +5,16 @@ import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
 import { InternalLink } from 'src/components/Link'
+import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
 import * as SVG from 'src/components/SVG'
 import TabSelector, { TabActionType } from 'src/components/TabSelector'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
+import { allContactsSortOptions, ContactsSortOption } from './contact-sorting'
 
 interface Props {
+  selectedContactSortOption: ContactsSortOption
+  onSelectedContactSortOptionChange: (newOption: ContactsSortOption) => void
   selectedViewMode?: string
   selectedContactUsernameOrId?: string
   searchQueryValue?: string | null
@@ -20,6 +24,8 @@ interface Props {
 const bp = 'md'
 
 const ContactCardsList = ({
+  selectedContactSortOption,
+  onSelectedContactSortOptionChange,
   selectedViewMode,
   selectedContactUsernameOrId,
   searchQueryValue,
@@ -86,27 +92,47 @@ const ContactCardsList = ({
         mx={-1}
         px={1}
       >
-        <Box
-          bg="white"
-          borderRadius="50%"
-          mx={1}
-          p={1}
-          role="button"
-          onClick={() => {}}
-          boxShadow={0}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          css={css`
-            cursor: pointer;
-            svg {
-              width: 1.5rem;
-              height: 1.5rem;
-            }
-          `}
-        >
-          <SVG.Options />
-        </Box>
+        <Popover
+          anchorPoint={{
+            _: PopoverAnchorPoint.TopRight,
+            md: PopoverAnchorPoint.Top,
+          }}
+          icon={<SVG.Options />}
+          popoverContents={
+            <Box p={2}>
+              <Text.Body3 color="africanElephant">Sort by</Text.Body3>
+              {allContactsSortOptions.map((option) => (
+                <Box
+                  cursor="pointer"
+                  onClick={() => onSelectedContactSortOptionChange(option)}
+                  display="flex"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  py={1}
+                  pr={2}
+                >
+                  {option === selectedContactSortOption ? (
+                    <SVG.Check
+                      color="black"
+                      css={css`
+                        width: 25px;
+                      `}
+                    />
+                  ) : (
+                    <Box width="25px" height="25px" />
+                  )}
+                  <Text.Body2
+                    css={css({
+                      whiteSpace: 'nowrap',
+                    })}
+                  >
+                    {option}
+                  </Text.Body2>
+                </Box>
+              ))}
+            </Box>
+          }
+        />
       </Box>
 
       <Box
@@ -139,6 +165,7 @@ const ContactCardsList = ({
 
       <Box
         gridArea="viewMode"
+        display={{ _: hideSearchBarInMobile ? 'none' : 'block', [bp]: 'block' }}
         width={{ _: '100%', [bp]: undefined }}
         justifySelf="end"
       >
@@ -149,6 +176,10 @@ const ContactCardsList = ({
               title: 'Glance',
               Icon: SVG.Grid,
               actionType: TabActionType.InternalLink,
+              onClick: () =>
+                onSelectedContactSortOptionChange(
+                  ContactsSortOption.MeetingDate,
+                ),
               linkTo: '/dashboard/contacts/glance',
             },
             {
@@ -156,6 +187,10 @@ const ContactCardsList = ({
               title: 'Detail',
               Icon: SVG.List,
               actionType: TabActionType.InternalLink,
+              onClick: () =>
+                onSelectedContactSortOptionChange(
+                  ContactsSortOption.Alphabetical,
+                ),
               linkTo: '/dashboard/contacts/detail',
             },
           ]}
