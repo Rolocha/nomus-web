@@ -165,6 +165,7 @@ const ContactCardsList = ({
 
       <Box
         gridArea="viewMode"
+        display={{ _: hideSearchBarInMobile ? 'none' : 'block', [bp]: 'block' }}
         width={{ _: '100%', [bp]: undefined }}
         justifySelf="end"
       >

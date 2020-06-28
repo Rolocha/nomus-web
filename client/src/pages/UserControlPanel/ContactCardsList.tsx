@@ -28,6 +28,20 @@ const ContactCardsList = ({
   searchQuery,
   viewMode,
 }: Props) => {
+  const hasAutoscrolledToContact = React.useRef(false)
+  const contactListRef = React.useRef<HTMLDivElement | null>(null)
+  React.useEffect(() => {
+    if (selectedContactUsernameOrId != null) {
+      if (!hasAutoscrolledToContact.current) {
+        const target = document.getElementById(
+          `contact-${selectedContactUsernameOrId}`,
+        )
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        hasAutoscrolledToContact.current = true
+      }
+    }
+  }, [contactListRef, contacts])
+
   const makeContactSortKey = (c: Contact) =>
     ({
       [ContactsSortOption.MeetingDate]: c.meetingDate
@@ -87,7 +101,7 @@ const ContactCardsList = ({
   }[selectedContactSortOption]
 
   return (
-    <Box overflowX="hidden">
+    <Box overflowX="hidden" ref={contactListRef}>
       {Object.keys(groupedContacts)
         .sort((groupKeyA, groupKeyB) => {
           return (
@@ -120,6 +134,7 @@ const ContactCardsList = ({
                     contact.id === selectedContactUsernameOrId
                   return (
                     <Box
+                      id={`contact-${contact.username ?? contact.id}`}
                       key={contact.id}
                       display="inline-block"
                       width={

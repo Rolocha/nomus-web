@@ -138,13 +138,34 @@ for (let i = 0; i < 20; i += 1) {
   })
 }
 
+const isValidViewMode = (viewMode: string): viewMode is 'glance' | 'detail' => {
+  return viewMode === 'glance' || viewMode === 'detail'
+}
+
+const getDefaultSortOptionForViewMode = (viewMode: string | undefined) =>
+  viewMode && isValidViewMode(viewMode)
+    ? {
+        detail: ContactsSortOption.Alphabetical,
+        glance: ContactsSortOption.MeetingDate,
+      }[viewMode]
+    : ContactsSortOption.MeetingDate
+
 export default () => {
   const params = useParams<ParamsType>()
+  const { viewMode } = params
+  const lastViewMode = React.useRef(viewMode)
   const [contactSortOption, setContactSortOption] = React.useState(
-    ContactsSortOption.Alphabetical,
+    getDefaultSortOptionForViewMode(viewMode),
   )
   const routeMatch = useRouteMatch()
   const history = useHistory()
+
+  React.useEffect(() => {
+    if (lastViewMode.current == null) {
+      setContactSortOption(getDefaultSortOptionForViewMode(viewMode))
+    }
+    lastViewMode.current = viewMode
+  }, [viewMode, lastViewMode])
   //   const { loading } = useQuery(
   //     gql`
   //       query UCPContactsSectionQuery {
