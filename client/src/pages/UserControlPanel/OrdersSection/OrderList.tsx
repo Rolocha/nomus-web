@@ -1,15 +1,14 @@
 import { css } from '@emotion/core'
-import * as React from 'react'
 import 'css.gg/icons/css/chevron-right.css'
-import Icon from 'src/components/Icon'
+import * as React from 'react'
+import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
+import Icon from 'src/components/Icon'
+import { ExternalLink, InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
-import { InternalLink, ExternalLink } from 'src/components/Link'
-import { useLocation } from 'react-router-dom'
 
 interface Props {
   orders: Array<Order>

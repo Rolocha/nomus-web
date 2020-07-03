@@ -40,7 +40,7 @@ const ContactCardsList = ({
         hasAutoscrolledToContact.current = true
       }
     }
-  }, [contactListRef, contacts])
+  }, [contactListRef, contacts, selectedContactUsernameOrId])
 
   const makeContactSortKey = (c: Contact) =>
     ({
