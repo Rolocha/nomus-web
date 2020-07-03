@@ -82,7 +82,6 @@ const TabSelector = ({
           [TabActionType.InternalLink]: (
             <Box width={`${100 / tabs.length}%`}>
               <InternalLink
-                noUnderline
                 key={tabConfig.id}
                 // @ts-ignore
                 to={tabConfig.linkTo}

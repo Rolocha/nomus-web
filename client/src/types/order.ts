@@ -1,8 +1,9 @@
 import { OrderState } from 'src/apollo/types/globalTypes'
+import { CardVersion } from './cardVersion'
 
 export interface Order {
   id: string
-  cardVersion: any
+  cardVersion: CardVersion
   price: number
   quantity: number
   state: OrderState

@@ -152,7 +152,6 @@ const ContactCardsList = ({
                         to={`/dashboard/contacts/detail/${
                           contact.username ?? contact.id
                         }`}
-                        noUnderline
                       >
                         <Box
                           display="flex"

@@ -51,7 +51,6 @@ const Modal = ({
   actions,
   allowCloseWithOutsideClick = true,
 }: Props) => {
-  const lastIsOpen = React.useRef(isOpen)
   const modalCardRef = React.useRef<HTMLDivElement>(null)
   const [confirmingClose, setConfirmingClose] = React.useState(false)
 
@@ -86,15 +85,12 @@ const Modal = ({
 
   // Disable scroll when modal gets opened
   React.useEffect(() => {
-    if (isOpen !== lastIsOpen.current) {
-      if (isOpen) {
-        document.querySelector('html')?.classList.add('scroll-lock')
-      } else {
-        document.querySelector('html')?.classList.remove('scroll-lock')
-      }
-      lastIsOpen.current = isOpen
+    if (isOpen) {
+      document.querySelector('html')?.classList.add('scroll-lock')
+    } else {
+      document.querySelector('html')?.classList.remove('scroll-lock')
     }
-  }, [isOpen, lastIsOpen])
+  }, [isOpen])
 
   return isOpen ? (
     <Box

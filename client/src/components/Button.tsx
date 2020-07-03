@@ -1,36 +1,33 @@
 import styled from '@emotion/styled'
-import {
-  sizeVariants,
-  styleVariants,
-  widthVariants,
-} from 'src/styles/components/buttonlike'
+import isPropValid from '@emotion/is-prop-valid'
+import { sizeVariants, styleVariants } from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
-import { space, SpaceProps, variant } from 'styled-system'
+import { layout, LayoutProps, space, SpaceProps, variant } from 'styled-system'
 
 type ButtonProps = {
   variant?: keyof typeof styleVariants
-  width?: keyof typeof widthVariants
   size?: keyof typeof sizeVariants
   as?: string
-} & SpaceProps
+} & SpaceProps &
+  LayoutProps
 
-const Button = styled<'button', ButtonProps>('button')(
+const Button = styled<'button', ButtonProps>('button', {
+  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
+})(
+  space,
   variant({ variants: styleVariants }),
-  variant({
-    prop: 'width',
-    variants: widthVariants,
-  }),
   variant({
     prop: 'size',
     variants: sizeVariants,
   }),
-  space,
+  // The 'layout' set of styles already has a "size" property that sets both width and height
+  // but we have our own custom "size" prop for Button so we want to exclude that
+  ({ size, ...props }) => layout(props),
 )
 
 Button.defaultProps = {
   color: theme.colors.ivory,
   variant: 'primary',
-  width: 'auto',
   size: 'normal',
 }
 

@@ -84,7 +84,7 @@ const ProfilePage = () => {
     },
     {
       linkPath: 'orders',
-      matchPath: 'orders',
+      matchPath: 'orders/:orderId?',
       label: 'Orders',
       Icon: SVG.Orders,
       Component: OrdersSection,
@@ -151,7 +151,7 @@ const ProfilePage = () => {
                   position="relative"
                   css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
                 >
-                  <InternalLink noUnderline to={sectionPath}>
+                  <InternalLink to={sectionPath}>
                     <Box
                       display="flex"
                       flexDirection={{ _: 'column', [bp]: 'row' }}
