@@ -40,7 +40,7 @@ const ContactCardsList = ({
         hasAutoscrolledToContact.current = true
       }
     }
-  }, [contactListRef, contacts])
+  }, [contactListRef, contacts, selectedContactUsernameOrId])
 
   const makeContactSortKey = (c: Contact) =>
     ({
@@ -152,7 +152,6 @@ const ContactCardsList = ({
                         to={`/dashboard/contacts/detail/${
                           contact.username ?? contact.id
                         }`}
-                        noUnderline
                       >
                         <Box
                           display="flex"

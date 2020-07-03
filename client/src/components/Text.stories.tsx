@@ -16,7 +16,6 @@ export const Typography = () => (
     <Text.SectionSubheader>Section Subheader</Text.SectionSubheader>
     <Text.MainNav>Main Nav Header</Text.MainNav>
 
-    <Text.BigBody>BigBody</Text.BigBody>
     <Text.Body>Body</Text.Body>
     <Text.Body2>Body2</Text.Body2>
     <Text.Body3>Body3</Text.Body3>

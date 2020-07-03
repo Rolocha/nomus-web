@@ -36,6 +36,7 @@ type BoxProps = {
   justifySelf?: ResponsiveValue<ThemeValue<'justifySelf', any>>
   transform?: ResponsiveValue<ThemeValue<'transform', any>>
   cursor?: ResponsiveValue<ThemeValue<'cursor', any>>
+  textAlign?: ResponsiveValue<ThemeValue<'textAlign', any>>
 } & SpaceProps &
   PositionProps &
   ColorProps &
@@ -78,6 +79,9 @@ const Box = styled<'div', BoxProps>('div')(
     },
     cursor: {
       property: 'cursor',
+    },
+    textAlign: {
+      property: 'textAlign',
     },
   }),
   space,

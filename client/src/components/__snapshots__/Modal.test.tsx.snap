@@ -22,7 +22,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
         Test Modal
       </h2>
       <p
-        className="css-1ra243m-Text e1pb1ozb0"
+        className="css-182fmg5-Text e1pb1ozb0"
       >
         Some content
       </p>

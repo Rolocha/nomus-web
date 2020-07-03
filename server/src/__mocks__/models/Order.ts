@@ -1,8 +1,8 @@
 import { Order } from 'src/models'
-import { createMockUser } from './User'
-import { createMockCardVersion } from './CardVersion'
 import { OrderState } from 'src/util/enums'
 import { createMockCard } from './Card'
+import { createMockCardVersion } from './CardVersion'
+import { createMockUser } from './User'
 
 export const createMockOrder = async (override: Partial<Order> = {}) => {
   const userInPayload = await createMockUser()
@@ -18,7 +18,7 @@ export const createMockOrder = async (override: Partial<Order> = {}) => {
     price: override.price ?? 27.99,
     cards: override.cards ?? cardsInPayload,
     state: override.state ?? OrderState.Captured,
-    tracking: override.tracking ?? '0000000000000',
+    trackingNumber: override.trackingNumber ?? '0000000000000',
     ...override,
   }
 

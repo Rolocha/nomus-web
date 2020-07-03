@@ -5,8 +5,8 @@ import * as buttonlikeStyles from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
 
 const linkBaseStyles = (props: LinkProps) => ({
-  textDecoration: props.noUnderline ? 'none' : 'underline',
-  color: props.color ?? theme.colors.nomusBlue,
+  textDecoration: props.underline ? 'underline' : 'none',
+  color: props.color ?? theme.colors.linkBlue,
 })
 
 interface LinkProps {
@@ -16,7 +16,7 @@ interface LinkProps {
   buttonSize?: keyof typeof buttonlikeStyles.sizeVariants
 
   width?: keyof typeof buttonlikeStyles.widthVariants
-  noUnderline?: boolean
+  underline?: boolean
   color?: string
   as?: any
   overrideStyles?: any
@@ -53,11 +53,11 @@ interface InternalLinkProps
     LinkProps {}
 
 const Link = styled<'a', LinkProps>('a', {
-  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'noUnderline',
+  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline',
 })(...args)
 const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
   ReactRouterLink,
-  { shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'noUnderline' },
+  { shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline' },
 )(...args)
 
 const defaultProps = {

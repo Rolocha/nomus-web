@@ -9,7 +9,7 @@ import { Card, CardVersion, User } from 'src/models'
 import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { OrderState } from '../util/enums'
-import { Ref, UUIDScalar, UUIDType } from './scalars'
+import { Ref, UUIDType } from './scalars'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
@@ -20,7 +20,6 @@ class Order {
   createdAt: Date
 
   @prop({ required: true, default: () => MUUID.v4() })
-  @Field((type) => UUIDScalar)
   _id: UUIDType
 
   // Override the 'id' virtual property getters/setters since Mongoose doesn't
@@ -66,7 +65,7 @@ class Order {
   //Tracking Number for USPS
   @prop({ required: false })
   @Field({ nullable: true })
-  tracking: string
+  trackingNumber: string
 
   //Stripe Order Object Reference. For now, this is null but futre work will replace this
   @prop({ required: false })
