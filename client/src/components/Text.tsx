@@ -73,7 +73,6 @@ export const SectionSubheader = H5
 export const H6 = semanticallyStyledText('h6', 'h6')
 export const MainNav = H6
 
-export const BigBody = semanticallyStyledText('p', 'bigBody')
 export const Body = semanticallyStyledText('p', 'body')
 export const Body2 = semanticallyStyledText('p', 'body2')
 export const Body3 = semanticallyStyledText('p', 'body3')

@@ -51,21 +51,15 @@ const textStyles: Record<string, any> = {
   },
 
   // <p />
-  bigBody: {
-    fontWeight: 400,
-    fontSize: [20, 20, 20, 20],
-    lineHeight: [1.4, 1.4, 1.5, 1.5],
-    color: colors.midnightGray,
-  },
   body: {
     fontWeight: 400,
-    fontSize: [16, 16, 16, 16],
+    fontSize: [16, 16, 20, 20],
     lineHeight: [1.4, 1.4, 1.5, 1.5],
     color: colors.midnightGray,
   },
   body2: {
     fontWeight: 400,
-    fontSize: [14, 14, 16, 16],
+    fontSize: [16, 16, 16, 16],
     lineHeight: [1.5, 1.5, 1.5, 1.5],
     color: colors.midnightGray,
   },
