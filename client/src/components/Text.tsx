@@ -30,10 +30,10 @@ export type TextProps = {
 
 const Text = styled<'p', TextProps>('p')(
   baseTextStyles,
+  fontSize,
   variant({
     variants: theme.textStyles,
   }),
-  fontSize,
   color,
   space,
   fontFamily,

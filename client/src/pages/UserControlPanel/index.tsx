@@ -101,7 +101,7 @@ const ProfilePage = () => {
     <Box
       bg={theme.colors.ivory}
       minHeight={{ [bp]: '100vh' }}
-      minWidth={{ _: '0', [bp]: breakpoints.lg }}
+      minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
     >
       <Navbar />
@@ -172,8 +172,8 @@ const ProfilePage = () => {
                       <Text.Plain
                         m={0}
                         color="white"
-                        fontSize={{ _: 10, [bp]: 16 }}
-                        fontWeight={isCurrentSection ? 'bold' : 'undefined'}
+                        fontSize={{ _: 10, [bp]: 'unset' }}
+                        fontWeight={isCurrentSection ? 500 : 'undefined'}
                       >
                         {label}
                       </Text.Plain>
@@ -189,7 +189,7 @@ const ProfilePage = () => {
             flexGrow={1}
             boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
             bg="white"
-            p={{ _: 3, [bp]: 5 }}
+            p={{ _: '24px', [bp]: '48px' }}
             // py={{ _: 4, [bp]: 5 }}
             borderTopRightRadius={{ [bp]: 3 }}
             borderBottomRightRadius={{ [bp]: 3 }}

@@ -22,7 +22,8 @@ const OrderList = ({ orders }: Props) => {
     display: 'grid',
     gridTemplateColumns: {
       _: '5fr 4fr 3fr',
-      [bp]: '2fr 2fr 2fr 3fr 1fr 2fr',
+      // Hard coding the required pixel values for known long entities like date, tracking #, "View order" button
+      [bp]: '180px 2fr 2fr 140px 1fr 100px',
     },
     gridTemplateAreas: {
       _: `
@@ -43,7 +44,7 @@ const OrderList = ({ orders }: Props) => {
       <Box {...rowStyles} mb={2} display={{ _: 'none', [bp]: 'grid' }}>
         {/* Sorta hacky, but this column is the only one where the label doesn't abide by the same grid spacing + padding as the rows so the -3 margin-left helps push it back to the front */}
         <Box gridArea="orderDate" ml={-3}>
-          <Text.Label>Date Ordered</Text.Label>
+          <Text.Label>Ordered On</Text.Label>
         </Box>
         <Box gridArea="status">
           <Text.Label>Status</Text.Label>
@@ -60,23 +61,23 @@ const OrderList = ({ orders }: Props) => {
         <Box gridArea="viewOrder"></Box>
       </Box>
 
-      {orders.map((order) => {
+      {orders.map((order, index) => {
         return (
           <Box
             key={order.id}
-            borderRadius={3}
+            borderRadius={2}
             borderWidth={1}
             borderStyle="solid"
             borderColor="africanElephant"
-            pt={{ _: 3, [bp]: 1 }}
-            pb={{ _: 0, [bp]: 1 }}
-            mb={3}
+            pt={{ _: 3, [bp]: 3 }}
+            pb={{ _: 0, [bp]: 3 }}
+            mb={index == orders.length - 1 ? 0 : 2}
             {...rowStyles}
             alignItems="center"
           >
             <Box gridArea="orderDate">
               <Box display={{ _: 'block', [bp]: 'none' }}>
-                <Text.Label>Date Ordered</Text.Label>
+                <Text.Label>Ordered On</Text.Label>
               </Box>
               <Text.Body2>{getFormattedFullDate(order.createdAt)}</Text.Body2>
             </Box>
@@ -90,7 +91,7 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Order #</Text.Label>
               </Box>
-              <Text.Body2>{order.id}</Text.Body2>
+              <Text.Body2>#{order.id}</Text.Body2>
             </Box>
             <Box gridArea="trackingNumber">
               <Box display={{ _: 'block', [bp]: 'none' }}>
@@ -118,15 +119,28 @@ const OrderList = ({ orders }: Props) => {
               textAlign="center"
               // This ensures the top-border reaches the edges even though there's padding in the parent
               mx={-rowStyles.px}
+              py={{ _: 2, [bp]: 0 }}
             >
               <InternalLink
                 to={`${location.pathname}/${order.id}`}
                 asButton
                 buttonStyle="tertiary"
-                css={css({ display: 'inline-block' })}
+                css={css({
+                  // We don't want all the extra button padding in this case
+                  padding: 'unset',
+                  display: 'inline-block',
+                  // Override default on-hover styles for this particular case
+                  // Medium-bold the text rather than using the light blue background
+                  '&:hover': {
+                    background: 'none',
+                    p: {
+                      fontWeight: 500,
+                    },
+                  },
+                })}
               >
                 <Box display="flex" alignItems="center">
-                  <Text.Body3 color="secondaryBlue">View/edit order</Text.Body3>
+                  <Text.Body3 color="secondaryBlue">View order</Text.Body3>
                   <Icon icon="chevron-right" />
                 </Box>
               </InternalLink>
