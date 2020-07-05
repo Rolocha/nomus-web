@@ -51,7 +51,9 @@ export default () => {
     register: passwordFormRegister,
     handleSubmit: passwordFormHandleSubmit,
     reset: passwordFormReset,
-  } = useForm<PasswordFormData>()
+  } = useForm<PasswordFormData>({
+    defaultValues: { oldPassword: '', newPassword: '', confirmNewPassword: '' },
+  })
   const haveSetDefaultRef = React.useRef(false)
   const [updateProfile] = useMutation<UpdateProfileQuery>(
     UPDATE_PROFILE_MUTATION,
@@ -81,20 +83,10 @@ export default () => {
   React.useEffect(() => {
     if (!haveSetDefaultRef.current && data) {
       emailFormReset({ email: data.user.email ?? '' })
-    }
-  }, [haveSetDefaultRef, data, emailFormReset])
-
-  React.useEffect(() => {
-    if (!haveSetDefaultRef.current && data) {
       usernameFormReset({ username: data.user.username ?? '' })
+      haveSetDefaultRef.current = true
     }
-  }, [haveSetDefaultRef, data, usernameFormReset])
-
-  React.useEffect(() => {
-    if (!haveSetDefaultRef.current && data) {
-      passwordFormReset({ oldPassword: '', newPassword: '' })
-    }
-  }, [haveSetDefaultRef, data, passwordFormReset])
+  }, [haveSetDefaultRef, data, emailFormReset, usernameFormReset])
 
   React.useEffect(() => {
     if (!haveSetDefaultRef.current && data) {
@@ -128,6 +120,11 @@ export default () => {
         confirmNewPassword: formData.confirmNewPassword,
       },
     })
+    passwordFormReset({
+      oldPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    })
   }
 
   const onActivationChange = (activationStatus: boolean) => {
@@ -158,8 +155,8 @@ export default () => {
         "signOut ."
         "resetPassword ."
         "passwordForm passwordCopy1"
-        "passwordForm passwordCopy2"
-        "passwordForm passwordCopy2"
+        "passwordForm passwordCopy1"
+        "passwordForm passwordCopy1"
         "resetPasswordButton ."
         "deactivateProfileHeader ."
         "deactivateProfileCopy deactivateProfileButton"
@@ -171,8 +168,8 @@ export default () => {
         "signOut . ."
         "resetPassword . ."
         "passwordForm . passwordCopy1"
-        "passwordForm . passwordCopy2"
-        "passwordForm . passwordCopy2"
+        "passwordForm . passwordCopy1"
+        "passwordForm . passwordCopy1"
         "resetPasswordButton . ."
         "deactivateProfileHeader . ."
         "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
@@ -206,13 +203,17 @@ export default () => {
 
       <Box gridArea="editEmail" placeSelf={{ _: 'start', [bp]: 'center' }}>
         {isEditingEmail ? (
-          <EditButton onClick={emailFormHandleSubmit(onSubmitEmail)} />
+          <EditButton
+            onClick={emailFormHandleSubmit(onSubmitEmail)}
+            iconOnlyBp={bp}
+          />
         ) : (
           <EditButton
             onClick={() => {
               setIsEditingEmail(true)
               setIsEditingUsername(false)
             }}
+            iconOnlyBp={bp}
           />
         )}
       </Box>
@@ -247,13 +248,17 @@ export default () => {
         placeSelf={{ _: 'end start', [bp]: 'center' }}
       >
         {isEditingUsername ? (
-          <EditButton onClick={usernameFormHandleSubmit(onSubmitUsername)} />
+          <EditButton
+            onClick={usernameFormHandleSubmit(onSubmitUsername)}
+            iconOnlyBp={bp}
+          />
         ) : (
           <EditButton
             onClick={() => {
               setIsEditingUsername(true)
               setIsEditingEmail(false)
             }}
+            iconOnlyBp={bp}
           />
         )}
       </Box>
@@ -266,9 +271,9 @@ export default () => {
         </Text.Body>
       </Box>
 
-      <Box gridArea="signOut" display={{ _: 'block', [bp]: 'block' }}>
+      <Box gridArea="signOut" display="block">
         <Button
-          width="full"
+          width="50%"
           variant="secondary"
           onClick={() => {
             logOut()
@@ -326,10 +331,7 @@ export default () => {
       </Box>
 
       <Box gridArea="passwordCopy1">
-        <Text.Body>Your new password needs at least:</Text.Body>
-      </Box>
-
-      <Box gridArea="passwordCopy2">
+        <Text.Body mb={3}>Your new password needs at least:</Text.Body>
         <Text.Body>
           8 characters <br />
           1 letter <br />
