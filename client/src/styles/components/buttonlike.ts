@@ -127,7 +127,7 @@ export const styleVariants = {
     },
   },
 
-  recover: {
+  success: {
     ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',

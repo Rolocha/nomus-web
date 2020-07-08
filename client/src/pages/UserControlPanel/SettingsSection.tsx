@@ -14,6 +14,7 @@ import Button from 'src/components/Button'
 import { useAuth } from 'src/utils/auth'
 import { useHistory } from 'react-router-dom'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
+import ActivationEditor from './ActivationEditor'
 
 const bp = 'lg'
 
@@ -36,7 +37,6 @@ export default () => {
   const { logOut } = useAuth()
   const [isEditingEmail, setIsEditingEmail] = React.useState(false)
   const [isEditingUsername, setIsEditingUsername] = React.useState(false)
-  const [isUserProfileActive, setUserProfileActive] = React.useState(true)
   const {
     register: emailFormRegister,
     handleSubmit: emailFormHandleSubmit,
@@ -88,12 +88,6 @@ export default () => {
     }
   }, [haveSetDefaultRef, data, emailFormReset, usernameFormReset])
 
-  React.useEffect(() => {
-    if (!haveSetDefaultRef.current && data) {
-      setUserProfileActive(data.user.activated)
-    }
-  }, [haveSetDefaultRef, data, setUserProfileActive])
-
   const onSubmitEmail = (formData: EmailFormData) => {
     updateProfile({
       variables: {
@@ -127,15 +121,6 @@ export default () => {
     })
   }
 
-  const onActivationChange = (activationStatus: boolean) => {
-    updateProfile({
-      variables: {
-        updatedUser: { activated: activationStatus },
-      },
-    })
-    setUserProfileActive(activationStatus)
-  }
-
   if (loading || !data) {
     return <LoadingPage />
   }
@@ -152,14 +137,15 @@ export default () => {
         "account ."
         "email editEmail"
         "username editUsername"
-        "signOut ."
+        "signOut signOut"
         "resetPassword ."
-        "passwordForm passwordCopy1"
-        "passwordForm passwordCopy1"
-        "passwordForm passwordCopy1"
-        "resetPasswordButton ."
+        "passwordForm passwordForm"
+        "passwordForm passwordForm"
+        "passwordForm passwordForm"
+        "resetPasswordButton resetPasswordButton"
         "deactivateProfileHeader ."
-        "deactivateProfileCopy deactivateProfileButton"
+        "deactivateProfileQuestion deactivateProfileQuestion"
+        "deactivateProfileButton deactivateProfileButton"
       `,
         [bp]: `
         "account . ."
@@ -193,15 +179,17 @@ export default () => {
               name="email"
               type="email"
               autoComplete="email"
+              fontSize="14px"
+              width="100%"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
         ) : (
-          <Text.Body>{data.user.email}</Text.Body>
+          <Text.Body2>{data.user.email}</Text.Body2>
         )}
       </Box>
 
-      <Box gridArea="editEmail" placeSelf={{ _: 'start', [bp]: 'center' }}>
+      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
         {isEditingEmail ? (
           <EditButton
             onClick={emailFormHandleSubmit(onSubmitEmail)}
@@ -219,33 +207,37 @@ export default () => {
       </Box>
 
       <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body>
+        <Text.Body3>
           This is the email associated with your account. If you would like to
           change the email on your profile, go to the Profile tab.
-        </Text.Body>
+        </Text.Body3>
       </Box>
 
       <Box gridArea="username">
         <Text.Label>USERNAME/URL</Text.Label>
         {isEditingUsername ? (
           <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
-            <Text.Body>{'nomus.me/u/'}</Text.Body>
-            <Form.Input
-              ref={usernameFormRegister({ required: true })}
-              name="username"
-              type="username"
-              autoComplete="username"
-            />
-            <Form.Input type="submit" display="none" />
+            <Box display="flex">
+              <Text.Body2>{'nomus.me/u/'}</Text.Body2>
+              <Form.Input
+                ref={usernameFormRegister({ required: true })}
+                name="username"
+                type="username"
+                autoComplete="username"
+                fontSize="14px"
+                width="100%"
+              />
+              <Form.Input type="submit" display="none" />
+            </Box>
           </Form.Form>
         ) : (
-          <Text.Body>{'nomus.me/u/' + data.user.username}</Text.Body>
+          <Text.Body2>{'nomus.me/u/' + data.user.username}</Text.Body2>
         )}
       </Box>
 
       <Box
         gridArea="editUsername"
-        placeSelf={{ _: 'end start', [bp]: 'center' }}
+        placeSelf={{ _: 'end', [bp]: 'start center' }}
       >
         {isEditingUsername ? (
           <EditButton
@@ -264,17 +256,18 @@ export default () => {
       </Box>
 
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body>
+        <Text.Body3>
           This is the username associated with your account and the public URL
           that leads to your profile. Changing your username will change your
           public profile link.
-        </Text.Body>
+        </Text.Body3>
       </Box>
 
-      <Box gridArea="signOut" display="block">
+      <Box gridArea="signOut" display="center">
         <Button
-          width="50%"
+          width={{ _: '100%', [bp]: '75%' }}
           variant="secondary"
+          mt={1}
           onClick={() => {
             logOut()
             history.push('/')
@@ -282,7 +275,7 @@ export default () => {
         >
           <Box alignItems="center" justifySelf="center">
             <Text.Plain fontSize="14px" color="nomusBlue">
-              Sign Out
+              Sign out
             </Text.Plain>
           </Box>
         </Button>
@@ -290,7 +283,7 @@ export default () => {
 
       <Box gridArea="resetPassword" alignSelf={{ _: 'start', md: 'center' }}>
         <Text.SectionHeader mb={1} mt={0}>
-          Reset Password
+          Reset password
         </Text.SectionHeader>
       </Box>
 
@@ -330,25 +323,25 @@ export default () => {
         </Form.Form>
       </Box>
 
-      <Box gridArea="passwordCopy1">
-        <Text.Body mb={3}>Your new password needs at least:</Text.Body>
-        <Text.Body>
+      <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
+        <Text.Body3 mb={3}>Your new password needs at least:</Text.Body3>
+        <Text.Body3>
           8 characters <br />
           1 letter <br />
           1 symbol <br />
           1 number <br />
-        </Text.Body>
+        </Text.Body3>
       </Box>
 
       <Box gridArea="resetPasswordButton">
         <Button
-          width="full"
+          width={{ _: '100%', [bp]: '75%' }}
           variant="secondary"
           onClick={passwordFormHandleSubmit(onPasswordChange)}
         >
           <Box alignItems="center" justifySelf="center">
             <Text.Plain fontSize="14px" color="nomusBlue">
-              Reset Password
+              Reset password
             </Text.Plain>
           </Box>
         </Button>
@@ -359,55 +352,34 @@ export default () => {
         alignSelf={{ _: 'start', md: 'center' }}
       >
         <Text.SectionHeader mb={1} mt={0}>
-          Deactivate Profile
+          Profile deactivation
         </Text.SectionHeader>
       </Box>
 
       <Box
         gridArea="deactivateProfileQuestion"
-        display={{ _: 'none', [bp]: 'block' }}
+        display={{ _: 'block', [bp]: 'block' }}
       >
-        <Text.Body>Would you like to deactivate your account?</Text.Body>
+        <Text.Body2>Would you like to deactivate your account?</Text.Body2>
+      </Box>
+
+      <Box gridArea="deactivateProfileButton">
+        <ActivationEditor
+          activatedValue={data.user.activated}
+          pageSizeBp={bp}
+        />
       </Box>
 
       <Box
-        gridArea="deactivateProfileButton"
-        alignSelf={{ _: 'start', [bp]: 'top center' }}
+        gridArea="deactivateProfileCopy"
+        display={{ _: 'none', [bp]: 'block' }}
       >
-        {isUserProfileActive ? (
-          <Button
-            width="full"
-            variant="danger"
-            onClick={async () => {
-              await onActivationChange(false)
-            }}
-          >
-            <Text.Plain fontSize="14px" color="invalidRed">
-              Deactivate
-            </Text.Plain>
-          </Button>
-        ) : (
-          <Button
-            width="full"
-            variant="recover"
-            onClick={async () => {
-              await onActivationChange(true)
-            }}
-          >
-            <Text.Plain fontSize="14px" color="validGreen">
-              Activate
-            </Text.Plain>
-          </Button>
-        )}
-      </Box>
-
-      <Box gridArea="deactivateProfileCopy">
-        <Text.Body>
+        <Text.Body3>
           Upon deactivating your account, you will no longer have a public
           profile tied to any physical business cards you’ve printed, but those
           who already have your contact wlil still have access to your profile.
           You will be able to Reactivate at any time in the future.
-        </Text.Body>
+        </Text.Body3>
       </Box>
 
       {/* <Box
