@@ -75,7 +75,7 @@ export default ({ order }: Props) => {
           </Box>
           <Box gridArea="quantity">
             <Text.Label>Quantity</Text.Label>
-            <Text.Body2>{order.quantity}</Text.Body2>
+            <Text.Body2>{`${order.quantity} cards`}</Text.Body2>
           </Box>
         </Box>
         <Box gridArea="pricing">

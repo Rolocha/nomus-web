@@ -86,7 +86,7 @@ export default () => {
             {formatName(data.user.name)}
           </Text.SectionHeader>
         )}
-        <Text.Body>{data.user.headline}</Text.Body>
+        <Text.Body2>{data.user.headline}</Text.Body2>
       </Box>
 
       <Box gridArea="editName" alignSelf="center">
@@ -128,17 +128,17 @@ export default () => {
       <Box gridArea="profileInfo">
         <Box mb={3}>
           <Text.Label mb={1}>PHONE</Text.Label>
-          <Text.Body>{data.user.phoneNumber}</Text.Body>
+          <Text.Body2>{data.user.phoneNumber}</Text.Body2>
         </Box>
 
         <Box mb={3}>
           <Text.Label>EMAIL</Text.Label>
-          <Text.Body>{data.user.email}</Text.Body>
+          <Text.Body2>{data.user.email}</Text.Body2>
         </Box>
 
         <Box mb={4}>
           <Text.Label>BIO</Text.Label>
-          <Text.Body>{data.user.bio}</Text.Body>
+          <Text.Body2>{data.user.bio}</Text.Body2>
         </Box>
       </Box>
 

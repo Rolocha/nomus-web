@@ -62,7 +62,7 @@ export default () => {
       state: OrderState.Enroute,
       price: 2500,
       quantity: 50,
-      createdAt: new Date('2020-05-20T04:06:25.850Z'),
+      createdAt: new Date('2020-09-20T04:06:25.850Z'),
       trackingNumber: '123456789101112',
       cardVersion: {
         frontImageUrl: 'https://placehold.it/500x300',
@@ -109,10 +109,12 @@ export default () => {
       {/* Orders list (hide if mobile-layout and an order is selected) */}
       {!(selectedOrder != null && !isDesktopLayout) && (
         <Box>
-          <Text.H3 mb={2}>Current orders</Text.H3>
+          <Text.H3 mb={3}>Current orders</Text.H3>
           <OrderList orders={currentOrders} />
 
-          <Text.H3 mt={4}>Previous orders</Text.H3>
+          <Text.H3 mt="40px" mb={3}>
+            Previous orders
+          </Text.H3>
           <OrderList orders={previousOrders} />
         </Box>
       )}
