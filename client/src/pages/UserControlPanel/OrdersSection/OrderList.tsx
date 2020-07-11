@@ -71,7 +71,7 @@ const OrderList = ({ orders }: Props) => {
             borderColor="africanElephant"
             pt={{ _: 3, [bp]: 3 }}
             pb={{ _: 0, [bp]: 3 }}
-            mb={index == orders.length - 1 ? 0 : 2}
+            mb={index === orders.length - 1 ? 0 : 2}
             {...rowStyles}
             alignItems="center"
           >
