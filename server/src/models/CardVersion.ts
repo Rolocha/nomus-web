@@ -85,6 +85,10 @@ export class CardVersion {
   @Field({ nullable: true })
   templateId: string
 
+  @prop({ required: true, default: [] })
+  @Field(() => [String], { nullable: true })
+  lineOrder: Array<string>
+
   static async findBySlugOrId(
     this: ReturnModelType<typeof CardVersion>,
     slugOrId: string,
