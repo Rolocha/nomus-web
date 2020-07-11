@@ -12,6 +12,7 @@ export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
 const Label = styled<'label', LabelProps>('label')(
   {
     textTransform: 'uppercase',
+    display: 'block',
   },
   variant({
     variants: theme.textStyles,
