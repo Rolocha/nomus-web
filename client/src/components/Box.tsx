@@ -1,5 +1,7 @@
 import styled from '@emotion/styled'
 import {
+  background,
+  BackgroundProps,
   border,
   BorderProps,
   color,
@@ -44,7 +46,8 @@ type BoxProps = {
   LayoutProps &
   FlexboxProps &
   GridProps &
-  ShadowProps
+  ShadowProps &
+  BackgroundProps
 
 const Box = styled<'div', BoxProps>('div')(
   {
@@ -84,6 +87,7 @@ const Box = styled<'div', BoxProps>('div')(
       property: 'textAlign',
     },
   }),
+  background,
   space,
   position,
   color,

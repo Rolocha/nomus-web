@@ -1,12 +1,17 @@
 import styled from '@emotion/styled'
 import { animations, colors } from 'src/styles'
 
-const Spinner = styled.div`
-  width: 50px;
-  height: 50px;
+interface Props {
+  size?: number
+}
+
+const Spinner = styled<'div', Props>('div')`
+  width: ${(props: Props) => props.size || 50}px;
+  height: ${(props: Props) => props.size || 50}px;
   border-radius: 50%;
-  border: 4px solid transparent;
-  border-top: 4px solid ${colors.nomusBlue};
+  border: ${(props) => (props.size || 50) / 12.5}px solid transparent;
+  border-top: ${(props) => (props.size || 50) / 12.5}px solid
+    ${colors.nomusBlue};
   animation: ${animations.rotate360} 1s ease infinite;
 `
 

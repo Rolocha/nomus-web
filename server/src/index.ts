@@ -8,6 +8,7 @@ import morgan from 'morgan'
 
 import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
+import sendgridRouter from 'src/sendgrid'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
 
@@ -23,6 +24,7 @@ app.get('/ping', async (req: Request, res: Response) => {
 
 app.use('/auth', bodyParser.json(), authRouter)
 app.use(graphqlPath, authMiddleware)
+app.use('/api/sendgrid', bodyParser.json(), authMiddleware, sendgridRouter)
 gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.listen(Number(appServerPort), () => {

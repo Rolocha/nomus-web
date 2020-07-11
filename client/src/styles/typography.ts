@@ -82,7 +82,7 @@ const textStyles: Record<string, any> = {
   },
   input: {
     ...baseTextStyles,
-    fontSize: [16, 16, 16, 16],
+    fontSize: [16, 16, 20, 20],
     fontWeight: 400,
     color: colors.midnightGray,
   },

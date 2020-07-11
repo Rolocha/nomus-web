@@ -16,3 +16,5 @@ export const graphqlPath = '/graphql'
 export const refreshTokenLifespan = ms('30 days')
 export const accessTokenLifespan = ms('15m')
 export const s3BucketName = 'nomus-assets'
+
+export const sendgridToken = process.env.SENDGRID_TOKEN
