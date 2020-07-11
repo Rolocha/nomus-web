@@ -102,6 +102,56 @@ export const styleVariants = {
     },
   },
 
+  danger: {
+    ...baseButtonStyles,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderColor: colors.invalidRed,
+    color: colors.invalidRed,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverRed,
+    },
+    '&:active': {
+      backgroundColor: colors.activeRed,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineRed}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: 'transparent',
+      color: colors.invalidRed,
+      borderColor: colors.invalidRed,
+    },
+  },
+
+  success: {
+    ...baseButtonStyles,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderColor: colors.validGreen,
+    color: colors.validGreen,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverGreen,
+    },
+    '&:active': {
+      backgroundColor: colors.activeGreen,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineGreen}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: 'transparent',
+      color: colors.validGreen,
+      borderColor: colors.validGreen,
+    },
+  },
+
   unstyled: {},
 } as const
 

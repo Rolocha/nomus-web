@@ -8,28 +8,28 @@
 // ====================================================
 
 export interface UCPCardsSectionQuery_user {
-  __typename: "User";
-  id: string;
-  defaultCardVersion: any | null;
+  __typename: 'User'
+  id: string
+  defaultCardVersion: any | null
 }
 
 export interface UCPCardsSectionQuery_cardVersions {
-  __typename: "CardVersion";
-  id: string;
-  createdAt: any;
-  frontImageUrl: string | null;
-  backImageUrl: string | null;
+  __typename: 'CardVersion'
+  id: string
+  createdAt: any
+  frontImageUrl: string | null
+  backImageUrl: string | null
 }
 
 export interface UCPCardsSectionQuery_cardVersionsStats {
-  __typename: "CardVersionStats";
-  id: string;
-  numCardsOrdered: number;
-  numTaps: number;
+  __typename: 'CardVersionStats'
+  id: string
+  numCardsOrdered: number
+  numTaps: number
 }
 
 export interface UCPCardsSectionQuery {
-  user: UCPCardsSectionQuery_user;
-  cardVersions: UCPCardsSectionQuery_cardVersions[];
-  cardVersionsStats: UCPCardsSectionQuery_cardVersionsStats[];
+  user: UCPCardsSectionQuery_user
+  cardVersions: UCPCardsSectionQuery_cardVersions[]
+  cardVersionsStats: UCPCardsSectionQuery_cardVersionsStats[]
 }

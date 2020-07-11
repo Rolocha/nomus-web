@@ -23,6 +23,8 @@ export interface AuthManagerOptions<
   logIn: (args: LoginArgs) => Promise<AuthData>
   // An async function that hits your signup endpoint and responds with auth data
   signUp: (args: SignupArgs) => Promise<AuthData>
+  // An async function that logs the user out and returns true on success, false otherwise
+  logOut: () => Promise<boolean>
   // An async function that hits your refresh endpoint and responds with a new access token
   refreshToken: (authData: AuthData) => Promise<AuthData>
   // A function for converting your auth data into the object you want useAuth to return
@@ -40,6 +42,7 @@ export class AuthManager<
   // Consumer supplied configuration via constructor
   private logIn: (args: LoginArgs) => Promise<AuthData>
   private signUp: (args: SignupArgs) => Promise<AuthData>
+  private logOut: () => Promise<boolean>
   private refreshToken: (args: AuthData) => Promise<AuthData>
   private makeUseAuthOutput: (authData: AuthData | null) => UseAuthOutput
   private authDataKey: string
@@ -56,12 +59,14 @@ export class AuthManager<
     authDataKey,
     logIn,
     signUp,
+    logOut,
     refreshToken,
     makeUseAuthOutput,
     expirationHeadstart,
   }: AuthManagerOptions<LoginArgs, SignupArgs, UseAuthOutput, AuthData>) {
     this.logIn = logIn
     this.signUp = signUp
+    this.logOut = logOut
     this.refreshToken = refreshToken
     this.authDataKey = authDataKey
     this.makeUseAuthOutput = makeUseAuthOutput
@@ -108,6 +113,7 @@ export class AuthManager<
       loggedIn: authData != null,
       logIn: this.logInAndSaveAuth,
       signUp: this.signUpAndSaveAuth,
+      logOut: this.logOutAndClearData,
       refreshToken: this.refreshToken,
     }
   }
@@ -134,6 +140,13 @@ export class AuthManager<
   private signUpAndSaveAuth = async (args: SignupArgs) => {
     const response = await this.signUp(args)
     this.updateAuthData(response)
+  }
+
+  private logOutAndClearData = async () => {
+    const response = await this.logOut()
+    if (response) {
+      this.updateAuthData(null)
+    }
   }
 
   private tokenHasExpired(authData: AuthData) {
