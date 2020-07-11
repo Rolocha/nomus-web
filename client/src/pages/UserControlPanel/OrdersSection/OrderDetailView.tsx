@@ -1,10 +1,10 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
 import Image from 'src/components/Image'
 import CopyableText from 'src/components/CopyableText'
 import * as Text from 'src/components/Text'
+import { ExternalLink } from 'src/components/Link'
 import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
@@ -117,24 +117,16 @@ export default ({ order }: Props) => {
         </Box>
       </Box>
 
-      <Box
-        pt={3}
-        display="flex"
-        flexDirection={{ _: 'column', [bp]: 'row' }}
-        mx={{ _: 0, [bp]: -2 }}
-        my={{ _: -2, [bp]: 0 }}
-      >
-        <Box width={{ _: '100%', [bp]: '50%' }} p={2}>
-          <Button width="100%" variant="primary">
-            Need help with your order?
-          </Button>
-        </Box>
-        <Box width={{ _: '100%', [bp]: '50%' }} p={2}>
-          {/* TODO: Make this a "dangerOutline" variant once Anshul adds that in */}
-          <Button width="100%" variant="secondary">
-            Cancel order
-          </Button>
-        </Box>
+      <Box mt={4}>
+        <Text.Body3 textAlign="center">
+          Need help with your order? Shoot us an email at{' '}
+          <ExternalLink
+            href={`mailto:hi@nomus.me?subject=Issue with Nomus order (${order.id})`}
+          >
+            hi@nomus.me
+          </ExternalLink>
+          .
+        </Text.Body3>
       </Box>
     </Box>
   )
