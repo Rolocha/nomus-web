@@ -21,8 +21,8 @@ interface PageType {
 }
 
 export const pages: Array<PageType> =
-  // TODO: Change to production
-  process.env.NODE_ENV === 'staging'
+  // TODO: Figure out how to exclude staging since its NODE_ENV is also production
+  process.env.NODE_ENV === 'production'
     ? [
         {
           name: 'landing',
