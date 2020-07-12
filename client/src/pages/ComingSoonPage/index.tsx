@@ -167,7 +167,12 @@ const ComingSoonPage = () => {
 
           {submitState === 'failure' ? (
             <Box>
-              <Text.Body>Uh oh, something went wrong on our end! 😣</Text.Body>
+              <Text.Body>
+                Uh oh, something went wrong on our end!{' '}
+                <span role="img" aria-label="upset face">
+                  😣
+                </span>
+              </Text.Body>
             </Box>
           ) : null}
         </Box>

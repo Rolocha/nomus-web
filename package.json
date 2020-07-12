@@ -7,7 +7,10 @@
   "scripts": {
     "types:watch": "apollo client:codegen --watch --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types",
     "types:clean": "rm -f ./client/src/apollo/types/*",
-    "types:gen": "yarn types:clean && apollo client:codegen --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types"
+    "types:gen": "yarn types:clean && apollo client:codegen --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types",
+    "test": "yarn test:client && yarn test:server",
+    "test:client": "cd client && yarn test --watchAll=false",
+    "test:server": "cd server && yarn test"
   },
   "workspaces": [
     "client/",
