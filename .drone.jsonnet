@@ -83,12 +83,12 @@ local build(app, when) = {
   ]
 };
 
-local syncToBucket(when) = {
-  "name": "deploy client to S3",
+local syncToBucket(bucket, when) = {
+  "name": "deploy client to S3 bucket" + bucket,
   "image": "plugins/s3-sync:1",
   "when": when,
   "settings": {
-    "bucket": "stage.nomus.me",
+    "bucket": bucket,
     "access_key": {
       "from_secret": "AWS_ACCESS_KEY_ID"
     },
@@ -121,7 +121,7 @@ local updateDeployConfig(env, host, when) = {
 
 // Deployment conditionals
 local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${NOMUS_DEPLOY_BRANCH}" };
-local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local PRODUCTION_DEPLOY_CONDITION = { "branch": ["bibek/wip-landing-page"] };
 local ALWAYS_CONDITION = {};
 
 
@@ -136,7 +136,8 @@ local ALWAYS_CONDITION = {};
       installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
       build("client", STAGING_DEPLOY_CONDITION),
-      syncToBucket(STAGING_DEPLOY_CONDITION)
+      syncToBucket("stage.nomus.me", STAGING_DEPLOY_CONDITION),
+      syncToBucket("nomus.me", PRODUCTION_DEPLOY_CONDITION)
     ],
     "trigger": {
       "event": {
