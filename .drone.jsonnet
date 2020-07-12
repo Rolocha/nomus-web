@@ -140,13 +140,12 @@ local ALWAYS_CONDITION = {};
       // env-agnostic steps
       installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
+      build("client", ALWAYS_CONDITION),
 
       // staging steps
-      build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket("stage.nomus.me", STAGING_DEPLOY_CONDITION),
 
       // production steps
-      build("client", PRODUCTION_DEPLOY_CONDITION),
       syncToBucket("nomus.me", PRODUCTION_DEPLOY_CONDITION)
     ],
     "trigger": {
