@@ -124,7 +124,7 @@ export default () => {
         <Modal
           isOpen={params.orderId != null}
           onClose={() => history.push('/dashboard/orders')}
-          width="calc(min(95%, 800px))"
+          anchorStyle="right"
         >
           {selectedOrder && <OrderDetailView order={selectedOrder} />}
         </Modal>

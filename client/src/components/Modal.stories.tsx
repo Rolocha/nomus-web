@@ -43,6 +43,35 @@ export const Primary = () => {
   )
 }
 
+export const RightAnchored = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  return (
+    <Box position="relative" zIndex={0}>
+      <Modal
+        anchorStyle="right"
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+        }}
+      >
+        <Box>
+          <Text.PageHeader mb={3}>Hello there</Text.PageHeader>
+          <Text.Body>This is the a right-anchored modal!</Text.Body>
+        </Box>
+      </Modal>
+
+      <Button
+        onClick={() => {
+          setIsModalOpen(true)
+        }}
+      >
+        Open modal
+      </Button>
+    </Box>
+  )
+}
+
 export const ConfirmUnsavedChanges = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
