@@ -89,6 +89,10 @@ local syncToBucket(bucket, when) = {
   "when": when,
   "settings": {
     "bucket": bucket,
+    "region": {
+      "nomus.me": "us-west-1",
+      "stage.nomus.me": "us-east-1"
+    }[bucket],
     "access_key": {
       "from_secret": "AWS_ACCESS_KEY_ID"
     },

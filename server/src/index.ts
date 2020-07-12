@@ -24,7 +24,7 @@ app.get('/ping', async (req: Request, res: Response) => {
 
 app.use('/auth', bodyParser.json(), authRouter)
 app.use(graphqlPath, authMiddleware)
-app.use('/api/sendgrid', bodyParser.json(), authMiddleware, sendgridRouter)
+app.use('/api/sendgrid', bodyParser.json(), sendgridRouter)
 gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.listen(Number(appServerPort), () => {
