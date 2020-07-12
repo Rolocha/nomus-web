@@ -14,9 +14,8 @@ services:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:production-latest
     restart: always
     command: yarn serve
-  client:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/client:production-latest
-    restart: always
-    command: yarn serve
+
   db:
+    ports:
+      - 27017:27017
     restart: always

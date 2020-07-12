@@ -5,7 +5,7 @@ local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
 
 local publishDockerImage(app, env, when) = {
-  "name": "publish " + env + " to ECR",
+  "name": "publish " + app + ":" + env + " to ECR",
   "image": "plugins/ecr",
   "when": when,
   "settings": {
@@ -106,7 +106,7 @@ local syncToBucket(bucket, when) = {
 };
 
 local updateDeployConfig(env, host, when) = {
-  "name": "update deployment config",
+  "name": "update " + env + " deployment config",
   "image": "node:12",
   "when": when,
   "environment": {
@@ -137,10 +137,16 @@ local ALWAYS_CONDITION = {};
     "type": "docker",
     "name": "client",
     "steps": [
+      // env-agnostic steps
       installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
+
+      // staging steps
       build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket("stage.nomus.me", STAGING_DEPLOY_CONDITION),
+
+      // production steps
+      build("client", PRODUCTION_DEPLOY_CONDITION),
       syncToBucket("nomus.me", PRODUCTION_DEPLOY_CONDITION)
     ],
     "trigger": {
@@ -158,11 +164,19 @@ local ALWAYS_CONDITION = {};
     "type": "docker",
     "name": "server",
     "steps": [
+      // env-agnostic steps
       installNodeModules("server", ALWAYS_CONDITION),
       test("server", ALWAYS_CONDITION),
+
+      // staging steps
       publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
       updateDeployConfig("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
+
+      // production steps
+      publishDockerImage("server", "production", PRODUCTION_DEPLOY_CONDITION),
+      updateDeployConfig("production", PRODUCTION_EC2_HOST, PRODUCTION_DEPLOY_CONDITION),
+      deployEC2("production", PRODUCTION_EC2_HOST, PRODUCTION_DEPLOY_CONDITION),
     ],
     "trigger": {
       "event": {
