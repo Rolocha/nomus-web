@@ -8,8 +8,10 @@ services:
       - 443:443
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - web-root:/var/www/html
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./dhparam:/etc/ssl/certs
   server:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:production-latest
     restart: always
@@ -29,6 +31,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - nginx
+    # Remove --staging and add --force-renewal to renew certs for realsies
     command: certonly --webroot --webroot-path=/var/www/html --email bibek@nomus.me --agree-tos --no-eff-email --staging -d nomus.me -d www.nomus.me
 
 volumes:
