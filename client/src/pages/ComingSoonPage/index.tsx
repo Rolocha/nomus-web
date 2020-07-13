@@ -59,9 +59,7 @@ const ComingSoonPage = () => {
         backgroundSize={{ _: '200% auto', [bp]: '100%' }}
         backgroundPosition={{ _: '75% bottom', [bp]: 'bottom' }}
         backgroundRepeat="no-repeat"
-      >
-        {/* <Image src={background} /> */}
-      </Box>
+      />
       <Box
         px={{ _: '24px', [bp]: '96px' }}
         position="relative"

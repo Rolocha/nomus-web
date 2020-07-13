@@ -14,6 +14,10 @@ type ButtonProps = {
 const Button = styled<'button', ButtonProps>('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
 })(
+  {
+    // Safari seems to add a tiny margin to buttons for some reason
+    margin: 0,
+  },
   space,
   variant({ variants: styleVariants }),
   variant({
