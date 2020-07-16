@@ -31,4 +31,4 @@ services:
       - ./client:/client
   db:
     ports:
-      - 27017
+      - 27017:27017

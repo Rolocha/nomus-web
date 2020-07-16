@@ -91,7 +91,7 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Order #</Text.Label>
               </Box>
-              <Text.Body2>#{order.id}</Text.Body2>
+              <Text.Body2>#{order.orderNumber}</Text.Body2>
             </Box>
             <Box gridArea="trackingNumber">
               <Box display={{ _: 'block', [bp]: 'none' }}>

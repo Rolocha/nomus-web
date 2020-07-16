@@ -22,12 +22,18 @@ describe('ContactsResolver', () => {
   describe('contacts query', () => {
     it("get's user's connections", async () => {
       const user_from = await createMockUser()
-      const user_to = await createMockUser({
+      const user_to_1 = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const connection = await createMockConnection({ from: user_from._id, to: user_to._id })
+      const user_to_2 = await createMockUser({
+        name: { first: 'Another', middle: 'Such', last: 'Person' },
+        email: 'person2@greendale.com',
+        password: 'save-greendale',
+      })
+      const connection_1 = await createMockConnection({ from: user_from._id, to: user_to_1._id })
+      const connection_2 = await createMockConnection({ from: user_from._id, to: user_to_2._id })
 
       const response = await execQuery({
         source: `
@@ -53,14 +59,24 @@ describe('ContactsResolver', () => {
 
       const expectedData = [
         {
-          id: user_to.id,
-          name: (user_to.name as DocumentType<PersonName>).toObject(),
-          notes: connection.notes ?? null,
-          phoneNumber: user_to.phoneNumber ?? null,
-          email: user_to.email,
+          id: user_to_1.id,
+          name: (user_to_1.name as DocumentType<PersonName>).toObject(),
+          notes: connection_1.notes ?? null,
+          phoneNumber: user_to_1.phoneNumber ?? null,
+          email: user_to_1.email,
           cardFrontImageUrl: null,
           cardBackImageUrl: null,
-          vcfUrl: user_to.vcfUrl ?? null,
+          vcfUrl: user_to_1.vcfUrl ?? null,
+        },
+        {
+          id: user_to_2.id,
+          name: (user_to_2.name as DocumentType<PersonName>).toObject(),
+          notes: connection_2.notes ?? null,
+          phoneNumber: user_to_2.phoneNumber ?? null,
+          email: user_to_2.email,
+          cardFrontImageUrl: null,
+          cardBackImageUrl: null,
+          vcfUrl: user_to_2.vcfUrl ?? null,
         },
       ]
 

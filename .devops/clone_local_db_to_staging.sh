@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Run this via docker exec -i db bash < ./clone_local_db_to_staging.sh
+
 echo 'grabbing local db'
 mongodump -h localhost:27017 -d rolocha-dev -u nomus -p admin -o /tmp/nomus-db-backup
 echo 'clearing out staging db'

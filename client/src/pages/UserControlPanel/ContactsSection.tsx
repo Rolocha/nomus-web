@@ -5,7 +5,7 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom'
-// import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
+import { gql, useQuery } from 'src/apollo'
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
 import { Contact } from 'src/types/contact'
@@ -13,129 +13,11 @@ import { ContactsSortOption } from './contact-sorting'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
+import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
 
 interface ParamsType {
   viewMode?: string
   usernameOrId?: string
-}
-
-const data: {
-  contacts: Contact[]
-} = {
-  contacts: [
-    {
-      id: '1',
-      username: 'hanad',
-      name: {
-        first: 'Hanad',
-        last: 'Musa',
-      },
-      phoneNumber: '4084318168',
-      email: 'nomus@me.com',
-      headline: 'COO at Place',
-      bio: 'hi it me',
-      profilePicUrl: 'http://via.placeholder.com/300x300',
-
-      cardFrontImageUrl: 'http://via.placeholder.com/500x300',
-      cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      vcfUrl: 'http://via.placeholder.com/500x300',
-
-      meetingPlace: 'Somewhere',
-      notes: 'they seemed cool',
-      meetingDate: new Date('2020-05-21T04:05:25.850Z'),
-    },
-    {
-      id: '2',
-      username: 'anshul',
-      name: {
-        first: 'Anshul',
-        last: 'Aggarwal',
-      },
-      phoneNumber: '4084318168',
-      email: 'nomus@me.com',
-      headline: 'CEO at Place',
-      bio: 'hi it me',
-      profilePicUrl: 'http://via.placeholder.com/300x300',
-
-      cardFrontImageUrl: 'http://via.placeholder.com/500x300',
-      cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      vcfUrl: 'http://via.placeholder.com/500x300',
-
-      meetingPlace: 'Somewhere',
-      notes: 'they seemed cool',
-      meetingDate: new Date('2020-05-21T04:05:25.850Z'),
-    },
-    {
-      id: '3',
-      username: 'arthur',
-      name: {
-        first: 'Arthur',
-        last: 'Aardvark',
-      },
-      phoneNumber: '4084318168',
-      email: 'nomus@me.com',
-      headline: 'Chief Aardvark',
-      bio: 'hi it me',
-      profilePicUrl: 'http://via.placeholder.com/300x300',
-
-      cardFrontImageUrl: 'http://via.placeholder.com/500x300',
-      cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      vcfUrl: 'http://via.placeholder.com/500x300',
-
-      meetingPlace: 'Somewhere',
-      notes: 'they seemed cool',
-      meetingDate: new Date('2020-05-21T04:06:25.850Z'),
-    },
-    {
-      id: '4',
-      username: 'cindy',
-      name: {
-        first: 'Cindy',
-        last: 'Cheung',
-      },
-      phoneNumber: '4084318168',
-      email: 'nomus@me.com',
-      headline: 'CDO at Place',
-      bio: 'hi it me',
-      profilePicUrl: 'http://via.placeholder.com/300x300',
-
-      cardFrontImageUrl: 'http://via.placeholder.com/500x300',
-      cardBackImageUrl: 'http://via.placeholder.com/500x300',
-      vcfUrl: 'http://via.placeholder.com/500x300',
-
-      meetingPlace: 'Somewhere',
-      notes: 'they seemed cool',
-      meetingDate: new Date('2020-05-20T04:06:25.850Z'),
-    },
-  ],
-}
-
-function nextChar(c: string) {
-  return c === 'z'
-    ? 'a'
-    : c === 'Z'
-    ? 'A'
-    : String.fromCharCode(c.charCodeAt(0) + 1)
-}
-
-for (let i = 0; i < 20; i += 1) {
-  const lastContact = data.contacts[data.contacts.length - 1]
-  const newMeetingDate = new Date(
-    // @ts-ignore
-    lastContact.meetingDate.getTime() + 1000 * 60 * 60 * 4,
-  )
-  data.contacts.push({
-    ...lastContact,
-    id: lastContact.id,
-    // @ts-ignore
-    username: lastContact.username.split('').map(nextChar).join(''),
-    name: {
-      first: lastContact.name.first.split('').map(nextChar).join(''),
-      middle: lastContact.name.middle,
-      last: lastContact.name.last.split('').map(nextChar).join(''),
-    },
-    meetingDate: newMeetingDate,
-  })
 }
 
 const isValidViewMode = (viewMode: string): viewMode is 'glance' | 'detail' => {
@@ -166,33 +48,36 @@ export default () => {
     }
     lastViewMode.current = viewMode
   }, [viewMode, lastViewMode])
-  //   const { loading } = useQuery(
-  //     gql`
-  //       query UCPContactsSectionQuery {
-  //         contacts {
-  //             username
-  //             name {
-  //                 first
-  //                 middle
-  //                 last
-  //             }
-  //             phone
-  //             email
-  //             headline
-  //             bio
-  //             profilePic
 
-  //             cardFrontImageUrl
-  //             cardBackImageUrl
-  //             notes
-  //             vcfUrl
-  //           }
-  //     `,
-  //   )
+  const { loading, data } = useQuery<UCPContactsSectionQuery>(
+    gql`
+      query UCPContactsSectionQuery {
+        contacts {
+          id
+          username
+          name {
+            first
+            middle
+            last
+          }
+          phoneNumber
+          email
+          headline
+          bio
+          profilePicUrl
 
-  // Fake data for now since making connections is hard :(
+          cardFrontImageUrl
+          cardBackImageUrl
+          notes
+          vcfUrl
 
-  const loading = false
+          meetingPlace
+          meetingDate
+        }
+      }
+    `,
+  )
+
   if (loading || !data) {
     return <LoadingPage />
   }

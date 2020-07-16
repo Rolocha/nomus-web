@@ -159,7 +159,7 @@ const ContactCardsList = ({
                           alignItems="center"
                         >
                           <Image
-                            src={contact.cardFrontImageUrl}
+                            src={contact.cardFrontImageUrl ?? undefined}
                             w={viewMode === 'grid' ? '100%' : '40px'}
                           />
                           {viewMode === 'linear' && contact.name && (

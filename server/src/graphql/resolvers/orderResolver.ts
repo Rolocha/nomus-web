@@ -114,7 +114,11 @@ class OrderResolver {
     const requesterUserId = context.user._id
     const requestedUserId = userId ?? requesterUserId
 
-    return await Order.mongo.find({ user: MUUID.from(requestedUserId) })
+    const orders = await Order.mongo
+      .find({ user: MUUID.from(requestedUserId) })
+      .populate('cardVersion')
+
+    return orders
   }
 
   @Authorized(Role.User)

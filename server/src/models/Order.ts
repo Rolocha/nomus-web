@@ -33,19 +33,24 @@ class Order {
     this._id = MUUID.from(id)
   }
 
+  // Human-presentable order number
+  @prop({ required: true, unique: true })
+  @Field({ nullable: false })
+  orderNumber: string
+
   //User who ordered the cards
   @prop({ required: true, ref: User, type: Buffer, _id: false })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 
   //Card Version that was ordered
-  @prop({ _id: false, required: true })
+  @prop({ required: true, ref: CardVersion, type: Buffer, _id: false })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
   //Quantity of cards in the order
   @prop({ required: false })
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   quantity: number
 
   //Price of cards in the order

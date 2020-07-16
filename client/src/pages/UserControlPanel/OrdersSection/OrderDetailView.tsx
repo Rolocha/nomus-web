@@ -17,7 +17,7 @@ const bp = 'md'
 export default ({ order }: Props) => {
   return (
     <Box>
-      <Text.H4>{`Order #${order.id}`}</Text.H4>
+      <Text.H4>{`Order #${order.orderNumber}`}</Text.H4>
       <Box
         pt={2}
         display="flex"

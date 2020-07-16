@@ -1,4 +1,4 @@
 export interface CardVersion {
-  frontImageUrl?: string
-  backImageUrl?: string
+  frontImageUrl: string | null
+  backImageUrl: string | null
 }
