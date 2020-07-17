@@ -14,8 +14,6 @@ interface LinkProps {
   // button variants are only used if asButton is true
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
   buttonSize?: keyof typeof buttonlikeStyles.sizeVariants
-
-  width?: keyof typeof buttonlikeStyles.widthVariants
   underline?: boolean
   color?: string
   as?: any
