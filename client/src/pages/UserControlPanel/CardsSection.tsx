@@ -116,15 +116,15 @@ export default () => {
 
             <Box px={{ _: 0, [bp]: 3 }} py={{ _: 2, [bp]: 0 }}>
               <Text.SectionSubheader>Version Information</Text.SectionSubheader>
-              <Text.Body>
+              <Text.Body2>
                 Date created: {formatDate(defaultCardVersion.createdAt)}
-              </Text.Body>
-              <Text.Body>
+              </Text.Body2>
+              <Text.Body2>
                 Cards ordered: {defaultCardVersionStats.numCardsOrdered}
-              </Text.Body>
-              <Text.Body>
+              </Text.Body2>
+              <Text.Body2>
                 Tap count: {defaultCardVersionStats.numTaps}
-              </Text.Body>
+              </Text.Body2>
             </Box>
           </Box>
         </Box>

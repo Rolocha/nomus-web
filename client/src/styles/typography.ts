@@ -38,13 +38,13 @@ const textStyles: Record<string, any> = {
   },
   h5: {
     fontWeight: 500,
-    fontSize: [20, 20, 24, 24],
+    fontSize: [16, 16, 20, 20],
     lineHeight: [1.4, 1.4, 1.5, 1.5],
     color: colors.midnightGray,
   },
   h6: {
     fontWeight: 400,
-    fontSize: [20, 20, 24, 24],
+    fontSize: [10, 10, 18, 18],
     lineHeight: [1.4, 1.4, 1.5, 1.5],
     letterSpacing: ['0.02em', '0.02em', '0.08em', '0.08em'],
     color: colors.midnightGray,

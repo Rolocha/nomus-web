@@ -137,9 +137,6 @@ const ContactCardsList = ({
                       id={`contact-${contact.username ?? contact.id}`}
                       key={contact.id}
                       display="inline-block"
-                      width={
-                        viewMode === 'grid' ? { _: '50%', [bp]: '25%' } : '100%'
-                      }
                       borderRadius={1}
                       p={2}
                       bg={
@@ -157,10 +154,18 @@ const ContactCardsList = ({
                           display="flex"
                           flexDirection="row"
                           alignItems="center"
+                          boxShadow={viewMode === 'grid' ? 0 : undefined}
                         >
                           <Image
-                            src={contact.cardFrontImageUrl ?? undefined}
-                            w={viewMode === 'grid' ? '100%' : '40px'}
+                            src={
+                              (viewMode === 'grid'
+                                ? contact.cardFrontImageUrl
+                                : contact.profilePicUrl) ?? undefined
+                            }
+                            borderRadius={
+                              viewMode === 'linear' ? '100%' : undefined
+                            }
+                            height={viewMode === 'grid' ? '130px' : '40px'}
                           />
                           {viewMode === 'linear' && contact.name && (
                             <Box ml={2}>
