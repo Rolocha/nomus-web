@@ -8,7 +8,6 @@ import {
 import { gql, useQuery } from 'src/apollo'
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
-import { Contact } from 'src/types/contact'
 import { ContactsSortOption } from './contact-sorting'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
