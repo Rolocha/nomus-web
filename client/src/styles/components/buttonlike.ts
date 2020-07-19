@@ -1,6 +1,5 @@
 import colors from '../colors'
 import typography from '../typography'
-import { flex } from 'styled-system'
 const { fontFamilies } = typography
 
 // Defining button styles centrally here since both <a /> and <button /> will consume them

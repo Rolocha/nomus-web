@@ -1,4 +1,4 @@
-import { useTransition, useSpring, animated } from 'react-spring'
+import { useTransition, animated } from 'react-spring'
 import { css, Global } from '@emotion/core'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
