@@ -25,7 +25,6 @@ export default () => {
       query UCPOrdersSectionQuery {
         orders {
           id
-          orderNumber
           cardVersion {
             frontImageUrl
             backImageUrl

@@ -3,6 +3,7 @@ import 'css.gg/icons/css/chevron-right.css'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
+import CopyableText from 'src/components/CopyableText'
 import Icon from 'src/components/Icon'
 import { ExternalLink, InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
@@ -14,6 +15,11 @@ interface Props {
   orders: Array<Order>
 }
 
+const shortenOrderId = (orderId: string) => {
+  const id = orderId.split('_')[1]
+  return [id.substr(0, 4), id.substr(-4)].join('...')
+}
+
 const bp = 'md'
 
 const OrderList = ({ orders }: Props) => {
@@ -23,7 +29,7 @@ const OrderList = ({ orders }: Props) => {
     gridTemplateColumns: {
       _: '5fr 4fr 3fr',
       // Hard coding the required pixel values for known long entities like date, tracking #, "View order" button
-      [bp]: '180px 2fr 2fr 140px 1fr 100px',
+      [bp]: '180px 2fr 200px 140px 1fr 100px',
     },
     gridTemplateAreas: {
       _: `
@@ -87,11 +93,15 @@ const OrderList = ({ orders }: Props) => {
               </Box>
               <Text.Body2>{order.state}</Text.Body2>
             </Box>
-            <Box gridArea="orderNumber">
+            <Box gridArea="orderNumber" placeSelf="center start">
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Order #</Text.Label>
               </Box>
-              <Text.Body2>#{order.orderNumber}</Text.Body2>
+              <Text.Body2>
+                <CopyableText copyText={order.id}>
+                  {shortenOrderId(order.id)}
+                </CopyableText>
+              </Text.Body2>
             </Box>
             <Box gridArea="trackingNumber">
               <Box display={{ _: 'block', [bp]: 'none' }}>

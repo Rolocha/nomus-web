@@ -3,7 +3,6 @@ import { CardVersion } from './cardVersion'
 
 export interface Order {
   id: string
-  orderNumber: string
   cardVersion: CardVersion
   price: number
   quantity: number

@@ -18,7 +18,6 @@ export interface UCPOrdersSectionQuery_orders_cardVersion {
 export interface UCPOrdersSectionQuery_orders {
   __typename: 'Order'
   id: string
-  orderNumber: string
   cardVersion: UCPOrdersSectionQuery_orders_cardVersion
   price: number
   quantity: number

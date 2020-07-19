@@ -18,7 +18,7 @@ import { AdminOnlyArgs } from '../auth'
 import { OrderState, Role } from 'src/util/enums'
 
 @InputType({ description: 'Input to generate new Order object' })
-class OrderGenerationInput implements Partial<Order> {
+class OrderGenerationInput implements Pick<Order, 'quantity' | 'price'> {
   @Field({ nullable: false })
   quantity: number
 
@@ -92,9 +92,9 @@ class OrderResolver {
     @Ctx() context: IApolloContext
   ): Promise<Order | Error> {
     if (context.user.roles.includes(Role.Admin)) {
-      return await Order.mongo.findById(MUUID.from(orderId))
+      return await Order.mongo.findById(orderId)
     } else {
-      const order = await Order.mongo.findById(MUUID.from(orderId)).populate('user')
+      const order = await Order.mongo.findById(orderId).populate('user')
       if ((order.user as User).id === context.user.id) {
         return order as Order
       } else {
