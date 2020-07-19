@@ -13,14 +13,18 @@ import {
   FontWeightProps,
   lineHeight,
   LineHeightProps,
+  ResponsiveValue,
   space,
   SpaceProps,
+  system,
+  ThemeValue,
   variant,
 } from 'styled-system'
 
 export type TextProps = {
   variant?: keyof typeof theme.textStyles | null
   as?: string
+  textAlign?: ResponsiveValue<ThemeValue<'textAlign', any>>
 } & FontSizeProps &
   ColorProps &
   FontFamilyProps &
@@ -39,6 +43,11 @@ const Text = styled<'p', TextProps>('p')(
   fontFamily,
   lineHeight,
   fontWeight,
+  system({
+    textAlign: {
+      property: 'textAlign',
+    },
+  }),
 )
 
 Text.defaultProps = {

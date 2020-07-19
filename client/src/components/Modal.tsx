@@ -24,13 +24,16 @@ type Actions = {
 }
 
 type AnchorStyle = 'center' | 'right'
+interface ChildOptions {
+  onModalClose: () => void
+}
 
 interface Props {
   isOpen: boolean
   onClose: (confirmed?: boolean) => void
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
-  children: React.ReactNode
+  children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
   width?: ResponsiveValue<
     CSS.MaxWidthProperty<TLengthStyledSystem>,
     RequiredTheme
@@ -197,7 +200,9 @@ const Modal = ({
                           }
                         >
                           <Box p={{ _: 3, md: 4 }} overflowX="auto">
-                            {children}
+                            {typeof children === 'function'
+                              ? children({ onModalClose: onClose })
+                              : children}
                             <Box
                               role="button"
                               aria-label="Close Modal"
