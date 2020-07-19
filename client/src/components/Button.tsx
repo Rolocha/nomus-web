@@ -1,6 +1,10 @@
 import styled from '@emotion/styled'
 import isPropValid from '@emotion/is-prop-valid'
-import { sizeVariants, styleVariants } from 'src/styles/components/buttonlike'
+import {
+  baseButtonStyles,
+  sizeVariants,
+  styleVariants,
+} from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
 import { layout, LayoutProps, space, SpaceProps, variant } from 'styled-system'
 
@@ -14,6 +18,7 @@ type ButtonProps = {
 const Button = styled<'button', ButtonProps>('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
 })(
+  baseButtonStyles,
   space,
   variant({ variants: styleVariants }),
   variant({

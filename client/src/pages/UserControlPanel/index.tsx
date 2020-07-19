@@ -103,17 +103,23 @@ const ProfilePage = () => {
       minHeight={{ [bp]: '100vh' }}
       minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
+      display="flex"
+      flexDirection="column"
+      alignItems="stretch"
     >
       <Navbar />
       <Box
         pb={{ [bp]: 4 }}
-        container={{
-          _: false,
-          [bp]: true,
-        }}
+        px={{ _: 0, [bp]: 5 }}
+        maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}
       >
         {data.user.name && (
-          <Box overflow="auto" my={4} display={{ _: 'none', [bp]: 'block' }}>
+          <Box
+            overflow="auto"
+            mt={4}
+            mb="24px"
+            display={{ _: 'none', [bp]: 'block' }}
+          >
             <Text.PageHeader>
               {`Welcome back, ${formatName(data.user.name)}`}
             </Text.PageHeader>
@@ -133,55 +139,66 @@ const ProfilePage = () => {
             bg={theme.colors.twilight}
             borderTopLeftRadius={{ _: 0, [bp]: 3 }}
             borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
-            // Needed to match the border-radius of selected item
-            overflow="hidden"
+            // Needed to ensure the current-tab caret indicator is visible
+            overflow="visible"
           >
-            {controlPanelSections.map(({ linkPath, path, Icon, label }) => {
-              const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
-              const isCurrentSection = location.pathname.startsWith(sectionPath)
-              return (
-                <Box
-                  key={path}
-                  bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
-                  p={3}
-                  flexBasis={{
-                    _: `${100 / controlPanelSections.length}%`,
-                    [bp]: 'auto',
-                  }}
-                  position="relative"
-                  css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
-                >
-                  <InternalLink to={sectionPath}>
-                    <Box
-                      display="flex"
-                      flexDirection={{ _: 'column', [bp]: 'row' }}
-                      alignItems="center"
-                    >
-                      <Icon
-                        color="white"
-                        css={css`
-                          height: 1.5em;
-
-                          // Margin below in mobile; on right in desktop
-                          margin-bottom: 0.5em;
-                          ${mq[bp]} {
-                            margin-right: 0.7em;
-                          }
-                        `}
-                      />
-                      <Text.Plain
-                        m={0}
-                        color="white"
-                        fontSize={{ _: 10, [bp]: 'unset' }}
-                        fontWeight={isCurrentSection ? 500 : 'undefined'}
+            {controlPanelSections.map(
+              ({ linkPath, path, Icon, label }, index) => {
+                const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
+                const isCurrentSection = location.pathname.startsWith(
+                  sectionPath,
+                )
+                return (
+                  <Box
+                    key={path}
+                    borderTopLeftRadius={{ _: 0, [bp]: index === 0 ? 3 : 0 }}
+                    borderBottomLeftRadius={{
+                      _: 0,
+                      [bp]: index === controlPanelSections.length - 1 ? 3 : 0,
+                    }}
+                    bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
+                    flexBasis={{
+                      _: `${100 / controlPanelSections.length}%`,
+                      [bp]: 'auto',
+                    }}
+                    position="relative"
+                    css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
+                  >
+                    <InternalLink to={sectionPath}>
+                      <Box
+                        py="24px"
+                        px={3}
+                        display="flex"
+                        flexDirection={{ _: 'column', [bp]: 'row' }}
+                        alignItems="center"
                       >
-                        {label}
-                      </Text.Plain>
-                    </Box>
-                  </InternalLink>
-                </Box>
-              )
-            })}
+                        <Icon
+                          color="white"
+                          css={css`
+                            height: 1.5em;
+
+                            // Margin below in mobile; on right in desktop
+                            margin-bottom: 0.5em;
+                            ${mq[bp]} {
+                              margin-bottom: 0;
+                              margin-right: 0.7em;
+                            }
+                          `}
+                        />
+                        <Text.Plain
+                          m={0}
+                          color="white"
+                          fontSize={{ _: 10, [bp]: 'unset' }}
+                          fontWeight={isCurrentSection ? 500 : 'undefined'}
+                        >
+                          {label}
+                        </Text.Plain>
+                      </Box>
+                    </InternalLink>
+                  </Box>
+                )
+              },
+            )}
           </Box>
 
           {/* Content for selected section */}

@@ -5,7 +5,6 @@ const { fontFamilies } = typography
 // Defining button styles centrally here since both <a /> and <button /> will consume them
 
 export const baseButtonStyles = {
-  padding: '8px 16px',
   fontFamily: fontFamilies.rubik,
   letterSpacing: '0.02em',
   fontWeight: 500,
@@ -27,7 +26,6 @@ const buttonTransition = [
 
 export const styleVariants = {
   primary: {
-    ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: colors.nomusBlue,
@@ -53,7 +51,6 @@ export const styleVariants = {
   },
 
   secondary: {
-    ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
@@ -78,7 +75,6 @@ export const styleVariants = {
   },
 
   tertiary: {
-    ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
@@ -103,7 +99,6 @@ export const styleVariants = {
   },
 
   danger: {
-    ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
@@ -128,7 +123,6 @@ export const styleVariants = {
   },
 
   success: {
-    ...baseButtonStyles,
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
@@ -155,19 +149,14 @@ export const styleVariants = {
   unstyled: {},
 } as const
 
-export const widthVariants = {
-  full: {
-    width: '100%',
-  },
-  auto: {},
-}
-
 export const sizeVariants = {
   big: {
     fontSize: '20px',
     borderRadius: '2em',
   },
   normal: {
+    paddingTop: '11.5px',
+    paddingBottom: '11.5px',
     fontSize: '14px',
     borderRadius: '8px',
   },

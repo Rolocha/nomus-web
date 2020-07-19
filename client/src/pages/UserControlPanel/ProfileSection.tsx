@@ -1,13 +1,13 @@
-import { css } from '@emotion/core'
 import * as React from 'react'
 import { gql, useQuery } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
+import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
-import { mq } from 'src/styles/breakpoints'
+import { colors } from 'src/styles'
 import { formatName } from 'src/utils/name'
 import NameplateEditor from './NameplateEditor'
 import ProfileEditor from './ProfileEditor'
@@ -50,7 +50,7 @@ export default () => {
       display="grid"
       gridTemplateColumns={{
         _: '4fr 6fr 2fr',
-        [bp]: '2fr 8fr 2fr',
+        [bp]: '2fr 3fr 5fr 2fr',
       }}
       gridTemplateRows={{
         _: '',
@@ -58,15 +58,15 @@ export default () => {
       }}
       gridTemplateAreas={{
         _: `
+        "previewButton previewButton previewButton"
         "profilePic nameplate editName"
         "cards cards cards"
         "profileInfo profileInfo editProfile"
-        "previewButton previewButton previewButton"
       `,
         [bp]: `
-      "profilePic nameplate editName"
-      "cards profileInfo editProfile"
-      ". previewButton ."
+        "previewButton previewButton . ."
+        "profilePic nameplate nameplate editName"
+        "cards profileInfo profileInfo editProfile"
     `,
       }}
       gridColumnGap={2}
@@ -154,20 +154,28 @@ export default () => {
         </Box>
       </Box>
 
-      <InternalLink
-        css={css`
-          grid-area: previewButton;
-          justify-self: stretch;
-          ${mq[bp]} {
-            justify-self: start;
-          }
-        `}
-        to={`/u/${data.user.username}`}
-        asButton
-        buttonStyle="secondary"
+      <Box
+        gridArea="previewButton"
+        justifySelf={{ _: 'stretch', [bp]: 'stretch' }}
       >
-        Preview public profile
-      </InternalLink>
+        <InternalLink
+          display="inline-block"
+          width="100%"
+          to={`/u/${data.user.username}`}
+          asButton
+          buttonStyle="secondary"
+        >
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            px={2}
+          >
+            <Text.Body2 color="linkBlue">{`nomus.com/u/${data.user.username}`}</Text.Body2>
+            <SVG.ExternalLink color={colors.linkBlue} />
+          </Box>
+        </InternalLink>
+      </Box>
 
       <Box gridArea="editProfile">
         <ProfileEditor
