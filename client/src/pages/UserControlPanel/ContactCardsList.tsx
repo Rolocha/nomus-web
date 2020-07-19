@@ -116,7 +116,7 @@ const ContactCardsList = ({
                 <Text.Label>{groupKey}</Text.Label>
               </Box>
               <Box
-                py={2}
+                p={2}
                 display="flex"
                 flexDirection={
                   ({
@@ -156,17 +156,25 @@ const ContactCardsList = ({
                           alignItems="center"
                           boxShadow={viewMode === 'grid' ? 0 : undefined}
                         >
-                          <Image
-                            src={
-                              (viewMode === 'grid'
-                                ? contact.cardFrontImageUrl
-                                : contact.profilePicUrl) ?? undefined
-                            }
-                            borderRadius={
-                              viewMode === 'linear' ? '100%' : undefined
-                            }
-                            height={viewMode === 'grid' ? '130px' : '40px'}
-                          />
+                          {
+                            {
+                              grid: (
+                                <Image
+                                  src={contact.cardFrontImageUrl ?? undefined}
+                                  height="125px"
+                                />
+                              ),
+                              linear: (
+                                <Image
+                                  // TODO: Come up with a default profile pic
+                                  src={contact.profilePicUrl ?? undefined}
+                                  borderRadius="100%"
+                                  height="40px"
+                                  width="40px"
+                                />
+                              ),
+                            }[viewMode]
+                          }
                           {viewMode === 'linear' && contact.name && (
                             <Box ml={2}>
                               <Text.Body

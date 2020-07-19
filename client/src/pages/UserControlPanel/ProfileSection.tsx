@@ -112,7 +112,11 @@ export default () => {
         >
           {/* Front of business card */}
           {data.cardVersion.frontImageUrl && (
-            <Box width={{ _: '50%', [bp]: '100%' }} mb={2}>
+            <Box
+              width={{ _: '50%', [bp]: '100%' }}
+              mb={{ _: 0, [bp]: 2 }}
+              mr={{ _: 2, [bp]: 0 }}
+            >
               <Image
                 boxShadow={0}
                 width="100%"
