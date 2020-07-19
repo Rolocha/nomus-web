@@ -9,6 +9,8 @@ import {
   PositionProps,
   RequiredTheme,
   ResponsiveValue,
+  shadow,
+  ShadowProps,
   space,
   SpaceProps,
   system,
@@ -18,12 +20,14 @@ import {
 type ImageProps = SpaceProps &
   PositionProps &
   BorderProps &
-  LayoutProps & {
+  LayoutProps &
+  ShadowProps & {
     h?: ResponsiveValue<CSS.HeightProperty<TLengthStyledSystem>, RequiredTheme>
     w?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
   }
 
 const Image = styled<'img', ImageProps>('img')(
+  shadow,
   space,
   position,
   border,

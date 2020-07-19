@@ -7,31 +7,19 @@ import {
 } from '@typegoose/typegoose'
 import { Card, CardVersion, User } from 'src/models'
 import { Field, ObjectType } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
 import { OrderState } from '../util/enums'
-import { Ref, UUIDType } from './scalars'
+import { Ref } from './scalars'
+import { BaseModel } from './BaseModel'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class Order {
+class Order extends BaseModel({
+  prefix: 'ord',
+}) {
   static mongo: ReturnModelType<typeof Order>
 
   @Field()
   createdAt: Date
-
-  @prop({ required: true, default: () => MUUID.v4() })
-  _id: UUIDType
-
-  // Override the 'id' virtual property getters/setters since Mongoose doesn't
-  // know how to handle our custom MUUID implementation
-  @Field() // Expose the pretty underscore-less string version on GraphQL schema
-  get id(): string {
-    return MUUID.from(this._id).toString()
-  }
-
-  set id(id: string) {
-    this._id = MUUID.from(id)
-  }
 
   //User who ordered the cards
   @prop({ required: true, ref: User, type: Buffer, _id: false })
@@ -39,13 +27,13 @@ class Order {
   user: Ref<User>
 
   //Card Version that was ordered
-  @prop({ _id: false, required: true })
+  @prop({ required: true, ref: CardVersion, type: Buffer, _id: false })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
   //Quantity of cards in the order
   @prop({ required: false })
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   quantity: number
 
   //Price of cards in the order

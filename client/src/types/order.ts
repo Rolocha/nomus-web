@@ -8,5 +8,5 @@ export interface Order {
   quantity: number
   state: OrderState
   createdAt: Date
-  trackingNumber: string
+  trackingNumber: string | null
 }

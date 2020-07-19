@@ -79,7 +79,7 @@ const FlippableCard = ({
           animationName: showBack ? rotateNoShow : rotateShow,
         })}
       >
-        <Image w={width} h={height} src={frontImageUrl} />
+        <Image boxShadow={0} w={width} h={height} src={frontImageUrl} />
       </Box>
       <Box
         width={width}
@@ -89,7 +89,7 @@ const FlippableCard = ({
           animationName: showBack ? rotateShow : rotateNoShow,
         })}
       >
-        <Image w={width} h={height} src={backImageUrl} />
+        <Image boxShadow={0} w={width} h={height} src={backImageUrl} />
       </Box>
       <FlipButton onClick={() => setShowBack(!showBack)} />
     </Box>

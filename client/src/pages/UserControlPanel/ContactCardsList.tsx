@@ -116,7 +116,7 @@ const ContactCardsList = ({
                 <Text.Label>{groupKey}</Text.Label>
               </Box>
               <Box
-                py={2}
+                p={2}
                 display="flex"
                 flexDirection={
                   ({
@@ -137,9 +137,6 @@ const ContactCardsList = ({
                       id={`contact-${contact.username ?? contact.id}`}
                       key={contact.id}
                       display="inline-block"
-                      width={
-                        viewMode === 'grid' ? { _: '50%', [bp]: '25%' } : '100%'
-                      }
                       borderRadius={1}
                       p={2}
                       bg={
@@ -157,11 +154,27 @@ const ContactCardsList = ({
                           display="flex"
                           flexDirection="row"
                           alignItems="center"
+                          boxShadow={viewMode === 'grid' ? 0 : undefined}
                         >
-                          <Image
-                            src={contact.cardFrontImageUrl}
-                            w={viewMode === 'grid' ? '100%' : '40px'}
-                          />
+                          {
+                            {
+                              grid: (
+                                <Image
+                                  src={contact.cardFrontImageUrl ?? undefined}
+                                  height="125px"
+                                />
+                              ),
+                              linear: (
+                                <Image
+                                  // TODO: Come up with a default profile pic
+                                  src={contact.profilePicUrl ?? undefined}
+                                  borderRadius="100%"
+                                  height="40px"
+                                  width="40px"
+                                />
+                              ),
+                            }[viewMode]
+                          }
                           {viewMode === 'linear' && contact.name && (
                             <Box ml={2}>
                               <Text.Body

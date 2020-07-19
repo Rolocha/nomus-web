@@ -3,6 +3,7 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import Image from 'src/components/Image'
+import CopyableText from 'src/components/CopyableText'
 import * as Text from 'src/components/Text'
 import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
@@ -17,7 +18,9 @@ const bp = 'md'
 export default ({ order }: Props) => {
   return (
     <Box>
-      <Text.H4>{`Order #${order.id}`}</Text.H4>
+      <Text.H4>
+        Order <CopyableText copyText={order.id}>{order.id}</CopyableText>
+      </Text.H4>
       <Box
         pt={2}
         display="flex"

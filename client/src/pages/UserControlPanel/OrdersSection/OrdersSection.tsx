@@ -44,56 +44,10 @@ export default () => {
     return <LoadingPage />
   }
 
-  const orders = [
-    {
-      id: '1',
-      state: OrderState.Created,
-      price: 2500,
-      quantity: 50,
-      createdAt: new Date('2020-05-20T04:06:25.850Z'),
-      trackingNumber: '123456789101112',
-      cardVersion: {
-        frontImageUrl: 'https://placehold.it/500x300',
-        backImageUrl: 'https://placehold.it/500x300',
-      },
-    },
-    {
-      id: '2',
-      state: OrderState.Enroute,
-      price: 2500,
-      quantity: 50,
-      createdAt: new Date('2020-09-20T04:06:25.850Z'),
-      trackingNumber: '123456789101112',
-      cardVersion: {
-        frontImageUrl: 'https://placehold.it/500x300',
-        backImageUrl: 'https://placehold.it/500x300',
-      },
-    },
-    {
-      id: '3',
-      state: OrderState.Fulfilled,
-      price: 2500,
-      quantity: 50,
-      createdAt: new Date('2020-05-20T04:06:25.850Z'),
-      trackingNumber: '123456789101112',
-      cardVersion: {
-        frontImageUrl: 'https://placehold.it/500x300',
-        backImageUrl: 'https://placehold.it/500x300',
-      },
-    },
-    {
-      id: '4',
-      state: OrderState.Fulfilled,
-      price: 2500,
-      quantity: 50,
-      createdAt: new Date('2020-05-20T04:06:25.850Z'),
-      trackingNumber: '123456789101112',
-      cardVersion: {
-        frontImageUrl: 'https://placehold.it/500x300',
-        backImageUrl: 'https://placehold.it/500x300',
-      },
-    },
-  ]
+  const { orders } = data
+  if (orders == null) {
+    return null
+  }
 
   const selectedOrder = orders.find((order) => order.id === params.orderId)
 
@@ -112,10 +66,14 @@ export default () => {
           <Text.H3 mb={3}>Current orders</Text.H3>
           <OrderList orders={currentOrders} />
 
-          <Text.H3 mt="40px" mb={3}>
-            Previous orders
-          </Text.H3>
-          <OrderList orders={previousOrders} />
+          {previousOrders.length > 0 && (
+            <Box>
+              <Text.H3 mt="40px" mb={3}>
+                Previous orders
+              </Text.H3>
+              <OrderList orders={previousOrders} />
+            </Box>
+          )}
         </Box>
       )}
 

@@ -168,9 +168,7 @@ describe('OrderResolver', () => {
         contextUser: user,
       })
 
-      const newOrder = await Order.mongo.findById(
-        MUUID.from(response.data?.createNewOrder?.orderId)
-      )
+      const newOrder = await Order.mongo.findById(response.data?.createNewOrder?.orderId)
       const newCardVersion = await CardVersion.mongo.findById(
         MUUID.from(response.data?.createNewOrder?.cardVersionId)
       )
@@ -236,9 +234,7 @@ describe('OrderResolver', () => {
         asAdmin: true,
       })
 
-      const newOrder = await Order.mongo.findById(
-        MUUID.from(response.data?.createNewOrder?.orderId)
-      )
+      const newOrder = await Order.mongo.findById(response.data?.createNewOrder?.orderId)
       const newCardVersion = await CardVersion.mongo.findById(
         MUUID.from(response.data?.createNewOrder?.cardVersionId)
       )

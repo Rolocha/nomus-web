@@ -112,14 +112,26 @@ export default () => {
         >
           {/* Front of business card */}
           {data.cardVersion.frontImageUrl && (
-            <Box width={{ _: '50%', [bp]: '100%' }} mb={2}>
-              <Image width="100%" src={data.cardVersion.frontImageUrl} />
+            <Box
+              width={{ _: '50%', [bp]: '100%' }}
+              mb={{ _: 0, [bp]: 2 }}
+              mr={{ _: 2, [bp]: 0 }}
+            >
+              <Image
+                boxShadow={0}
+                width="100%"
+                src={data.cardVersion.frontImageUrl}
+              />
             </Box>
           )}
           {data.cardVersion.backImageUrl && (
             <Box width={{ _: '50%', [bp]: '100%' }}>
               {/* Back of business card */}
-              <Image width="100%" src={data.cardVersion.backImageUrl} />
+              <Image
+                boxShadow={0}
+                width="100%"
+                src={data.cardVersion.backImageUrl}
+              />
             </Box>
           )}
         </Box>
