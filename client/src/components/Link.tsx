@@ -1,5 +1,6 @@
 import isPropValid from '@emotion/is-prop-valid'
 import styled from '@emotion/styled'
+import { space, SpaceProps, layout, LayoutProps } from 'styled-system'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import * as buttonlikeStyles from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
@@ -9,7 +10,7 @@ const linkBaseStyles = (props: LinkProps) => ({
   color: props.color ?? theme.colors.linkBlue,
 })
 
-interface LinkProps {
+interface LinkProps extends SpaceProps, LayoutProps {
   asButton?: boolean
   // button variants are only used if asButton is true
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
@@ -29,6 +30,8 @@ interface LinkProps {
 // underlying component (<a /> vs React Router's <Link />) so
 // the styled component definition args are identical
 const args = [
+  space,
+  layout,
   (props: LinkProps) =>
     props.asButton
       ? {
