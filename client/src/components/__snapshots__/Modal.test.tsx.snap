@@ -71,7 +71,6 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
         </div>
       </div>
     </aside>
-    )
   </div>
 </div>
 `;

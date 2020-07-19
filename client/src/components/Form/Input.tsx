@@ -39,7 +39,7 @@ type InputProps = {
 const Input = styled<'input', InputProps>('input')(
   {
     borderRadius: '6px',
-    padding: '4px 8px',
+    padding: '10px 8px',
     border: `1px solid ${theme.colors.africanElephant}`,
   },
   space,

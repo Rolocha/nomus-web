@@ -223,13 +223,19 @@ const Modal = ({
                             <Box
                               display="flex"
                               flexDirection="row"
-                              justifyContent="flex-end"
                               borderTop={`1px solid ${colors.superlightGray}`}
                               p="inherit"
                             >
-                              <Box p={3}>
+                              <Box
+                                p={3}
+                                width="100%"
+                                display="grid"
+                                gridTemplateColumns="1fr 1fr 1fr 1fr"
+                                gridTemplateAreas={`". . secondary primary"`}
+                              >
                                 {actions.secondary && (
                                   <Button
+                                    gridArea="secondary"
                                     variant="secondary"
                                     mr={2}
                                     onClick={actions.secondary.handler}
@@ -239,6 +245,7 @@ const Modal = ({
                                 )}
                                 {actions.primary && (
                                   <Button
+                                    gridArea="primary"
                                     variant="primary"
                                     onClick={actions.primary.handler}
                                   >
@@ -282,7 +289,6 @@ const Modal = ({
                   </Box>
                 )}
               </Box>
-              )
             </animated.div>
           ),
       )}

@@ -6,20 +6,30 @@ import {
   styleVariants,
 } from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
-import { layout, LayoutProps, space, SpaceProps, variant } from 'styled-system'
+import {
+  grid,
+  GridProps,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  variant,
+} from 'styled-system'
 
 type ButtonProps = {
   variant?: keyof typeof styleVariants
   size?: keyof typeof sizeVariants
   as?: string
 } & SpaceProps &
-  LayoutProps
+  LayoutProps &
+  GridProps
 
 const Button = styled<'button', ButtonProps>('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
 })(
   baseButtonStyles,
   space,
+  grid,
   variant({ variants: styleVariants }),
   variant({
     prop: 'size',

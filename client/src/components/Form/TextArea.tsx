@@ -38,12 +38,10 @@ type TextAreaProps = {
 
 const TextArea = styled<'textarea', TextAreaProps>('textarea')(
   {
-    boxShadow: 'inset 0px 0px 4px rgba(0, 0, 0, 0.25)',
+    border: `1px solid ${theme.colors.africanElephant}`,
     borderRadius: '6px',
     padding: '12px',
-    border: 'none',
     fontFamily: theme.fontFamilies.rubik,
-    fontSize: 14,
     fontWeight: 400,
   },
   space,
@@ -59,7 +57,8 @@ const TextArea = styled<'textarea', TextAreaProps>('textarea')(
 )
 
 TextArea.defaultProps = {
-  fontSize: theme.textStyles.body.fontSize,
+  ...theme.textStyles.input,
+  lineHeight: 1.5,
 }
 
 export default TextArea
