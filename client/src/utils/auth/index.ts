@@ -63,8 +63,16 @@ const authManager = new AuthManager<
   logIn: (args: LoginArgs) => jsonFetch('post', '/auth/login', args),
   signUp: (args: SignupArgs) => jsonFetch('post', '/auth/signup', args),
   logOut: async () => {
-    const response = await fetch('/auth/logout', { method: 'post' })
-    return response.status === 200
+    try {
+      const response = await fetch('/auth/logout', { method: 'post' })
+      if (!response.ok || response.status !== 200) {
+        throw new Error('Logout failed')
+      }
+      return true
+    } catch (err) {
+      console.error(err)
+      return false
+    }
   },
   makeUseAuthOutput: (authData) => {
     return {
