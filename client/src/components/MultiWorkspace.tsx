@@ -2,6 +2,7 @@ import { css } from '@emotion/core'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
+import { InternalLink } from 'src/components/Link'
 import {
   Redirect,
   Route,
@@ -10,7 +11,6 @@ import {
   useRouteMatch,
 } from 'react-router-dom'
 import { colors } from 'src/styles'
-import { InternalLink } from 'src/components/Link'
 import breakpoints, { mq } from 'src/styles/breakpoints'
 
 interface TabItem {
@@ -24,6 +24,7 @@ interface TabItem {
 
 interface Props {
   children: Array<TabItem>
+  wizard: boolean
 }
 
 const bp = 'md'
@@ -43,7 +44,7 @@ const POINTY_TAB_INDICATOR = css`
   }
 `
 
-const MultiWorkspace = ({ children: tabs }: Props) => {
+const MultiWorkspace = ({ wizard, children: tabs }: Props) => {
   const routeMatch = useRouteMatch()
   const location = useLocation()
 
@@ -110,7 +111,7 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
                     fontSize={{ _: 10, [bp]: 'unset' }}
                     fontWeight={isCurrentSection ? 500 : 'undefined'}
                   >
-                    {label}
+                    {wizard ? `Step ${index + 1} / ${label}` : label}
                   </Text.Plain>
                 </Box>
               </InternalLink>
@@ -131,11 +132,54 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         borderBottomLeftRadius={{ [bp]: 3 }}
         // Just for now
         minHeight="50vh"
+        position="relative"
       >
         <Switch>
-          {tabs.map(({ matchPath, path, content }) => (
+          {tabs.map(({ matchPath, path, content }, index) => (
             <Route key={path} path={`${routeMatch.url}/${matchPath ?? path}`}>
-              {content}
+              <Box>{content}</Box>
+              {/* Previous step button */}
+              {wizard && tabs[index - 1] != null && (
+                <InternalLink
+                  px={{ _: 2, [bp]: 4 }}
+                  py={{ _: 1, [bp]: 3 }}
+                  css={css`
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    transform: translate(5%, 110%);
+                    ${mq[bp]} {
+                      transform: translate(-10%, 30%);
+                    }
+                  `}
+                  to={
+                    tabs[index - 1].linkPath || (tabs[index - 1].path as string)
+                  }
+                  asButton
+                  buttonStyle="primary"
+                >{`Previous step: ${tabs[index - 1].label}`}</InternalLink>
+              )}
+              {/* Next step button */}
+              {wizard && tabs[index + 1] != null && (
+                <InternalLink
+                  px={{ _: 2, [bp]: 4 }}
+                  py={{ _: 1, [bp]: 3 }}
+                  css={css`
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    transform: translate(-5%, 110%);
+                    ${mq[bp]} {
+                      transform: translate(10%, 30%);
+                    }
+                  `}
+                  to={
+                    tabs[index + 1].linkPath || (tabs[index + 1].path as string)
+                  }
+                  asButton
+                  buttonStyle="primary"
+                >{`Next step: ${tabs[index + 1].label}`}</InternalLink>
+              )}
             </Route>
           ))}
           {/* If user lands on a route that doesn't match any, redirect to the first one */}
@@ -148,6 +192,10 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
       </Box>
     </Box>
   )
+}
+
+MultiWorkspace.defaultProps = {
+  wizard: false,
 }
 
 export default MultiWorkspace
