@@ -1,7 +1,7 @@
 import { onError } from 'apollo-link-error'
 import { Observable } from 'apollo-link'
 
-import { ensureActiveToken } from 'src/utils/auth'
+import { ensureActiveToken, logOutAndClearData } from 'src/utils/auth'
 
 export default onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
@@ -42,6 +42,7 @@ export default onError(
           })
           .catch((err) => {
             observer.error(err)
+            logOutAndClearData()
           })
       })
     }

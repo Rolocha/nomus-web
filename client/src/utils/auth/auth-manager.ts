@@ -93,6 +93,13 @@ export class AuthManager<
     return wasTokenRefreshed
   }
 
+  public logOutAndClearData = async () => {
+    const response = await this.logOut()
+    if (response) {
+      this.updateAuthData(null)
+    }
+  }
+
   public useAuth() {
     const [authData, setAuthData] = useState<AuthData | null>(this.authData)
 
@@ -140,13 +147,6 @@ export class AuthManager<
   private signUpAndSaveAuth = async (args: SignupArgs) => {
     const response = await this.signUp(args)
     this.updateAuthData(response)
-  }
-
-  private logOutAndClearData = async () => {
-    const response = await this.logOut()
-    if (response) {
-      this.updateAuthData(null)
-    }
   }
 
   private tokenHasExpired(authData: AuthData) {
