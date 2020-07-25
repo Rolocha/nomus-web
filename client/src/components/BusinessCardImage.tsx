@@ -12,8 +12,8 @@ import {
 } from 'styled-system'
 
 interface Props {
-  frontImageUrl: string
-  backImageUrl: string
+  frontImageUrl?: string
+  backImageUrl?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
   height?: ResponsiveValue<
     CSS.HeightProperty<TLengthStyledSystem>,
@@ -28,7 +28,8 @@ const faceStyles = css({
   animationTimingFunction: 'linear',
   transitionProperty: 'transform',
   animationFillMode: 'forwards',
-  overflow: 'hidden',
+  // Enable visiblity of card's box shadow
+  overflow: 'visible',
   perspective: '1000px',
   position: 'relative',
   display: 'inline-block',
@@ -46,7 +47,7 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
     p={1}
     role="button"
     onClick={onClick}
-    boxShadow={0}
+    boxShadow="knob"
     zIndex={3}
     css={css`
       transform: translate(40%, -40%);
@@ -61,13 +62,33 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
   </Box>
 )
 
-const FlippableCard = ({
+const BusinessCardImage = ({
   frontImageUrl,
   backImageUrl,
   width,
   height,
 }: Props) => {
   const [showBack, setShowBack] = React.useState(false)
+
+  const frontImage = (
+    <Image boxShadow="businessCard" w={width} h={height} src={frontImageUrl} />
+  )
+  const backImage = (
+    <Image boxShadow="businessCard" w={width} h={height} src={backImageUrl} />
+  )
+
+  if (backImageUrl == null && frontImageUrl == null) {
+    throw new Error(
+      'Provide at least one side of the business card image to <BusinessCardImage />',
+    )
+  }
+  if (frontImageUrl == null) {
+    return backImage
+  }
+
+  if (backImageUrl == null) {
+    return frontImage
+  }
 
   return (
     <Box position="relative" display="inline-block" width={width}>
@@ -79,7 +100,7 @@ const FlippableCard = ({
           animationName: showBack ? rotateNoShow : rotateShow,
         })}
       >
-        <Image boxShadow={0} w={width} h={height} src={frontImageUrl} />
+        {frontImage}
       </Box>
       <Box
         width={width}
@@ -89,11 +110,11 @@ const FlippableCard = ({
           animationName: showBack ? rotateShow : rotateNoShow,
         })}
       >
-        <Image boxShadow={0} w={width} h={height} src={backImageUrl} />
+        {backImage}
       </Box>
       <FlipButton onClick={() => setShowBack(!showBack)} />
     </Box>
   )
 }
 
-export default FlippableCard
+export default BusinessCardImage

@@ -7,6 +7,7 @@ import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import { ContactsSortOption } from './contact-sorting'
 import ContactCardsList from './ContactCardsList'
+import BusinessCardImage from 'src/components/BusinessCardImage'
 
 interface ParamsType {
   usernameOrId: string
@@ -56,7 +57,8 @@ const ContactsDetailView = ({
         gridArea="list"
         placeSelf="stretch"
         maxHeight="inherit"
-        overflow="auto"
+        // Required to allow selected contact caret (>) to be visible
+        overflow="visible"
       >
         <ContactCardsList
           contacts={contacts}
@@ -108,10 +110,10 @@ const ContactsDetailView = ({
           </Box>
 
           <Box gridArea="nameplate" alignSelf={{ _: 'start', md: 'center' }}>
-            <Text.SectionHeader mb={1} mt={0}>
+            <Text.SectionSubheader mb={1} mt={0}>
               {formatName(selectedContact.name)}
-            </Text.SectionHeader>
-            <Text.Body>{selectedContact.headline}</Text.Body>
+            </Text.SectionSubheader>
+            <Text.Body2>{selectedContact.headline}</Text.Body2>
           </Box>
           <Box
             gridArea="contactInfo"
@@ -120,68 +122,80 @@ const ContactsDetailView = ({
             flexDirection="row"
             mx={-3}
           >
+            {selectedContact.phoneNumber && (
+              <Box px={3}>
+                <Text.Label>Phone</Text.Label>
+                <Text.Body2>{selectedContact.phoneNumber}</Text.Body2>
+              </Box>
+            )}
             {selectedContact.email && (
               <Box px={3}>
                 <Text.Label>Email</Text.Label>
-                <Text.Body>{selectedContact.email}</Text.Body>
-              </Box>
-            )}
-            {selectedContact.phoneNumber && (
-              <Box px={3}>
-                <Text.Label>Phone Number</Text.Label>
-                <Text.Body>{selectedContact.phoneNumber}</Text.Body>
+                <Text.Body2>{selectedContact.email}</Text.Body2>
               </Box>
             )}
           </Box>
 
-          {(selectedContact.cardFrontImageUrl ||
-            selectedContact.cardBackImageUrl) && (
-            <Box
-              gridArea="cards"
-              width={{ _: '100%', [bp]: '100%' }}
-              mx={{ _: -1, [bp]: 0 }}
-              my={{ _: 0, [bp]: -1 }}
-              display="flex"
-              flexDirection={{ _: 'row', [bp]: 'column' }}
-            >
-              {selectedContact.cardFrontImageUrl && (
-                <Box px={{ _: 1, [bp]: 0 }} py={{ _: 0, [bp]: 1 }}>
-                  <Image width="100%" src={selectedContact.cardFrontImageUrl} />
-                </Box>
-              )}
-              {selectedContact.cardBackImageUrl && (
-                <Box px={{ _: 1, [bp]: 0 }} py={{ _: 0, [bp]: 1 }}>
-                  <Image width="100%" src={selectedContact.cardBackImageUrl} />
-                </Box>
-              )}
-            </Box>
-          )}
+          {selectedContact.cardFrontImageUrl &&
+            selectedContact.cardBackImageUrl && (
+              <Box
+                gridArea="cards"
+                width={{ _: '100%', [bp]: '100%' }}
+                display="flex"
+                px={2}
+                flexDirection={{ _: 'row', [bp]: 'column' }}
+              >
+                <BusinessCardImage
+                  width="100%"
+                  frontImageUrl={selectedContact.cardFrontImageUrl}
+                  backImageUrl={selectedContact.cardBackImageUrl}
+                />
+              </Box>
+            )}
 
           <Box gridArea="bio">
             <Text.Label>BIO</Text.Label>
-            <Text.Body>{selectedContact.bio}</Text.Body>
+            <Text.Body3>{selectedContact.bio}</Text.Body3>
           </Box>
 
-          <Box gridArea="notes">
-            <Text.SectionHeader mb={2}>Your notes</Text.SectionHeader>
-            <Box display="flex" flexDirection="row" mx={-3} mb={2}>
-              <Box px={3}>
-                <Text.Label>Meeting Date</Text.Label>
-                <Text.Body>
-                  {selectedContact.meetingDate
-                    ? getFormattedFullDate(selectedContact.meetingDate)
-                    : ''}
-                </Text.Body>
-              </Box>
-
-              <Box px={3}>
-                <Text.Label>Meeting Place</Text.Label>
-                <Text.Body>{selectedContact.meetingPlace ?? ''}</Text.Body>
-              </Box>
+          <Box
+            gridArea="notes"
+            display="grid"
+            gridTemplateColumns="2fr 6fr"
+            gridColumnGap={3}
+            gridRowGap="24px"
+            gridTemplateAreas={`
+            "title title"
+            "meetingDate meetingPlace"
+            "tags additionalNotes"
+          `}
+          >
+            <Box gridArea="title">
+              <Text.SectionHeader>Your notes</Text.SectionHeader>
             </Box>
-            <Box>
+
+            <Box gridArea="meetingDate">
+              <Text.Label>Meeting Date</Text.Label>
+              <Text.Body2>
+                {selectedContact.meetingDate
+                  ? getFormattedFullDate(selectedContact.meetingDate)
+                  : ''}
+              </Text.Body2>
+            </Box>
+
+            <Box gridArea="meetingPlace">
+              <Text.Label>Meeting Place</Text.Label>
+              <Text.Body2>{selectedContact.meetingPlace ?? ''}</Text.Body2>
+            </Box>
+
+            <Box gridArea="tags">
+              <Text.Label>Tags</Text.Label>
+              <Text.Body2>TODO</Text.Body2>
+            </Box>
+
+            <Box gridArea="additionalNotes">
               <Text.Label>Additional Notes</Text.Label>
-              <Text.Body>{selectedContact.notes ?? ''}</Text.Body>
+              <Text.Body2>{selectedContact.notes ?? ''}</Text.Body2>
             </Box>
           </Box>
         </Box>

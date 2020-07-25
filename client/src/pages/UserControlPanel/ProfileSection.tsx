@@ -2,6 +2,7 @@ import * as React from 'react'
 import { gql, useQuery } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import Box from 'src/components/Box'
+import BusinessCardImage from 'src/components/BusinessCardImage'
 import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
@@ -117,20 +118,18 @@ export default () => {
               mb={{ _: 0, [bp]: 2 }}
               mr={{ _: 2, [bp]: 0 }}
             >
-              <Image
-                boxShadow={0}
+              <BusinessCardImage
                 width="100%"
-                src={data.cardVersion.frontImageUrl}
+                frontImageUrl={data.cardVersion.frontImageUrl}
               />
             </Box>
           )}
           {data.cardVersion.backImageUrl && (
             <Box width={{ _: '50%', [bp]: '100%' }}>
               {/* Back of business card */}
-              <Image
-                boxShadow={0}
+              <BusinessCardImage
                 width="100%"
-                src={data.cardVersion.backImageUrl}
+                backImageUrl={data.cardVersion.backImageUrl}
               />
             </Box>
           )}

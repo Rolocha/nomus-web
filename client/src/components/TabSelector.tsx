@@ -72,7 +72,7 @@ const TabSelector = ({
             )}
             <Text.Body3
               color={selected ? selectedColor : unselectedColor}
-              fontWeight={selected ? 'bold' : undefined}
+              fontWeight={selected ? 500 : undefined}
             >
               {tabConfig.title}
             </Text.Body3>

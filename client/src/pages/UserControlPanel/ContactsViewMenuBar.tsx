@@ -99,8 +99,10 @@ const ContactCardsList = ({
           }}
           icon={<SVG.Options />}
           popoverContents={
-            <Box p={2}>
-              <Text.Body3 color="africanElephant">Sort by</Text.Body3>
+            <Box py={2}>
+              <Text.Body3 px={2} color="africanElephant">
+                Sort by
+              </Text.Body3>
               {allContactsSortOptions.map((option) => (
                 <Box
                   cursor="pointer"
@@ -109,7 +111,12 @@ const ContactCardsList = ({
                   justifyContent="flex-start"
                   alignItems="center"
                   py={1}
-                  pr={2}
+                  px={2}
+                  css={css({
+                    '&:hover': {
+                      backgroundColor: colors.hoverBlue,
+                    },
+                  })}
                 >
                   {option === selectedContactSortOption ? (
                     <SVG.Check
@@ -152,11 +159,11 @@ const ContactCardsList = ({
             }}
           >
             <Box display="flex" flexDirection="row" alignItems="center">
-              <Text.Body mr={3} color="inherit">
+              <Text.Body mr={3} color="linkBlue">
                 nomus.me/u/{selectedContactUsernameOrId}
               </Text.Body>
               <Box>
-                <Icon color="inherit" size={0.8} icon="external" />
+                <Icon color="linkBlue" size={0.8} icon="external" />
               </Box>
             </Box>
           </InternalLink>
@@ -178,7 +185,7 @@ const ContactCardsList = ({
               actionType: TabActionType.InternalLink,
               onClick: () =>
                 onSelectedContactSortOptionChange(
-                  ContactsSortOption.MeetingDate,
+                  ContactsSortOption.MeetingDateNewest,
                 ),
               linkTo: '/dashboard/contacts/glance',
             },

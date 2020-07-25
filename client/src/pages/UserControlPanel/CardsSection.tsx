@@ -7,7 +7,7 @@ import {
 } from 'src/apollo/types/UCPCardsSectionQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import FlippableCard from 'src/components/FlippableCard'
+import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { getMonthAbbreviation } from 'src/utils/date'
@@ -71,7 +71,7 @@ export default () => {
     <Box>
       {defaultCardVersion && defaultCardVersionStats && (
         <Box>
-          <Text.SectionHeader mb={2}>Active Card</Text.SectionHeader>
+          <Text.SectionHeader mb={2}>Active card</Text.SectionHeader>
           <Box
             display="flex"
             flexDirection={{ _: 'column', [bp]: 'row' }}
@@ -85,7 +85,7 @@ export default () => {
               flexDirection="column"
             >
               <Box display="inline-block">
-                <FlippableCard
+                <BusinessCardImage
                   frontImageUrl={defaultCardVersion?.frontImageUrl || ''}
                   backImageUrl={defaultCardVersion?.backImageUrl || ''}
                   width={{ _: '100%', [bp]: '300px' }}
@@ -94,6 +94,7 @@ export default () => {
                   display="flex"
                   flexDirection="row"
                   justifyContent="stretch"
+                  mt={3}
                   mx={-1}
                   css={css`
                     & > ${Box} {
@@ -114,17 +115,33 @@ export default () => {
               </Box>
             </Box>
 
-            <Box px={{ _: 0, [bp]: 3 }} py={{ _: 2, [bp]: 0 }}>
-              <Text.SectionSubheader>Version Information</Text.SectionSubheader>
-              <Text.Body2>
-                Date created: {formatDate(defaultCardVersion.createdAt)}
-              </Text.Body2>
-              <Text.Body2>
-                Cards ordered: {defaultCardVersionStats.numCardsOrdered}
-              </Text.Body2>
-              <Text.Body2>
-                Tap count: {defaultCardVersionStats.numTaps}
-              </Text.Body2>
+            <Box
+              px={{ _: 0, [bp]: 3 }}
+              py={{ _: 2, [bp]: 0 }}
+              // Not worth using grid for the parent Box so we fake it here to mimic 4fr / 12fr
+              width="calc(100% * (4/12))"
+            >
+              <Text.SectionSubheader mb={2}>
+                Version information
+              </Text.SectionSubheader>
+              <Box
+                display="grid"
+                gridTemplateColumns="1fr 1fr"
+                gridRowGap={{ _: 1, [bp]: 2 }}
+              >
+                <Text.Body2>Date created</Text.Body2>
+                <Text.Body2>
+                  {formatDate(defaultCardVersion.createdAt)}
+                </Text.Body2>
+
+                <Text.Body2>Cards ordered</Text.Body2>
+                <Text.Body2>
+                  {defaultCardVersionStats.numCardsOrdered}
+                </Text.Body2>
+
+                <Text.Body2>Tap count</Text.Body2>
+                <Text.Body2>{defaultCardVersionStats.numTaps}</Text.Body2>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -132,9 +149,10 @@ export default () => {
 
       {nonDefaultCardVersions.length > 0 && (
         <Box mt={4}>
-          <Text.SectionHeader mb={2}>Other Card Versions</Text.SectionHeader>
+          <Text.SectionHeader mb={2}>Other card versions</Text.SectionHeader>
           <Box
             overflowX="auto"
+            overflowY="auto"
             display="flex"
             flexDirection="row"
             my={0}
@@ -149,7 +167,7 @@ export default () => {
                   py={2}
                   px={2}
                 >
-                  <FlippableCard
+                  <BusinessCardImage
                     frontImageUrl={cv.frontImageUrl || ''}
                     backImageUrl={cv.backImageUrl || ''}
                     width={{ _: '60vw', [bp]: '300px' }}
@@ -161,6 +179,23 @@ export default () => {
                       `${cardVersionStatsById[cv.id].numTaps} taps`,
                     ].join(' / ')}
                   </Text.Body3>
+                  <Box
+                    mt={2}
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="stretch"
+                    mx={-1}
+                  >
+                    <Box px={1}>
+                      <Button variant="primary">Reorder card</Button>
+                    </Box>
+                    <Box px={1}>
+                      <Button variant="secondary">Modify card</Button>
+                    </Box>
+                    <Box px={1}>
+                      <Button variant="secondary">Make active</Button>
+                    </Box>
+                  </Box>
                 </Box>
               )
             })}
