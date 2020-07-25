@@ -48,9 +48,9 @@ type IconComponentProps = IconProps & {
 
 const IconComponent = ({ icon, color, size }: IconComponentProps) => (
   <Icon
+    color={color}
     css={css`
       ${size ? `--ggs: ${size};` : ''}
-      ${color ? `color: ${color};` : ''}
     `}
     className={`gg-${icon}`}
   />

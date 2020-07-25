@@ -41,6 +41,9 @@ const Input = styled<'input', InputProps>('input')(
     borderRadius: '6px',
     padding: '10px 8px',
     border: `1px solid ${theme.colors.africanElephant}`,
+    '&::placeholder': {
+      color: theme.colors.africanElephant,
+    },
   },
   space,
   position,

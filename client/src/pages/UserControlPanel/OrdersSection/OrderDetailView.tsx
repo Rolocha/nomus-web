@@ -83,7 +83,7 @@ export default ({ order }: Props) => {
         </Box>
         <Box gridArea="pricing">
           <Box
-            boxShadow={0}
+            boxShadow="workingWindow"
             borderRadius={2}
             p={3}
             css={css({

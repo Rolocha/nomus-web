@@ -1,11 +1,13 @@
 export enum ContactsSortOption {
   Alphabetical = 'Alphabetical',
-  MeetingDate = 'Meeting Date',
-  MeetingPlace = 'Meeting Place',
+  MeetingDateNewest = 'Meeting date (newest)',
+  MeetingDateOldest = 'Meeting date (oldest)',
+  MeetingPlace = 'Meeting place',
 }
 
 export const allContactsSortOptions = [
   ContactsSortOption.Alphabetical,
-  ContactsSortOption.MeetingDate,
+  ContactsSortOption.MeetingDateNewest,
+  ContactsSortOption.MeetingDateOldest,
   ContactsSortOption.MeetingPlace,
 ]

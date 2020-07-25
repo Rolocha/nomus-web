@@ -19,6 +19,7 @@ interface Props {
 const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const popoverCard = React.useRef<HTMLDivElement | null>(null)
+  const openerButton = React.useRef<HTMLDivElement | null>(null)
 
   const popoverStyles: { [k in PopoverAnchorPoint]: any } = {
     [PopoverAnchorPoint.Top]: {
@@ -53,8 +54,16 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
 
   React.useEffect(() => {
     const listener = (event: MouseEvent) => {
-      // @ts-ignore
-      if (popoverCard.current && !popoverCard.current.contains(event.target)) {
+      if (
+        popoverCard.current &&
+        // @ts-ignore
+        !popoverCard.current.contains(event.target) &&
+        // If the click happened on the opener button, ignore it here and let the opener's onClick handle
+        // setting isOpen to false instead. Otherwise they clobber each other and it doesn't close.
+        openerButton.current &&
+        // @ts-ignore
+        !openerButton.current.contains(event.target)
+      ) {
         setIsOpen(false)
       }
     }
@@ -68,12 +77,13 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
   return (
     <Box position="relative">
       <Box
+        ref={openerButton}
         bg="white"
         borderRadius="50%"
         mx={1}
         p={1}
         role="button"
-        boxShadow={0}
+        boxShadow="knob"
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -95,7 +105,7 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
           ref={popoverCard}
           {...anchorPointStyles}
           bg="white"
-          boxShadow={0}
+          boxShadow="workingWindow"
           borderRadius={2}
         >
           {popoverContents}

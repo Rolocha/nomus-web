@@ -27,9 +27,9 @@ const getDefaultSortOptionForViewMode = (viewMode: string | undefined) =>
   viewMode && isValidViewMode(viewMode)
     ? {
         detail: ContactsSortOption.Alphabetical,
-        glance: ContactsSortOption.MeetingDate,
+        glance: ContactsSortOption.MeetingDateNewest,
       }[viewMode]
-    : ContactsSortOption.MeetingDate
+    : ContactsSortOption.MeetingDateNewest
 
 export default () => {
   const params = useParams<ParamsType>()
