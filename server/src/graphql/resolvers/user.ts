@@ -6,6 +6,7 @@ import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } fro
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import zxcvbn from 'zxcvbn'
+import { validateUsername } from 'src/util/username'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -91,7 +92,12 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
-    userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
+    if (await validateUsername(userUpdatePayload.username)) {
+      userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
+    } else {
+      throw new Error('non-unique-username')
+    }
+
     userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first
     userBeingUpdated.name.middle = userUpdatePayload.middleName ?? userBeingUpdated.name.middle
     userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last
