@@ -159,9 +159,9 @@ const ContactCardsList = ({
             }}
           >
             <Box display="flex" flexDirection="row" alignItems="center">
-              <Text.Body mr={3} color="linkBlue">
+              <Text.Body2 mr={3} color="linkBlue">
                 nomus.me/u/{selectedContactUsernameOrId}
-              </Text.Body>
+              </Text.Body2>
               <Box>
                 <Icon color="linkBlue" size={0.8} icon="external" />
               </Box>
