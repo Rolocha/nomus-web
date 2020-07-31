@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { UserModel } from 'src/models/User'
+import { UserModel, validateUsername } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -260,6 +260,34 @@ describe('UserResolver', () => {
       expect(response.data.deleteUser).toBe(user.id)
       const deletedUser = await UserModel.findById(MUUID.from(user.id))
       expect(deletedUser).toBeNull()
+    })
+  })
+
+  describe('username testing', () => {
+    it('has a username collision', async () => {
+      await createMockUser({ username: 'roxmysox' })
+      expect(await validateUsername('roxmysox')).toBe(false)
+    })
+
+    it('does not have a collision', async () => {
+      await createMockUser({ username: 'roxmysox' })
+      expect(await validateUsername('roxyoursox')).toBe(true)
+    })
+
+    it('creates a new username for a new user', async () => {
+      const user = await createMockUser({
+        name: {
+          first: 'A',
+          last: 'A',
+        },
+      })
+      expect(user.username.substring(0, 4)).toBe('A.A.')
+      expect(user.username.length).toBe(10)
+    })
+  })
+  describe('reserved routes', () => {
+    it('tries to be a reserved route', async () => {
+      expect(await validateUsername('dashboard')).toBe(false)
     })
   })
 })

@@ -25,6 +25,34 @@ export interface UserCreatePayload {
   password: string
 }
 
+export const ReservedRoutes = ['dashboard', 'profile', 'faq']
+
+export const validateUsername = async (usernameVal: string): Promise<boolean> => {
+  const exists = await User.mongo.find({ username: usernameVal }).limit(1)
+
+  if (exists.length > 0) {
+    return false
+  }
+
+  if (ReservedRoutes.includes(usernameVal)) {
+    return false
+  }
+
+  if (usernameVal.length <= 5) {
+    return false
+  }
+
+  return true
+}
+
+@pre<User>('save', async function (next) {
+  if (this.isNew && this.username == null) {
+    this.username =
+      this.name.first + '.' + this.name.last + '.' + Math.random().toString(36).substring(2, 8)
+    next()
+  }
+  next()
+})
 @pre<User>('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10)
@@ -81,7 +109,7 @@ export class User {
   @Field({ nullable: true })
   email: string
 
-  @prop()
+  @prop({ unique: true, validate: validateUsername })
   @Field({ nullable: true })
   username: string
 
