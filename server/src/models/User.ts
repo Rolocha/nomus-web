@@ -58,7 +58,7 @@ export const validateUsername = async (usernameVal: string): Promise<boolean> =>
     return false
   }
 
-  if (usernameVal.length <= 5) {
+  if (usernameVal && usernameVal.length <= 5) {
     return false
   }
 
