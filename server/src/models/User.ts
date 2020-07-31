@@ -25,7 +25,27 @@ export interface UserCreatePayload {
   password: string
 }
 
-export const ReservedRoutes = ['dashboard', 'profile', 'faq']
+export const ReservedRoutes = [
+  'dashboard',
+  'profile',
+  'faq',
+  'careers',
+  'jobs',
+  'login',
+  'auth',
+  'api',
+  'signup',
+  'register',
+  'registration',
+  'faq',
+  'dashboard',
+  'card-builder',
+  'get-started',
+  'about',
+  'profile',
+  'design',
+  'hello',
+]
 
 export const validateUsername = async (usernameVal: string): Promise<boolean> => {
   const exists = await User.mongo.find({ username: usernameVal }).limit(1)
