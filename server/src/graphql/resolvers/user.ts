@@ -91,10 +91,12 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
-    if (await validateUsername(userUpdatePayload.username)) {
-      userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
-    } else {
-      throw new Error('non-unique-username')
+    if (userUpdatePayload.username) {
+      if (await validateUsername(userUpdatePayload.username)) {
+        userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
+      } else {
+        throw new Error('non-unique-username')
+      }
     }
 
     userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first

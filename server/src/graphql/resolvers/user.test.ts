@@ -192,7 +192,7 @@ describe('UserResolver', () => {
     it('updates the specified properties on the context user', async () => {
       const user = await createMockUser({
         name: {
-          first: 'A',
+          first: 'L',
           last: 'A',
         },
         email: 'abc@gmail.com',
