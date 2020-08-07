@@ -25,9 +25,9 @@ const EditButton = ({ iconOnlyBp, onClick }: EditButtonProps) => (
       <Box
         display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
       >
-        <Text.Plain fontSize="14px" fontWeight="bold" color="nomusBlue">
+        <Text.Body2 fontSize="14px" color="nomusBlue">
           Edit
-        </Text.Plain>
+        </Text.Body2>
       </Box>
     </Box>
   </Button>
