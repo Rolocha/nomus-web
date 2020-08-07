@@ -15,6 +15,7 @@ import { useAuth } from 'src/utils/auth'
 import { useHistory } from 'react-router-dom'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import ActivationEditor from './ActivationEditor'
+import ProgressBar from './ProgressBar'
 
 const bp = 'lg'
 
@@ -331,6 +332,7 @@ export default () => {
           1 symbol <br />
           1 number <br />
         </Text.Body3>
+        <ProgressBar value={80} />
       </Box>
 
       <Box gridArea="resetPasswordButton">
