@@ -16,6 +16,7 @@ import { useHistory } from 'react-router-dom'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import ActivationEditor from './ActivationEditor'
 import ProgressBar from './ProgressBar'
+import zxcvbn from 'zxcvbn'
 
 const bp = 'lg'
 
@@ -52,6 +53,7 @@ export default () => {
     register: passwordFormRegister,
     handleSubmit: passwordFormHandleSubmit,
     reset: passwordFormReset,
+    watch: passwordWatch,
   } = useForm<PasswordFormData>({
     defaultValues: { oldPassword: '', newPassword: '', confirmNewPassword: '' },
   })
@@ -325,14 +327,11 @@ export default () => {
       </Box>
 
       <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3 mb={3}>Your new password needs at least:</Text.Body3>
-        <Text.Body3>
-          8 characters <br />
-          1 letter <br />
-          1 symbol <br />
-          1 number <br />
-        </Text.Body3>
-        <ProgressBar value={80} />
+        <Text.Body3>New password strength:</Text.Body3>
+        <ProgressBar
+          value={zxcvbn(passwordWatch('newPassword')).score}
+          max={4}
+        />
       </Box>
 
       <Box gridArea="resetPasswordButton">
