@@ -128,6 +128,21 @@ export default () => {
     return <LoadingPage />
   }
 
+  const renderPasswordCopy = (passwordStrength: number) => {
+    switch (passwordStrength) {
+      case 0:
+        return <Text.Body3>Way too weak</Text.Body3>
+      case 1:
+        return <Text.Body3>Pretty weak</Text.Body3>
+      case 2:
+        return <Text.Body3>It's ok, but you can do better</Text.Body3>
+      case 3:
+        return <Text.Body3>Awesome</Text.Body3>
+      case 4:
+        return <Text.Body3>Amazing!</Text.Body3>
+    }
+  }
+
   return (
     <Box
       display="grid"
@@ -326,13 +341,16 @@ export default () => {
         </Form.Form>
       </Box>
 
-      <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3>New password strength:</Text.Body3>
-        <ProgressBar
-          value={zxcvbn(passwordWatch('newPassword')).score}
-          max={4}
-        />
-      </Box>
+      {passwordWatch('newPassword').length > 0 && (
+        <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
+          <Text.Body3>New password strength:</Text.Body3>
+          {renderPasswordCopy(zxcvbn(passwordWatch('newPassword')).score)}
+          <ProgressBar
+            value={zxcvbn(passwordWatch('newPassword')).score}
+            max={4}
+          />
+        </Box>
+      )}
 
       <Box gridArea="resetPasswordButton">
         <Button
