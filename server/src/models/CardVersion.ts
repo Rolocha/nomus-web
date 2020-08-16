@@ -5,6 +5,7 @@ import { Ref, UUIDScalar, UUIDType } from './scalars'
 import { Address, PersonName } from './subschemas'
 import User from './User'
 import { validateEmail } from './utils'
+import { CardSpecBaseType } from 'src/util/enums'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
@@ -33,7 +34,15 @@ export class CardVersion {
   @Field({ nullable: true })
   cardSlug: string
 
-  @prop({ _id: false, required: true })
+  @prop({
+    enum: [CardSpecBaseType.Custom, CardSpecBaseType.Template],
+    required: true,
+    default: CardSpecBaseType.Custom,
+  })
+  @Field((type) => CardSpecBaseType, { nullable: false })
+  baseType: CardSpecBaseType
+
+  @prop({ _id: false, required: false })
   @Field(() => PersonName, { nullable: true })
   name: PersonName
 

@@ -2,6 +2,9 @@ import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
+import { CardSpecBaseType, OrderState, Role } from 'src/util/enums'
+import { calculateCost } from 'src/util/pricing'
+import { stripe } from 'src/util/stripe'
 import {
   Arg,
   Authorized,
@@ -9,27 +12,35 @@ import {
   Field,
   InputType,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
-  ObjectType,
 } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
-import { OrderState, Role } from 'src/util/enums'
 
-@InputType({ description: 'Input to generate new Order object' })
-class OrderGenerationInput implements Pick<Order, 'quantity' | 'price'> {
-  @Field({ nullable: false })
-  quantity: number
+@InputType({ description: 'Specification for a new Card Version object for Order' })
+class BaseCardSpecInput implements Partial<CardVersion> {
+  @Field({ nullable: true })
+  cardSlug?: string
 
-  @Field({ nullable: false })
-  price: number
+  @Field({ nullable: true })
+  vcfNotes?: string
 }
 
-@InputType({ description: 'Input to generate new Card Version object for Order' })
-class CardVersionInput implements Partial<CardVersion> {
+@InputType({ description: 'Specification for a card built using custom assets' })
+class CustomCardSpecInput extends BaseCardSpecInput {
   @Field({ nullable: false })
-  cardSlug: string
+  frontImageDataUrl: string
+
+  @Field({ nullable: true })
+  backImageDataUrl?: string
+}
+
+@InputType({ description: 'Specification for a card built using a template' })
+class TemplateCardSpecInput extends BaseCardSpecInput {
+  @Field({ nullable: true })
+  templateId?: string
 
   @Field({ nullable: true })
   firstName?: string
@@ -51,35 +62,65 @@ class CardVersionInput implements Partial<CardVersion> {
   company?: string
 
   @Field({ nullable: true })
-  vcfNotes?: string
-
-  @Field({ nullable: true })
   addressLine1?: string
   @Field({ nullable: true })
   addressLine2?: string
   @Field({ nullable: true })
   addressLine3?: string
+}
+
+@InputType({ description: 'A shipping address input' })
+class ShippingAddressInput {
+  @Field({ nullable: false })
+  line1: string
 
   @Field({ nullable: true })
-  frontImageUrl: string
+  line2?: string
 
-  @Field({ nullable: true })
-  backImageUrl: string
+  @Field({ nullable: false })
+  city: string
 
-  @Field({ nullable: true })
-  vcfUrl?: string
+  @Field({ nullable: false })
+  state: string
 
-  @Field({ nullable: true })
-  templateId?: string
+  @Field({ nullable: false })
+  postalCode: string
+}
+
+@InputType({
+  description: 'Input to generate new Order object, regardless of what type of card base was used',
+})
+class BaseCreateOrderInput implements Pick<Order, 'quantity'> {
+  @Field({ nullable: false })
+  quantity: number
+
+  // Credit/debit card Stripe token we'll use for payment auth/capture
+  @Field({ nullable: false })
+  stripeToken: string
+
+  @Field((type) => ShippingAddressInput, { nullable: false })
+  shippingAddress: ShippingAddressInput
+}
+
+@InputType({ description: 'Input to generate new Order object' })
+class CreateCustomOrderInput extends BaseCreateOrderInput {
+  @Field((type) => CustomCardSpecInput)
+  cardSpec: CustomCardSpecInput
 }
 
 @ObjectType()
-class NewOrderAndCardVersion {
+class CreateOrderResponse {
   @Field()
-  orderId: string
+  clientSecret: string
 
   @Field()
-  cardVersionId: string
+  orderId: string
+}
+
+@InputType({ description: 'Input for trackinig an order object' })
+class CreateOrderIntentInput {
+  @Field()
+  amount: number
 }
 
 @Resolver()
@@ -121,57 +162,63 @@ class OrderResolver {
     return orders
   }
 
+  // @Authorized(Role.User)
+  // @Mutation((type) => CreateOrderIntentResponse)
+  // async createOrderIntent(
+  //   @Arg('payload', { nullable: false }) payload: CreateOrderIntentInput,
+  //   @Ctx() context: IApolloContext
+  // ): Promise<CreateOrderIntentResponse> {}
+
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
-  @Mutation((type) => NewOrderAndCardVersion)
-  async createNewOrder(
+  @Mutation((type) => CreateOrderResponse)
+  async createCustomOrder(
     @Arg('userId', { nullable: true }) userId: string | null,
-    @Arg('orderPayload', { nullable: false }) orderPayload: OrderGenerationInput,
-    @Arg('cardVersionPayload', { nullable: false }) cardVersionPayload: CardVersionInput,
+    @Arg('payload', { nullable: false }) payload: CreateCustomOrderInput,
     @Ctx() context: IApolloContext
-  ): Promise<NewOrderAndCardVersion> {
+  ): Promise<CreateOrderResponse> {
     const requestingUserId = context.user._id
     const userIdCheck = userId ?? requestingUserId
     const requestedUser: User = await User.mongo.findById(MUUID.from(userIdCheck))
 
+    const { quantity, stripeToken, shippingAddress, cardSpec } = payload
+
+    // TODO: Upload custom card assets to S3 so we can store those links in the CardVersion
+    const frontImageUrl = '' // uploadToS3(cardSpec.frontImageDataUrl)
+    const backImageUrl = '' // uploadToS3(cardSpec.backImageDataUrl)
+
     const createCardVersion: Partial<CardVersion> = {
       user: requestedUser._id,
-      cardSlug: cardVersionPayload.cardSlug,
-      name: {
-        first: cardVersionPayload.firstName ?? requestedUser.name.first,
-        middle: cardVersionPayload.middleName ?? requestedUser.name.middle,
-        last: cardVersionPayload.lastName ?? requestedUser.name.last,
-      },
-      phoneNumber: cardVersionPayload.phoneNumber ?? requestedUser.phoneNumber,
-      email: cardVersionPayload.email ?? requestedUser.email,
-      title: cardVersionPayload.title,
-      company: cardVersionPayload.company,
-      vcfNotes: cardVersionPayload.vcfNotes,
-      address: {
-        line1: cardVersionPayload.addressLine1,
-        line2: cardVersionPayload.addressLine2,
-        line3: cardVersionPayload.addressLine3,
-      },
-      frontImageUrl: cardVersionPayload.frontImageUrl,
-      backImageUrl: cardVersionPayload.backImageUrl,
-      vcfUrl: cardVersionPayload.vcfUrl,
+      frontImageUrl: frontImageUrl,
+      backImageUrl: backImageUrl,
+      vcfNotes: cardSpec.vcfNotes,
+      baseType: CardSpecBaseType.Custom,
     }
     const createdCardVersion = await CardVersionModel.create(createCardVersion)
+
+    const price = calculateCost(quantity)
+    if (price == null) {
+      throw new Error('Invalid quantity specified, failed to calculate pricing')
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: price,
+      currency: 'usd', // We'll know we made it when we can change this line :')
+    })
 
     const createOrder: Partial<Order> = {
       user: requestedUser._id,
       cardVersion: createdCardVersion._id,
       state: OrderState.Captured,
-      ...orderPayload,
+      price,
+      ...payload,
     }
     const createdOrder = await Order.mongo.create(createOrder)
 
-    const returnVal: NewOrderAndCardVersion = {
+    return {
+      clientSecret: paymentIntent.client_secret,
       orderId: createdOrder.id,
-      cardVersionId: createdCardVersion.id,
     }
-
-    return returnVal
   }
 }
 export default OrderResolver

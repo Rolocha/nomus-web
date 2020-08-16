@@ -10,6 +10,7 @@ type ValueOf<T> = T[keyof T]
 
 export enum TabActionType {
   InternalLink,
+  OnClick,
 }
 
 interface TabConfig {
@@ -32,7 +33,7 @@ interface Props {
   borderColor?: string
 }
 
-const TabSelector = ({
+const SegmentedController = ({
   tabs,
   selectedTabId,
   unselectedBg,
@@ -80,9 +81,8 @@ const TabSelector = ({
         )
         return {
           [TabActionType.InternalLink]: (
-            <Box width={`${100 / tabs.length}%`}>
+            <Box key={tabConfig.id} width={`${100 / tabs.length}%`}>
               <InternalLink
-                key={tabConfig.id}
                 // @ts-ignore
                 to={tabConfig.linkTo}
                 onClick={tabConfig.onClick}
@@ -91,13 +91,24 @@ const TabSelector = ({
               </InternalLink>
             </Box>
           ),
+          [TabActionType.OnClick]: (
+            <Box
+              role="button"
+              cursor="pointer"
+              key={tabConfig.id}
+              width={`${100 / tabs.length}%`}
+              onClick={tabConfig.onClick}
+            >
+              {InnerContent}
+            </Box>
+          ),
         }[tabConfig.actionType]
       })}
     </Box>
   )
 }
 
-TabSelector.defaultProps = {
+SegmentedController.defaultProps = {
   unselectedBg: colors.white,
   unselectedColor: colors.nomusBlue,
   selectedBg: colors.nomusBlue,
@@ -105,4 +116,4 @@ TabSelector.defaultProps = {
   borderColor: colors.nomusBlue,
 }
 
-export default TabSelector
+export default SegmentedController

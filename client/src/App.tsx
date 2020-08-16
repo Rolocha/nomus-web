@@ -1,4 +1,6 @@
 import { css, Global } from '@emotion/core'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { ThemeProvider } from 'emotion-theming'
@@ -8,6 +10,7 @@ import { PageRouter } from 'src/pages'
 import theme from 'src/styles/theme'
 
 AOS.init()
+const stripePromise = loadStripe('pk_test_BHZBEPSq17NwCwSopGfQIfTs00pTG0HM75')
 
 interface PropsType {}
 interface StateType {
@@ -47,11 +50,23 @@ class App extends React.Component<PropsType, StateType> {
             }
           `}
         />
-        <ApolloProvider client={apolloClient}>
-          <ThemeProvider theme={theme}>
-            <PageRouter />
-          </ThemeProvider>
-        </ApolloProvider>
+        <Elements
+          stripe={stripePromise}
+          options={{
+            fonts: [
+              {
+                cssSrc:
+                  'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap',
+              },
+            ],
+          }}
+        >
+          <ApolloProvider client={apolloClient}>
+            <ThemeProvider theme={theme}>
+              <PageRouter />
+            </ThemeProvider>
+          </ApolloProvider>
+        </Elements>
       </div>
     )
   }

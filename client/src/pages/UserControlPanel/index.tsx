@@ -43,7 +43,7 @@ const ProfilePage = () => {
   return (
     <Box
       bg={theme.colors.ivory}
-      minHeight={{ [bp]: '100vh' }}
+      minHeight="100vh"
       minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
       display="flex"
@@ -52,60 +52,72 @@ const ProfilePage = () => {
       zIndex={0}
     >
       <Navbar />
+
       <Box
         zIndex={0}
         pb={{ [bp]: 4 }}
         px={{ _: 0, [bp]: 5 }}
-        maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}
+        width="100%"
+        display="flex"
+        flexDirection="column"
+        alignItems="stretch"
       >
-        {data.user.name && (
-          <Box
-            overflow="auto"
-            mt={4}
-            mb="24px"
-            display={{ _: 'none', [bp]: 'block' }}
-          >
-            <Text.PageHeader>
-              {`Welcome back, ${formatName(data.user.name)}`}
-            </Text.PageHeader>
+        <Box
+          width={{ [bp]: `min(100%, calc(1.5 * ${breakpoints.lg}))` }}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          pb={{ [bp]: 4 }}
+        >
+          <Box width="100%">
+            {data.user.name && (
+              <Box pt={4} pb="24px" display={{ _: 'none', [bp]: 'block' }}>
+                <Text.PageHeader>{`Welcome back, ${formatName(
+                  data.user.name,
+                )}`}</Text.PageHeader>
+              </Box>
+            )}
+
+            <MultiWorkspace
+              children={[
+                {
+                  key: 'profile',
+                  label: 'Profile',
+                  Icon: SVG.Profile,
+                  content: <ProfileSection />,
+                },
+                {
+                  key: 'cards',
+                  label: 'Cards',
+                  Icon: SVG.Cards,
+                  content: <CardsSection />,
+                },
+                {
+                  key: 'contacts',
+                  linkPath: 'contacts',
+                  matchPath: 'contacts/:viewMode?/:usernameOrId?',
+                  label: 'Contacts',
+                  Icon: SVG.Contacts,
+                  content: <ContactsSection />,
+                },
+                {
+                  key: 'orders',
+                  linkPath: 'orders',
+                  matchPath: 'orders/:orderId?',
+                  label: 'Orders',
+                  Icon: SVG.Orders,
+                  content: <OrdersSection />,
+                },
+                {
+                  key: 'settings',
+                  label: 'Settings',
+                  Icon: SVG.Settings,
+                  content: <SettingsSection />,
+                },
+              ]}
+            />
           </Box>
-        )}
-        <MultiWorkspace
-          children={[
-            {
-              path: 'profile',
-              label: 'Profile',
-              Icon: SVG.Profile,
-              content: <ProfileSection />,
-            },
-            {
-              path: 'cards',
-              label: 'Cards',
-              Icon: SVG.Cards,
-              content: <CardsSection />,
-            },
-            {
-              linkPath: 'contacts',
-              matchPath: 'contacts/:viewMode?/:usernameOrId?',
-              label: 'Contacts',
-              Icon: SVG.Contacts,
-              content: <ContactsSection />,
-            },
-            {
-              linkPath: 'orders',
-              matchPath: 'orders/:orderId?',
-              label: 'Orders',
-              Icon: SVG.Orders,
-              content: <OrdersSection />,
-            },
-            {
-              path: 'settings',
-              label: 'Settings',
-              Icon: SVG.Settings,
-              content: <SettingsSection />,
-            },
-          ]}
-        />
+        </Box>
       </Box>
     </Box>
   )

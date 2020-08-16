@@ -59,7 +59,7 @@ export default () => {
   )
 
   return (
-    <Box>
+    <Box p={{ _: '24px', md: '48px' }} height="100%" overflowY="scroll">
       {/* Orders list (hide if mobile-layout and an order is selected) */}
       {!(selectedOrder != null && !isDesktopLayout) && (
         <Box>

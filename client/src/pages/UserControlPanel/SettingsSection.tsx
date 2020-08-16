@@ -7,7 +7,7 @@ import LoadingPage from 'src/pages/LoadingPage'
 import * as Text from 'src/components/Text'
 import * as Form from 'src/components/Form'
 import { useForm } from 'react-hook-form'
-import EditButton from './EditButton'
+import EditButton from '../../components/EditButton'
 import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
 import CHANGE_PASSWORD_MUTATION from './changePasswordMutation'
 import Button from 'src/components/Button'
@@ -142,6 +142,9 @@ export default () => {
 
   return (
     <Box
+      p={{ _: '24px', md: '48px' }}
+      overflowY="scroll"
+      height="100%"
       display="grid"
       gridTemplateColumns={{
         _: '8fr 4fr',

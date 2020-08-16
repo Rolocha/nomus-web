@@ -72,6 +72,7 @@ export default () => {
       }}
       gridColumnGap={2}
       gridRowGap={3}
+      p={{ _: '24px', md: '48px' }}
     >
       <Box gridArea="profilePic">
         <Image

@@ -26,3 +26,13 @@ registerEnumType(Role, {
   name: 'Role',
   description: 'User access control roles',
 })
+
+export enum CardSpecBaseType {
+  Custom = 'custom',
+  Template = 'template',
+}
+
+registerEnumType(CardSpecBaseType, {
+  name: 'CardSpecBaseType',
+  description: 'The base type for a card being built',
+})
