@@ -3,21 +3,14 @@ import * as React from 'react'
 import { Redirect, Route, useLocation, useRouteMatch } from 'react-router-dom'
 import Box from 'src/components/Box'
 import { InternalLink } from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
 
-export interface WizardStepProps {
-  onClickPreviousStep?: () => void
-  onClickNextStep?: () => void
-  ref?: React.RefObject<any>
-}
-
 interface TabItem {
   Icon: (...args: any) => JSX.Element
   label: React.ReactNode
-  content: React.ReactElement<WizardStepProps>
+  content: React.ReactElement
   key: string
   linkPath?: string
   matchPath?: string
@@ -25,8 +18,6 @@ interface TabItem {
 
 interface Props {
   children: Array<TabItem>
-  wizard: boolean
-  disableNextStep: (currentStepKey: string) => boolean
 }
 
 const bp = 'md'
@@ -46,21 +37,9 @@ const POINTY_TAB_INDICATOR = css`
   }
 `
 
-type StepComponentsRecord = Record<string, React.RefObject<WizardStepProps>>
-
-const MultiWorkspace = ({ wizard, children: tabs, disableNextStep }: Props) => {
+const MultiWorkspace = ({ children: tabs }: Props) => {
   const routeMatch = useRouteMatch()
   const location = useLocation()
-
-  const stepComponents = React.useRef<StepComponentsRecord>({})
-
-  if (Object.keys(stepComponents.current).length !== tabs.length) {
-    // add refs
-    stepComponents.current = tabs.reduce<StepComponentsRecord>((acc, tab) => {
-      acc[tab.key] = React.createRef()
-      return acc
-    }, {})
-  }
 
   return (
     <Box
@@ -126,7 +105,7 @@ const MultiWorkspace = ({ wizard, children: tabs, disableNextStep }: Props) => {
                     fontSize={{ _: 10, [bp]: 'unset' }}
                     fontWeight={isCurrentSection ? 500 : 'undefined'}
                   >
-                    {wizard ? `Step ${index + 1} / ${label}` : label}
+                    {label}
                   </Text.Plain>
                 </Box>
               </InternalLink>
@@ -163,76 +142,8 @@ const MultiWorkspace = ({ wizard, children: tabs, disableNextStep }: Props) => {
                 })()}
               >
                 <Box overflowY="hidden" height="100%">
-                  {React.cloneElement(content, {
-                    ref: stepComponents.current[key],
-                  })}
+                  {content}
                 </Box>
-                {/* Previous step button */}
-                {wizard && tabs[index - 1] != null && (
-                  <InternalLink
-                    px={{ _: 2, [bp]: 4 }}
-                    py={{ _: 1, [bp]: 3 }}
-                    css={css`
-                      position: absolute;
-                      bottom: 0;
-                      left: 0;
-                      transform: translate(5%, 110%);
-                      ${mq[bp]} {
-                        transform: translate(-10%, 30%);
-                      }
-                    `}
-                    to={
-                      tabs[index - 1].linkPath ||
-                      (tabs[index - 1].key as string)
-                    }
-                    asButton
-                    buttonStyle="primary"
-                    onClick={
-                      stepComponents.current[key].current?.onClickPreviousStep
-                    }
-                  >
-                    <Box display="flex" flexDirection="row" alignItems="center">
-                      <SVG.ArrowRightO
-                        css={css({ transform: 'rotate(180deg)' })}
-                        color="white"
-                      />
-                      <Text.Plain ml={2}>{`Previous step: ${
-                        tabs[index - 1].label
-                      }`}</Text.Plain>
-                    </Box>
-                  </InternalLink>
-                )}
-                {/* Next step button */}
-                {wizard && !disableNextStep(key) && tabs[index + 1] != null && (
-                  <InternalLink
-                    px={{ _: 2, [bp]: 4 }}
-                    css={css`
-                      position: absolute;
-                      bottom: 0;
-                      right: 0;
-                      transform: translate(-5%, 110%);
-                      ${mq[bp]} {
-                        transform: translate(10%, 30%);
-                      }
-                    `}
-                    to={
-                      tabs[index + 1].linkPath ||
-                      (tabs[index + 1].key as string)
-                    }
-                    asButton
-                    buttonStyle="primary"
-                    onClick={
-                      stepComponents.current[key].current?.onClickNextStep
-                    }
-                  >
-                    <Box display="flex" flexDirection="row" alignItems="center">
-                      <Text.Plain mr={2}>{`Next step: ${
-                        tabs[index + 1].label
-                      }`}</Text.Plain>
-                      <SVG.ArrowRightO color="white" />
-                    </Box>
-                  </InternalLink>
-                )}
               </Box>
             )}
           </Route>
@@ -248,9 +159,6 @@ const MultiWorkspace = ({ wizard, children: tabs, disableNextStep }: Props) => {
   )
 }
 
-MultiWorkspace.defaultProps = {
-  wizard: false,
-  disableNextStep: () => false,
-}
+MultiWorkspace.defaultProps = {}
 
 export default MultiWorkspace

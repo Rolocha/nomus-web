@@ -1,16 +1,16 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
+import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import { ExternalLink } from 'src/components/Link'
 import SegmentedController, {
   TabActionType,
 } from 'src/components/SegmentedController'
-import { colors } from 'src/styles'
 import * as Text from 'src/components/Text'
-import { Redirect, useLocation, useParams } from 'react-router-dom'
-import { CardBuilderState, CardBuilderAction } from './reducer'
+import { colors } from 'src/styles'
 import { specs } from './copy'
+import { CardBuilderAction, CardBuilderState } from './reducer'
 
 interface Props {
   selectedBaseType: string | undefined

@@ -1,27 +1,27 @@
+import { useMutation } from '@apollo/react-hooks'
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 import {
   CreateCustomOrderMutation,
   CreateCustomOrderMutationVariables,
 } from 'src/apollo/types/CreateCustomOrderMutation'
-import * as React from 'react'
-import { useParams } from 'react-router-dom'
 import Box from 'src/components/Box'
-import Wizard from 'src/components/Wizard'
 import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import Wizard from 'src/components/Wizard'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
 import CheckoutStep from './CheckoutStep'
-import ReviewStep from './ReviewStep'
-import { cardBuilderReducer, initialState, CheckoutFormData } from './reducer'
-import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
-import { useForm } from 'react-hook-form'
-
 import CREATE_CUSTOM_ORDER_MUTATION from './createCustomOrderMutation'
-import { useMutation } from '@apollo/react-hooks'
+import { cardBuilderReducer, CheckoutFormData, initialState } from './reducer'
+import ReviewStep from './ReviewStep'
+
 interface ParamsType {
   buildBaseType?: string
 }
@@ -47,6 +47,9 @@ const CardBuilder = ({}: Props) => {
   const stripe = useStripe()
   const elements = useElements()
   const [createCustomOrder] = useMutation(CREATE_CUSTOM_ORDER_MUTATION)
+
+  const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
+  const backImageDataUrl = cardBuilderState.backDesignFile?.url
 
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
@@ -90,7 +93,6 @@ const CardBuilder = ({}: Props) => {
       cardElement == null
     ) {
       console.log('missing data')
-      debugger
       return
     }
 

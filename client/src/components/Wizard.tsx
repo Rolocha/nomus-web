@@ -1,6 +1,12 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
-import { Redirect, Route, useLocation, useRouteMatch } from 'react-router-dom'
+import {
+  Redirect,
+  Route,
+  Switch,
+  useLocation,
+  useRouteMatch,
+} from 'react-router-dom'
 import Box from 'src/components/Box'
 import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
@@ -64,27 +70,35 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
     }, {})
   }
 
-  const isStepDisabled = (index: number) => {
-    // Recursively verify that we're allowed to be at this step by checking the last step
-    if (index > 0 && isStepDisabled(index - 1)) {
-      return true
-    }
+  const isStepDisabled = React.useCallback(
+    (index: number) => {
+      // Recursively verify that we're allowed to be at this step by checking the last step
+      if (index > 0 && isStepDisabled(index - 1)) {
+        return true
+      }
 
-    const step = steps[index]
-    if (step == null) {
-      return true
-    }
+      const step = steps[index]
+      if (step == null) {
+        return true
+      }
 
-    if (step.accessCondition == null) {
-      return false
-    }
-    if (typeof step.accessCondition === 'boolean') {
-      return !step.accessCondition
-    }
-    if (typeof step.accessCondition === 'function') {
-      return !step.accessCondition()
-    }
-  }
+      if (step.accessCondition == null) {
+        return false
+      }
+      if (typeof step.accessCondition === 'boolean') {
+        return !step.accessCondition
+      }
+      if (typeof step.accessCondition === 'function') {
+        return !step.accessCondition()
+      }
+    },
+    [steps],
+  )
+
+  const latestAccessibleStep = steps
+    .slice()
+    .reverse()
+    .find((_, index) => !isStepDisabled(steps.length - 1 - index))
 
   return (
     <Box
@@ -183,112 +197,129 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         position="relative"
         height="100%"
       >
-        {steps.map(({ matchPath, key, content }, index) => (
-          <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
-            {({ match }) => (
-              <Box
-                overflowY="hidden"
-                height="100%"
-                // Rather than mounting/unmounting the different pages, we simply adjust the
-                // display block so that their inner state doesn't get lost. Not the most performant
-                // but it'll do fine for now
-                display={(() => {
-                  // debugger
-                  return match?.path.endsWith(matchPath ?? key)
-                    ? 'block'
-                    : 'none'
-                })()}
-              >
-                <Box overflowY="hidden" height="100%">
-                  {React.cloneElement(content, {
-                    ref: stepComponents.current[key],
-                  })}
-                </Box>
-                {/* Previous step button */}
-                {!isStepDisabled(index - 1) && (
-                  <InternalLink
-                    px={{ _: 2, [bp]: 4 }}
-                    py={{ _: 1, [bp]: 3 }}
-                    css={css`
-                      position: absolute;
-                      bottom: 0;
-                      left: 0;
-                      transform: translate(5%, 110%);
-                      ${mq[bp]} {
-                        transform: translate(-10%, 30%);
-                      }
-                    `}
-                    to={
-                      steps[index - 1].linkPath ||
-                      (steps[index - 1].key as string)
-                    }
-                    asButton
-                    buttonSize="big"
-                    buttonStyle="primary"
-                    onClick={
-                      stepComponents.current[key].current?.onClickPreviousStep
-                    }
+        <Switch>
+          {steps.map(({ matchPath, key, content }, index) => (
+            <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
+              {({ match }) =>
+                // If the step trying to be accessed is disabled (not enough user-provided state to render it yet)
+                // redirect to the root route, which will redirect to step 1
+                isStepDisabled(index) ? (
+                  <Redirect to={routeMatch.path} />
+                ) : (
+                  <Box
+                    overflowY="hidden"
+                    height="100%"
+                    // Rather than mounting/unmounting the different pages, we simply adjust the
+                    // display block so that their inner state doesn't get lost. Not the most performant
+                    // but it'll do fine for now
+                    display={(() => {
+                      // debugger
+                      return match?.path.endsWith(matchPath ?? key)
+                        ? 'block'
+                        : 'none'
+                    })()}
                   >
-                    <Box display="flex" flexDirection="row" alignItems="center">
-                      <SVG.ArrowRightO
-                        css={css({ transform: 'rotate(180deg)' })}
-                        color="white"
-                      />
-                      <Text.Plain ml={2}>{`Previous step: ${
-                        steps[index - 1].label
-                      }`}</Text.Plain>
+                    <Box overflowY="hidden" height="100%">
+                      {React.cloneElement(content, {
+                        ref: stepComponents.current[key],
+                      })}
                     </Box>
-                  </InternalLink>
-                )}
-                {/* Next step (or submit) button */}
-                {(!isStepDisabled(index + 1) ||
-                  (index === steps.length - 1 && exitPath != null)) && (
-                  <InternalLink
-                    px={{ _: 2, [bp]: 4 }}
-                    css={css`
-                      position: absolute;
-                      bottom: 0;
-                      right: 0;
-                      transform: translate(-5%, 110%);
-                      ${mq[bp]} {
-                        transform: translate(10%, 30%);
-                      }
-                    `}
-                    to={
-                      index === steps.length - 1
-                        ? exitPath ?? '/'
-                        : steps[index + 1].linkPath ||
-                          (steps[index + 1].key as string)
-                    }
-                    asButton
-                    buttonSize="big"
-                    buttonStyle={
-                      index === steps.length - 1 ? 'success' : 'primary'
-                    }
-                    onClick={
-                      stepComponents.current[key].current?.onClickNextStep
-                    }
-                  >
-                    <Box display="flex" flexDirection="row" alignItems="center">
-                      <Text.Plain mr={2}>
-                        {index === steps.length - 1
-                          ? exitText
-                          : `Next step: ${steps[index + 1].label}`}
-                      </Text.Plain>
-                      <SVG.ArrowRightO color="white" />
-                    </Box>
-                  </InternalLink>
-                )}
-              </Box>
-            )}
+                    {/* Previous step button */}
+                    {!isStepDisabled(index - 1) && (
+                      <InternalLink
+                        px={{ _: 2, [bp]: 4 }}
+                        py={{ _: 1, [bp]: 3 }}
+                        css={css`
+                          position: absolute;
+                          bottom: 0;
+                          left: 0;
+                          transform: translate(5%, 110%);
+                          ${mq[bp]} {
+                            transform: translate(-10%, 30%);
+                          }
+                        `}
+                        to={
+                          steps[index - 1].linkPath ||
+                          (steps[index - 1].key as string)
+                        }
+                        asButton
+                        buttonSize="big"
+                        buttonStyle="primary"
+                        onClick={
+                          stepComponents.current[key].current
+                            ?.onClickPreviousStep
+                        }
+                      >
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          alignItems="center"
+                        >
+                          <SVG.ArrowRightO
+                            css={css({ transform: 'rotate(180deg)' })}
+                            color="white"
+                          />
+                          <Text.Plain ml={2}>{`Previous step: ${
+                            steps[index - 1].label
+                          }`}</Text.Plain>
+                        </Box>
+                      </InternalLink>
+                    )}
+                    {/* Next step (or submit) button */}
+                    {(!isStepDisabled(index + 1) ||
+                      (index === steps.length - 1 && exitPath != null)) && (
+                      <InternalLink
+                        px={{ _: 2, [bp]: 4 }}
+                        css={css`
+                          position: absolute;
+                          bottom: 0;
+                          right: 0;
+                          transform: translate(-5%, 110%);
+                          ${mq[bp]} {
+                            transform: translate(10%, 30%);
+                          }
+                        `}
+                        to={
+                          index === steps.length - 1
+                            ? exitPath ?? '/'
+                            : steps[index + 1].linkPath ||
+                              (steps[index + 1].key as string)
+                        }
+                        asButton
+                        buttonSize="big"
+                        buttonStyle={
+                          index === steps.length - 1 ? 'success' : 'primary'
+                        }
+                        onClick={
+                          stepComponents.current[key].current?.onClickNextStep
+                        }
+                      >
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          alignItems="center"
+                        >
+                          <Text.Plain mr={2}>
+                            {index === steps.length - 1
+                              ? exitText
+                              : `Next step: ${steps[index + 1].label}`}
+                          </Text.Plain>
+                          <SVG.ArrowRightO color="white" />
+                        </Box>
+                      </InternalLink>
+                    )}
+                  </Box>
+                )
+              }
+            </Route>
+          ))}
+          {/* If user lands on a route that doesn't match any, redirect to the first one */}
+          <Route>
+            <Redirect
+              to={`${routeMatch.path}/${steps[0].linkPath ?? steps[0].key}`}
+            />
           </Route>
-        ))}
-        {/* If user lands on a route that doesn't match any, redirect to the first one */}
-        <Route exact path={`${routeMatch.path}`}>
-          <Redirect
-            to={`${routeMatch.path}/${steps[0].linkPath ?? steps[0].key}`}
-          />
-        </Route>
+        </Switch>
       </Box>
     </Box>
   )

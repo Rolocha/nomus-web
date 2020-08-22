@@ -1,23 +1,14 @@
 import { css } from '@emotion/core'
-import { useStripe, useElements } from '@stripe/react-stripe-js'
-import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
-import {
-  CreateCustomOrderMutation,
-  CreateCustomOrderMutationVariables,
-} from 'src/apollo/types/CreateCustomOrderMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import Button from 'src/components/Button'
-import { WizardStepProps } from 'src/components/MultiWorkspace'
 import * as Text from 'src/components/Text'
+import { WizardStepProps } from 'src/components/Wizard'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
 import EditButton from '../../components/EditButton'
-import CREATE_CUSTOM_ORDER_MUTATION from './createCustomOrderMutation'
 import { getCostSummary } from './pricing'
-import { BaseType, CardBuilderAction, CardBuilderState } from './reducer'
-import { useMutation } from '@apollo/react-hooks'
+import { BaseType, CardBuilderState } from './reducer'
 
 interface Props {
   cardBuilderState: CardBuilderState
@@ -26,12 +17,7 @@ interface Props {
 
 const ReviewStep = React.forwardRef(
   ({ cardBuilderState, handleOrderSubmit }: Props, ref) => {
-    const stripe = useStripe()
-    const elements = useElements()
-
-    const [createCustomOrder] = useMutation(CREATE_CUSTOM_ORDER_MUTATION)
-
-    // Expose to the parent MultiWorkspace what to do on next/previous button clicks
+    // Expose to the parent Wizard what to do on next/previous button clicks
     React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
       onClickNextStep: () => {
         handleOrderSubmit()
@@ -226,12 +212,6 @@ const ReviewStep = React.forwardRef(
                 : '...'}
             </Text.Body2>
           </Box>
-        </Box>
-
-        <Box mt={3} gridColumn="3/4" gridRow="2/2">
-          <Button width="100%" variant="primary" type="submit">
-            Submit order
-          </Button>
         </Box>
       </Box>
     )

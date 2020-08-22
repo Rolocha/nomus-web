@@ -1,14 +1,7 @@
-import { useMutation } from '@apollo/react-hooks'
 import { css } from '@emotion/core'
 import * as stripeJs from '@stripe/stripe-js'
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { FormContextValues } from 'react-hook-form'
-import {
-  CreateCustomOrderMutation,
-  CreateCustomOrderMutationVariables,
-} from 'src/apollo/types/CreateCustomOrderMutation'
 import Box from 'src/components/Box'
 import Card from 'src/components/Card'
 import CreditCardInput from 'src/components/CreditCardInput'
@@ -16,14 +9,9 @@ import * as Form from 'src/components/Form'
 import { ExternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { WizardStepProps } from 'src/components/Wizard'
 import { formatDollarAmount } from 'src/utils/money'
-import SUBMIT_ORDER_MUTATION from './createCustomOrderMutation'
-import {
-  calculateEstimatedTaxes,
-  QUANTITY_TO_PRICE,
-  getCostSummary,
-} from './pricing'
-import { WizardStepProps } from 'src/components/MultiWorkspace'
+import { getCostSummary, QUANTITY_TO_PRICE } from './pricing'
 import { CardBuilderAction, CardBuilderState } from './reducer'
 
 interface Props {
@@ -43,7 +31,7 @@ const CheckoutStep = React.forwardRef(
     }: Props,
     ref,
   ) => {
-    // Expose to the parent MultiWorkspace what to do on next/previous button clicks
+    // Expose to the parent Wizard what to do on next/previous button clicks
     React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
       onClickNextStep: () => {
         updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
@@ -51,28 +39,19 @@ const CheckoutStep = React.forwardRef(
       },
     }))
 
-    const [error, setError] = React.useState<string | null>(null)
-    const [processing, setProcessing] = React.useState<boolean>(false)
-
-    const stripe = useStripe()
-    const elements = useElements()
-    const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
-    const backImageDataUrl = cardBuilderState.backDesignFile?.url
-
-    const [createCustomOrder] = useMutation<CreateCustomOrderMutation>(
-      SUBMIT_ORDER_MUTATION,
-    )
+    // Prepopulate the form on load if we already have data from a previous visit of this step
+    React.useEffect(() => {
+      if (cardBuilderState.formData) {
+        checkoutFormMethods.reset(cardBuilderState.formData)
+      }
+    }, [])
 
     // Handle real-time validation errors from the card Element.
     const handleCardInputChange = (
       event: stripeJs.StripeCardElementChangeEvent,
     ) => {
       updateCardBuilderState({ cardEntryComplete: event.complete })
-      if (event.error) {
-        setError(event.error.message)
-      } else {
-        setError(null)
-      }
+      // TODO: Handle errors from event.error
     }
 
     const costSummary = getCostSummary(cardBuilderState.quantity)
