@@ -19,8 +19,8 @@ const ReviewStep = React.forwardRef(
   ({ cardBuilderState, handleOrderSubmit }: Props, ref) => {
     // Expose to the parent Wizard what to do on next/previous button clicks
     React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
-      onClickNextStep: () => {
-        handleOrderSubmit()
+      onTransitionToNextStep: async () => {
+        await handleOrderSubmit()
       },
     }))
 

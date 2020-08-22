@@ -4,19 +4,22 @@ import {
   Redirect,
   Route,
   Switch,
+  useHistory,
   useLocation,
   useRouteMatch,
 } from 'react-router-dom'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
 import { InternalLink } from 'src/components/Link'
+import Spinner from 'src/components/Spinner'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
 
 export interface WizardStepProps {
-  onClickPreviousStep?: () => void
-  onClickNextStep?: () => void
+  onTransitionToPreviousStep?: () => Promise<void>
+  onTransitionToNextStep?: () => Promise<void>
   readyForNextStep?: () => boolean
   ref?: React.RefObject<any>
 }
@@ -59,6 +62,16 @@ type StepComponentsRecord = Record<string, React.RefObject<WizardStepProps>>
 const Wizard = ({ steps, exitPath, exitText }: Props) => {
   const routeMatch = useRouteMatch()
   const location = useLocation()
+  const history = useHistory()
+
+  const [
+    processingNextTransition,
+    setProcessingNextTransition,
+  ] = React.useState(false)
+  const [
+    processingPreviousTransition,
+    setProcessingPreviousTransition,
+  ] = React.useState(false)
 
   const stepComponents = React.useRef<StepComponentsRecord>({})
 
@@ -94,11 +107,6 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
     },
     [steps],
   )
-
-  const latestAccessibleStep = steps
-    .slice()
-    .reverse()
-    .find((_, index) => !isStepDisabled(steps.length - 1 - index))
 
   return (
     <Box
@@ -200,25 +208,13 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         <Switch>
           {steps.map(({ matchPath, key, content }, index) => (
             <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
-              {({ match }) =>
+              {
                 // If the step trying to be accessed is disabled (not enough user-provided state to render it yet)
                 // redirect to the root route, which will redirect to step 1
                 isStepDisabled(index) ? (
                   <Redirect to={routeMatch.path} />
                 ) : (
-                  <Box
-                    overflowY="hidden"
-                    height="100%"
-                    // Rather than mounting/unmounting the different pages, we simply adjust the
-                    // display block so that their inner state doesn't get lost. Not the most performant
-                    // but it'll do fine for now
-                    display={(() => {
-                      // debugger
-                      return match?.path.endsWith(matchPath ?? key)
-                        ? 'block'
-                        : 'none'
-                    })()}
-                  >
+                  <Box overflowY="hidden" height="100%">
                     <Box overflowY="hidden" height="100%">
                       {React.cloneElement(content, {
                         ref: stepComponents.current[key],
@@ -226,7 +222,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                     </Box>
                     {/* Previous step button */}
                     {!isStepDisabled(index - 1) && (
-                      <InternalLink
+                      <Button
                         px={{ _: 2, [bp]: 4 }}
                         py={{ _: 1, [bp]: 3 }}
                         css={css`
@@ -238,37 +234,52 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                             transform: translate(-10%, 30%);
                           }
                         `}
-                        to={
-                          steps[index - 1].linkPath ||
-                          (steps[index - 1].key as string)
-                        }
-                        asButton
-                        buttonSize="big"
-                        buttonStyle="primary"
-                        onClick={
-                          stepComponents.current[key].current
-                            ?.onClickPreviousStep
-                        }
+                        size="big"
+                        variant="primary"
+                        disabled={processingPreviousTransition}
+                        onClick={async () => {
+                          try {
+                            setProcessingPreviousTransition(true)
+                            const previousStepAction =
+                              stepComponents.current[key].current
+                                ?.onTransitionToPreviousStep
+                            if (previousStepAction != null) {
+                              await previousStepAction()
+                            }
+                            const previousStepPath =
+                              steps[index - 1].linkPath ||
+                              (steps[index - 1].key as string)
+                            if (previousStepPath != null) {
+                              history.push(previousStepPath)
+                            }
+                          } finally {
+                            setProcessingPreviousTransition(false)
+                          }
+                        }}
                       >
                         <Box
                           display="flex"
                           flexDirection="row"
                           alignItems="center"
                         >
-                          <SVG.ArrowRightO
-                            css={css({ transform: 'rotate(180deg)' })}
-                            color="white"
-                          />
+                          {processingPreviousTransition ? (
+                            <Spinner width="1em" height="1em" />
+                          ) : (
+                            <SVG.ArrowRightO
+                              css={css({ transform: 'rotate(180deg)' })}
+                              color="white"
+                            />
+                          )}
                           <Text.Plain ml={2}>{`Previous step: ${
                             steps[index - 1].label
                           }`}</Text.Plain>
                         </Box>
-                      </InternalLink>
+                      </Button>
                     )}
                     {/* Next step (or submit) button */}
-                    {(!isStepDisabled(index + 1) ||
-                      (index === steps.length - 1 && exitPath != null)) && (
-                      <InternalLink
+                    {(!isStepDisabled(index + 1) || // Next step exists
+                      (index === steps.length - 1 && exitPath != null)) && ( // or this is the last step and an exit path is provided
+                      <Button
                         px={{ _: 2, [bp]: 4 }}
                         css={css`
                           position: absolute;
@@ -279,20 +290,32 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                             transform: translate(10%, 30%);
                           }
                         `}
-                        to={
-                          index === steps.length - 1
-                            ? exitPath ?? '/'
-                            : steps[index + 1].linkPath ||
-                              (steps[index + 1].key as string)
-                        }
-                        asButton
-                        buttonSize="big"
-                        buttonStyle={
+                        size="big"
+                        variant={
                           index === steps.length - 1 ? 'success' : 'primary'
                         }
-                        onClick={
-                          stepComponents.current[key].current?.onClickNextStep
-                        }
+                        disabled={processingNextTransition}
+                        onClick={async () => {
+                          try {
+                            setProcessingNextTransition(true)
+                            const nextStepAction =
+                              stepComponents.current[key].current
+                                ?.onTransitionToNextStep
+                            if (nextStepAction != null) {
+                              await nextStepAction()
+                            }
+                            const nextStepPath =
+                              index === steps.length - 1
+                                ? exitPath ?? '/'
+                                : steps[index + 1].linkPath ||
+                                  (steps[index + 1].key as string)
+                            if (nextStepPath != null) {
+                              history.push(nextStepPath)
+                            }
+                          } finally {
+                            setProcessingNextTransition(false)
+                          }
+                        }}
                       >
                         <Box
                           display="flex"
@@ -304,9 +327,13 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                               ? exitText
                               : `Next step: ${steps[index + 1].label}`}
                           </Text.Plain>
-                          <SVG.ArrowRightO color="white" />
+                          {processingNextTransition ? (
+                            <Spinner width="1em" height="1em" />
+                          ) : (
+                            <SVG.ArrowRightO color="white" />
+                          )}
                         </Box>
-                      </InternalLink>
+                      </Button>
                     )}
                   </Box>
                 )

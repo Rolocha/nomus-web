@@ -17,7 +17,7 @@ import { CardBuilderAction, CardBuilderState } from './reducer'
 interface Props {
   cardBuilderState: CardBuilderState
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
-  handleCardSubmit: () => void
+  handleCardSubmit: () => Promise<void>
   checkoutFormMethods: FormContextValues<any>
 }
 
@@ -33,9 +33,9 @@ const CheckoutStep = React.forwardRef(
   ) => {
     // Expose to the parent Wizard what to do on next/previous button clicks
     React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
-      onClickNextStep: () => {
+      onTransitionToNextStep: async () => {
         updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
-        handleCardSubmit()
+        await handleCardSubmit()
       },
     }))
 
@@ -199,11 +199,15 @@ const CheckoutStep = React.forwardRef(
                   <Form.Label htmlFor="card-element">
                     Credit or debit card
                   </Form.Label>
-                  <CreditCardInput
-                    id="card-element"
-                    handleChange={handleCardInputChange}
-                    postalCode={checkoutFormMethods.getValues().postalCode}
-                  />
+                  {cardBuilderState.stripeToken ? (
+                    <Text.Body2>{`**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`}</Text.Body2>
+                  ) : (
+                    <CreditCardInput
+                      id="card-element"
+                      handleChange={handleCardInputChange}
+                      postalCode={checkoutFormMethods.getValues().postalCode}
+                    />
+                  )}
                 </Box>
               </Box>
             </Box>

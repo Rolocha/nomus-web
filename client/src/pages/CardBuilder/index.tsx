@@ -53,7 +53,7 @@ const CardBuilder = ({}: Props) => {
 
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
-      // throw new Error('Stripe and/or Stripe Elements not initialized')
+      throw new Error('Stripe and/or Stripe Elements not initialized')
       return
     }
 
@@ -80,7 +80,6 @@ const CardBuilder = ({}: Props) => {
     }
 
     const { formData, stripeToken } = cardBuilderState
-    const cardElement = elements?.getElement('card')
 
     if (
       formData == null ||
@@ -89,8 +88,7 @@ const CardBuilder = ({}: Props) => {
       formData.city == null ||
       formData.state == null ||
       formData.postalCode == null ||
-      stripeToken == null ||
-      cardElement == null
+      stripeToken == null
     ) {
       console.log('missing data')
       return
@@ -137,7 +135,9 @@ const CardBuilder = ({}: Props) => {
       orderCreateResult?.data?.createCustomOrder.clientSecret,
       {
         payment_method: {
-          card: cardElement,
+          card: {
+            token: stripeToken.id,
+          },
           billing_details: {
             name: formData.name,
           },
@@ -152,7 +152,7 @@ const CardBuilder = ({}: Props) => {
     } else {
       updateCardBuilderState({ paymentIntent: payload.paymentIntent })
     }
-  }, [])
+  }, [stripe, elements, cardBuilderState, updateCardBuilderState])
 
   return (
     <Box
