@@ -11,6 +11,7 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { specs } from './copy'
 import { CardBuilderAction, CardBuilderState } from './reducer'
+import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 
 interface Props {
   selectedBaseType: string | undefined
@@ -18,41 +19,10 @@ interface Props {
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
 
-interface ParamsType {
-  buildBaseType?: string
-}
-
-const BaseStep = ({ cardBuilderState, updateCardBuilderState }: Props) => {
-  const location = useLocation()
-  const buildBaseType = cardBuilderState.baseType
+const BaseStep = ({ selectedBaseType, updateCardBuilderState }: Props) => {
   return (
     <Box overflowY="scroll" height="100%" p={{ _: '24px', md: '48px' }}>
-      <Text.SectionHeader mb={3}>Would you like to use...</Text.SectionHeader>
-      <SegmentedController
-        tabs={[
-          {
-            id: 'template',
-            title: 'A template?',
-            actionType: TabActionType.OnClick,
-            onClick: () => {
-              updateCardBuilderState({ baseType: 'template' })
-            },
-          },
-          {
-            id: 'custom',
-            title: 'Your own design?',
-            actionType: TabActionType.OnClick,
-            onClick: () => updateCardBuilderState({ baseType: 'custom' }),
-          },
-        ]}
-        unselectedBg={colors.secondaryBlue}
-        unselectedColor={colors.white}
-        selectedBg={colors.nomusBlue}
-        selectedColor={colors.white}
-        borderColor={colors.nomusBlue}
-        selectedTabId={buildBaseType}
-      />
-      {buildBaseType === 'custom' || buildBaseType === 'template'
+      {selectedBaseType === 'custom' || selectedBaseType === 'template'
         ? {
             custom: (
               <Box
@@ -87,30 +57,7 @@ const BaseStep = ({ cardBuilderState, updateCardBuilderState }: Props) => {
                   </Box>
                 </Box>
 
-                <Box
-                  display="grid"
-                  gridTemplateColumns="1fr 1fr 1fr"
-                  gridColumnGap={3}
-                  css={css`
-                    text-align: center;
-                    ${Box} {
-                      // Align text in center of boxes
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                    }
-                  `}
-                >
-                  <Box bg="#FBDD9D">
-                    <Text.Body2>bleed</Text.Body2>
-                  </Box>
-                  <Box border="4px solid #444">
-                    <Text.Body2>business card</Text.Body2>
-                  </Box>
-                  <Box border={`2px dashed ${colors.brightCoral}`}>
-                    <Text.Body2>text-safe space</Text.Body2>
-                  </Box>
-                </Box>
+                <CardBuilderPreviewLegend />
 
                 <Text.Body2>
                   Have any questions?{' '}
@@ -143,7 +90,7 @@ const BaseStep = ({ cardBuilderState, updateCardBuilderState }: Props) => {
                 </Box>
               </Box>
             ),
-          }[buildBaseType]
+          }[selectedBaseType]
         : null}
     </Box>
   )

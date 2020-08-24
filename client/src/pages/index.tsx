@@ -11,10 +11,11 @@ import CardBuilder from 'src/pages/CardBuilder'
 import LoginPage from 'src/pages/LoginPage'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import AdminPanel from 'src/pages/AdminPanel'
+import FourOhFourPage from 'src/pages/FourOhFour'
 
 interface PageType {
   name: string
-  path: string
+  path?: string
   exact?: boolean // default is false
   component: (...args: any) => JSX.Element | null
   requiredAuthLevel?: AuthLevel
@@ -40,8 +41,8 @@ export const pages: Array<PageType> = [
     requiredAuthLevel: Role.User,
   },
   {
-    name: 'card builder',
-    path: '/card-builder',
+    name: 'card studio',
+    path: '/card-studio/:buildBaseType?',
     component: CardBuilder,
     requiredAuthLevel: Role.User,
   },
@@ -56,6 +57,12 @@ export const pages: Array<PageType> = [
     exact: false,
     component: AdminPanel,
     requiredAuthLevel: Role.Admin,
+  },
+
+  // 404 page
+  {
+    name: '404 page',
+    component: FourOhFourPage,
   },
 ]
 

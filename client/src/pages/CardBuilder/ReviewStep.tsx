@@ -12,17 +12,21 @@ import { BaseType, CardBuilderState } from './reducer'
 
 interface Props {
   cardBuilderState: CardBuilderState
-  handleOrderSubmit: () => void
+  handleOrderSubmit: () => Promise<void>
 }
 
 const ReviewStep = React.forwardRef(
   ({ cardBuilderState, handleOrderSubmit }: Props, ref) => {
     // Expose to the parent Wizard what to do on next/previous button clicks
-    React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
-      onTransitionToNextStep: async () => {
-        await handleOrderSubmit()
-      },
-    }))
+    React.useImperativeHandle<any, WizardStepProps>(
+      ref,
+      () => ({
+        onTransitionToNextStep: async () => {
+          await handleOrderSubmit()
+        },
+      }),
+      [handleOrderSubmit],
+    )
 
     const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
     const backImageDataUrl = cardBuilderState.backDesignFile?.url

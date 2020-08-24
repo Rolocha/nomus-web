@@ -3,12 +3,14 @@ import Box from './Box'
 import Button from './Button'
 import * as Text from 'src/components/Text'
 interface Props {
+  className?: string
   topBarColor: string
   icon: React.ReactNode
   header: string
   subheader?: string
   bodyText: string
   buttonText?: string
+  boxShadow?: string
   onClick?: () => void
   onButtonClick?: () => void
   align: 'left' | 'center' | 'mix'
@@ -27,6 +29,7 @@ const getGridTemplateAreas = (props: Props) => {
 
 // https://www.notion.so/Card-Spec-55e903502e484758890bee88689a2daf
 const Card = ({
+  className,
   align,
   size,
   icon,
@@ -35,13 +38,15 @@ const Card = ({
   subheader,
   bodyText,
   buttonText,
+  boxShadow,
   onClick,
   onButtonClick,
 }: Props) => {
   return (
     <Box
+      className={className}
       borderRadius={2}
-      boxShadow="workingWindow"
+      boxShadow={boxShadow ?? 'workingWindow'}
       onClick={onClick}
       cursor={onClick != null ? 'pointer' : undefined}
     >

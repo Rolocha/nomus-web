@@ -32,12 +32,23 @@ const CheckoutStep = React.forwardRef(
     ref,
   ) => {
     // Expose to the parent Wizard what to do on next/previous button clicks
-    React.useImperativeHandle<any, WizardStepProps>(ref, () => ({
-      onTransitionToNextStep: async () => {
-        updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
-        await handleCardSubmit()
-      },
-    }))
+    React.useImperativeHandle<any, WizardStepProps>(
+      ref,
+      () => ({
+        onTransitionToNextStep: async () => {
+          updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
+          if (!cardBuilderState.stripeToken) {
+            await handleCardSubmit()
+          }
+        },
+      }),
+      [
+        updateCardBuilderState,
+        cardBuilderState,
+        handleCardSubmit,
+        checkoutFormMethods,
+      ],
+    )
 
     // Prepopulate the form on load if we already have data from a previous visit of this step
     React.useEffect(() => {
@@ -76,33 +87,32 @@ const CheckoutStep = React.forwardRef(
       },
     ] as const).map(({ quantity, description, icon }) => {
       const price = QUANTITY_TO_PRICE[quantity]
+      const selected = cardBuilderState.quantity === quantity
       return (
-        <Box
-          borderRadius={2}
-          boxShadow={
-            cardBuilderState.quantity === quantity ? 'workingWindow' : 'knob'
+        <Card
+          css={css`
+            transition: 0.3s ease transform;
+            transform: scale(${selected ? 1.05 : 1});
+          `}
+          key={quantity}
+          topBarColor={
+            cardBuilderState.quantity === quantity ? 'gold' : 'disabledBlue'
           }
-        >
-          <Card
-            key={quantity}
-            topBarColor={
-              cardBuilderState.quantity === quantity ? 'gold' : 'disabledBlue'
-            }
-            align="mix"
-            size="small"
-            icon={icon}
-            header={`${quantity} cards / ${formatDollarAmount(price)}`}
-            subheader={`${formatDollarAmount(
-              Math.round(price / quantity),
-            )} per card`}
-            bodyText={description}
-            onClick={() =>
-              updateCardBuilderState({
-                quantity,
-              })
-            }
-          />
-        </Box>
+          align="mix"
+          size="small"
+          icon={icon}
+          header={`${quantity} cards / ${formatDollarAmount(price)}`}
+          subheader={`${formatDollarAmount(
+            Math.round(price / quantity),
+          )} per card`}
+          bodyText={description}
+          boxShadow={selected ? 'prominent' : 'workingWindow'}
+          onClick={() =>
+            updateCardBuilderState({
+              quantity,
+            })
+          }
+        />
       )
     })
 

@@ -3,7 +3,7 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { Redirect, useParams, useRouteMatch } from 'react-router-dom'
 import {
   CreateCustomOrderMutation,
   CreateCustomOrderMutationVariables,
@@ -19,7 +19,12 @@ import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
 import CheckoutStep from './CheckoutStep'
 import CREATE_CUSTOM_ORDER_MUTATION from './createCustomOrderMutation'
-import { cardBuilderReducer, CheckoutFormData, initialState } from './reducer'
+import {
+  cardBuilderReducer,
+  CheckoutFormData,
+  initialState,
+  BaseType,
+} from './reducer'
 import ReviewStep from './ReviewStep'
 
 interface ParamsType {
@@ -31,7 +36,8 @@ const bp = 'md'
 interface Props {}
 
 const CardBuilder = ({}: Props) => {
-  const params = useParams<ParamsType>()
+  const { buildBaseType } = useParams<ParamsType>()
+  const routeMatch = useRouteMatch()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
@@ -73,9 +79,15 @@ const CardBuilder = ({}: Props) => {
     }
   }, [stripe, elements])
 
+  const handleOrderUpdate = React.useCallback(async () => {
+    console.log('updating order')
+  }, [])
+
   const handleOrderSubmit = React.useCallback(async () => {
+    debugger
+
     if (stripe == null) {
-      console.log('stripe was null')
+      // TODO: Handle errors gracefully
       return
     }
 
@@ -148,12 +160,113 @@ const CardBuilder = ({}: Props) => {
     if (payload.error) {
       throw payload.error
     } else if (payload.paymentIntent == null) {
-      throw new Error('paymentIntent response in undefined')
+      throw new Error('paymentIntent in response undefined')
     } else {
       updateCardBuilderState({ paymentIntent: payload.paymentIntent })
     }
-  }, [stripe, elements, cardBuilderState, updateCardBuilderState])
+  }, [
+    stripe,
+    elements,
+    cardBuilderState,
+    updateCardBuilderState,
+    createCustomOrder,
+  ])
 
+  const isValidBaseType = (type?: string): type is BaseType =>
+    type != null && ['custom', 'template'].includes(type)
+
+  if (!isValidBaseType(buildBaseType)) {
+    // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
+    return <Redirect to="/shop" />
+  }
+
+  // When the checkout form is mounted, the most up-to-date data comes from watchedFields
+  // When it isn't (e.g. when user is on the final "Review" step), watchedFields is empty
+  // so we need to get the cached data from cardBuilderState instead
+  const formData =
+    Object.keys(watchedFields).length === 0 && cardBuilderState.formData
+      ? cardBuilderState.formData
+      : watchedFields
+
+  const wizardSteps = [
+    {
+      key: 'build',
+      label: 'Build',
+      Icon: SVG.FormatText,
+      content: (
+        <BuildStep
+          selectedBaseType={buildBaseType}
+          cardBuilderState={cardBuilderState}
+          updateCardBuilderState={updateCardBuilderState}
+          handleOrderUpdate={handleOrderUpdate}
+        />
+      ),
+      accessCondition: [
+        {
+          custom: true,
+          template: cardBuilderState.templateId != null,
+        }[buildBaseType],
+      ].every(Boolean),
+    },
+    {
+      key: 'checkout',
+      label: 'Checkout',
+      Icon: SVG.Cart,
+      content: (
+        <CheckoutStep
+          cardBuilderState={cardBuilderState}
+          updateCardBuilderState={updateCardBuilderState}
+          handleCardSubmit={handleCardSubmit}
+          checkoutFormMethods={checkoutFormMethods}
+        />
+      ),
+      accessCondition: [
+        ...{
+          custom: [cardBuilderState.frontDesignFile != null],
+          template: [],
+        }[cardBuilderState.baseType],
+      ].every(Boolean),
+    },
+    {
+      key: 'review',
+      label: 'Review',
+      Icon: SVG.CheckO,
+      content: (
+        <ReviewStep
+          cardBuilderState={cardBuilderState}
+          handleOrderSubmit={handleOrderSubmit}
+        />
+      ),
+      accessCondition: () => {
+        console.log({ formData, cardBuilderState })
+        return [
+          formData.addressLine1,
+          formData.state,
+          formData.city,
+          formData.postalCode,
+          formData.name,
+          cardBuilderState.cardEntryComplete,
+        ].every(Boolean)
+      },
+    },
+  ]
+
+  // If template base type, add in a step at the beginning for template selection
+  if (isValidBaseType(buildBaseType) && buildBaseType === 'template') {
+    wizardSteps.splice(0, 0, {
+      key: 'base',
+      label: 'Base',
+      Icon: SVG.Stack,
+      content: (
+        <BaseStep
+          selectedBaseType={buildBaseType}
+          cardBuilderState={cardBuilderState}
+          updateCardBuilderState={updateCardBuilderState}
+        />
+      ),
+      accessCondition: true,
+    })
+  }
   return (
     <Box
       bg={theme.colors.ivory}
@@ -174,8 +287,6 @@ const CardBuilder = ({}: Props) => {
         alignItems="center"
       >
         <Box
-          maxHeight="900px"
-          height={`calc(100vh - 100px)`}
           maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}
           display="flex"
           flexDirection="column"
@@ -184,79 +295,9 @@ const CardBuilder = ({}: Props) => {
             <Text.PageHeader>Card Builder</Text.PageHeader>
           </Box>
           <Wizard
-            exitPath="/"
+            exitPath="/dashboard/orders"
             exitText="Submit order"
-            steps={[
-              {
-                key: 'step-1-base',
-                label: 'Base',
-                Icon: SVG.Stack,
-                content: (
-                  <BaseStep
-                    selectedBaseType={params.buildBaseType}
-                    cardBuilderState={cardBuilderState}
-                    updateCardBuilderState={updateCardBuilderState}
-                  />
-                ),
-                accessCondition: true,
-              },
-              {
-                key: 'step-2-build',
-                label: 'Build',
-                Icon: SVG.FormatText,
-                content: (
-                  <BuildStep
-                    selectedBaseType={params.buildBaseType}
-                    cardBuilderState={cardBuilderState}
-                    updateCardBuilderState={updateCardBuilderState}
-                  />
-                ),
-                accessCondition: [
-                  cardBuilderState.baseType != null,
-                  cardBuilderState.baseType === 'template'
-                    ? cardBuilderState.templateId != null
-                    : true,
-                ].every(Boolean),
-              },
-              {
-                key: 'step-3-checkout',
-                label: 'Checkout',
-                Icon: SVG.Cart,
-                content: (
-                  <CheckoutStep
-                    cardBuilderState={cardBuilderState}
-                    updateCardBuilderState={updateCardBuilderState}
-                    handleCardSubmit={handleCardSubmit}
-                    checkoutFormMethods={checkoutFormMethods}
-                  />
-                ),
-                accessCondition: [
-                  ...{
-                    custom: [cardBuilderState.frontDesignFile != null],
-                    template: [],
-                  }[cardBuilderState.baseType],
-                ].every(Boolean),
-              },
-              {
-                key: 'step-4-review',
-                label: 'Review',
-                Icon: SVG.CheckO,
-                content: (
-                  <ReviewStep
-                    cardBuilderState={cardBuilderState}
-                    handleOrderSubmit={handleOrderSubmit}
-                  />
-                ),
-                accessCondition: [
-                  watchedFields?.addressLine1,
-                  watchedFields?.state,
-                  watchedFields?.city,
-                  watchedFields?.postalCode,
-                  watchedFields?.name,
-                  cardBuilderState.cardEntryComplete,
-                ].every(Boolean),
-              },
-            ]}
+            steps={wizardSteps}
           />
         </Box>
       </Box>

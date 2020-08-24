@@ -212,7 +212,10 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                 // If the step trying to be accessed is disabled (not enough user-provided state to render it yet)
                 // redirect to the root route, which will redirect to step 1
                 isStepDisabled(index) ? (
-                  <Redirect to={routeMatch.path} />
+                  (() => {
+                    console.log({ index, steps })
+                    return true
+                  })() && <Redirect to={routeMatch.url} />
                 ) : (
                   <Box overflowY="hidden" height="100%">
                     <Box overflowY="hidden" height="100%">
@@ -238,8 +241,8 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                         variant="primary"
                         disabled={processingPreviousTransition}
                         onClick={async () => {
+                          setProcessingPreviousTransition(true)
                           try {
-                            setProcessingPreviousTransition(true)
                             const previousStepAction =
                               stepComponents.current[key].current
                                 ?.onTransitionToPreviousStep
@@ -296,14 +299,15 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                         }
                         disabled={processingNextTransition}
                         onClick={async () => {
+                          setProcessingNextTransition(true)
                           try {
-                            setProcessingNextTransition(true)
                             const nextStepAction =
                               stepComponents.current[key].current
                                 ?.onTransitionToNextStep
                             if (nextStepAction != null) {
                               await nextStepAction()
                             }
+
                             const nextStepPath =
                               index === steps.length - 1
                                 ? exitPath ?? '/'
@@ -343,8 +347,12 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
           {/* If user lands on a route that doesn't match any, redirect to the first one */}
           <Route>
             <Redirect
-              to={`${routeMatch.path}/${steps[0].linkPath ?? steps[0].key}`}
+              to={`${routeMatch.url}/${steps[0].linkPath ?? steps[0].key}`}
             />
+            {() => {
+              console.log('redirecting')
+              return null
+            }}
           </Route>
         </Switch>
       </Box>

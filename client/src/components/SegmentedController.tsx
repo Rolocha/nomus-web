@@ -45,7 +45,9 @@ const SegmentedController = ({
   return (
     <Box
       border={`1px solid ${borderColor}`}
-      borderRadius={2}
+      borderRadius="10em"
+      p={1}
+      bg={unselectedBg}
       display="flex"
       flexDirection="row"
       overflow="hidden"
@@ -57,6 +59,7 @@ const SegmentedController = ({
           <Box
             bg={selected ? selectedBg : unselectedBg}
             p={2}
+            borderRadius="10em"
             display="flex"
             flexDirection="row"
             alignItems="center"
