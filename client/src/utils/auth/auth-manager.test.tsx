@@ -55,6 +55,7 @@ const setup = (useAuth: () => any) => {
 const makeTestManager = ({
   refreshToken,
   logIn,
+  logOut,
   signUp,
   makeUseAuthOutput,
   expirationHeadstart,
@@ -67,6 +68,7 @@ const makeTestManager = ({
     authDataKey: AUTH_DATA_KEY,
     refreshToken: refreshToken ?? jest.fn().mockResolvedValue(mockAuthData),
     logIn: logIn ?? jest.fn().mockResolvedValue(mockAuthData),
+    logOut: logOut ?? jest.fn().mockResolvedValue(mockAuthData),
     signUp: signUp ?? jest.fn().mockResolvedValue(mockAuthData),
     makeUseAuthOutput: makeUseAuthOutput ?? jest.fn().mockReturnValue({}),
   })
