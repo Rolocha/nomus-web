@@ -160,7 +160,7 @@ export default () => {
         <InternalLink
           display="inline-block"
           width="100%"
-          to={`/u/${data.user.username}`}
+          to={`/${data.user.username}`}
           asButton
           buttonStyle="secondary"
         >
@@ -170,7 +170,7 @@ export default () => {
             justifyContent="space-between"
             px={2}
           >
-            <Text.Body2 color="linkBlue">{`nomus.com/u/${data.user.username}`}</Text.Body2>
+            <Text.Body2 color="linkBlue">{`nomus.com/${data.user.username}`}</Text.Body2>
             <SVG.ExternalLink color={colors.linkBlue} />
           </Box>
         </InternalLink>
