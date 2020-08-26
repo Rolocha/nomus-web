@@ -15,6 +15,8 @@ import { useAuth } from 'src/utils/auth'
 import { useHistory } from 'react-router-dom'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import ActivationEditor from './ActivationEditor'
+import ProgressBar from './ProgressBar'
+import zxcvbn from 'zxcvbn'
 
 const bp = 'lg'
 
@@ -51,6 +53,7 @@ export default () => {
     register: passwordFormRegister,
     handleSubmit: passwordFormHandleSubmit,
     reset: passwordFormReset,
+    watch: passwordFormWatch,
   } = useForm<PasswordFormData>({
     defaultValues: { oldPassword: '', newPassword: '', confirmNewPassword: '' },
   })
@@ -123,6 +126,16 @@ export default () => {
 
   if (loading || !data) {
     return <LoadingPage />
+  }
+
+  const renderPasswordCopy = (passwordStrength: number): string => {
+    return [
+      'Way too weak',
+      'Pretty weak',
+      "It's ok, but you can do better",
+      'Awesome',
+      'Amazing!',
+    ][passwordStrength]
   }
 
   return (
@@ -323,15 +336,18 @@ export default () => {
         </Form.Form>
       </Box>
 
-      <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3 mb={3}>Your new password needs at least:</Text.Body3>
-        <Text.Body3>
-          8 characters <br />
-          1 letter <br />
-          1 symbol <br />
-          1 number <br />
-        </Text.Body3>
-      </Box>
+      {passwordFormWatch('newPassword').length > 0 && (
+        <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
+          <Text.Body3>New password strength:</Text.Body3>
+          <Text.Body3>
+            {renderPasswordCopy(zxcvbn(passwordFormWatch('newPassword')).score)}
+          </Text.Body3>
+          <ProgressBar
+            value={zxcvbn(passwordFormWatch('newPassword')).score}
+            max={4}
+          />
+        </Box>
+      )}
 
       <Box gridArea="resetPasswordButton">
         <Button

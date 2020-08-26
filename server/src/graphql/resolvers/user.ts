@@ -5,6 +5,7 @@ import { Role } from 'src/util/enums'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
+import zxcvbn from 'zxcvbn'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -63,6 +64,10 @@ class UserResolver {
 
     if (newPassword !== confirmNewPassword) {
       throw new Error('password-confirmation-no-match')
+    }
+
+    if (zxcvbn(newPassword).score < 2) {
+      throw new Error('password-too-weak')
     }
 
     // Don't need to hash, a Mongoose pre-save hook will take care of that

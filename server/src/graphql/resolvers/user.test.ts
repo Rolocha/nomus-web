@@ -79,7 +79,7 @@ describe('UserResolver', () => {
   describe('changePassword', () => {
     it('changes the password for the context user', async () => {
       const oldPassword = 'abc123'
-      const newPassword = 'def456'
+      const newPassword = 'horsebatterystaplecorrect'
       const user = await createMockUser({
         // Will get hashed by the mongoose pre-save hook
         password: oldPassword,
@@ -131,6 +131,33 @@ describe('UserResolver', () => {
 
       expect(response.data).toBe(null)
       expect(response.errors[0].message).toBe('incorrect-old-password')
+    })
+
+    it('errors if the password is too simple', async () => {
+      const oldPassword = 'abc123'
+      const newPassword = 'def456'
+      const user = await createMockUser({
+        // Will get hashed by the mongoose pre-save hook
+        password: oldPassword,
+      })
+      const response = await execQuery({
+        source: `
+          mutation ChangePasswordTestQuery($oldPassword: String!, $newPassword: String!, $confirmNewPassword: String!) {
+            changePassword(oldPassword: $oldPassword, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword) {
+              id
+            }
+          }
+        `,
+        variableValues: {
+          oldPassword,
+          newPassword,
+          confirmNewPassword: newPassword,
+        },
+        contextUser: user,
+      })
+
+      expect(response.data).toBe(null)
+      expect(response.errors[0].message).toBe('password-too-weak')
     })
 
     it("errors if the new passwords don't match", async () => {
