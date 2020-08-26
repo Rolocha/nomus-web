@@ -12,7 +12,7 @@ const ProgressBar = ({ value, max, showPercent }: ProgressBarProps) => (
   <Box display="flex" flexDirection="row" alignItems="center">
     <progress value={value} max={max} />
     {showPercent && (
-      <Text.Plain fontSize="14px">{(value / max) * 100}%</Text.Plain>
+      <Text.Body3 fontSize="14px">{(value / max) * 100}%</Text.Body3>
     )}
   </Box>
 )
