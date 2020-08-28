@@ -4,6 +4,7 @@ import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import MUUID from 'uuid-mongodb'
+import { Result } from 'src/util/error'
 
 beforeAll(async () => {
   await initDB()
@@ -266,12 +267,12 @@ describe('UserResolver', () => {
   describe('username testing', () => {
     it('has a username collision', async () => {
       await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxmysox')).toBe(false)
+      expect(await validateUsername('roxmysox')).toStrictEqual(Result.fail('non-unique-username'))
     })
 
     it('does not have a collision', async () => {
       await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxyoursox')).toBe(true)
+      expect(await validateUsername('roxyoursox')).toStrictEqual(Result.ok())
     })
 
     it('creates a new username for a new user', async () => {
@@ -287,7 +288,7 @@ describe('UserResolver', () => {
   })
   describe('reserved routes', () => {
     it('tries to be a reserved route', async () => {
-      expect(await validateUsername('dashboard')).toBe(false)
+      expect(await validateUsername('dashboard')).toStrictEqual(Result.fail('reserved-route'))
     })
   })
 })
