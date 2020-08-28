@@ -17,6 +17,7 @@ import { PersonName } from './subschemas'
 import Token from './Token'
 import { validateEmail } from './utils'
 import { Role } from 'src/util/enums'
+import { Result } from 'src/util/error'
 
 export interface UserCreatePayload {
   _id?: UUIDType
@@ -25,6 +26,66 @@ export interface UserCreatePayload {
   password: string
 }
 
+export const ReservedRoutes = [
+  'dashboard',
+  'profile',
+  'faq',
+  'careers',
+  'jobs',
+  'login',
+  'auth',
+  'api',
+  'signup',
+  'register',
+  'registration',
+  'faq',
+  'dashboard',
+  'card-builder',
+  'get-started',
+  'about',
+  'profile',
+  'design',
+  'hello',
+]
+
+type ValidateUsernameResult = Result<
+  null,
+  | 'username-too-short'
+  | 'empty-username'
+  | 'reserved-route'
+  | 'non-unique-username'
+  | 'unknown-error'
+>
+export const validateUsername = async (usernameVal: string): Promise<ValidateUsernameResult> => {
+  const exists = await User.mongo.find({ username: usernameVal }).limit(1)
+
+  if (exists.length > 0) {
+    return Result.fail('non-unique-username')
+  }
+
+  if (ReservedRoutes.includes(usernameVal)) {
+    return Result.fail('reserved-route')
+  }
+
+  if (usernameVal == null) {
+    return Result.fail('empty-username')
+  }
+
+  if (usernameVal.length <= 5) {
+    return Result.fail('username-too-short')
+  }
+
+  return Result.ok()
+}
+
+@pre<User>('save', async function (next) {
+  if (this.isNew && this.username == null) {
+    this.username =
+      this.name.first + '.' + this.name.last + '.' + Math.random().toString(36).substring(2, 8)
+    next()
+  }
+  next()
+})
 @pre<User>('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10)
@@ -81,7 +142,12 @@ export class User {
   @Field({ nullable: true })
   email: string
 
-  @prop()
+  @prop({
+    unique: true,
+    validate: async (username) => {
+      return (await validateUsername(username)).isSuccess
+    },
+  })
   @Field({ nullable: true })
   username: string
 

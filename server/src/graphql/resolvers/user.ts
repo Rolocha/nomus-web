@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { IApolloContext } from 'src/graphql/types'
-import { User } from 'src/models/User'
+import { User, validateUsername } from 'src/models/User'
 import { Role } from 'src/util/enums'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
@@ -91,7 +91,14 @@ class UserResolver {
         ? context.user
         : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
 
-    userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
+    if (userUpdatePayload.username) {
+      if (await validateUsername(userUpdatePayload.username)) {
+        userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
+      } else {
+        throw new Error('non-unique-username')
+      }
+    }
+
     userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first
     userBeingUpdated.name.middle = userUpdatePayload.middleName ?? userBeingUpdated.name.middle
     userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last

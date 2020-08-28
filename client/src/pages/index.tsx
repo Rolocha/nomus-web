@@ -40,7 +40,7 @@ export const pages: Array<PageType> = [
   },
   {
     name: 'contact info',
-    path: '/u/:username/:cardNameOrId?',
+    path: '/:username/:cardNameOrId?',
     component: ContactInfoPage,
   },
   {

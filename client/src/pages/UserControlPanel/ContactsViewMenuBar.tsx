@@ -150,7 +150,7 @@ const ContactCardsList = ({
         {selectedContactUsernameOrId && (
           <InternalLink
             asButton
-            to={`/u/${selectedContactUsernameOrId}`}
+            to={`/${selectedContactUsernameOrId}`}
             buttonStyle="secondary"
             overrideStyles={{
               display: 'flex',
@@ -160,7 +160,7 @@ const ContactCardsList = ({
           >
             <Box display="flex" flexDirection="row" alignItems="center">
               <Text.Body2 mr={3} color="linkBlue">
-                nomus.me/u/{selectedContactUsernameOrId}
+                nomus.me/{selectedContactUsernameOrId}
               </Text.Body2>
               <Box>
                 <Icon color="linkBlue" size={0.8} icon="external" />

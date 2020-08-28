@@ -101,11 +101,13 @@ export default () => {
   }
 
   const onSubmitUsername = (formData: UsernameFormData) => {
-    updateProfile({
-      variables: {
-        updatedUser: { username: formData.username },
-      },
-    })
+    if (formData.username) {
+      updateProfile({
+        variables: {
+          updatedUser: { username: formData.username },
+        },
+      })
+    }
     setIsEditingUsername(false)
   }
 
@@ -231,9 +233,9 @@ export default () => {
         {isEditingUsername ? (
           <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
             <Box display="flex">
-              <Text.Body2>{'nomus.me/u/'}</Text.Body2>
+              <Text.Body2>{'nomus.me/'}</Text.Body2>
               <Form.Input
-                ref={usernameFormRegister({ required: true })}
+                ref={usernameFormRegister()}
                 name="username"
                 type="username"
                 autoComplete="username"
@@ -244,7 +246,7 @@ export default () => {
             </Box>
           </Form.Form>
         ) : (
-          <Text.Body2>{'nomus.me/u/' + data.user.username}</Text.Body2>
+          <Text.Body2>{'nomus.me/' + data.user.username}</Text.Body2>
         )}
       </Box>
 

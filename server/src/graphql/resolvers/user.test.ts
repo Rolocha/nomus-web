@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs'
-import { UserModel } from 'src/models/User'
+import { UserModel, validateUsername } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import MUUID from 'uuid-mongodb'
+import { Result } from 'src/util/error'
 
 beforeAll(async () => {
   await initDB()
@@ -192,7 +193,7 @@ describe('UserResolver', () => {
     it('updates the specified properties on the context user', async () => {
       const user = await createMockUser({
         name: {
-          first: 'A',
+          first: 'L',
           last: 'A',
         },
         email: 'abc@gmail.com',
@@ -260,6 +261,34 @@ describe('UserResolver', () => {
       expect(response.data.deleteUser).toBe(user.id)
       const deletedUser = await UserModel.findById(MUUID.from(user.id))
       expect(deletedUser).toBeNull()
+    })
+  })
+
+  describe('username testing', () => {
+    it('has a username collision', async () => {
+      await createMockUser({ username: 'roxmysox' })
+      expect(await validateUsername('roxmysox')).toStrictEqual(Result.fail('non-unique-username'))
+    })
+
+    it('does not have a collision', async () => {
+      await createMockUser({ username: 'roxmysox' })
+      expect(await validateUsername('roxyoursox')).toStrictEqual(Result.ok())
+    })
+
+    it('creates a new username for a new user', async () => {
+      const user = await createMockUser({
+        name: {
+          first: 'A',
+          last: 'A',
+        },
+      })
+      expect(user.username.substring(0, 4)).toBe('A.A.')
+      expect(user.username.length).toBe(10)
+    })
+  })
+  describe('reserved routes', () => {
+    it('tries to be a reserved route', async () => {
+      expect(await validateUsername('dashboard')).toStrictEqual(Result.fail('reserved-route'))
     })
   })
 })
