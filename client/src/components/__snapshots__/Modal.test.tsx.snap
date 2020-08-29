@@ -2,7 +2,7 @@
 
 exports[`<Modal /> renders a modal with the specified content 1`] = `
 <div
-  className="css-1xi4blx"
+  className="css-1x3sxzl-Box e1gi27mm0"
 >
   <div
     style={
@@ -13,7 +13,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
   >
     <aside
       aria-modal={true}
-      className="css-11ikt3e"
+      className="css-f0vs8s-Box e1gi27mm0"
       display="flex"
       height="100vh"
       onClick={[Function]}
@@ -31,7 +31,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
         }
       >
         <div
-          className="css-j5lki3"
+          className="css-1dxwlu-Box e1gi27mm0"
           display="flex"
           height="unset"
           width={
@@ -42,7 +42,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
           }
         >
           <div
-            className="css-1corken"
+            className="css-q4rbdj-Box e1gi27mm0"
           >
             <h2
               className="css-aaj9al-Text e1pb1ozb0"
@@ -56,7 +56,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
             </p>
             <div
               aria-label="Close Modal"
-              className="css-uruiul-Modal"
+              className="css-1qehuvj-Box-Modal e1gi27mm0"
               onClick={[Function]}
               role="button"
             >
