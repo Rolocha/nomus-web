@@ -1,9 +1,8 @@
-import { useTransition, animated } from 'react-spring'
-import { css, Global } from '@emotion/core'
+import { css } from '@emotion/core'
 import { rgba } from 'polished'
 import * as React from 'react'
+import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
 import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
@@ -25,46 +24,22 @@ const buttonStyles = css`
   }
 `
 
-const navItems = [
+const navItems: Array<{
+  name: string
+  path: string
+  nestedItems?: Array<any>
+}> = [
   {
     name: 'shop',
     path: '/shop',
-    nestedItems: [
-      {
-        name: 'Card Studio',
-        path: '/shop/card-studio',
-      },
-      {
-        name: 'Design Consultation',
-        path: '/shop/design-consultation',
-      },
-    ],
-  },
-  {
-    name: 'products',
-    path: '/products',
-    nestedItems: [
-      {
-        name: 'Overview',
-        path: '/products',
-      },
-      {
-        name: 'Cards',
-        path: '/products/cards',
-      },
-      {
-        name: 'Digital',
-        path: '/products/digital',
-      },
-    ],
   },
   {
     name: 'about',
-    path: '/about',
+    path: '/shop',
   },
   {
     name: 'faq',
-    path: '/faq',
+    path: '/shop',
   },
 ]
 
@@ -242,7 +217,11 @@ const Navbar = (props: Props) => {
             }}
           >
             <Text.Body2>
-              <SVG.Menu color={colors.nomusBlue} />
+              {mobileMenuOpen ? (
+                <SVG.Close color={colors.nomusBlue} />
+              ) : (
+                <SVG.Menu color={colors.nomusBlue} />
+              )}
             </Text.Body2>
           </Box>
         </Box>
