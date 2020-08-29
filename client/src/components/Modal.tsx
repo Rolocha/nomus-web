@@ -1,5 +1,5 @@
 import { useTransition, animated } from 'react-spring'
-import { css, Global } from '@emotion/core'
+import { css } from '@emotion/core'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
@@ -25,7 +25,7 @@ type Actions = {
 
 type AnchorStyle = 'center' | 'right'
 interface ChildOptions {
-  onModalClose: () => void
+  onModalClose?: () => void
 }
 
 interface Props {
@@ -162,13 +162,6 @@ const Modal = ({
                 bg={rgba(colors.nomusBlue, 0.8)}
                 onClick={handleOutsideClick}
               >
-                <Global
-                  styles={css`
-                    .scroll-lock {
-                      overflow: hidden;
-                    }
-                  `}
-                />
                 {foregroundTransitions.map(
                   ({ item, key, props }) =>
                     item && (
@@ -300,6 +293,7 @@ Modal.defaultProps = {
   anchorStyle: 'center',
   allowCloseWithOutsideClick: true,
   confirmClose: () => false,
+  onClose: () => {},
 }
 
 export default Modal

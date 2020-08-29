@@ -106,9 +106,11 @@ const ProfilePage = () => {
       display="flex"
       flexDirection="column"
       alignItems="stretch"
+      zIndex={0}
     >
       <Navbar />
       <Box
+        zIndex={0}
         pb={{ [bp]: 4 }}
         px={{ _: 0, [bp]: 5 }}
         maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}
