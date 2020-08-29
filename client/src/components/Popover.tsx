@@ -11,12 +11,18 @@ export enum PopoverAnchorPoint {
 }
 
 interface Props {
+  omitIconBg: boolean
   icon: React.ReactNode
   popoverContents: React.ReactNode
   anchorPoint: ResponsiveValue<PopoverAnchorPoint>
 }
 
-const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
+const PopoverButton = ({
+  omitIconBg,
+  icon,
+  popoverContents,
+  anchorPoint,
+}: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const popoverCard = React.useRef<HTMLDivElement | null>(null)
   const openerButton = React.useRef<HTMLDivElement | null>(null)
@@ -74,28 +80,32 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
     }
   })
 
+  const iconBgProps = {
+    bg: 'white',
+    boxShadow: 'knob',
+    borderRadius: '50%',
+    p: 1,
+    css: css`
+      &,
+      svg {
+        width: 2rem;
+        height: 2rem;
+      }
+    `,
+  }
+
   return (
     <Box position="relative">
       <Box
         ref={openerButton}
-        bg="white"
-        borderRadius="50%"
+        {...(omitIconBg ? {} : iconBgProps)}
         mx={1}
-        p={1}
         role="button"
-        boxShadow="knob"
         display="flex"
         alignItems="center"
         justifyContent="center"
         onClick={() => setIsOpen(!isOpen)}
-        css={css`
-          cursor: pointer;
-          &,
-          svg {
-            width: 2rem;
-            height: 2rem;
-          }
-        `}
+        cursor="pointer"
       >
         {icon}
       </Box>
@@ -116,7 +126,8 @@ const PopoverButton = ({ icon, popoverContents, anchorPoint }: Props) => {
 }
 
 PopoverButton.defaultProps = {
-  anchorPoint: 'top',
+  omitIconBg: false,
+  anchorPoint: PopoverAnchorPoint.Top,
 }
 
 export default PopoverButton

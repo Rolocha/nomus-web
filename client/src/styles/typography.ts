@@ -43,8 +43,9 @@ const textStyles: Record<string, any> = {
     color: colors.midnightGray,
   },
   h6: {
+    // main nav
     fontWeight: 400,
-    fontSize: [10, 10, 18, 18],
+    fontSize: [18, 18, 18, 18],
     lineHeight: [1.4, 1.4, 1.5, 1.5],
     letterSpacing: ['0.02em', '0.02em', '0.08em', '0.08em'],
     color: colors.midnightGray,

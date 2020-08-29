@@ -1,3 +1,4 @@
+import * as React from 'react'
 import isPropValid from '@emotion/is-prop-valid'
 import styled from '@emotion/styled'
 import { space, SpaceProps, layout, LayoutProps } from 'styled-system'
@@ -50,10 +51,10 @@ const args = [
 ] as const
 
 interface InternalLinkProps
-  extends React.ComponentProps<typeof Link>,
+  extends React.ComponentProps<typeof ExternalLink>,
     LinkProps {}
 
-const Link = styled<'a', LinkProps>('a', {
+const ExternalLink = styled<'a', LinkProps>('a', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline',
 })(...args)
 const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
@@ -66,8 +67,26 @@ const defaultProps = {
   buttonStyle: 'primary',
   buttonSize: 'normal',
 } as const
-Link.defaultProps = defaultProps
+ExternalLink.defaultProps = defaultProps
 InternalLink.defaultProps = defaultProps
 
-export { Link as ExternalLink, InternalLink }
-export default Link
+interface UnifiedLinkProps extends InternalLinkProps, LinkProps {
+  to?: string
+}
+
+// An isomorphic Link component where the link is always passed in via the "to" prop so that you
+// don't have to decide whether to pass in "to" for the react-router InternalLink or "href" for
+// the traditional <a /> ExternalLink
+const UnifiedLink = ({ to, ref, ...props }: UnifiedLinkProps) => {
+  const isLinkInternal = !to?.startsWith('http') ?? false
+
+  return to != null && isLinkInternal ? (
+    // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
+    <InternalLink {...props} to={to} />
+  ) : (
+    <ExternalLink ref={ref} {...props} href={to} />
+  )
+}
+
+export { ExternalLink, InternalLink }
+export default UnifiedLink

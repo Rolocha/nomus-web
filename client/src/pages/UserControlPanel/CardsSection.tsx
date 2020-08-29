@@ -97,9 +97,9 @@ export default () => {
                   mt={3}
                   mx={-1}
                   css={css`
-                    & > ${Box} {
+                    & > * {
                       flex-grow: 1;
-                      > ${Button} {
+                      > * {
                         width: 100%;
                       }
                     }
