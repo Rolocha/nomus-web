@@ -55,10 +55,10 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  //Stripe Order Object Reference. For now, this is null but futre work will replace this
+  //Stripe PaymentIntent id. For now, this is null but futre work will replace this
   @prop({ required: false })
   @Field({ nullable: true })
-  stripeOrder: string
+  paymentIntent: string
 }
 
 Order.mongo = getModelForClass(Order)

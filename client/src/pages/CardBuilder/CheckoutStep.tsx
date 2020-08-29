@@ -18,6 +18,7 @@ interface Props {
   cardBuilderState: CardBuilderState
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
   handleCardSubmit: () => Promise<void>
+  handleOrderUpdate: () => Promise<void>
   checkoutFormMethods: FormContextValues<any>
 }
 
@@ -27,6 +28,7 @@ const CheckoutStep = React.forwardRef(
       cardBuilderState,
       updateCardBuilderState,
       handleCardSubmit,
+      handleOrderUpdate,
       checkoutFormMethods,
     }: Props,
     ref,
@@ -37,9 +39,13 @@ const CheckoutStep = React.forwardRef(
       () => ({
         onTransitionToNextStep: async () => {
           updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
+          await handleOrderUpdate()
           if (!cardBuilderState.stripeToken) {
             await handleCardSubmit()
           }
+        },
+        onTransitionToPreviousStep: async () => {
+          updateCardBuilderState({ formData: checkoutFormMethods.getValues() })
         },
       }),
       [

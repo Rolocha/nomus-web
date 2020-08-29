@@ -90,37 +90,34 @@ class ShippingAddressInput {
 @InputType({
   description: 'Input to generate new Order object, regardless of what type of card base was used',
 })
-class BaseCreateOrderInput implements Pick<Order, 'quantity'> {
-  @Field({ nullable: false })
+class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
+  @Field({ nullable: true })
+  orderId: string
+
+  @Field({ nullable: true })
   quantity: number
 
   // Credit/debit card Stripe token we'll use for payment auth/capture
-  @Field({ nullable: false })
+  @Field({ nullable: true })
   stripeToken: string
 
-  @Field((type) => ShippingAddressInput, { nullable: false })
+  @Field((type) => ShippingAddressInput, { nullable: true })
   shippingAddress: ShippingAddressInput
 }
 
-@InputType({ description: 'Input to generate new Order object' })
-class CreateCustomOrderInput extends BaseCreateOrderInput {
+@InputType({ description: 'Input to generate new or update existing custom card Order' })
+class UpsertCustomOrderInput extends BaseUpsertOrderInput {
   @Field((type) => CustomCardSpecInput)
   cardSpec: CustomCardSpecInput
 }
 
 @ObjectType()
-class CreateOrderResponse {
+class UpsertOrderResponse {
   @Field()
   clientSecret: string
 
   @Field()
   orderId: string
-}
-
-@InputType({ description: 'Input for trackinig an order object' })
-class CreateOrderIntentInput {
-  @Field()
-  amount: number
 }
 
 @Resolver()
@@ -162,26 +159,19 @@ class OrderResolver {
     return orders
   }
 
-  // @Authorized(Role.User)
-  // @Mutation((type) => CreateOrderIntentResponse)
-  // async createOrderIntent(
-  //   @Arg('payload', { nullable: false }) payload: CreateOrderIntentInput,
-  //   @Ctx() context: IApolloContext
-  // ): Promise<CreateOrderIntentResponse> {}
-
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
-  @Mutation((type) => CreateOrderResponse)
-  async createCustomOrder(
+  @Mutation((type) => UpsertOrderResponse)
+  async upsertCustomOrder(
     @Arg('userId', { nullable: true }) userId: string | null,
-    @Arg('payload', { nullable: false }) payload: CreateCustomOrderInput,
+    @Arg('payload', { nullable: false }) payload: UpsertCustomOrderInput,
     @Ctx() context: IApolloContext
   ): Promise<CreateOrderResponse> {
     const requestingUserId = context.user._id
     const userIdCheck = userId ?? requestingUserId
     const requestedUser: User = await User.mongo.findById(MUUID.from(userIdCheck))
 
-    const { quantity, stripeToken, shippingAddress, cardSpec } = payload
+    const { orderId, quantity, stripeToken, shippingAddress, cardSpec } = payload
 
     // TODO: Upload custom card assets to S3 so we can store those links in the CardVersion
     const frontImageUrl = '' // uploadToS3(cardSpec.frontImageDataUrl)
@@ -196,11 +186,13 @@ class OrderResolver {
     }
     const createdCardVersion = await CardVersionModel.create(createCardVersion)
 
+    // TODO: Factor in tax and shipping into calculateCost()
     const price = calculateCost(quantity)
     if (price == null) {
       throw new Error('Invalid quantity specified, failed to calculate pricing')
     }
 
+    // TODO: create if orderId is null, otherwise update existing one using Order.find({ id: orderId }).paymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: price,
       currency: 'usd', // We'll know we made it when we can change this line :')
@@ -210,6 +202,7 @@ class OrderResolver {
       user: requestedUser._id,
       cardVersion: createdCardVersion._id,
       state: OrderState.Captured,
+      paymentIntent: paymentIntent.id,
       price,
       ...payload,
     }

@@ -80,7 +80,7 @@ const CardBuilder = ({}: Props) => {
   }, [stripe, elements])
 
   const handleOrderUpdate = React.useCallback(async () => {
-    console.log('updating order')
+    console.log('TODO: call upsertCustomOrder')
   }, [])
 
   const handleOrderSubmit = React.useCallback(async () => {
@@ -217,6 +217,7 @@ const CardBuilder = ({}: Props) => {
           cardBuilderState={cardBuilderState}
           updateCardBuilderState={updateCardBuilderState}
           handleCardSubmit={handleCardSubmit}
+          handleOrderUpdate={handleOrderUpdate}
           checkoutFormMethods={checkoutFormMethods}
         />
       ),
@@ -237,17 +238,15 @@ const CardBuilder = ({}: Props) => {
           handleOrderSubmit={handleOrderSubmit}
         />
       ),
-      accessCondition: () => {
-        console.log({ formData, cardBuilderState })
-        return [
+      accessCondition: () =>
+        [
           formData.addressLine1,
           formData.state,
           formData.city,
           formData.postalCode,
           formData.name,
           cardBuilderState.cardEntryComplete,
-        ].every(Boolean)
-      },
+        ].every(Boolean),
     },
   ]
 

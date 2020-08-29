@@ -1,8 +1,8 @@
 import { gql } from 'src/apollo'
 
 export default gql`
-  mutation CreateCustomOrderMutation($payload: CreateCustomOrderInput!) {
-    createCustomOrder(payload: $payload) {
+  mutation UpsertCustomOrderMutation($payload: UpsertCustomOrderInput!) {
+    upsertCustomOrder(payload: $payload) {
       clientSecret
       orderId
     }

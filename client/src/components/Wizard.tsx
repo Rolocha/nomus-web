@@ -20,7 +20,6 @@ import { mq } from 'src/styles/breakpoints'
 export interface WizardStepProps {
   onTransitionToPreviousStep?: () => Promise<void>
   onTransitionToNextStep?: () => Promise<void>
-  readyForNextStep?: () => boolean
   ref?: React.RefObject<any>
 }
 
