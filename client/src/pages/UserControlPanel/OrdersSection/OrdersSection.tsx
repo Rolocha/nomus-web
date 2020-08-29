@@ -51,15 +51,16 @@ export default () => {
 
   const selectedOrder = orders.find((order) => order.id === params.orderId)
 
-  const currentOrders = orders.filter(
-    (order) => order.state !== OrderState.Fulfilled,
-  )
-  const previousOrders = orders.filter(
-    (order) => order.state === OrderState.Fulfilled,
-  )
+  const currentOrders = orders
+    .filter((order) => order.state !== OrderState.Fulfilled)
+    .sort((a, b) => b.createdAt - a.createdAt)
+
+  const previousOrders = orders
+    .filter((order) => order.state === OrderState.Fulfilled)
+    .sort((a, b) => b.createdAt - a.createdAt)
 
   return (
-    <Box>
+    <Box p={{ _: '24px', md: '48px' }} height="100%" overflowY="scroll">
       {/* Orders list (hide if mobile-layout and an order is selected) */}
       {!(selectedOrder != null && !isDesktopLayout) && (
         <Box>

@@ -12,6 +12,9 @@ export const baseButtonStyles = {
   border: 'none',
   textAlign: 'center',
   outline: 'none',
+  '&:disabled': {
+    cursor: 'not-allowed',
+  },
 } as const
 
 const buttonTransition = [
@@ -101,7 +104,7 @@ export const styleVariants = {
   danger: {
     borderWidth: '1px',
     borderStyle: 'solid',
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
     borderColor: colors.invalidRed,
     color: colors.invalidRed,
     transition: buttonTransition,
@@ -116,7 +119,7 @@ export const styleVariants = {
       outline: 'none',
     },
     '&:disabled': {
-      backgroundColor: 'transparent',
+      backgroundColor: 'white',
       color: colors.invalidRed,
       borderColor: colors.invalidRed,
     },
@@ -125,14 +128,16 @@ export const styleVariants = {
   success: {
     borderWidth: '1px',
     borderStyle: 'solid',
-    backgroundColor: 'transparent',
+    backgroundColor: colors.validGreen,
     borderColor: colors.validGreen,
-    color: colors.validGreen,
+    color: colors.white,
     transition: buttonTransition,
     '&:hover': {
+      borderColor: colors.hoverGreen,
       backgroundColor: colors.hoverGreen,
     },
     '&:active': {
+      borderColor: colors.activeGreen,
       backgroundColor: colors.activeGreen,
     },
     '&:focus': {
@@ -140,7 +145,7 @@ export const styleVariants = {
       outline: 'none',
     },
     '&:disabled': {
-      backgroundColor: 'transparent',
+      backgroundColor: 'white',
       color: colors.validGreen,
       borderColor: colors.validGreen,
     },
@@ -153,10 +158,12 @@ export const sizeVariants = {
   big: {
     fontSize: '20px',
     borderRadius: '2em',
+    paddingTop: '13px',
+    paddingBottom: '13px',
   },
   normal: {
-    paddingTop: '11.5px',
-    paddingBottom: '11.5px',
+    paddingTop: '9.5px',
+    paddingBottom: '9.5px',
     fontSize: '14px',
     borderRadius: '8px',
   },

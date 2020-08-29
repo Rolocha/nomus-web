@@ -38,7 +38,10 @@ export default () => {
   const [contactSortOption, setContactSortOption] = React.useState(
     getDefaultSortOptionForViewMode(viewMode),
   )
-  const routeMatch = useRouteMatch()
+  const rootRouteMatch = useRouteMatch({
+    path: '/dashboard/contacts',
+    exact: true,
+  })
   const history = useHistory()
 
   React.useEffect(() => {
@@ -93,7 +96,12 @@ export default () => {
     : ''
 
   return (
-    <Box>
+    <Box
+      p={{ _: '24px', md: '48px' }}
+      overflowY="scroll"
+      height="100%"
+      width="100%"
+    >
       <Box mb={3}>
         <ContactsViewMenuBar
           selectedContactSortOption={contactSortOption}
@@ -128,9 +136,9 @@ export default () => {
             />
           ),
         }[params.viewMode]
-      ) : (
-        <Redirect to={`${routeMatch.url}/glance`} />
-      )}
+      ) : rootRouteMatch ? (
+        <Redirect to={`${rootRouteMatch.url}/glance`} />
+      ) : null}
     </Box>
   )
 }

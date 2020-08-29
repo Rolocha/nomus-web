@@ -7,7 +7,9 @@ import Icon from 'src/components/Icon'
 import { InternalLink } from 'src/components/Link'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
 import * as SVG from 'src/components/SVG'
-import TabSelector, { TabActionType } from 'src/components/TabSelector'
+import SegmentedController, {
+  TabActionType,
+} from 'src/components/SegmentedController'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { allContactsSortOptions, ContactsSortOption } from './contact-sorting'
@@ -176,7 +178,7 @@ const ContactCardsList = ({
         width={{ _: '100%', [bp]: undefined }}
         justifySelf="end"
       >
-        <TabSelector
+        <SegmentedController
           tabs={[
             {
               id: 'glance',

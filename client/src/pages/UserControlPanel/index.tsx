@@ -1,16 +1,9 @@
-import { css } from '@emotion/core'
 import * as React from 'react'
-import {
-  Redirect,
-  Route,
-  Switch,
-  useLocation,
-  useRouteMatch,
-} from 'react-router-dom'
+import { useLocation, useRouteMatch } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
 import Box from 'src/components/Box'
-import { InternalLink } from 'src/components/Link'
+import MultiWorkspace from 'src/components/MultiWorkspace'
 import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
@@ -25,21 +18,6 @@ import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
 
 const bp = 'md'
-const POINTY_TAB_INDICATOR = css`
-  ${mq[bp]} {
-    &:after {
-      content: ' ';
-      display: block;
-      width: 1rem;
-      height: 1rem;
-      position: absolute;
-      top: 50%;
-      left: 100%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      background-color: ${theme.colors.nomusBlue};
-    }
-  }
-`
 
 const ProfilePage = () => {
   const { loading, data } = useQuery<UserControlPanelSkeletonQuery>(
@@ -62,45 +40,10 @@ const ProfilePage = () => {
     return <LoadingPage />
   }
 
-  const controlPanelSections = [
-    {
-      path: 'profile',
-      label: 'Profile',
-      Icon: SVG.Profile,
-      Component: ProfileSection,
-    },
-    {
-      path: 'cards',
-      label: 'Cards',
-      Icon: SVG.Cards,
-      Component: CardsSection,
-    },
-    {
-      linkPath: 'contacts',
-      matchPath: 'contacts/:viewMode?/:usernameOrId?',
-      label: 'Contacts',
-      Icon: SVG.Contacts,
-      Component: ContactsSection,
-    },
-    {
-      linkPath: 'orders',
-      matchPath: 'orders/:orderId?',
-      label: 'Orders',
-      Icon: SVG.Orders,
-      Component: OrdersSection,
-    },
-    {
-      path: 'settings',
-      label: 'Settings',
-      Icon: SVG.Settings,
-      Component: SettingsSection,
-    },
-  ]
-
   return (
     <Box
       bg={theme.colors.ivory}
-      minHeight={{ [bp]: '100vh' }}
+      minHeight="100vh"
       minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
       display="flex"
@@ -109,132 +52,70 @@ const ProfilePage = () => {
       zIndex={0}
     >
       <Navbar />
+
       <Box
         zIndex={0}
         pb={{ [bp]: 4 }}
         px={{ _: 0, [bp]: 5 }}
-        maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}
+        width="100%"
+        display="flex"
+        flexDirection="column"
+        alignItems="stretch"
       >
-        {data.user.name && (
-          <Box
-            overflow="auto"
-            mt={4}
-            mb="24px"
-            display={{ _: 'none', [bp]: 'block' }}
-          >
-            <Text.PageHeader>
-              {`Welcome back, ${formatName(data.user.name)}`}
-            </Text.PageHeader>
-          </Box>
-        )}
         <Box
+          width={{ [bp]: `min(100%, calc(1.5 * ${breakpoints.lg}))` }}
           display="flex"
-          flexDirection={{ _: 'column', [bp]: 'row' }}
-          alignItems={{ [bp]: 'flex-start' }}
+          flexDirection="column"
+          alignItems="center"
+          pb={{ [bp]: 4 }}
         >
-          {/* Menu for selecting dashboard section */}
-          <Box
-            display="flex"
-            flexDirection={{ _: 'row', [bp]: 'column' }}
-            flexShrink={0}
-            minWidth={{ [bp]: 200 }}
-            bg={theme.colors.twilight}
-            borderTopLeftRadius={{ _: 0, [bp]: 3 }}
-            borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
-            // Needed to ensure the current-tab caret indicator is visible
-            overflow="visible"
-          >
-            {controlPanelSections.map(
-              ({ linkPath, path, Icon, label }, index) => {
-                const sectionPath = `${routeMatch.url}/${linkPath ?? path}`
-                const isCurrentSection = location.pathname.startsWith(
-                  sectionPath,
-                )
-                return (
-                  <Box
-                    key={path}
-                    borderTopLeftRadius={{ _: 0, [bp]: index === 0 ? 3 : 0 }}
-                    borderBottomLeftRadius={{
-                      _: 0,
-                      [bp]: index === controlPanelSections.length - 1 ? 3 : 0,
-                    }}
-                    bg={isCurrentSection ? theme.colors.nomusBlue : undefined}
-                    flexBasis={{
-                      _: `${100 / controlPanelSections.length}%`,
-                      [bp]: 'auto',
-                    }}
-                    position="relative"
-                    css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
-                  >
-                    <InternalLink to={sectionPath}>
-                      <Box
-                        py="24px"
-                        px={3}
-                        display="flex"
-                        flexDirection={{ _: 'column', [bp]: 'row' }}
-                        alignItems="center"
-                      >
-                        <Icon
-                          color="white"
-                          css={css`
-                            height: 1.5em;
-
-                            // Margin below in mobile; on right in desktop
-                            margin-bottom: 0.5em;
-                            ${mq[bp]} {
-                              margin-bottom: 0;
-                              margin-right: 0.7em;
-                            }
-                          `}
-                        />
-                        <Text.Plain
-                          m={0}
-                          color="white"
-                          fontSize={{ _: 10, [bp]: 'unset' }}
-                          fontWeight={isCurrentSection ? 500 : 'undefined'}
-                        >
-                          {label}
-                        </Text.Plain>
-                      </Box>
-                    </InternalLink>
-                  </Box>
-                )
-              },
+          <Box width="100%">
+            {data.user.name && (
+              <Box pt={4} pb="24px" display={{ _: 'none', [bp]: 'block' }}>
+                <Text.PageHeader>{`Welcome back, ${formatName(
+                  data.user.name,
+                )}`}</Text.PageHeader>
+              </Box>
             )}
-          </Box>
 
-          {/* Content for selected section */}
-          <Box
-            flexGrow={1}
-            boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
-            bg="white"
-            p={{ _: '24px', [bp]: '48px' }}
-            // py={{ _: 4, [bp]: 5 }}
-            borderTopRightRadius={{ [bp]: 3 }}
-            borderBottomRightRadius={{ [bp]: 3 }}
-            borderBottomLeftRadius={{ [bp]: 3 }}
-            // Just for now
-            minHeight="50vh"
-          >
-            <Switch>
-              {controlPanelSections.map(({ matchPath, path, Component }) => (
-                <Route
-                  key={path}
-                  path={`${routeMatch.url}/${matchPath ?? path}`}
-                >
-                  <Component />
-                </Route>
-              ))}
-              {/* If user lands on a route that doesn't match any, redirect to the first one */}
-              <Route>
-                <Redirect
-                  to={`${routeMatch.url}/${
-                    controlPanelSections[0].linkPath ??
-                    controlPanelSections[0].path
-                  }`}
-                />
-              </Route>
-            </Switch>
+            <MultiWorkspace
+              children={[
+                {
+                  key: 'profile',
+                  label: 'Profile',
+                  Icon: SVG.Profile,
+                  content: <ProfileSection />,
+                },
+                {
+                  key: 'cards',
+                  label: 'Cards',
+                  Icon: SVG.Cards,
+                  content: <CardsSection />,
+                },
+                {
+                  key: 'contacts',
+                  linkPath: 'contacts',
+                  matchPath: 'contacts/:viewMode?/:usernameOrId?',
+                  label: 'Contacts',
+                  Icon: SVG.Contacts,
+                  content: <ContactsSection />,
+                },
+                {
+                  key: 'orders',
+                  linkPath: 'orders',
+                  matchPath: 'orders/:orderId?',
+                  label: 'Orders',
+                  Icon: SVG.Orders,
+                  content: <OrdersSection />,
+                },
+                {
+                  key: 'settings',
+                  label: 'Settings',
+                  Icon: SVG.Settings,
+                  content: <SettingsSection />,
+                },
+              ]}
+            />
           </Box>
         </Box>
       </Box>

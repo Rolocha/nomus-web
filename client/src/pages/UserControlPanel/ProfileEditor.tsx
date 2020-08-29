@@ -8,7 +8,7 @@ import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import Modal from 'src/components/Modal'
 import * as Text from 'src/components/Text'
-import EditButton from './EditButton'
+import EditButton from '../../components/EditButton'
 import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
 
 interface NameplateFormData {

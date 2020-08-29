@@ -20,6 +20,26 @@ export enum OrderState {
 }
 
 /**
+ * Input to generate new Order object
+ */
+export interface CreateCustomOrderInput {
+  quantity: number
+  stripeToken: string
+  shippingAddress: ShippingAddressInput
+  cardSpec: CustomCardSpecInput
+}
+
+/**
+ * Specification for a card built using custom assets
+ */
+export interface CustomCardSpecInput {
+  cardSlug?: string | null
+  vcfNotes?: string | null
+  frontImageDataUrl: string
+  backImageDataUrl?: string | null
+}
+
+/**
  * Input for udpating user profile
  */
 export interface ProfileUpdateInput {
@@ -32,6 +52,17 @@ export interface ProfileUpdateInput {
   headline?: string | null
   bio?: string | null
   activated?: boolean | null
+}
+
+/**
+ * A shipping address input
+ */
+export interface ShippingAddressInput {
+  line1: string
+  line2?: string | null
+  city: string
+  state: string
+  postalCode: string
 }
 
 //==============================================================

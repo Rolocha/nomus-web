@@ -68,7 +68,7 @@ export default () => {
   }, {})
 
   return (
-    <Box>
+    <Box p={{ _: '24px', md: '48px' }} overflowY="scroll" height="100%">
       {defaultCardVersion && defaultCardVersionStats && (
         <Box>
           <Text.SectionHeader mb={2}>Active card</Text.SectionHeader>

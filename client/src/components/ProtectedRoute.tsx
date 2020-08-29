@@ -8,7 +8,7 @@ interface Props {
   component: React.ElementType<any>
   requiredAuthLevel: AuthLevel
   exact?: boolean
-  path: string
+  path?: string
 }
 
 const ProtectedRoute = ({
