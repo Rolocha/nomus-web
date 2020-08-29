@@ -3,7 +3,7 @@ import { rgba } from 'polished'
 import * as React from 'react'
 import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -24,22 +24,38 @@ const buttonStyles = css`
   }
 `
 
-const navItems: Array<{
+interface DirectNavItem {
   name: string
   path: string
-  nestedItems?: Array<any>
-}> = [
+  linkType: 'internal' | 'external'
+}
+const isDirectNavItem = (link: NavLink): link is DirectNavItem => 'path' in link
+
+interface NestedNavItem {
+  name: string
+  linkType: 'internal' | 'external'
+  nestedItems: Array<DirectNavItem>
+}
+const isNestedNavItem = (item: NavLink): item is NestedNavItem =>
+  'nestedItems' in item
+
+type NavLink = DirectNavItem | NestedNavItem
+
+const navItems: Array<NavLink> = [
   {
     name: 'shop',
+    linkType: 'internal',
     path: '/shop',
   },
   {
     name: 'about',
-    path: '/shop',
+    linkType: 'external',
+    path: 'https://www.notion.so/About-Us-34bb756e6b10412786a720cd9a081d1f',
   },
   {
     name: 'faq',
-    path: '/shop',
+    linkType: 'external',
+    path: 'https://www.notion.so/FAQ-4cb5ad040eb34b939e279bc15adf929a',
   },
 ]
 
@@ -102,7 +118,7 @@ const Navbar = (props: Props) => {
           alignItems: 'center',
         })}
         gridColumnGap={4}
-        p={3}
+        px={4}
         height="100px"
         position="relative"
         zIndex={2}
@@ -122,49 +138,59 @@ const Navbar = (props: Props) => {
           display={{ _: 'none', [bp]: 'flex' }}
           css={css`
             & > *:not(:last-child) {
-              margin-right: 16px;
+              margin-right: 40px;
             }
           `}
         >
-          {navItems.map((item) => (
-            <Box display="flex" alignItems="center">
-              <InternalLink to={item.path}>
-                <Text.Body color={colors.nomusBlue}>{item.name}</Text.Body>
-              </InternalLink>
-              {'nestedItems' in item && item.nestedItems != null ? (
-                <PopoverButton
-                  omitIconBg
-                  icon={
-                    <SVG.Caret
-                      color={colors.nomusBlue}
-                      css={css({ transform: 'rotateX(180deg)' })}
-                    />
-                  }
-                  popoverContents={
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      width="auto"
-                      p={2}
-                    >
-                      {item.nestedItems.map((nestedItem) => (
-                        <InternalLink to={nestedItem.path} py={2}>
-                          <Text.Body3
-                            color={colors.nomusBlue}
-                            css={css({ whiteSpace: 'nowrap' })}
-                          >
-                            {nestedItem.name}
-                          </Text.Body3>
-                        </InternalLink>
-                      ))}
-                    </Box>
-                  }
-                />
-              ) : null}
-            </Box>
-          ))}
+          {navItems.map((item) => {
+            const titleComponent = (
+              <Text.Body color={colors.nomusBlue}>{item.name}</Text.Body>
+            )
+
+            return (
+              <Box>
+                {isNestedNavItem(item) ? (
+                  <PopoverButton
+                    omitIconBg
+                    icon={
+                      <Box display="flex" alignItems="center">
+                        {titleComponent}
+                        <SVG.Caret
+                          color={colors.nomusBlue}
+                          css={css({ transform: 'rotateX(180deg)' })}
+                        />
+                      </Box>
+                    }
+                    popoverContents={
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="flex-start"
+                        alignItems="flex-start"
+                        width="auto"
+                        p={2}
+                      >
+                        {item.nestedItems.map((nestedItem) => {
+                          return (
+                            <Link to={nestedItem.path} py={2}>
+                              <Text.Body3
+                                color={colors.nomusBlue}
+                                css={css({ whiteSpace: 'nowrap' })}
+                              >
+                                {nestedItem.name}
+                              </Text.Body3>
+                            </Link>
+                          )
+                        })}
+                      </Box>
+                    }
+                  />
+                ) : (
+                  <Link to={item.path}>{titleComponent}</Link>
+                )}
+              </Box>
+            )
+          })}
         </Box>
 
         {/* Nav menu right-hand items */}
@@ -182,22 +208,22 @@ const Navbar = (props: Props) => {
           >
             {loggedIn
               ? [
-                  <InternalLink to="/dashboard">
+                  <Link to="/dashboard">
                     <Box display="flex" alignItems="center">
                       <SVG.Profile />
                       <Text.Body ml={2} color={colors.nomusBlue}>
                         profile
                       </Text.Body>
                     </Box>
-                  </InternalLink>,
+                  </Link>,
                 ]
               : [
-                  <InternalLink to="/login">
+                  <Link to="/login">
                     <Text.Body ml={2} color={colors.nomusBlue}>
                       sign in
                     </Text.Body>
-                  </InternalLink>,
-                  <InternalLink
+                  </Link>,
+                  <Link
                     to="/register"
                     asButton
                     buttonStyle="secondary"
@@ -206,7 +232,7 @@ const Navbar = (props: Props) => {
                     px={3}
                   >
                     <Text.Body color={colors.nomusBlue}>get started</Text.Body>
-                  </InternalLink>,
+                  </Link>,
                 ]}
           </Box>
           <Box
@@ -262,29 +288,37 @@ const Navbar = (props: Props) => {
                           p="24px"
                           overflowY="auto"
                         >
-                          {navItems.map((item) => (
-                            <Box mb={3}>
-                              <InternalLink to={item.path}>
-                                <Text.MainNav color={colors.nomusBlue}>
-                                  {item.name}
-                                </Text.MainNav>
-                              </InternalLink>
-                              <Box mt={2}>
-                                {(item?.nestedItems ?? []).map((nestedItem) => (
-                                  <InternalLink
-                                    display="block"
-                                    to={nestedItem.path}
-                                    ml={2}
-                                    mb={2}
-                                  >
-                                    <Text.Body2 color={colors.nomusBlue}>
-                                      {nestedItem.name}
-                                    </Text.Body2>
-                                  </InternalLink>
-                                ))}
+                          {navItems.map((item) => {
+                            const nestedTitle = (
+                              <Text.MainNav color={colors.nomusBlue}>
+                                {item.name}
+                              </Text.MainNav>
+                            )
+                            return (
+                              <Box mb={3}>
+                                {isNestedNavItem(item) ? (
+                                  nestedTitle
+                                ) : (
+                                  <Link to={item.path}>{nestedTitle}</Link>
+                                )}
+                                <Box mt={2}>
+                                  {isNestedNavItem(item) &&
+                                    item.nestedItems.map((nestedItem) => (
+                                      <Link
+                                        display="block"
+                                        to={nestedItem.path}
+                                        ml={2}
+                                        mb={2}
+                                      >
+                                        <Text.Body2 color={colors.nomusBlue}>
+                                          {nestedItem.name}
+                                        </Text.Body2>
+                                      </Link>
+                                    ))}
+                                </Box>
                               </Box>
-                            </Box>
-                          ))}
+                            )
+                          })}
 
                           <Box
                             display="flex"
@@ -292,20 +326,16 @@ const Navbar = (props: Props) => {
                             alignItems="stretch"
                             width="100%"
                           >
-                            <InternalLink
+                            <Link
                               asButton
                               buttonStyle="secondary"
                               to="/register"
                             >
                               get started
-                            </InternalLink>
-                            <InternalLink
-                              asButton
-                              buttonStyle="tertiary"
-                              to="/login"
-                            >
+                            </Link>
+                            <Link asButton buttonStyle="tertiary" to="/login">
                               sign in
-                            </InternalLink>
+                            </Link>
                           </Box>
                         </Box>
                       </animated.div>
