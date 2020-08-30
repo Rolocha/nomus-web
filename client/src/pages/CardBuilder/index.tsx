@@ -5,9 +5,9 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { Redirect, useParams } from 'react-router-dom'
 import {
-  CreateCustomOrderMutation,
-  CreateCustomOrderMutationVariables,
-} from 'src/apollo/types/CreateCustomOrderMutation'
+  UpsertCustomOrderMutation,
+  UpsertCustomOrderMutationVariables,
+} from 'src/apollo/types/UpsertCustomOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
@@ -103,7 +103,7 @@ const CardBuilder = () => {
     }
 
     const basePayload: Partial<
-      CreateCustomOrderMutationVariables['payload']
+      UpsertCustomOrderMutationVariables['payload']
     > = {
       shippingAddress: {
         line1: formData?.addressLine1,
@@ -117,7 +117,7 @@ const CardBuilder = () => {
     }
 
     let orderCreateResult: ExecutionResult<
-      CreateCustomOrderMutation
+      UpsertCustomOrderMutation
     > | null = null
     if (cardBuilderState.baseType === 'custom') {
       orderCreateResult = await createCustomOrder({
@@ -135,12 +135,12 @@ const CardBuilder = () => {
       // TODO: Implement template
     }
 
-    if (orderCreateResult?.data?.createCustomOrder.clientSecret == null) {
+    if (orderCreateResult?.data?.upsertCustomOrder.clientSecret == null) {
       throw new Error('boo')
     }
 
     const payload = await stripe.confirmCardPayment(
-      orderCreateResult?.data?.createCustomOrder.clientSecret,
+      orderCreateResult?.data?.upsertCustomOrder.clientSecret,
       {
         payment_method: {
           card: {

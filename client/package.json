@@ -100,7 +100,7 @@
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
-    "dev": "PORT=4000 node scripts/start.js",
+    "dev": "yarn && PORT=4000 node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
