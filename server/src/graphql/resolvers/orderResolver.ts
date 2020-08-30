@@ -37,37 +37,37 @@ class CustomCardSpecInput extends BaseCardSpecInput {
   backImageDataUrl?: string
 }
 
-@InputType({ description: 'Specification for a card built using a template' })
-class TemplateCardSpecInput extends BaseCardSpecInput {
-  @Field({ nullable: true })
-  templateId?: string
+// @InputType({ description: 'Specification for a card built using a template' })
+// class TemplateCardSpecInput extends BaseCardSpecInput {
+//   @Field({ nullable: true })
+//   templateId?: string
 
-  @Field({ nullable: true })
-  firstName?: string
-  @Field({ nullable: true })
-  middleName?: string
-  @Field({ nullable: true })
-  lastName?: string
+//   @Field({ nullable: true })
+//   firstName?: string
+//   @Field({ nullable: true })
+//   middleName?: string
+//   @Field({ nullable: true })
+//   lastName?: string
 
-  @Field({ nullable: true })
-  phoneNumber?: string
+//   @Field({ nullable: true })
+//   phoneNumber?: string
 
-  @Field({ nullable: true })
-  email?: string
+//   @Field({ nullable: true })
+//   email?: string
 
-  @Field({ nullable: true })
-  title?: string
+//   @Field({ nullable: true })
+//   title?: string
 
-  @Field({ nullable: true })
-  company?: string
+//   @Field({ nullable: true })
+//   company?: string
 
-  @Field({ nullable: true })
-  addressLine1?: string
-  @Field({ nullable: true })
-  addressLine2?: string
-  @Field({ nullable: true })
-  addressLine3?: string
-}
+//   @Field({ nullable: true })
+//   addressLine1?: string
+//   @Field({ nullable: true })
+//   addressLine2?: string
+//   @Field({ nullable: true })
+//   addressLine3?: string
+// }
 
 @InputType({ description: 'A shipping address input' })
 class ShippingAddressInput {
@@ -166,12 +166,12 @@ class OrderResolver {
     @Arg('userId', { nullable: true }) userId: string | null,
     @Arg('payload', { nullable: false }) payload: UpsertCustomOrderInput,
     @Ctx() context: IApolloContext
-  ): Promise<CreateOrderResponse> {
+  ): Promise<UpsertOrderResponse> {
     const requestingUserId = context.user._id
     const userIdCheck = userId ?? requestingUserId
     const requestedUser: User = await User.mongo.findById(MUUID.from(userIdCheck))
 
-    const { orderId, quantity, stripeToken, shippingAddress, cardSpec } = payload
+    const { quantity, cardSpec } = payload
 
     // TODO: Upload custom card assets to S3 so we can store those links in the CardVersion
     const frontImageUrl = '' // uploadToS3(cardSpec.frontImageDataUrl)

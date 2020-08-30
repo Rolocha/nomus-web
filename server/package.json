@@ -30,7 +30,8 @@
     "build": "webpack --mode none",
     "dev": "ts-node-dev --no-deps --respawn --poll --interval 1000 --nolazy --inspect=0.0.0.0:9229 -r tsconfig-paths/register -- src",
     "serve": "node dist",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -63,6 +64,7 @@
     "@types/webpack": "^4.41.11",
     "aws-sdk-mock": "^5.1.0",
     "body-parser": "^1.19.0",
+    "eslint": "^7.7.0",
     "graphql-tag": "^2.10.3",
     "husky": "^4.2.5",
     "jest": "^25.5.3",
@@ -86,7 +88,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "yarn lint && pretty-quick --staged"
     }
   },
   "proxy": "http://localhost:3001",
