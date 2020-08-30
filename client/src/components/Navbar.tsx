@@ -7,29 +7,16 @@ import Link from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import PopoverButton from './Popover'
 
 interface Props {}
-
-const buttonStyles = css`
-  padding: 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  svg {
-    height: 1em;
-    margin-right: 5px;
-  }
-`
 
 interface DirectNavItem {
   name: string
   path: string
   linkType: 'internal' | 'external'
 }
-const isDirectNavItem = (link: NavLink): link is DirectNavItem => 'path' in link
 
 interface NestedNavItem {
   name: string
@@ -66,7 +53,6 @@ const Navbar = (props: Props) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
   const { loggedIn } = useAuth()
 
-  const isDesktop = useBreakpoint(bp)
   const backgroundTransitions = useTransition(mobileMenuOpen, null, {
     from: { opacity: 0 },
     enter: { opacity: 1 },

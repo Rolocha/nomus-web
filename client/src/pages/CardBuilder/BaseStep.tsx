@@ -1,17 +1,11 @@
-import { css } from '@emotion/core'
 import * as React from 'react'
-import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import { ExternalLink } from 'src/components/Link'
-import SegmentedController, {
-  TabActionType,
-} from 'src/components/SegmentedController'
 import * as Text from 'src/components/Text'
-import { colors } from 'src/styles'
+import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
 import { CardBuilderAction, CardBuilderState } from './reducer'
-import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 
 interface Props {
   selectedBaseType: string | undefined

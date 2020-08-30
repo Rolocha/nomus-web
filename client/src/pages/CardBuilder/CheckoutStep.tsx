@@ -50,9 +50,10 @@ const CheckoutStep = React.forwardRef(
       }),
       [
         updateCardBuilderState,
-        cardBuilderState,
-        handleCardSubmit,
         checkoutFormMethods,
+        handleOrderUpdate,
+        cardBuilderState.stripeToken,
+        handleCardSubmit,
       ],
     )
 
@@ -61,7 +62,7 @@ const CheckoutStep = React.forwardRef(
       if (cardBuilderState.formData) {
         checkoutFormMethods.reset(cardBuilderState.formData)
       }
-    }, [])
+    }, [cardBuilderState.formData, checkoutFormMethods])
 
     // Handle real-time validation errors from the card Element.
     const handleCardInputChange = (

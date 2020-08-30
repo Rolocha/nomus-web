@@ -4,9 +4,7 @@ import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 
-interface Props {}
-
-const CardBuilderPreviewLegend = ({}: Props) => {
+const CardBuilderPreviewLegend = () => {
   return (
     <Box
       display="grid"

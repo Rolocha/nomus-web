@@ -62,7 +62,7 @@ const FileUploadButton = ({
           }
       handleFileItemChange(fileItem)
     },
-    [handleFileItemChange],
+    [createObjectUrl, handleFileItemChange],
   )
 
   const startDragView = () => {
@@ -98,7 +98,7 @@ const FileUploadButton = ({
       handleFiles(dt.files)
       endDragView()
     },
-    [],
+    [handleFiles],
   )
 
   return (

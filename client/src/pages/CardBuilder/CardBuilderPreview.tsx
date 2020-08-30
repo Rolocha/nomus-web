@@ -3,10 +3,8 @@ import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import Image from 'src/components/Image'
 import * as SVG from 'src/components/SVG'
 import { colors } from 'src/styles'
-import { FileItem } from 'src/types/files'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 
 interface Props {

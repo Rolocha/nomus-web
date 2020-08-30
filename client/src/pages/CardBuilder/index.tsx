@@ -3,7 +3,7 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useParams, useRouteMatch } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import {
   CreateCustomOrderMutation,
   CreateCustomOrderMutationVariables,
@@ -33,11 +33,8 @@ interface ParamsType {
 
 const bp = 'md'
 
-interface Props {}
-
-const CardBuilder = ({}: Props) => {
+const CardBuilder = () => {
   const { buildBaseType } = useParams<ParamsType>()
-  const routeMatch = useRouteMatch()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
@@ -60,7 +57,6 @@ const CardBuilder = ({}: Props) => {
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
       throw new Error('Stripe and/or Stripe Elements not initialized')
-      return
     }
 
     const card = elements.getElement(CardElement)
@@ -166,10 +162,10 @@ const CardBuilder = ({}: Props) => {
     }
   }, [
     stripe,
-    elements,
     cardBuilderState,
-    updateCardBuilderState,
     createCustomOrder,
+    frontImageDataUrl,
+    backImageDataUrl,
   ])
 
   const isValidBaseType = (type?: string): type is BaseType =>

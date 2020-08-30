@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useLocation, useRouteMatch } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
 import Box from 'src/components/Box'
@@ -8,7 +7,7 @@ import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
-import breakpoints, { mq } from 'src/styles/breakpoints'
+import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
@@ -33,8 +32,6 @@ const ProfilePage = () => {
       }
     `,
   )
-  const routeMatch = useRouteMatch()
-  const location = useLocation()
 
   if (loading || !data) {
     return <LoadingPage />

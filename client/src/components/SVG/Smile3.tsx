@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from './types'
 
-const Smile3 = ({}: SVGProps) => (
+const Smile3 = () => (
   <svg
     width="65"
     height="64"

@@ -2,7 +2,7 @@ import { ClassNames } from '@emotion/core'
 
 import * as React from 'react'
 import * as stripeJs from '@stripe/stripe-js'
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { CardElement } from '@stripe/react-stripe-js'
 import Box from './Box'
 import { colors, typography } from 'src/styles'
 

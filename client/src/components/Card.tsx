@@ -17,16 +17,6 @@ interface Props {
   size: 'small' | 'medium'
 }
 
-const getGridTemplateAreas = (props: Props) => {
-  return {
-    center: `
-        ""
-        `,
-    left: '',
-    mix: '',
-  }[props.align]
-}
-
 // https://www.notion.so/Card-Spec-55e903502e484758890bee88689a2daf
 const Card = ({
   className,

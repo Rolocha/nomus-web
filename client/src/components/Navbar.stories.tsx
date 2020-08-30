@@ -1,10 +1,8 @@
-import { css } from '@emotion/core'
-import { BrowserRouter as Router } from 'react-router-dom'
 import { action } from '@storybook/addon-actions'
 import React from 'react'
+import { BrowserRouter as Router } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
-import * as Text from 'src/components/Text'
 
 export default {
   title: 'Navbar',
