@@ -95,7 +95,7 @@ const Navbar = (props: Props) => {
   }, [mobileMenuOpen])
 
   return (
-    <Box zIndex={300} width="100%">
+    <Box position="relative" zIndex={300} width="100%">
       <Box
         bg="white"
         width="100%"

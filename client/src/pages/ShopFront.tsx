@@ -22,9 +22,10 @@ const bp = 'lg'
 
 const ShopFront = ({}: Props) => {
   return (
-    <Box position="relative">
+    <Box position="relative" zIndex={0}>
       <Navbar />
       <Box
+        zIndex={0}
         position="absolute"
         top="100px"
         left="0"
@@ -49,9 +50,8 @@ const ShopFront = ({}: Props) => {
               mb={2}
               css={css({ maxWidth: '80%' })}
             >
-              Make your card all your own with one of our templates or your own
-              design. Whichever you choose, your cards will have the Nomus
-              tap-to-share chip built in.
+              Whichever you choose, your cards will have a Nomus tap-to-share
+              chip built in.
             </Text.Body2>
 
             <Box
@@ -64,24 +64,19 @@ const ShopFront = ({}: Props) => {
               gridTemplateRows={{ _: 'auto', [bp]: '1fr auto' }}
               gridTemplateAreas={{
                 _: `
-                  "firstTitle"
                   "firstCard"
                   "firstNote"
-                  "secondTitle"
                   "secondCard"
                   "secondNote"
                 `,
                 [bp]: `
-                  "firstTitle secondTitle"
                   "firstCard secondCard"
                   "firstNote secondNote"
                 `,
               }}
             >
-              <Text.SectionSubheader textAlign="center" gridArea="firstTitle">
-                A Nomus template
-              </Text.SectionSubheader>
               <Box
+                bg="white"
                 gridArea="firstCard"
                 position="relative"
                 borderRadius={2}
@@ -92,7 +87,7 @@ const ShopFront = ({}: Props) => {
                 width="100%"
                 overflow="hidden"
               >
-                <Image src={cardTemplateBg} />
+                <Image w="100%" h="100%" src={cardTemplateBg} />
                 <Box
                   position="absolute"
                   top="0"
@@ -109,7 +104,7 @@ const ShopFront = ({}: Props) => {
                     size="big"
                     disabled
                   >
-                    Coming soon
+                    Templates coming soon
                   </Button>
                 </Box>
               </Box>
@@ -119,9 +114,6 @@ const ShopFront = ({}: Props) => {
                 time.
               </Text.Body2>
 
-              <Text.SectionSubheader textAlign="center" gridArea="secondTitle">
-                Your own design
-              </Text.SectionSubheader>
               <Box
                 mt={{ _: 3, [bp]: 'unset' }}
                 gridArea="secondCard"
