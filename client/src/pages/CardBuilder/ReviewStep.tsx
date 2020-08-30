@@ -6,8 +6,8 @@ import * as Text from 'src/components/Text'
 import { WizardStepProps } from 'src/components/Wizard'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
-import EditButton from '../../components/EditButton'
-import { getCostSummary } from './pricing'
+import EditButton from 'src/components/EditButton'
+import { getCostSummary } from 'src/utils/pricing'
 import { BaseType, CardBuilderState } from './reducer'
 
 interface Props {

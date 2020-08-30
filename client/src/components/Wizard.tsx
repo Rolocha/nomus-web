@@ -265,7 +265,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                           alignItems="center"
                         >
                           {processingPreviousTransition ? (
-                            <Spinner width="1em" height="1em" />
+                            <Spinner size="1em" />
                           ) : (
                             <SVG.ArrowRightO
                               css={css({ transform: 'rotate(180deg)' })}
@@ -331,7 +331,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                               : `Next step: ${steps[index + 1].label}`}
                           </Text.Plain>
                           {processingNextTransition ? (
-                            <Spinner width="1em" height="1em" />
+                            <Spinner size="1em" />
                           ) : (
                             <SVG.ArrowRightO color="white" />
                           )}
