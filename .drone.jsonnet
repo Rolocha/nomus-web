@@ -134,7 +134,7 @@ local ALWAYS_CONDITION = {};
     "name": "client",
     "steps": [
       installNodeModules("client", ALWAYS_CONDITION),
-      test("client", ALWAYS_CONDITION),
+      // test("client", ALWAYS_CONDITION),
       build("client", STAGING_DEPLOY_CONDITION),
       syncToBucket(STAGING_DEPLOY_CONDITION)
     ],
@@ -154,7 +154,7 @@ local ALWAYS_CONDITION = {};
     "name": "server",
     "steps": [
       installNodeModules("server", ALWAYS_CONDITION),
-      test("server", ALWAYS_CONDITION),
+      // test("server", ALWAYS_CONDITION),
       publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
       updateDeployConfig("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
