@@ -1,4 +1,4 @@
-// Keep in sync with client/src/pages/CardBuilder/pricing.ts
+// Keep in sync with client/src/utils/pricing.ts
 export const QUANTITY_TO_PRICE = {
   25: 2999,
   50: 5499,

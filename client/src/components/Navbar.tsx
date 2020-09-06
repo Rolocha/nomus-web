@@ -9,6 +9,7 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import PopoverButton from './Popover'
+import { ABOUT_PAGE_NOTION_LINK, FAQ_PAGE_NOTION_LINK } from 'src/constants'
 
 interface Props {}
 
@@ -37,12 +38,12 @@ const navItems: Array<NavLink> = [
   {
     name: 'about',
     linkType: 'external',
-    path: 'https://www.notion.so/About-Us-34bb756e6b10412786a720cd9a081d1f',
+    path: ABOUT_PAGE_NOTION_LINK,
   },
   {
     name: 'faq',
     linkType: 'external',
-    path: 'https://www.notion.so/FAQ-4cb5ad040eb34b939e279bc15adf929a',
+    path: FAQ_PAGE_NOTION_LINK,
   },
 ]
 
@@ -94,7 +95,7 @@ const Navbar = (props: Props) => {
   }, [mobileMenuOpen])
 
   return (
-    <Box zIndex={300} width="100%">
+    <Box position="relative" zIndex={300} width="100%">
       <Box
         bg="white"
         width="100%"

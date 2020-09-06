@@ -1,5 +1,6 @@
 import colors from '../colors'
 import typography from '../typography'
+import * as polished from 'polished'
 const { fontFamilies } = typography
 
 // Defining button styles centrally here since both <a /> and <button /> will consume them
@@ -27,6 +28,32 @@ const buttonTransition = [
   .map((prop) => `0.3s ease ${prop}`)
   .join(', ')
 
+const generateColorVariant = (rootColor: string, textColor: string) => ({
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  backgroundColor: rootColor,
+  borderColor: rootColor,
+  color: textColor,
+  transition: buttonTransition,
+  '&:hover': {
+    backgroundColor: polished.darken(0.05, rootColor),
+    borderColor: polished.darken(0.05, rootColor),
+  },
+  '&:active': {
+    backgroundColor: polished.darken(0.1, rootColor),
+    borderColor: polished.darken(0.1, rootColor),
+  },
+  '&:focus': {
+    boxShadow: `0 0 4px 0 ${colors.outlineBlue}`,
+    outline: 'none',
+  },
+  '&:disabled': {
+    backgroundColor: '#DFE5EC',
+    color: colors.disabledBlue,
+    borderColor: '#DFE5EC',
+  },
+})
+
 export const styleVariants = {
   primary: {
     borderWidth: '1px',
@@ -50,8 +77,11 @@ export const styleVariants = {
     '&:disabled': {
       backgroundColor: '#DFE5EC',
       color: colors.disabledBlue,
+      borderColor: '#DFE5EC',
     },
   },
+
+  primaryGold: generateColorVariant(colors.gold, colors.nomusBlue),
 
   secondary: {
     borderWidth: '1px',

@@ -11,7 +11,7 @@ import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { WizardStepProps } from 'src/components/Wizard'
 import { formatDollarAmount } from 'src/utils/money'
-import { getCostSummary, QUANTITY_TO_PRICE } from './pricing'
+import { getCostSummary, QUANTITY_TO_PRICE } from 'src/utils/pricing'
 import { CardBuilderAction, CardBuilderState } from './reducer'
 
 interface Props {

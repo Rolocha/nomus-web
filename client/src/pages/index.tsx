@@ -12,6 +12,7 @@ import LoginPage from 'src/pages/LoginPage'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import AdminPanel from 'src/pages/AdminPanel'
 import FourOhFourPage from 'src/pages/FourOhFour'
+import ShopFront from 'src/pages/ShopFront'
 
 interface PageType {
   name: string
@@ -33,6 +34,12 @@ export const pages: Array<PageType> = [
     exact: true,
     path: '/login',
     component: LoginPage,
+  },
+  {
+    name: 'shop front',
+    exact: true,
+    path: '/shop',
+    component: ShopFront,
   },
   {
     name: 'dashboard',
