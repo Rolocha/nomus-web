@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { IApolloContext } from 'src/graphql/types'
 import { User, validateUsername } from 'src/models/User'
+import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
@@ -46,7 +47,10 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-    return await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
+    const user = await User.mongo
+      .findOne({ _id: MUUID.from(requestedUserId) })
+      .populate('defaultCardVersion')
+    return user
   }
 
   @Authorized(Role.User)
@@ -123,6 +127,32 @@ class UserResolver {
 
     await User.mongo.deleteOne({ _id: MUUID.from(requestedUserId) })
     return MUUID.from(requestedUserId).toString()
+  }
+
+  @Authorized(Role.User)
+  @Mutation(() => User)
+  async changeActiveCardVersion(
+    @Arg('cardVersionId', { nullable: false }) cardVersionId: string,
+    @Ctx() context: IApolloContext
+  ): Promise<User> {
+    const cardVersionToMakeActive = (
+      await CardVersion.mongo
+        .find({
+          user: context.user._id,
+          _id: MUUID.from(cardVersionId),
+        })
+        .limit(1)
+    )[0]
+
+    if (cardVersionToMakeActive == null) {
+      throw new Error('Invalid card version id')
+    }
+
+    context.user.defaultCardVersion = MUUID.from(cardVersionId)
+    await context.user.save()
+
+    const responseUser = await context.user.populate('defaultCardVersion').execPopulate()
+    return responseUser
   }
 }
 export default UserResolver

@@ -20,16 +20,6 @@ export enum OrderState {
 }
 
 /**
- * Input to generate new Order object
- */
-export interface CreateCustomOrderInput {
-  quantity: number
-  stripeToken: string
-  shippingAddress: ShippingAddressInput
-  cardSpec: CustomCardSpecInput
-}
-
-/**
  * Specification for a card built using custom assets
  */
 export interface CustomCardSpecInput {
@@ -63,6 +53,17 @@ export interface ShippingAddressInput {
   city: string
   state: string
   postalCode: string
+}
+
+/**
+ * Input to generate new or update existing custom card Order
+ */
+export interface UpsertCustomOrderInput {
+  orderId?: string | null
+  quantity?: number | null
+  stripeToken?: string | null
+  shippingAddress?: ShippingAddressInput | null
+  cardSpec: CustomCardSpecInput
 }
 
 //==============================================================

@@ -7,10 +7,15 @@
 // GraphQL query operation: UCPCardsSectionQuery
 // ====================================================
 
+export interface UCPCardsSectionQuery_user_defaultCardVersion {
+  __typename: 'CardVersion'
+  id: string
+}
+
 export interface UCPCardsSectionQuery_user {
   __typename: 'User'
   id: string
-  defaultCardVersion: any | null
+  defaultCardVersion: UCPCardsSectionQuery_user_defaultCardVersion | null
 }
 
 export interface UCPCardsSectionQuery_cardVersions {

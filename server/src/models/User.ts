@@ -144,9 +144,6 @@ export class User {
 
   @prop({
     unique: true,
-    validate: async (username) => {
-      return (await validateUsername(username)).isSuccess
-    },
   })
   @Field({ nullable: true })
   username: string
@@ -155,7 +152,7 @@ export class User {
   password: string
 
   @prop({ type: Buffer, ref: 'CardVersion' })
-  @Field(() => UUIDScalar, { nullable: true })
+  @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
   @prop({ required: false })

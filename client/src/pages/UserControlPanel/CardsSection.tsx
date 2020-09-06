@@ -1,6 +1,6 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
-import { gql, useQuery } from 'src/apollo'
+import { gql, useQuery, useMutation } from 'src/apollo'
 import {
   UCPCardsSectionQuery,
   UCPCardsSectionQuery_cardVersionsStats,
@@ -11,6 +11,8 @@ import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { getMonthAbbreviation } from 'src/utils/date'
+import { CHANGE_ACTIVE_CARD_VERSION } from './mutations'
+import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
 
 const bp = 'md'
 
@@ -27,7 +29,9 @@ export default () => {
       query UCPCardsSectionQuery {
         user {
           id
-          defaultCardVersion
+          defaultCardVersion {
+            id
+          }
         }
 
         cardVersions {
@@ -46,19 +50,33 @@ export default () => {
     `,
   )
 
+  const [changeActiveCardVersion] = useMutation<ChangeActiveCardVersion>(
+    CHANGE_ACTIVE_CARD_VERSION,
+  )
+
+  const createCardActivationHandler = React.useCallback(
+    (cardVersionId: string) => async (_: any) =>
+      await changeActiveCardVersion({
+        variables: {
+          cardVersionId,
+        },
+      }),
+    [changeActiveCardVersion],
+  )
+
   if (loading || !data) {
     return <LoadingPage />
   }
 
   const defaultCardVersion = data.cardVersions.find(
-    (version) => version.id === data.user.defaultCardVersion,
+    (version) => version.id === data.user.defaultCardVersion?.id,
   )
   const defaultCardVersionStats = data.cardVersionsStats.find(
-    (version) => version.id === data.user.defaultCardVersion,
+    (version) => version.id === data.user.defaultCardVersion?.id,
   )
 
   const nonDefaultCardVersions = data.cardVersions.filter(
-    (version) => version.id !== data.user.defaultCardVersion,
+    (version) => version.id !== data.user.defaultCardVersion?.id,
   )
   const cardVersionStatsById = data.cardVersionsStats.reduce<
     Record<string, UCPCardsSectionQuery_cardVersionsStats>
@@ -193,7 +211,12 @@ export default () => {
                       <Button variant="secondary">Modify card</Button>
                     </Box>
                     <Box px={1}>
-                      <Button variant="secondary">Make active</Button>
+                      <Button
+                        variant="secondary"
+                        onClick={createCardActivationHandler(cv.id)}
+                      >
+                        Make active
+                      </Button>
                     </Box>
                   </Box>
                 </Box>

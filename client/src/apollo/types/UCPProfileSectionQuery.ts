@@ -14,11 +14,19 @@ export interface UCPProfileSectionQuery_user_name {
   last: string
 }
 
+export interface UCPProfileSectionQuery_user_defaultCardVersion {
+  __typename: 'CardVersion'
+  id: string
+  frontImageUrl: string | null
+  backImageUrl: string | null
+}
+
 export interface UCPProfileSectionQuery_user {
   __typename: 'User'
   id: string
   username: string | null
   name: UCPProfileSectionQuery_user_name | null
+  defaultCardVersion: UCPProfileSectionQuery_user_defaultCardVersion | null
   profilePicUrl: string | null
   headline: string | null
   phoneNumber: string | null
@@ -26,13 +34,6 @@ export interface UCPProfileSectionQuery_user {
   bio: string | null
 }
 
-export interface UCPProfileSectionQuery_cardVersion {
-  __typename: 'CardVersion'
-  frontImageUrl: string | null
-  backImageUrl: string | null
-}
-
 export interface UCPProfileSectionQuery {
   user: UCPProfileSectionQuery_user
-  cardVersion: UCPProfileSectionQuery_cardVersion | null
 }
