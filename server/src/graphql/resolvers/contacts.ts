@@ -165,6 +165,15 @@ class ContactsResolver {
     @Arg('notesInput', { nullable: true }) notesInput: NotesInput,
     @Ctx() context: IApolloContext
   ): Promise<Contact> {
+    const connection = await Connection.mongo
+      .findOne({ from: context.user._id, to: MUUID.from(contactId) })
+      .populate({
+        path: 'to',
+        populate: {
+          path: 'defaultCardVersion',
+        },
+      })
+    
     
   }
 }
