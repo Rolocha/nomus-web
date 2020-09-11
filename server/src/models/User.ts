@@ -127,10 +127,6 @@ export class User {
   @Field({ nullable: true })
   bio: string
 
-  // The S3 key in the nomus-assets bucket that contains the user's profile pic
-  @prop()
-  profilePicS3Key: string
-
   @prop()
   @Field({ nullable: true })
   profilePicUrl: string

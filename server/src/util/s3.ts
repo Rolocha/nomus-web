@@ -35,7 +35,7 @@ export const uploadProfilePicture = async (
       throw new Error('failed-aws-connection')
     }
 
-    const ContentType = mime.lookup(filepath) ?? 'image/png'
+    const ContentType = mime.lookup(filepath)
     if (ContentType === false) {
       throw new Error('failed-file-read')
     }
