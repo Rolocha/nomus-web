@@ -7,8 +7,13 @@ import {
   ReturnModelType,
 } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
+import * as fs from 'fs'
+import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
 import { accessTokenLifespan, authTokenPrivateKey } from 'src/config'
+import { Role } from 'src/util/enums'
+import { EventualResult, Result } from 'src/util/error'
+import * as S3 from 'src/util/s3'
 import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { CardVersion } from './CardVersion'
@@ -16,8 +21,6 @@ import { Ref, UUIDScalar, UUIDType } from './scalars'
 import { PersonName } from './subschemas'
 import Token from './Token'
 import { validateEmail } from './utils'
-import { Role } from 'src/util/enums'
-import { Result } from 'src/util/error'
 
 export interface UserCreatePayload {
   _id?: UUIDType
@@ -124,6 +127,10 @@ export class User {
   @Field({ nullable: true })
   bio: string
 
+  // The S3 key in the nomus-assets bucket that contains the user's profile pic
+  @prop()
+  profilePicS3Key: string
+
   @prop()
   @Field({ nullable: true })
   profilePicUrl: string
@@ -144,9 +151,6 @@ export class User {
 
   @prop({
     unique: true,
-    validate: async (username) => {
-      return (await validateUsername(username)).isSuccess
-    },
   })
   @Field({ nullable: true })
   username: string
@@ -215,6 +219,47 @@ export class User {
     // to send it to the client
     const { preHashToken } = await Token.mongo.createNewTokenForUser(MUUID.from(this._id))
     return preHashToken
+  }
+
+  public async updateProfilePic(
+    this: DocumentType<User>,
+    file: FileUpload
+  ): EventualResult<User, ''> {
+    const filename = `${this.id}-${Date.now().toString()}-${file.filename}`
+    const filepath = `/tmp/${filename}`
+
+    const { createReadStream } = file
+
+    try {
+      const writableStream = fs.createWriteStream(filepath, {
+        autoClose: true,
+      })
+
+      await new Promise((res, rej) => {
+        createReadStream()
+          .pipe(writableStream)
+          .on('finish', () => res(true))
+          .on('error', () => rej(false))
+      })
+    } catch (err) {
+      throw new Error('Error creating write or readstream')
+    }
+
+    try {
+      const result = await S3.uploadProfilePicture(filepath, filename)
+      if (!result.isSuccess) {
+        throw new Error(`Failed to upload to S3: ${result.error}`)
+      }
+
+      const pictureLink = result.getValue()
+      this.profilePicUrl = pictureLink
+      return Result.ok(await this.save())
+    } catch (err) {
+      throw new Error(`unknown error: ${err}`)
+    } finally {
+      // Delete the file now that we're done
+      fs.unlink(filepath, () => {})
+    }
   }
 }
 

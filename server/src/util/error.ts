@@ -29,6 +29,10 @@ export class Result<T, E extends string> {
     return this._value
   }
 
+  get value(): T {
+    return this.getValue()
+  }
+
   public static ok<U>(value?: U): Result<U, any> {
     return new Result<U, any>(true, null, value)
   }
@@ -44,6 +48,8 @@ export class Result<T, E extends string> {
   //   return Result.ok<any>()
   // }
 }
+
+export type EventualResult<T, E extends string> = Promise<Result<T, E>>
 
 export class NamedError<T extends string> extends Error {
   public name: T

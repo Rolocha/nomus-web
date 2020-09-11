@@ -1,11 +1,14 @@
+import { GraphQLUpload } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
+import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
 import { User, validateUsername } from 'src/models/User'
 import { Role } from 'src/util/enums'
+import * as S3 from 'src/util/s3'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
-import { AdminOnlyArgs } from '../auth'
 import zxcvbn from 'zxcvbn'
+import { AdminOnlyArgs } from '../auth'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -37,6 +40,17 @@ class ProfileUpdateInput implements Partial<User> {
 
 @Resolver()
 class UserResolver {
+  // Performs any necessary changes to go from DB representation of User to public representation of User
+  private async sanitizeUser(user: User) {
+    if (user.profilePicUrl) {
+      const signedProfilePicUrl = await S3.getSignedUrl(user.profilePicUrl)
+      if (signedProfilePicUrl.isSuccess) {
+        user.profilePicUrl = signedProfilePicUrl.value
+      }
+    }
+    return user
+  }
+
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => User)
@@ -46,7 +60,10 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-    return await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
+    const user = await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
+
+    const userObject = user.toObject() as User
+    return await this.sanitizeUser(userObject)
   }
 
   @Authorized(Role.User)
@@ -72,7 +89,8 @@ class UserResolver {
 
     // Don't need to hash, a Mongoose pre-save hook will take care of that
     context.user.password = newPassword
-    return await context.user.save()
+    await context.user.save()
+    return await this.sanitizeUser(context.user)
   }
 
   @Authorized(Role.User)
@@ -109,7 +127,8 @@ class UserResolver {
     userBeingUpdated.bio = userUpdatePayload.bio ?? userBeingUpdated.bio
     userBeingUpdated.activated = userUpdatePayload.activated ?? userBeingUpdated.activated
 
-    return await userBeingUpdated.save()
+    await userBeingUpdated.save()
+    return await this.sanitizeUser(userBeingUpdated)
   }
 
   @Authorized(Role.User)
@@ -123,6 +142,16 @@ class UserResolver {
 
     await User.mongo.deleteOne({ _id: MUUID.from(requestedUserId) })
     return MUUID.from(requestedUserId).toString()
+  }
+
+  @Authorized(Role.User)
+  @Mutation((type) => User)
+  async updateProfilePicture(
+    @Arg('file', (type) => GraphQLUpload) file: FileUpload,
+    @Ctx() context: IApolloContext
+  ): Promise<User> {
+    await context.user.updateProfilePic(file)
+    return await this.sanitizeUser(context.user)
   }
 }
 export default UserResolver

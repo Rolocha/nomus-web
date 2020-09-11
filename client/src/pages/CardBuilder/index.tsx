@@ -5,9 +5,9 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { Redirect, useParams } from 'react-router-dom'
 import {
-  CreateCustomOrderMutation,
-  CreateCustomOrderMutationVariables,
-} from 'src/apollo/types/CreateCustomOrderMutation'
+  UpsertCustomOrderMutation,
+  UpsertCustomOrderMutationVariables,
+} from 'src/apollo/types/UpsertCustomOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
@@ -18,7 +18,7 @@ import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
 import CheckoutStep from './CheckoutStep'
-import CREATE_CUSTOM_ORDER_MUTATION from './createCustomOrderMutation'
+import UPSERT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 import {
   cardBuilderReducer,
   CheckoutFormData,
@@ -49,7 +49,7 @@ const CardBuilder = () => {
 
   const stripe = useStripe()
   const elements = useElements()
-  const [createCustomOrder] = useMutation(CREATE_CUSTOM_ORDER_MUTATION)
+  const [upsertCustomOrder] = useMutation(UPSERT_CUSTOM_ORDER_MUTATION)
 
   const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
   const backImageDataUrl = cardBuilderState.backDesignFile?.url
@@ -103,7 +103,7 @@ const CardBuilder = () => {
     }
 
     const basePayload: Partial<
-      CreateCustomOrderMutationVariables['payload']
+      UpsertCustomOrderMutationVariables['payload']
     > = {
       shippingAddress: {
         line1: formData?.addressLine1,
@@ -117,10 +117,10 @@ const CardBuilder = () => {
     }
 
     let orderCreateResult: ExecutionResult<
-      CreateCustomOrderMutation
+      UpsertCustomOrderMutation
     > | null = null
     if (cardBuilderState.baseType === 'custom') {
-      orderCreateResult = await createCustomOrder({
+      orderCreateResult = await upsertCustomOrder({
         variables: {
           payload: {
             ...basePayload,
@@ -135,12 +135,12 @@ const CardBuilder = () => {
       // TODO: Implement template
     }
 
-    if (orderCreateResult?.data?.createCustomOrder.clientSecret == null) {
+    if (orderCreateResult?.data?.upsertCustomOrder.clientSecret == null) {
       throw new Error('boo')
     }
 
     const payload = await stripe.confirmCardPayment(
-      orderCreateResult?.data?.createCustomOrder.clientSecret,
+      orderCreateResult?.data?.upsertCustomOrder.clientSecret,
       {
         payment_method: {
           card: {
@@ -163,7 +163,7 @@ const CardBuilder = () => {
   }, [
     stripe,
     cardBuilderState,
-    createCustomOrder,
+    upsertCustomOrder,
     frontImageDataUrl,
     backImageDataUrl,
   ])

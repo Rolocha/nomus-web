@@ -4,7 +4,7 @@ import * as React from 'react'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
 import Box from 'src/components/Box'
-import { colors } from 'src/styles'
+import { colors, animations } from 'src/styles'
 import { rgba } from 'polished'
 
 const HiddenUploadInput = styled.input`
@@ -62,6 +62,11 @@ const EditableImage = ({ src, editable, size, onImageUpdate }: Props) => {
           background-size: cover;
           background-image: url(${src});
           overflow: hidden;
+
+          animation: ${updating &&
+          css`
+            ${animations.fadeIn} 0.5s ease infinite alternate
+          `};
 
           .edit-text {
             transform: scaleX(0);

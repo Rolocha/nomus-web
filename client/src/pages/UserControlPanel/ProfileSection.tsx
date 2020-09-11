@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { gql, useQuery } from 'src/apollo'
+import { gql, useQuery, useMutation } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
+import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import { InternalLink } from 'src/components/Link'
@@ -42,8 +43,23 @@ export default () => {
     `,
   )
 
+  const [updateProfilePicture] = useMutation<UpdateProfilePictureMutation>(
+    gql`
+      mutation UpdateProfilePictureMutation($file: Upload!) {
+        updateProfilePicture(file: $file) {
+          id
+          profilePicUrl
+        }
+      }
+    `,
+  )
+
   const handleProfilePictureUpdate = async (image: File) => {
-    console.log('TODO: update profile picture')
+    await updateProfilePicture({
+      variables: {
+        file: image,
+      },
+    })
   }
 
   if (loading || !data) {
