@@ -16,6 +16,8 @@ import {
   ResponsiveValue,
   space,
   SpaceProps,
+  grid,
+  GridProps,
   system,
   ThemeValue,
   variant,
@@ -30,7 +32,8 @@ export type TextProps = {
   FontFamilyProps &
   LineHeightProps &
   FontWeightProps &
-  SpaceProps
+  SpaceProps &
+  GridProps
 
 const Text = styled<'p', TextProps>('p')(
   baseTextStyles,
@@ -40,6 +43,7 @@ const Text = styled<'p', TextProps>('p')(
   }),
   color,
   space,
+  grid,
   fontFamily,
   lineHeight,
   fontWeight,

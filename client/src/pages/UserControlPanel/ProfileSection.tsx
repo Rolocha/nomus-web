@@ -28,16 +28,16 @@ export default () => {
             middle
             last
           }
+          defaultCardVersion {
+            id
+            frontImageUrl
+            backImageUrl
+          }
           profilePicUrl
           headline
           phoneNumber
           email
           bio
-        }
-
-        cardVersion {
-          frontImageUrl
-          backImageUrl
         }
       }
     `,
@@ -123,7 +123,7 @@ export default () => {
         />
       </Box>
 
-      {data.cardVersion && (
+      {data.user.defaultCardVersion && (
         <Box
           gridArea="cards"
           display="flex"
@@ -133,7 +133,7 @@ export default () => {
           flexShrink={0}
         >
           {/* Front of business card */}
-          {data.cardVersion.frontImageUrl && (
+          {data.user.defaultCardVersion.frontImageUrl && (
             <Box
               width={{ _: '50%', [bp]: '100%' }}
               mb={{ _: 0, [bp]: 2 }}
@@ -141,16 +141,16 @@ export default () => {
             >
               <BusinessCardImage
                 width="100%"
-                frontImageUrl={data.cardVersion.frontImageUrl}
+                frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
               />
             </Box>
           )}
-          {data.cardVersion.backImageUrl && (
+          {data.user.defaultCardVersion.backImageUrl && (
             <Box width={{ _: '50%', [bp]: '100%' }}>
               {/* Back of business card */}
               <BusinessCardImage
                 width="100%"
-                backImageUrl={data.cardVersion.backImageUrl}
+                backImageUrl={data.user.defaultCardVersion.backImageUrl}
               />
             </Box>
           )}

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
 import { User, validateUsername } from 'src/models/User'
+import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import * as S3 from 'src/util/s3'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
@@ -60,7 +61,9 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-    const user = await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
+    const user = await User.mongo
+      .findOne({ _id: MUUID.from(requestedUserId) })
+      .populate('defaultCardVersion')
 
     const userObject = user.toObject() as User
     return await this.sanitizeUser(userObject)
@@ -152,6 +155,32 @@ class UserResolver {
   ): Promise<User> {
     await context.user.updateProfilePic(file)
     return await this.sanitizeUser(context.user)
+  }
+    
+  @Authorized(Role.User)
+  @Mutation(() => User)
+  async changeActiveCardVersion(
+    @Arg('cardVersionId', { nullable: false }) cardVersionId: string,
+    @Ctx() context: IApolloContext
+  ): Promise<User> {
+    const cardVersionToMakeActive = (
+      await CardVersion.mongo
+        .find({
+          user: context.user._id,
+          _id: MUUID.from(cardVersionId),
+        })
+        .limit(1)
+    )[0]
+
+    if (cardVersionToMakeActive == null) {
+      throw new Error('Invalid card version id')
+    }
+
+    context.user.defaultCardVersion = MUUID.from(cardVersionId)
+    await context.user.save()
+
+    const responseUser = await context.user.populate('defaultCardVersion').execPopulate()
+    return responseUser
   }
 }
 export default UserResolver

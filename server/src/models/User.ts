@@ -17,7 +17,7 @@ import * as S3 from 'src/util/s3'
 import { Field, ObjectType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { CardVersion } from './CardVersion'
-import { Ref, UUIDScalar, UUIDType } from './scalars'
+import { Ref, UUIDType } from './scalars'
 import { PersonName } from './subschemas'
 import Token from './Token'
 import { validateEmail } from './utils'
@@ -159,7 +159,7 @@ export class User {
   password: string
 
   @prop({ type: Buffer, ref: 'CardVersion' })
-  @Field(() => UUIDScalar, { nullable: true })
+  @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
   @prop({ required: false })
