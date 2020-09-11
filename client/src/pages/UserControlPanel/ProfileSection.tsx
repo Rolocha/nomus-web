@@ -78,7 +78,7 @@ export default () => {
         <Image
           width="100%"
           borderRadius="50%"
-          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x300'}
+          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x500'}
         />
       </Box>
 
