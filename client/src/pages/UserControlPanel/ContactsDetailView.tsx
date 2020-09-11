@@ -8,6 +8,7 @@ import { formatName } from 'src/utils/name'
 import { ContactsSortOption } from './contact-sorting'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
+import NotesEditor from './NotesEditor'
 
 interface ParamsType {
   usernameOrId: string
@@ -83,12 +84,14 @@ const ContactsDetailView = ({
             "cards cards"
             "contactInfo contactInfo"
             "bio bio"
+            "notesTitle notesTitle"
             "notes notes"
           `,
             [bp]: `
               "profilePic nameplate"
               "profilePic contactInfo"
               "cards bio"
+              "notesTitle notesTitle"
               "notes notes"
             `,
           }}
@@ -159,20 +162,40 @@ const ContactsDetailView = ({
           </Box>
 
           <Box
+            gridArea="notesTitle"
+            display="grid"
+            gridTemplateColumns="6fr 2fr"
+            gridColumnGap={3}
+            gridRowGap="24px"
+            gridTemplateAreas={`
+            "title editNotes"
+            `}
+          >
+            <Box gridArea="title">
+              <Text.SectionHeader>Your notes</Text.SectionHeader>
+            </Box>
+
+            <Box gridArea="editNotes">
+              <NotesEditor 
+                editIconOnlyBp={bp}
+                defaultValues={{
+
+                }}
+              />
+            </Box>
+          </Box>
+
+          <Box
             gridArea="notes"
             display="grid"
             gridTemplateColumns="2fr 6fr"
             gridColumnGap={3}
             gridRowGap="24px"
             gridTemplateAreas={`
-            "title title"
             "meetingDate meetingPlace"
             "tags additionalNotes"
           `}
           >
-            <Box gridArea="title">
-              <Text.SectionHeader>Your notes</Text.SectionHeader>
-            </Box>
 
             <Box gridArea="meetingDate">
               <Text.Label>Meeting Date</Text.Label>

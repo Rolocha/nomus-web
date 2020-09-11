@@ -4,7 +4,7 @@ import Connection from 'src/models/Connection'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
 import { User } from 'src/models/User'
-import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver, Mutation, InputType } from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
@@ -47,6 +47,20 @@ class Contact {
   vcfUrl: string
 
   //unique to the connections, notes taken by the user querying
+  @Field({ nullable: true })
+  notes: string
+
+  @Field({ nullable: true })
+  meetingPlace: string
+
+  @Field({ nullable: true })
+  meetingDate: Date
+}
+
+@InputType({
+  description: 'Input to update Notes'
+})
+class NotesInput {
   @Field({ nullable: true })
   notes: string
 
@@ -140,6 +154,18 @@ class ContactsResolver {
       : // Otherwise, just get the default card version for the provided username
         await User.mongo.getDefaultCardVersionForUsername(username)
     return cardVersion
+  }
+
+  //The `updateNotes` mutation takes in note fields and inserts it into the db
+  //this is done in the contacts view when one wants to edit their notes.
+  @Authorized(Role.User)
+  @Mutation(() => Contact)
+  async updateNotes(
+    @Arg('contactId', { nullable: false }) contactId: string,
+    @Arg('notesInput', { nullable: true }) notesInput: NotesInput,
+    @Ctx() context: IApolloContext
+  ): Promise<Contact> {
+    
   }
 }
 
