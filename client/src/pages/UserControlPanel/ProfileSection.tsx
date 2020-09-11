@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { gql, useQuery } from 'src/apollo'
+import { gql, useQuery, useMutation } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
+import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
@@ -12,6 +12,7 @@ import { colors } from 'src/styles'
 import { formatName } from 'src/utils/name'
 import NameplateEditor from './NameplateEditor'
 import ProfileEditor from './ProfileEditor'
+import EditableImage from 'src/components/EditableImage'
 
 const bp = 'md'
 
@@ -41,6 +42,25 @@ export default () => {
       }
     `,
   )
+
+  const [updateProfilePicture] = useMutation<UpdateProfilePictureMutation>(
+    gql`
+      mutation UpdateProfilePictureMutation($file: Upload!) {
+        updateProfilePicture(file: $file) {
+          id
+          profilePicUrl
+        }
+      }
+    `,
+  )
+
+  const handleProfilePictureUpdate = async (image: File) => {
+    await updateProfilePicture({
+      variables: {
+        file: image,
+      },
+    })
+  }
 
   if (loading || !data) {
     return <LoadingPage />
@@ -75,10 +95,10 @@ export default () => {
       p={{ _: '24px', md: '48px' }}
     >
       <Box gridArea="profilePic">
-        <Image
-          width="100%"
-          borderRadius="50%"
+        <EditableImage
+          editable
           src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x300'}
+          onImageUpdate={handleProfilePictureUpdate}
         />
       </Box>
 

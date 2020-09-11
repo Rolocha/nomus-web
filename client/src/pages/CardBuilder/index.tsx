@@ -18,7 +18,7 @@ import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
 import CheckoutStep from './CheckoutStep'
-import CREATE_CUSTOM_ORDER_MUTATION from './createCustomOrderMutation'
+import UPSERT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 import {
   cardBuilderReducer,
   CheckoutFormData,
@@ -49,7 +49,7 @@ const CardBuilder = () => {
 
   const stripe = useStripe()
   const elements = useElements()
-  const [createCustomOrder] = useMutation(CREATE_CUSTOM_ORDER_MUTATION)
+  const [upsertCustomOrder] = useMutation(UPSERT_CUSTOM_ORDER_MUTATION)
 
   const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
   const backImageDataUrl = cardBuilderState.backDesignFile?.url
@@ -120,7 +120,7 @@ const CardBuilder = () => {
       UpsertCustomOrderMutation
     > | null = null
     if (cardBuilderState.baseType === 'custom') {
-      orderCreateResult = await createCustomOrder({
+      orderCreateResult = await upsertCustomOrder({
         variables: {
           payload: {
             ...basePayload,
@@ -163,7 +163,7 @@ const CardBuilder = () => {
   }, [
     stripe,
     cardBuilderState,
-    createCustomOrder,
+    upsertCustomOrder,
     frontImageDataUrl,
     backImageDataUrl,
   ])

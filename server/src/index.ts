@@ -10,19 +10,23 @@ import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
+// import { graphqlUploadExpress } from 'graphql-upload'
 
 db.init()
 
+const cookieMiddleware = cookieParser()
 const app = express()
-app.use(cookieParser())
 app.use(morgan(':date[clf] | :method :url :status - :response-time ms'))
 
 app.get('/ping', async (req: Request, res: Response) => {
   res.send('pong')
 })
 
-app.use('/auth', bodyParser.json(), authRouter)
-app.use(graphqlPath, authMiddleware)
+// Set up public auth routes
+app.use('/auth', cookieMiddleware, bodyParser.json(), authRouter)
+
+// Set up GraphQL
+app.use(graphqlPath, cookieMiddleware, authMiddleware)
 gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.listen(Number(appServerPort), () => {

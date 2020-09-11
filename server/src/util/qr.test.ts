@@ -1,9 +1,11 @@
+import AWS from 'aws-sdk'
 import * as AWSMock from 'aws-sdk-mock'
 import { urlToQRImageUrl } from './qr'
 
 describe('qr module', () => {
   describe('urlToImageUrl', () => {
     it('generates a QR code for the given url, uploads it to S3, and returns the link', async () => {
+      AWSMock.setSDKInstance(AWS)
       const putObjectMock = jest.fn().mockImplementation((_, cb) => {
         cb()
       })
