@@ -44,10 +44,6 @@ class App extends React.Component<PropsType, StateType> {
             p {
               margin: 0;
             }
-
-            .scroll-lock {
-              overflow: hidden;
-            }
           `}
         />
         <Elements

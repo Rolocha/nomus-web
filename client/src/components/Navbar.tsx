@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css, Global } from '@emotion/core'
 import { rgba } from 'polished'
 import * as React from 'react'
 import { animated, useTransition } from 'react-spring'
@@ -85,17 +85,17 @@ const Navbar = (props: Props) => {
     }
   }
 
-  // Disable background scroll when menu gets opened
-  React.useEffect(() => {
-    if (mobileMenuOpen) {
-      document.querySelector('html')?.classList.add('scroll-lock')
-    } else {
-      document.querySelector('html')?.classList.remove('scroll-lock')
-    }
-  }, [mobileMenuOpen])
-
   return (
-    <Box position="relative" zIndex={300} width="100%">
+    <Box position="relative" zIndex={300} width="100%" as="nav" id="navbar">
+      {mobileMenuOpen && (
+        <Global
+          styles={css`
+            html {
+              overflow: hidden;
+            }
+          `}
+        />
+      )}
       <Box
         bg="white"
         width="100%"
