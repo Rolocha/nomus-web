@@ -82,12 +82,14 @@ export default () => {
         "previewButton previewButton previewButton"
         "profilePic nameplate editName"
         "cards cards cards"
-        "profileInfo profileInfo editProfile"
+        "phoneNumber phoneNumber editProfile"
+        "profileInfo profileInfo profileInfo"
       `,
         [bp]: `
         "previewButton previewButton . ."
         "profilePic nameplate nameplate editName"
-        "cards profileInfo profileInfo editProfile"
+        "cards phoneNumber phoneNumber editProfile"
+        "cards profileInfo profileInfo profileInfo"
     `,
       }}
       gridColumnGap={3}
@@ -157,12 +159,14 @@ export default () => {
         </Box>
       )}
 
-      <Box gridArea="profileInfo">
-        <Box mb={3}>
+      <Box gridArea="phoneNumber">
+        <Box>
           <Text.Label mb={1}>PHONE</Text.Label>
           <Text.Body2>{data.user.phoneNumber}</Text.Body2>
         </Box>
+      </Box>
 
+      <Box gridArea="profileInfo">
         <Box mb={3}>
           <Text.Label>EMAIL</Text.Label>
           <Text.Body2>{data.user.email}</Text.Body2>
