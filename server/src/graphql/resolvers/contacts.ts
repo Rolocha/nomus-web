@@ -159,22 +159,18 @@ class ContactsResolver {
   //The `updateNotes` mutation takes in note fields and inserts it into the db
   //this is done in the contacts view when one wants to edit their notes.
   @Authorized(Role.User)
-  @Mutation(() => Contact)
+  @Mutation(() => Connection)
   async updateNotes(
     @Arg('contactId', { nullable: false }) contactId: string,
     @Arg('notesInput', { nullable: true }) notesInput: NotesInput,
     @Ctx() context: IApolloContext
-  ): Promise<Contact> {
-    const connection = await Connection.mongo
-      .findOne({ from: context.user._id, to: MUUID.from(contactId) })
-      .populate({
-        path: 'to',
-        populate: {
-          path: 'defaultCardVersion',
-        },
-      })
+  ): Promise<Connection> {
+    const connection = await Connection.mongo.findOne({ from: context.user._id, to: MUUID.from(contactId) })
+    connection.meetingDate = notesInput.meetingDate ?? connection.meetingDate
+    connection.meetingPlace = notesInput.meetingPlace ?? connection.meetingPlace
+    connection.notes = notesInput.notes ?? connection.notes
     
-    
+    return await connection.save()
   }
 }
 

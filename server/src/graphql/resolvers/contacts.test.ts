@@ -310,4 +310,46 @@ describe('ContactsResolver', () => {
       expect(response.errors).toBeDefined()
     })
   })
+  describe('updateNotes mutation', () => {
+    it('updates the notes of a users connection', async () => {
+      const user_from = await createMockUser()
+      const user_to = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      const meetingDate = new Date()
+      await createMockConnection({
+        from: user_from._id,
+        to: user_to._id,
+        meetingDate,
+        meetingPlace: 'there',
+        notes: 'foo',
+      })
+
+      const response = await execQuery({
+        source: `
+          mutation UpdateNotesTestQuery($contactId: String!, $notesInput: NotesInput!) {
+            updateNotes(contactId: $contactId, notesInput: $notesInput) {
+              meetingDate
+              meetingPlace
+              notes
+            }
+          }
+        `,
+        variableValues: {
+          contactId: user_to.id,
+          notesInput: {
+            "meetingPlace": 'here',
+            "notes": "lovely"
+          }
+        },
+        contextUser: user_from,
+      })
+
+      expect(response.data?.updateNotes?.meetingPlace).toBe('here')
+      expect(response.data?.updateNotes?.meetingDate).toBe(meetingDate.getTime())
+      expect(response.data?.updateNotes?.notes).toBe('lovely')
+    })
+  })
 })
