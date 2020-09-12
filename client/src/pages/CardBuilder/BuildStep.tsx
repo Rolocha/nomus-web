@@ -125,8 +125,8 @@ const BuildStep = React.forwardRef(
                       gridRowGap={2}
                     >
                       {specs.map((specLine) => [
-                        <Text.Body2>{specLine[0]}</Text.Body2>,
-                        <Text.Body2>{specLine[1]}</Text.Body2>,
+                        <Text.Body2 key={0}>{specLine[0]}</Text.Body2>,
+                        <Text.Body2 key={1}>{specLine[1]}</Text.Body2>,
                       ])}
                     </Box>
                   </Box>

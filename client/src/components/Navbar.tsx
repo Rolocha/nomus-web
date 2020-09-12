@@ -135,7 +135,7 @@ const Navbar = (props: Props) => {
             )
 
             return (
-              <Box>
+              <Box key={item.name}>
                 {isNestedNavItem(item) ? (
                   <PopoverButton
                     omitIconBg
@@ -159,7 +159,11 @@ const Navbar = (props: Props) => {
                       >
                         {item.nestedItems.map((nestedItem) => {
                           return (
-                            <Link to={nestedItem.path} py={2}>
+                            <Link
+                              key={nestedItem.name}
+                              to={nestedItem.path}
+                              py={2}
+                            >
                               <Text.Body3
                                 color={colors.nomusBlue}
                                 css={css({ whiteSpace: 'nowrap' })}
@@ -195,7 +199,7 @@ const Navbar = (props: Props) => {
           >
             {loggedIn
               ? [
-                  <Link to="/dashboard">
+                  <Link key="dashboard" to="/dashboard">
                     <Box display="flex" alignItems="center">
                       <SVG.Profile />
                       <Text.Body ml={2} color={colors.nomusBlue}>
@@ -205,12 +209,13 @@ const Navbar = (props: Props) => {
                   </Link>,
                 ]
               : [
-                  <Link to="/login">
+                  <Link key="login" to="/login">
                     <Text.Body ml={2} color={colors.nomusBlue}>
                       sign in
                     </Text.Body>
                   </Link>,
                   <Link
+                    key="register"
                     to="/register"
                     asButton
                     buttonStyle="secondary"
@@ -282,7 +287,7 @@ const Navbar = (props: Props) => {
                               </Text.MainNav>
                             )
                             return (
-                              <Box mb={3}>
+                              <Box key={item.name} mb={3}>
                                 {isNestedNavItem(item) ? (
                                   nestedTitle
                                 ) : (
@@ -292,6 +297,7 @@ const Navbar = (props: Props) => {
                                   {isNestedNavItem(item) &&
                                     item.nestedItems.map((nestedItem) => (
                                       <Link
+                                        key={nestedItem.name}
                                         display="block"
                                         to={nestedItem.path}
                                         ml={2}

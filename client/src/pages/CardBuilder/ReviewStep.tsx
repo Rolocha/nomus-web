@@ -68,9 +68,9 @@ const ReviewStep = React.forwardRef(
               Associated information
             </Text.SectionSubheader>
             <Box display="grid" gridTemplateColumns="2fr 2fr" gridRowGap={2}>
-              {associatedInfo.map((item) => [
-                <Text.Body2>{item[0]}</Text.Body2>,
-                <Text.Body2>{item[1]}</Text.Body2>,
+              {associatedInfo.map((item, index) => [
+                <Text.Body2 key={index + '0'}>{item[0]}</Text.Body2>,
+                <Text.Body2 key={index + '1'}>{item[1]}</Text.Body2>,
               ])}
             </Box>
           </Box>
@@ -140,8 +140,8 @@ const ReviewStep = React.forwardRef(
                 `${cardBuilderState.formData?.city}, ${cardBuilderState.formData?.state} ${cardBuilderState.formData?.postalCode}`,
               ]
                 .filter(Boolean)
-                .map((line) => (
-                  <Text.Body2>{line}</Text.Body2>
+                .map((line, index) => (
+                  <Text.Body2 key={index}>{line}</Text.Body2>
                 ))}
             </Box>
             <Box>
@@ -164,8 +164,8 @@ const ReviewStep = React.forwardRef(
                 `${cardBuilderState?.stripeToken?.card?.brand} ${cardBuilderState?.stripeToken?.card?.funding} card`,
                 `**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`,
                 `${cardBuilderState?.stripeToken?.card?.address_zip}`,
-              ].map((line) => (
-                <Text.Body2>{line}</Text.Body2>
+              ].map((line, index) => (
+                <Text.Body2 key={index}>{line}</Text.Body2>
               ))}
             </Box>
             <Box>

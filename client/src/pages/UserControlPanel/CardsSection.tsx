@@ -180,6 +180,7 @@ export default () => {
               const formattedCreationDate = formatDate(cv.createdAt)
               return (
                 <Box
+                  key={cv.id}
                   display="inline-block"
                   css={css({ flexShrink: 0 })}
                   py={2}

@@ -107,6 +107,7 @@ const ContactCardsList = ({
               </Text.Body3>
               {allContactsSortOptions.map((option) => (
                 <Box
+                  key={option}
                   cursor="pointer"
                   onClick={() => onSelectedContactSortOptionChange(option)}
                   display="flex"

@@ -176,7 +176,7 @@ const Footer = ({}: Props) => {
               { Icon: SVG.Twitter, link: 'https://twitter.com/nomusme' },
               { Icon: SVG.Instagram, link: 'https://instagram.com/nomus.me' },
             ] as const).map(({ Icon, link }) => (
-              <Link to={link}>
+              <Link key={link} to={link}>
                 <Box
                   mx={1}
                   borderRadius="100%"
