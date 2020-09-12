@@ -11,6 +11,7 @@ interface Props {
 }
 
 const CopyableText = ({ copyText, children }: Props) => {
+  const [didCopy, setDidCopy] = React.useState(false)
   const textRef = React.useRef<HTMLDivElement | null>(null)
 
   const handleCopy = React.useCallback(() => {
@@ -27,6 +28,8 @@ const CopyableText = ({ copyText, children }: Props) => {
       dummy.select()
       document.execCommand('copy')
       document.body.removeChild(dummy)
+
+      setDidCopy(true)
     }
   }, [copyText, textRef])
 
@@ -34,6 +37,7 @@ const CopyableText = ({ copyText, children }: Props) => {
     <Box
       as="span"
       position="relative"
+      onMouseOver={() => setDidCopy(false)}
       css={css`
         &:hover {
           > :first-child {
@@ -58,8 +62,9 @@ const CopyableText = ({ copyText, children }: Props) => {
         bg="hoverBlue"
         py={1}
         px={2}
+        as="span"
       >
-        <Text.Body2>Copy</Text.Body2>
+        <Text.Body2>{didCopy ? 'Copied!' : 'Copy...'}</Text.Body2>
       </Box>
 
       <Box as="span" ref={textRef}>
