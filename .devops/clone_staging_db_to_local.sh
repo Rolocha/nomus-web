@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run this via docker exec -i db bash < ./clone_local_db_to_staging.sh
+# Run this via docker exec -i db bash < ./clone_staging_db_to_local.sh
 
 SRC_HOST=ec2-52-20-46-100.compute-1.amazonaws.com
 SRC_DB=rolocha-staging

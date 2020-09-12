@@ -90,7 +90,7 @@ export default () => {
         "cards profileInfo profileInfo editProfile"
     `,
       }}
-      gridColumnGap={2}
+      gridColumnGap={3}
       gridRowGap={3}
       p={{ _: '24px', md: '48px' }}
     >
@@ -129,7 +129,6 @@ export default () => {
           display="flex"
           flexDirection={{ _: 'row', [bp]: 'column' }}
           alignItems={{ _: 'center', [bp]: 'flex-end' }}
-          pr={3}
           flexShrink={0}
         >
           {/* Front of business card */}
