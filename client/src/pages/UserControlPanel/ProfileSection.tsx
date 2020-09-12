@@ -98,6 +98,7 @@ export default () => {
         <EditableImage
           editable
           src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x300'}
+          width="100%"
           onImageUpdate={handleProfilePictureUpdate}
         />
       </Box>
