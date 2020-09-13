@@ -11,59 +11,68 @@
  * foo
  */
 export enum OrderState {
-  Captured = 'Captured',
-  Created = 'Created',
-  Creating = 'Creating',
-  Enroute = 'Enroute',
-  Fulfilled = 'Fulfilled',
-  Paid = 'Paid',
+  Captured = "Captured",
+  Created = "Created",
+  Creating = "Creating",
+  Enroute = "Enroute",
+  Fulfilled = "Fulfilled",
+  Paid = "Paid",
 }
 
 /**
  * Specification for a card built using custom assets
  */
 export interface CustomCardSpecInput {
-  cardSlug?: string | null
-  vcfNotes?: string | null
-  frontImageDataUrl: string
-  backImageDataUrl?: string | null
+  cardSlug?: string | null;
+  vcfNotes?: string | null;
+  frontImageDataUrl: string;
+  backImageDataUrl?: string | null;
+}
+
+/**
+ * Input to update Notes
+ */
+export interface NotesInput {
+  notes?: string | null;
+  meetingPlace?: string | null;
+  meetingDate?: any | null;
 }
 
 /**
  * Input for udpating user profile
  */
 export interface ProfileUpdateInput {
-  username?: string | null
-  firstName?: string | null
-  middleName?: string | null
-  lastName?: string | null
-  phoneNumber?: string | null
-  email?: string | null
-  headline?: string | null
-  bio?: string | null
-  activated?: boolean | null
+  username?: string | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  email?: string | null;
+  headline?: string | null;
+  bio?: string | null;
+  activated?: boolean | null;
 }
 
 /**
  * A shipping address input
  */
 export interface ShippingAddressInput {
-  line1: string
-  line2?: string | null
-  city: string
-  state: string
-  postalCode: string
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
 }
 
 /**
  * Input to generate new or update existing custom card Order
  */
 export interface UpsertCustomOrderInput {
-  orderId?: string | null
-  quantity?: number | null
-  stripeToken?: string | null
-  shippingAddress?: ShippingAddressInput | null
-  cardSpec: CustomCardSpecInput
+  orderId?: string | null;
+  quantity?: number | null;
+  stripeToken?: string | null;
+  shippingAddress?: ShippingAddressInput | null;
+  cardSpec: CustomCardSpecInput;
 }
 
 //==============================================================

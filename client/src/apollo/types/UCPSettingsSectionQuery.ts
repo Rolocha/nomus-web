@@ -8,21 +8,21 @@
 // ====================================================
 
 export interface UCPSettingsSectionQuery_user_name {
-  __typename: 'PersonName'
-  first: string
-  middle: string | null
-  last: string
+  __typename: "PersonName";
+  first: string;
+  middle: string | null;
+  last: string;
 }
 
 export interface UCPSettingsSectionQuery_user {
-  __typename: 'User'
-  id: string
-  username: string | null
-  name: UCPSettingsSectionQuery_user_name | null
-  email: string | null
-  activated: boolean
+  __typename: "User";
+  id: string;
+  username: string | null;
+  name: UCPSettingsSectionQuery_user_name | null;
+  email: string | null;
+  activated: boolean;
 }
 
 export interface UCPSettingsSectionQuery {
-  user: UCPSettingsSectionQuery_user
+  user: UCPSettingsSectionQuery_user;
 }

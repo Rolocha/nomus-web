@@ -179,8 +179,11 @@ const ContactsDetailView = ({
               <NotesEditor 
                 editIconOnlyBp={bp}
                 defaultValues={{
-
+                  meetingDate: selectedContact.meetingDate,
+                  meetingPlace: selectedContact.meetingPlace,
+                  notes: selectedContact.notes
                 }}
+                contact={selectedContact}
               />
             </Box>
           </Box>

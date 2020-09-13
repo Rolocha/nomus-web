@@ -8,16 +8,16 @@
 // ====================================================
 
 export interface ChangePasswordQuery_changePassword {
-  __typename: 'User'
-  id: string
+  __typename: "User";
+  id: string;
 }
 
 export interface ChangePasswordQuery {
-  changePassword: ChangePasswordQuery_changePassword
+  changePassword: ChangePasswordQuery_changePassword;
 }
 
 export interface ChangePasswordQueryVariables {
-  oldPassword: string
-  newPassword: string
-  confirmNewPassword: string
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }
