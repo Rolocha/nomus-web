@@ -273,7 +273,7 @@ const Modal = ({
                       onClose={cancelCloseConfirm}
                       actions={{
                         primary: {
-                          text: 'Go back',
+                          text: 'No thanks',
                           handler: cancelCloseConfirm,
                         },
                         secondary: {
