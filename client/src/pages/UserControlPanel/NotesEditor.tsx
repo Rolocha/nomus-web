@@ -1,14 +1,18 @@
-import React from "react"
-import { useForm } from "react-hook-form"
-import Box from "src/components/Box"
-import EditButton from "src/components/EditButton"
+import React from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import Box from 'src/components/Box'
+import EditButton from 'src/components/EditButton'
 import UPDATE_NOTES_MUTATION from './updateNotesMutation'
-import { UpdateNotesQuery } from "src/apollo/types/UpdateNotesQuery"
-import { useMutation } from "src/apollo"
-import deepEqual from "deep-equal"
-import { Contact } from "src/types/contact"
-import Modal from "src/components/Modal"
-
+import { UpdateNotesQuery } from 'src/apollo/types/UpdateNotesQuery'
+import { useMutation } from 'src/apollo'
+import deepEqual from 'deep-equal'
+import * as Text from 'src/components/Text'
+import { Contact } from 'src/types/contact'
+import Modal from 'src/components/Modal'
+import * as Form from 'src/components/Form'
+import { css } from '@emotion/core'
+import ReactDatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 interface NotesFormData {
   meetingDate?: Date | null
@@ -25,14 +29,12 @@ interface Props {
 
 export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
   const [isEditing, setIsEditing] = React.useState(false)
-  const { register, handleSubmit, getValues, reset } = useForm<
+  const { register, handleSubmit, getValues, reset, control } = useForm<
     NotesFormData
   >({
     defaultValues,
   })
-  const [updateNotes] = useMutation<UpdateNotesQuery>(
-    UPDATE_NOTES_MUTATION
-  )
+  const [updateNotes] = useMutation<UpdateNotesQuery>(UPDATE_NOTES_MUTATION)
 
   const onFormSubmit = React.useCallback(
     async (formData: NotesFormData) => {
@@ -40,7 +42,7 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
         variables: {
           contactId: contact.id,
           notesInput: formData,
-        }
+        },
       })
       if (errors == null) {
         setIsEditing(false)
@@ -48,14 +50,14 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
         reset(getValues())
       }
     },
-    [updateNotes, setIsEditing, reset, getValues, contact.id]
+    [updateNotes, setIsEditing, reset, getValues, contact.id],
   )
 
   const hasUnsavedChanges = React.useCallback(
     () => !deepEqual(defaultValues, getValues()),
     [defaultValues, getValues],
   )
-  
+
   return (
     <Box>
       <EditButton
@@ -79,7 +81,52 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
         }}
       >
         <Box>
+          <Text.PageHeader mb={3}>Edit Notes</Text.PageHeader>
+          <Form.Form onSubmit={handleSubmit(onFormSubmit)}>
+            <Box
+              display="flex"
+              flexDirection={{ _: 'column', md: 'row' }}
+              justifyContent="space-between"
+              mb={3}
+              mx={{ _: 0, md: -1 }}
+              css={css`
+                & > * {
+                  flex-basis: calc(100% / 3);
+                }
+              `}
+            >
+              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+                <Form.Label htmlFor="meetingDate">MEETING DATE</Form.Label>
 
+                <Controller
+                  as={ReactDatePicker}
+                  control={control}
+                  valueName="selected" // DateSelect value's name is selected
+                  onChange={([selected]) => selected}
+                  name="meetingDate"
+                  className="meetingDate"
+                  placeholderText="Select date"
+                  todayButton="Today"
+                />
+              </Form.Item>
+              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+                <Form.Label htmlFor="meetingPlace">MEETING PLACE</Form.Label>
+                <Form.Input
+                  name="meetingPlace"
+                  ref={register({ required: false })}
+                  type="text"
+                />
+              </Form.Item>
+            </Box>
+            <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Label htmlFor="notes">ADDITIONAL NOTES</Form.Label>
+              <Form.TextArea
+                name="notes"
+                rows={4}
+                ref={register({ required: false })}
+              />
+            </Form.Item>
+          </Form.Form>
         </Box>
       </Modal>
     </Box>
