@@ -1,5 +1,5 @@
 import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import EditButton from 'src/components/EditButton'
 import UPDATE_NOTES_MUTATION from './updateNotesMutation'
@@ -11,8 +11,6 @@ import { Contact } from 'src/types/contact'
 import Modal from 'src/components/Modal'
 import * as Form from 'src/components/Form'
 import { css } from '@emotion/core'
-import ReactDatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 
 interface NotesFormData {
   meetingDate?: Date | null
@@ -29,15 +27,16 @@ interface Props {
 
 export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
   const [isEditing, setIsEditing] = React.useState(false)
-  const { register, handleSubmit, getValues, reset, control } = useForm<
-    NotesFormData
-  >({
+  const { register, handleSubmit, getValues, reset } = useForm<NotesFormData>({
     defaultValues,
   })
   const [updateNotes] = useMutation<UpdateNotesQuery>(UPDATE_NOTES_MUTATION)
 
   const onFormSubmit = React.useCallback(
     async (formData: NotesFormData) => {
+      if (!formData.meetingDate) {
+        formData.meetingDate = null
+      }
       const { errors } = await updateNotes({
         variables: {
           contactId: contact.id,
@@ -97,16 +96,10 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
             >
               <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
                 <Form.Label htmlFor="meetingDate">MEETING DATE</Form.Label>
-
-                <Controller
-                  as={ReactDatePicker}
-                  control={control}
-                  valueName="selected" // DateSelect value's name is selected
-                  onChange={([selected]) => selected}
+                <Form.Input
                   name="meetingDate"
-                  className="meetingDate"
-                  placeholderText="Select date"
-                  todayButton="Today"
+                  type="date"
+                  ref={register({ required: false })}
                 />
               </Form.Item>
               <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
