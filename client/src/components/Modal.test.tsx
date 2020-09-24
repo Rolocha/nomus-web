@@ -22,14 +22,14 @@ describe('<Modal />', () => {
   it('if confirmClose is true, show confirmation modal when trying to close', () => {
     const closeModal = jest.fn()
 
-    const { getByText } = render(
+    const { getByText, getByLabelText } = render(
       <Modal isOpen={true} onClose={closeModal} confirmClose={() => true}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,
     )
 
-    getByText('X').click()
+    getByLabelText('Close Modal').click()
     expect(getByText('Discard?')).toBeDefined()
 
     // Click discard button

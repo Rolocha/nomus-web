@@ -7,6 +7,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
+import * as SVG from 'src/components/SVG'
 import {
   RequiredTheme,
   ResponsiveValue,
@@ -220,7 +221,7 @@ const Modal = ({
                                 cursor: pointer;
                               `}
                             >
-                              <Text.Plain fontSize={24}>X</Text.Plain>
+                              <SVG.Close color={colors.midnightGray}/>
                             </Box>
                           </Box>
 
