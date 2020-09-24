@@ -288,7 +288,7 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        query ContactTestQuery($contactUsername: String!) {
+        query ContactTestQuery($contactUsername: String) {
           contactByUsername(contactUsername: $contactUsername) {
             id
             name {

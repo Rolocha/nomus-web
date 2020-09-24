@@ -9,6 +9,12 @@ import { ContactsSortOption } from './contact-sorting'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import NotesEditor from './NotesEditor'
+import { useQuery } from '@apollo/react-hooks'
+import { gql } from 'src/apollo'
+import {
+  ContactByUsernameQueryVariables,
+  ContactByUsernameQuery,
+} from 'src/apollo/types/ContactByUsernameQuery'
 
 interface ParamsType {
   usernameOrId: string
@@ -29,14 +35,43 @@ const ContactsDetailView = ({
   contacts,
   searchQueryValue,
 }: Props) => {
-  const selectedContact =
-    selectedContactUsernameOrId != null
-      ? contacts.find(
-          (user) =>
-            user.username === selectedContactUsernameOrId ||
-            user.id === selectedContactUsernameOrId,
-        ) ?? null
-      : null
+  const { data, error } = useQuery<
+    ContactByUsernameQuery,
+    ContactByUsernameQueryVariables
+  >(
+    gql`
+      query ContactByUsernameQuery($contactUsername: String) {
+        contactByUsername(contactUsername: $contactUsername) {
+          id
+          username
+          name {
+            first
+            middle
+            last
+          }
+          phoneNumber
+          email
+          headline
+          bio
+          profilePicUrl
+
+          cardFrontImageUrl
+          cardBackImageUrl
+          vcfUrl
+
+          meetingDate
+          meetingPlace
+          notes
+        }
+      }
+    `,
+    {
+      variables: {
+        contactUsername: selectedContactUsernameOrId,
+      },
+    },
+  )
+  const selectedContact = error ? null : data?.contactByUsername
   return (
     <Box
       display={{ _: undefined, [bp]: 'grid' }}
@@ -176,12 +211,12 @@ const ContactsDetailView = ({
             </Box>
 
             <Box gridArea="editNotes">
-              <NotesEditor 
+              <NotesEditor
                 editIconOnlyBp={bp}
                 defaultValues={{
                   meetingDate: selectedContact.meetingDate,
                   meetingPlace: selectedContact.meetingPlace,
-                  notes: selectedContact.notes
+                  notes: selectedContact.notes,
                 }}
                 contact={selectedContact}
               />
@@ -199,7 +234,6 @@ const ContactsDetailView = ({
             "tags additionalNotes"
           `}
           >
-
             <Box gridArea="meetingDate">
               <Text.Label>Meeting Date</Text.Label>
               <Text.Body2>

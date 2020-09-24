@@ -156,9 +156,13 @@ class ContactsResolver {
   @Authorized(Role.User)
   @Query(() => Contact)
   async contactByUsername(
-    @Arg('contactUsername', { nullable: false }) contactUsername: string,
+    @Arg('contactUsername', { nullable: true }) contactUsername: string,
     @Ctx() context: IApolloContext
   ): Promise<Contact> {
+    if (contactUsername == null) {
+      throw new Error('contactUsername is null')
+    }
+
     const userQueried = await User.mongo.findOne({ username: contactUsername })
     const connection = await Connection.mongo
       .findOne({ from: context.user._id, to: userQueried._id })
