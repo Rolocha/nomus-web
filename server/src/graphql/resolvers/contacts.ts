@@ -4,7 +4,17 @@ import Connection from 'src/models/Connection'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
 import { User } from 'src/models/User'
-import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver, Mutation, InputType } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Field,
+  ObjectType,
+  Query,
+  Resolver,
+  Mutation,
+  InputType,
+} from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
@@ -58,7 +68,7 @@ class Contact {
 }
 
 @InputType({
-  description: 'Input to update Notes'
+  description: 'Input to update Notes',
 })
 class NotesInput {
   @Field({ nullable: true })
@@ -143,6 +153,29 @@ class ContactsResolver {
     return connectionToContact(connection)
   }
 
+  @Authorized(Role.User)
+  @Query(() => Contact)
+  async contactByUsername(
+    @Arg('contactUsername', { nullable: false }) contactUsername: string,
+    @Ctx() context: IApolloContext
+  ): Promise<Contact> {
+    const userQueried = await User.mongo.findOne({ username: contactUsername })
+    const connection = await Connection.mongo
+      .findOne({ from: context.user._id, to: userQueried._id })
+      .populate({
+        path: 'to',
+        populate: {
+          path: 'defaultCardVersion',
+        },
+      })
+
+    if (!connection) {
+      throw new Error('No connection exists between current user and queried user')
+    }
+
+    return connectionToContact(connection)
+  }
+
   @Query(() => CardVersion)
   async publicContact(
     @Arg('username') username: string,
@@ -165,11 +198,14 @@ class ContactsResolver {
     @Arg('notesInput', { nullable: true }) notesInput: NotesInput,
     @Ctx() context: IApolloContext
   ): Promise<Connection> {
-    const connection = await Connection.mongo.findOne({ from: context.user._id, to: MUUID.from(contactId) })
+    const connection = await Connection.mongo.findOne({
+      from: context.user._id,
+      to: MUUID.from(contactId),
+    })
     connection.meetingDate = notesInput.meetingDate ?? connection.meetingDate
     connection.meetingPlace = notesInput.meetingPlace ?? connection.meetingPlace
     connection.notes = notesInput.notes ?? connection.notes
-    
+
     return await connection.save()
   }
 }

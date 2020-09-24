@@ -270,6 +270,66 @@ describe('ContactsResolver', () => {
 
       expect(response.data?.contact).toMatchObject(expectedData)
     })
+    it('gets a contact by username where connection exists', async () => {
+      const user_from = await createMockUser()
+      const user_to = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      const meetingDate = new Date()
+      const connection = await createMockConnection({
+        from: user_from._id,
+        to: user_to._id,
+        meetingDate,
+        meetingPlace: 'there',
+        notes: 'foo',
+      })
+
+      const response = await execQuery({
+        source: `
+        query ContactTestQuery($contactUsername: String!) {
+          contactByUsername(contactUsername: $contactUsername) {
+            id
+            name {
+              first
+              middle
+              last
+            }
+            phoneNumber
+            email
+            
+            cardFrontImageUrl
+            cardBackImageUrl
+            vcfUrl
+
+            meetingDate
+            meetingPlace
+            notes
+          }
+        }
+        `,
+        variableValues: {
+          contactUsername: user_to.username,
+        },
+        contextUser: user_from,
+      })
+
+      const expectedData = {
+        id: user_to.id,
+        name: (user_to.name as DocumentType<PersonName>).toObject(),
+        phoneNumber: user_to.phoneNumber ?? null,
+        email: user_to.email,
+        cardFrontImageUrl: null,
+        cardBackImageUrl: null,
+        vcfUrl: user_to.vcfUrl ?? null,
+        notes: connection.notes ?? null,
+        meetingDate: meetingDate.getTime(),
+        meetingPlace: connection.meetingPlace,
+      }
+
+      expect(response.data?.contactByUsername).toMatchObject(expectedData)
+    })
     it('fails if no connection exists', async () => {
       const user_from = await createMockUser()
       const user_to = await createMockUser({
@@ -340,9 +400,9 @@ describe('ContactsResolver', () => {
         variableValues: {
           contactId: user_to.id,
           notesInput: {
-            "meetingPlace": 'here',
-            "notes": "lovely"
-          }
+            meetingPlace: 'here',
+            notes: 'lovely',
+          },
         },
         contextUser: user_from,
       })
