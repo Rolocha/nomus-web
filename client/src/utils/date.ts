@@ -33,6 +33,6 @@ export const getMonthString = (month: number) =>
 export const getFormattedFullDate = (date: Date | number) => {
   const dateObj = new Date(date)
   return `${getMonthString(
-    dateObj.getMonth(),
-  )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
+    dateObj.getUTCMonth(),
+  )} ${dateObj.getUTCDate()}, ${dateObj.getUTCFullYear()}`
 }
