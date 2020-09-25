@@ -158,16 +158,14 @@ export const styleVariants = {
   success: {
     borderWidth: '1px',
     borderStyle: 'solid',
-    backgroundColor: colors.validGreen,
+    backgroundColor: 'white',
     borderColor: colors.validGreen,
-    color: colors.white,
+    color: colors.validGreen,
     transition: buttonTransition,
     '&:hover': {
-      borderColor: colors.hoverGreen,
       backgroundColor: colors.hoverGreen,
     },
     '&:active': {
-      borderColor: colors.activeGreen,
       backgroundColor: colors.activeGreen,
     },
     '&:focus': {
