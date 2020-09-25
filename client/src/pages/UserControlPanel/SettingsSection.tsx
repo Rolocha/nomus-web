@@ -189,7 +189,7 @@ export default () => {
       </Box>
 
       <Box gridArea="email">
-        <Text.Label mb={1}>EMAIL</Text.Label>
+        <Text.Label>EMAIL</Text.Label>
         {isEditingEmail ? (
           <Form.Form onSubmit={emailFormHandleSubmit(onSubmitEmail)}>
             <Form.Input
@@ -197,13 +197,14 @@ export default () => {
               name="email"
               type="email"
               autoComplete="email"
-              fontSize="14px"
+              fontSize="16px"
               width="100%"
+              padding="4px 4px"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
         ) : (
-          <Text.Body2>{data.user.email}</Text.Body2>
+          <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
         )}
       </Box>
 
@@ -236,33 +237,41 @@ export default () => {
         {isEditingUsername ? (
           <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
             <Box display="flex">
-              <Text.Body2>{'nomus.me/'}</Text.Body2>
+              <Text.Body2 mt={1}>{'nomus.me/'}</Text.Body2>
               <Form.Input
                 ref={usernameFormRegister()}
                 name="username"
                 type="username"
                 autoComplete="username"
-                fontSize="14px"
+                fontSize="16px"
                 width="100%"
+                padding="0px 6px"
               />
               <Form.Input type="submit" display="none" />
             </Box>
           </Form.Form>
         ) : (
-          <Text.Body2>{'nomus.me/' + data.user.username}</Text.Body2>
+          <Text.Body2 mt={2}>{'nomus.me/' + data.user.username}</Text.Body2>
         )}
       </Box>
 
-      <Box
-        gridArea="editUsername"
-        placeSelf={{ _: 'end', [bp]: 'start center' }}
-      >
-        {isEditingUsername ? (
-          <EditButton
+      {isEditingUsername ? (
+        <Box gridArea="editUsername">
+          <Button
+            width={{ _: '100%', [bp]: '85%' }}
+            variant="success"
             onClick={usernameFormHandleSubmit(onSubmitUsername)}
-            iconOnlyBp={bp}
-          />
-        ) : (
+          >
+            <Text.Plain fontSize="14px" color="validGreen">
+              Save
+            </Text.Plain>
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          gridArea="editUsername"
+          placeSelf={{ _: 'end', [bp]: 'start center' }}
+        >
           <EditButton
             onClick={() => {
               setIsEditingUsername(true)
@@ -270,8 +279,8 @@ export default () => {
             }}
             iconOnlyBp={bp}
           />
-        )}
-      </Box>
+        </Box>
+      )}
 
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
