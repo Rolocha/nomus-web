@@ -85,7 +85,6 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
             <Box
               display="flex"
               flexDirection={{ _: 'column', md: 'row' }}
-              justifyContent="space-between"
               mb={3}
               mx={{ _: 0, md: -1 }}
               css={css`
@@ -108,6 +107,7 @@ export default ({ defaultValues, contact, editIconOnlyBp }: Props) => {
                   name="meetingPlace"
                   ref={register({ required: false })}
                   type="text"
+                  padding="12px 8px"
                 />
               </Form.Item>
             </Box>
