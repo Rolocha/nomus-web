@@ -1,28 +1,29 @@
 import { css } from '@emotion/core'
-import { getFormattedFullDate } from 'src/utils/date'
 import * as React from 'react'
+import { useForm } from 'react-hook-form'
 import { useHistory, useParams } from 'react-router-dom'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import { gql, useQuery } from 'src/apollo'
 import {
   ContactPageQuery,
   ContactPageQueryVariables,
 } from 'src/apollo/types/ContactPageQuery'
+import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
-import * as SVG from 'src/components/SVG'
-import * as Text from 'src/components/Text'
-import * as Form from 'src/components/Form'
+import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
-import Image from 'src/components/Image'
-import Navbar from 'src/components/Navbar'
-import LoadingPage from 'src/pages/LoadingPage'
-import { formatName } from 'src/utils/name'
-import { downloadFile } from 'src/utils/download'
-import { colors } from 'src/styles'
-import Link from 'src/components/Link'
 import EditButton from 'src/components/EditButton'
+import * as Form from 'src/components/Form'
+import Image from 'src/components/Image'
+import Link from 'src/components/Link'
 import Modal from 'src/components/Modal'
-import { useForm } from 'react-hook-form'
+import Navbar from 'src/components/Navbar'
+import * as Text from 'src/components/Text'
+import LoadingPage from 'src/pages/LoadingPage'
+import { colors } from 'src/styles'
+import { mq } from 'src/styles/breakpoints'
+import { useAuth } from 'src/utils/auth'
+import { getFormattedDateFromISODateOnly } from 'src/utils/date'
+import { formatName } from 'src/utils/name'
 
 interface UrlParams {
   username?: string
@@ -32,7 +33,7 @@ interface UrlParams {
 const bp = 'md'
 
 interface NotesFormData {
-  meetingDate: Date | null
+  meetingDate: string | null
   meetingPlace: string | null
   tags: Array<string> | null
   additionalNotes: string | null
@@ -42,19 +43,31 @@ const ContactInfoPage = () => {
   const { username, cardNameOrId }: UrlParams = useParams()
   const history = useHistory()
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
-  const openNotesModal = React.useCallback(() => setIsNotesModalOpen(true), [
-    setIsNotesModalOpen,
-  ])
-  const closeNotesModal = React.useCallback(() => setIsNotesModalOpen(false), [
-    setIsNotesModalOpen,
-  ])
+  const [hasMadeEdits, setHasMadeEdits] = React.useState(false)
+  const [hasInstantiatedNotes, setHasInstantiatedNotes] = React.useState(false)
+
+  const { loggedIn } = useAuth()
 
   const meetingDateRef = React.useRef<HTMLInputElement | null>(null)
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const additionalNotesRef = React.useRef<HTMLTextAreaElement | null>(null)
 
-  const { handleSubmit, register } = useForm<NotesFormData>()
+  const { handleSubmit, setValue, register, watch, reset } = useForm<
+    NotesFormData
+  >({
+    defaultValues: {
+      meetingDate: new Date().toISOString().substring(0, 10),
+    },
+  })
+
+  const openNotesModal = React.useCallback(() => {
+    setIsNotesModalOpen(true)
+  }, [setIsNotesModalOpen])
+
+  const closeNotesModal = React.useCallback(() => setIsNotesModalOpen(false), [
+    setIsNotesModalOpen,
+  ])
 
   const setRefAndRegister = React.useCallback(
     (refObject: React.MutableRefObject<any>) => (element: any) => {
@@ -129,9 +142,39 @@ const ContactInfoPage = () => {
     return null
   }
 
-  const saveNotes = () => {}
+  // Data is loaded at this point
 
   const { publicContact: contact } = data
+  if (!hasInstantiatedNotes) {
+    if (contact.meetingDate) setValue('meetingDate', contact.meetingDate)
+    if (contact.meetingPlace) setValue('meetingPlace', contact.meetingPlace)
+    if (contact.notes) setValue('additionalNotes', contact.notes)
+    setHasInstantiatedNotes(true)
+  }
+
+  const formFields = watch()
+
+  const saveNotes = (data: NotesFormData) => {
+    setHasMadeEdits(true)
+    // Update form's default values so if they open the modal again,
+    // it keeps the previous edits
+    reset(watch())
+    if (loggedIn) {
+      // TODO: Mutation to immediately save your notes to your account
+    }
+    closeNotesModal()
+  }
+
+  const notesParams = new URLSearchParams()
+  if (formFields.meetingDate)
+    notesParams.set('meetingDate', formFields.meetingDate)
+  if (formFields.meetingPlace)
+    notesParams.set('meetingPlace', formFields.meetingPlace)
+  if (formFields.additionalNotes)
+    notesParams.set('additionalNotes', formFields.additionalNotes)
+  const downloadLink = `/api/contact-card/${
+    contact.username
+  }?${notesParams.toString()}`
 
   return contact ? (
     <Box>
@@ -147,7 +190,7 @@ const ContactInfoPage = () => {
         position="relative"
       >
         <Box
-          py={{ _: '24px', md: '48px' }}
+          py={{ _: 0, md: '48px' }}
           display="grid"
           gridTemplateColumns={{ _: '1fr', [bp]: '7fr 5fr' }}
           gridTemplateAreas={{
@@ -161,6 +204,7 @@ const ContactInfoPage = () => {
               "buttons buttons"
             `,
           }}
+          mb={{ _: '100px', [bp]: 0 }}
           gridColumnGap={3}
           gridRowGap={4}
         >
@@ -177,11 +221,13 @@ const ContactInfoPage = () => {
             }}
             gridTemplateAreas={{
               _: `
+              "banner banner"
               "profilePic nameplate"
               "cards cards"
               "profileInfo profileInfo"
             `,
               [bp]: `
+              "banner banner"
               "profilePic nameplate"
               "cards profileInfo"
           `,
@@ -189,6 +235,15 @@ const ContactInfoPage = () => {
             gridColumnGap={3}
             gridRowGap={3}
           >
+            {hasMadeEdits && !loggedIn && (
+              <Box gridArea="banner">
+                <Banner
+                  type="warning"
+                  title="Unsaved notes"
+                  description="Save to Nomus to avoid losing your notes."
+                />
+              </Box>
+            )}
             <Box gridArea="profilePic">
               <Image
                 borderRadius="50%"
@@ -262,8 +317,9 @@ const ContactInfoPage = () => {
 
           <Box
             gridArea="notes"
+            placeSelf="start stretch"
             display="grid"
-            gridTemplateColumns="5fr 1fr"
+            gridTemplateColumns="2fr 1fr"
             gridColumnGap={3}
             gridRowGap={2}
             borderRadius={3}
@@ -278,7 +334,7 @@ const ContactInfoPage = () => {
             "additionalNotes additionalNotes"
           `}
           >
-            <Box gridArea="title">
+            <Box gridArea="title" placeSelf="center start">
               <Text.SectionHeader>Your notes</Text.SectionHeader>
             </Box>
 
@@ -288,19 +344,19 @@ const ContactInfoPage = () => {
 
             <Box gridArea="meetingDate">
               <Text.Label>Meeting Date</Text.Label>
-              {contact.meetingDate ? (
+              {formFields.meetingDate ? (
                 <Text.Body2>
-                  {getFormattedFullDate(contact.meetingDate)}
+                  {getFormattedDateFromISODateOnly(formFields.meetingDate)}
                 </Text.Body2>
               ) : (
-                <Text.Body2>{getFormattedFullDate(new Date())}</Text.Body2>
+                <Text.Body2>ERROR</Text.Body2>
               )}
             </Box>
 
             <Box gridArea="meetingPlace">
               <Text.Label>Meeting Place</Text.Label>
-              {contact.meetingPlace ? (
-                <Text.Body2>{contact.meetingPlace}</Text.Body2>
+              {formFields.meetingPlace ? (
+                <Text.Body2>{formFields.meetingPlace}</Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -341,8 +397,8 @@ const ContactInfoPage = () => {
 
             <Box gridArea="additionalNotes">
               <Text.Label>Additional Notes</Text.Label>
-              {contact.notes ? (
-                <Text.Body2>{contact.notes}</Text.Body2>
+              {formFields.additionalNotes ? (
+                <Text.Body2>{formFields.additionalNotes}</Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -369,14 +425,14 @@ const ContactInfoPage = () => {
             actions={{
               primary: {
                 text: 'Save',
-                handler: saveNotes,
+                submitForm: 'notes-form',
               },
               secondary: {
                 text: 'Cancel',
                 handler: closeNotesModal,
               },
             }}
-            width="min(700px, 80%)"
+            width="min(700px, 95%)"
           >
             <Text.CardHeader mb={3}>
               Edit your notes about {formatName(contact.name)}
@@ -385,14 +441,26 @@ const ContactInfoPage = () => {
               Jotting down a couple of quick details about your connection will
               help you better remember them and why they matter to you.
             </Text.Body2>
-            <Form.Form onSubmit={handleSubmit(saveNotes)}>
+            {(() => {
+              console.log({ formFields })
+            })()}
+            <Form.Form onSubmit={handleSubmit(saveNotes)} id="notes-form">
               <Box
                 display="grid"
-                gridTemplateColumns="1fr 1fr 1fr"
-                gridTemplateAreas={`
+                gridTemplateColumns={{ _: '1fr', [bp]: '1fr 1fr 1fr' }}
+                gridTemplateAreas={{
+                  _: `
+                  "meetingDate"
+                  "meetingPlace"
+                  "tags"
+                  "additionalNotes"
+                  `,
+                  [bp]: `
+
                   "meetingDate meetingPlace tags"
                   "additionalNotes additionalNotes additionalNotes"
-                `}
+                `,
+                }}
                 gridColumnGap={3}
                 gridRowGap={3}
                 css={css({
@@ -405,6 +473,8 @@ const ContactInfoPage = () => {
                     width="100%"
                     type="date"
                     name="meetingDate"
+                    placeholder="YYYY-MM-DD"
+                    defaultValue={formFields.meetingDate ?? ''}
                     ref={setRefAndRegister(meetingDateRef)}
                   ></Form.Input>
                 </Box>
@@ -415,6 +485,7 @@ const ContactInfoPage = () => {
                     width="100%"
                     type="text"
                     name="meetingPlace"
+                    defaultValue={formFields.meetingPlace ?? ''}
                     ref={setRefAndRegister(meetingPlaceRef)}
                   ></Form.Input>
                 </Box>
@@ -439,18 +510,38 @@ const ContactInfoPage = () => {
 
           <Box
             // Only upper margin in desktop mode
-            // mt={{ [bp]: 5 }}
             gridArea="buttons"
             display="grid"
+            css={css`
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              width: 100%;
+              padding: 16px;
+              ${mq[bp]} {
+                padding: 0;
+                position: static;
+              }
+            `}
+            bg="white"
+            boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
             gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 6fr' }}
-            gridColumnGap={3}
+            gridColumnGap={{ _: 2, [bp]: 3 }}
+            gridRowGap={2}
           >
-            <Button variant="primary" size="big">
-              Save contact card
-            </Button>
+            <Link
+              asButton
+              buttonStyle="primary"
+              buttonSize="big"
+              download={`${contact.username}.vcf`}
+              type="external"
+              to={downloadLink}
+            >
+              <Text.Body2 color="white">Save contact card</Text.Body2>
+            </Link>
 
             <Button variant="secondary" size="big">
-              Save to Nomus
+              <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
             </Button>
           </Box>
         </Box>

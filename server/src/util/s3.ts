@@ -88,3 +88,31 @@ export const getSignedUrl = async (
     return Result.fail(err.message)
   }
 }
+
+export const getBase64Url = async (
+  key: string
+): EventualResult<string, 'failed-aws-connection' | 'failed-get-object'> => {
+  try {
+    let s3Service: AWS.S3 | null
+    try {
+      s3Service = new AWS.S3()
+    } catch (err) {
+      throw new Error('failed-aws-connection')
+    }
+
+    const data = await s3Service
+      .getObject({
+        Bucket: 'nomus-assets',
+        Key: key,
+      })
+      .promise()
+      .catch((err) => {
+        throw new Error('failed-get-object')
+      })
+
+    const base64Image = data.Body.toString('base64')
+    return Result.ok(base64Image)
+  } catch (err) {
+    return Result.fail(err.message)
+  }
+}

@@ -25,6 +25,9 @@ const colors = {
   validGreen: '#62AD00',
   disabledBlue: '#8598AD',
 
+  // Other Colors
+  poppy: '#EA9C00',
+
   // Backgrounds
   ivory: '#FBF9F0',
   offWhite: '#FDFCF7',

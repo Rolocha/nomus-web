@@ -72,20 +72,27 @@ InternalLink.defaultProps = defaultProps
 
 interface UnifiedLinkProps extends InternalLinkProps, LinkProps {
   to: string
+  type?: 'internal' | 'external'
 }
 
 // An isomorphic Link component where the link is always passed in via the "to" prop so that you
 // don't have to decide whether to pass in "to" for the react-router InternalLink or "href" for
 // the traditional <a /> ExternalLink
-const UnifiedLink = ({ to, ref, ...props }: UnifiedLinkProps) => {
+const UnifiedLink = ({ to, type, ref, ...props }: UnifiedLinkProps) => {
+  const linkTypes = {
+    internal: <InternalLink {...props} to={to} />,
+    external: <ExternalLink ref={ref} {...props} href={to} />,
+  }
+  if (type != null) {
+    return linkTypes[type]
+  }
+
   const isLinkInternal = !(to.startsWith('http') || to.startsWith('mailto'))
 
-  return to != null && isLinkInternal ? (
-    // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
-    <InternalLink {...props} to={to} />
-  ) : (
-    <ExternalLink ref={ref} {...props} href={to} />
-  )
+  return to != null && isLinkInternal
+    ? // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
+      linkTypes.internal
+    : linkTypes.external
 }
 
 export { ExternalLink, InternalLink }
