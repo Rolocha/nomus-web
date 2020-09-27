@@ -9,6 +9,7 @@
 
 export interface UpdateProfilePictureMutation_updateProfilePicture {
   __typename: 'User'
+  id: string
   profilePicUrl: string | null
 }
 

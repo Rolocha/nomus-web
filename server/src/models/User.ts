@@ -182,8 +182,10 @@ export class User {
     this: ReturnModelType<typeof User>,
     username: string
   ) {
-    const user = await this.findOne({ username })
-    return await CardVersion.mongo.findById(MUUID.from(user.defaultCardVersion as UUIDType))
+    const user = await (await this.findOne({ username }))
+      .populate('defaultCardVersion')
+      .execPopulate()
+    return user.defaultCardVersion
   }
 
   public static async findByCredentials(
@@ -215,6 +217,14 @@ export class User {
     // to send it to the client
     const { preHashToken } = await Token.mongo.createNewTokenForUser(MUUID.from(this._id))
     return preHashToken
+  }
+
+  public async getProfilePicUrl(this: DocumentType<User>): Promise<string | null> {
+    if (this.profilePicUrl) {
+      const signedProfilePicUrl = await S3.getSignedUrl(this.profilePicUrl)
+      return signedProfilePicUrl.value
+    }
+    return null
   }
 
   public async updateProfilePic(

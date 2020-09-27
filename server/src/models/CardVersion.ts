@@ -83,7 +83,7 @@ export class CardVersion {
   backImageUrl: string
 
   @prop({ required: false })
-  @Field()
+  @Field({ nullable: true })
   vcfUrl: string
 
   @prop({ required: true, ref: 'User', type: Buffer })

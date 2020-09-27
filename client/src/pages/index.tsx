@@ -54,16 +54,17 @@ export const pages: Array<PageType> = [
     requiredAuthLevel: Role.User,
   },
   {
-    name: 'contact info',
-    path: '/:username/:cardNameOrId?',
-    component: ContactInfoPage,
-  },
-  {
     name: 'admin panel',
     path: '/admin',
     exact: false,
     component: AdminPanel,
     requiredAuthLevel: Role.Admin,
+  },
+  // Has to be last so other routes can get accessed
+  {
+    name: 'contact info',
+    path: '/:username/:cardNameOrId?',
+    component: ContactInfoPage,
   },
 
   // 404 page

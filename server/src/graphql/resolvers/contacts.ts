@@ -1,5 +1,5 @@
 import { IApolloContext } from 'src/graphql/types'
-
+import { DocumentType } from '@typegoose/typegoose'
 import Connection from 'src/models/Connection'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
@@ -48,30 +48,35 @@ class Contact {
 
   //unique to the connections, notes taken by the user querying
   @Field({ nullable: true })
-  notes: string
+  notes?: string
 
   @Field({ nullable: true })
-  meetingPlace: string
+  meetingPlace?: string
 
   @Field({ nullable: true })
-  meetingDate: Date
+  meetingDate?: Date
 }
 
-const connectionToContact = (connection: Connection): Contact => {
-  const connectionUser = connection.to as User
+const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
   return {
-    id: connectionUser._id,
-    name: connectionUser.name,
-    phoneNumber: connectionUser.phoneNumber,
-    email: connectionUser.email,
-    vcfUrl: connectionUser.vcfUrl,
-    cardFrontImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.frontImageUrl,
-    cardBackImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.backImageUrl,
-    bio: connectionUser.bio,
-    headline: connectionUser.headline,
-    profilePicUrl: connectionUser.profilePicUrl,
-    username: connectionUser.username,
+    id: user._id,
+    name: user.name,
+    phoneNumber: user.phoneNumber,
+    email: user.email,
+    vcfUrl: user.vcfUrl,
+    cardFrontImageUrl: (user.defaultCardVersion as CardVersion | null)?.frontImageUrl,
+    cardBackImageUrl: (user.defaultCardVersion as CardVersion | null)?.backImageUrl,
+    bio: user.bio,
+    headline: user.headline,
+    profilePicUrl: await user.getProfilePicUrl(),
+    username: user.username,
+  }
+}
 
+const connectionToContact = async (connection: Connection): Promise<Contact> => {
+  const connectionUser = connection.to as DocumentType<User>
+  return {
+    ...(await userToContact(connectionUser)),
     meetingPlace: connection.meetingPlace,
     meetingDate: connection.meetingDate,
     notes: connection.notes,
@@ -102,7 +107,7 @@ class ContactsResolver {
         },
       })
 
-    return connections.map(connectionToContact)
+    return await Promise.all(connections.map(connectionToContact))
   }
 
   // The contact query returns a specific user's contact information
@@ -129,17 +134,21 @@ class ContactsResolver {
     return connectionToContact(connection)
   }
 
-  @Query(() => CardVersion)
+  @Query(() => Contact)
   async publicContact(
     @Arg('username') username: string,
     @Arg('cardNameOrId', { nullable: true }) cardNameOrId?: string
   ) {
-    const cardVersion = cardNameOrId
-      ? // If cardNameOrId present, find the cardVersion directly, either with its id or its name + associated user
-        await CardVersion.mongo.findBySlugOrId(cardNameOrId, username)
-      : // Otherwise, just get the default card version for the provided username
-        await User.mongo.getDefaultCardVersionForUsername(username)
-    return cardVersion
+    const user = await (await User.mongo.findOne({ username }))
+      .populate('defaultCardVersion')
+      .execPopulate()
+    const contact = userToContact(user)
+    // const cardVersion = cardNameOrId
+    //   ? // If cardNameOrId present, find the cardVersion directly, either with its id or its name + associated user
+    //     await CardVersion.mongo.findBySlugOrId(cardNameOrId, username)
+    //   : // Otherwise, just get the default card version for the provided username
+    //     await User.mongo.getDefaultCardVersionForUsername(username)
+    return contact
   }
 }
 

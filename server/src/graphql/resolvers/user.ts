@@ -1,3 +1,4 @@
+import { DocumentType } from '@typegoose/typegoose'
 import { GraphQLUpload } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
@@ -42,12 +43,10 @@ class ProfileUpdateInput implements Partial<User> {
 @Resolver()
 class UserResolver {
   // Performs any necessary changes to go from DB representation of User to public representation of User
-  private async sanitizeUser(user: User) {
+  private async sanitizeUser(user: DocumentType<User>) {
     if (user.profilePicUrl) {
-      const signedProfilePicUrl = await S3.getSignedUrl(user.profilePicUrl)
-      if (signedProfilePicUrl.isSuccess) {
-        user.profilePicUrl = signedProfilePicUrl.value
-      }
+      const profilePicUrl = await user.getProfilePicUrl()
+      user.profilePicUrl = profilePicUrl
     }
     return user
   }
@@ -65,7 +64,7 @@ class UserResolver {
       .findOne({ _id: MUUID.from(requestedUserId) })
       .populate('defaultCardVersion')
 
-    const userObject = user.toObject() as User
+    const userObject = user.toObject() as DocumentType<User>
     return await this.sanitizeUser(userObject)
   }
 
@@ -156,7 +155,7 @@ class UserResolver {
     await context.user.updateProfilePic(file)
     return await this.sanitizeUser(context.user)
   }
-    
+
   @Authorized(Role.User)
   @Mutation(() => User)
   async changeActiveCardVersion(
