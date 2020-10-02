@@ -3,7 +3,6 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
-import { mq } from 'src/styles/breakpoints'
 import { css } from '@emotion/core'
 import { colors } from 'src/styles'
 
@@ -18,17 +17,14 @@ const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
       <Box
         display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
       >
-        <Text.Body2 fontSize="14px" color="validGreen">
+        <Text.Body2 fontSize="14px" color="validGreen" ml={1}>
           Save
         </Text.Body2>
       </Box>
       <SVG.Check
         css={css`
           width: 20px;
-          ${iconOnlyBp &&
-          `${mq[iconOnlyBp]} {
-            margin-right: 8px;
-        }`}
+          ${iconOnlyBp}
         `}
         color={colors.validGreen}
       />
