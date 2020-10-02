@@ -284,9 +284,8 @@ export default () => {
 
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
-          This is the username associated with your account and the public URL
-          that leads to your profile. Changing your username will change your
-          public profile link.
+          This is your username for this account. Changing your username will
+          change your public profile link.
         </Text.Body3>
       </Box>
 
@@ -294,7 +293,6 @@ export default () => {
         <Button
           width={{ _: '100%', [bp]: '75%' }}
           variant="secondary"
-          mt={1}
           onClick={() => {
             logOut()
             history.push('/')
@@ -377,7 +375,7 @@ export default () => {
         </Button>
       </Box>
 
-      <Box
+      {/* <Box
         gridArea="deactivateProfileHeader"
         alignSelf={{ _: 'start', md: 'center' }}
       >
@@ -410,7 +408,7 @@ export default () => {
           who already have your contact wlil still have access to your profile.
           You will be able to Reactivate at any time in the future.
         </Text.Body3>
-      </Box>
+      </Box> */}
 
       {/* <Box
         gridArea="accountDeletionHeader"
