@@ -17,6 +17,7 @@ import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import ActivationEditor from './ActivationEditor'
 import ProgressBar from './ProgressBar'
 import zxcvbn from 'zxcvbn'
+import SaveButton from 'src/components/SaveButton'
 
 const bp = 'lg'
 
@@ -208,27 +209,13 @@ export default () => {
         )}
       </Box>
 
-      {isEditingEmail ? (
-        <Box
-          gridArea="editEmail"
-          position="relative"
-          justifySelf="start center"
-        >
-          <Button
-            width={{ _: '100%', [bp]: '100%' }}
-            variant="success"
+      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
+        {isEditingEmail ? (
+          <SaveButton
             onClick={emailFormHandleSubmit(onSubmitEmail)}
-          >
-            <Text.Plain fontSize="14px" color="validGreen">
-              Save
-            </Text.Plain>
-          </Button>
-        </Box>
-      ) : (
-        <Box
-          gridArea="editEmail"
-          placeSelf={{ _: 'end', [bp]: 'start center' }}
-        >
+            iconOnlyBp={bp}
+          />
+        ) : (
           <EditButton
             onClick={() => {
               setIsEditingEmail(true)
@@ -236,8 +223,8 @@ export default () => {
             }}
             iconOnlyBp={bp}
           />
-        </Box>
-      )}
+        )}
+      </Box>
 
       <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
@@ -269,27 +256,16 @@ export default () => {
         )}
       </Box>
 
-      {isEditingUsername ? (
-        <Box
-          gridArea="editUsername"
-          position="relative"
-          justifySelf="start center"
-        >
-          <Button
-            width={{ _: '100%', [bp]: '100%' }}
-            variant="success"
+      <Box
+        gridArea="editUsername"
+        placeSelf={{ _: 'end', [bp]: 'start center' }}
+      >
+        {isEditingUsername ? (
+          <SaveButton
             onClick={usernameFormHandleSubmit(onSubmitUsername)}
-          >
-            <Text.Plain fontSize="14px" color="validGreen">
-              Save
-            </Text.Plain>
-          </Button>
-        </Box>
-      ) : (
-        <Box
-          gridArea="editUsername"
-          placeSelf={{ _: 'end', [bp]: 'start center' }}
-        >
+            iconOnlyBp={bp}
+          />
+        ) : (
           <EditButton
             onClick={() => {
               setIsEditingUsername(true)
@@ -297,9 +273,8 @@ export default () => {
             }}
             iconOnlyBp={bp}
           />
-        </Box>
-      )}
-
+        )}
+      </Box>
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
           This is your username for this account. Changing your username will
