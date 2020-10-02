@@ -179,7 +179,7 @@ export default () => {
         "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
       }}
-      gridColumnGap={2}
+      gridColumnGap={3}
       gridRowGap={3}
     >
       <Box gridArea="account" alignSelf={{ _: 'start', lg: 'center' }}>
@@ -198,8 +198,8 @@ export default () => {
               type="email"
               autoComplete="email"
               fontSize="16px"
-              width="100%"
-              padding="4px 4px"
+              width="85%"
+              padding="2px 4px"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
@@ -208,13 +208,27 @@ export default () => {
         )}
       </Box>
 
-      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
-        {isEditingEmail ? (
-          <EditButton
+      {isEditingEmail ? (
+        <Box
+          gridArea="editEmail"
+          position="relative"
+          justifySelf="start center"
+        >
+          <Button
+            width={{ _: '100%', [bp]: '100%' }}
+            variant="success"
             onClick={emailFormHandleSubmit(onSubmitEmail)}
-            iconOnlyBp={bp}
-          />
-        ) : (
+          >
+            <Text.Plain fontSize="14px" color="validGreen">
+              Save
+            </Text.Plain>
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          gridArea="editEmail"
+          placeSelf={{ _: 'end', [bp]: 'start center' }}
+        >
           <EditButton
             onClick={() => {
               setIsEditingEmail(true)
@@ -222,8 +236,8 @@ export default () => {
             }}
             iconOnlyBp={bp}
           />
-        )}
-      </Box>
+        </Box>
+      )}
 
       <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
@@ -256,9 +270,13 @@ export default () => {
       </Box>
 
       {isEditingUsername ? (
-        <Box gridArea="editUsername">
+        <Box
+          gridArea="editUsername"
+          position="relative"
+          justifySelf="start center"
+        >
           <Button
-            width={{ _: '100%', [bp]: '85%' }}
+            width={{ _: '100%', [bp]: '100%' }}
             variant="success"
             onClick={usernameFormHandleSubmit(onSubmitUsername)}
           >
