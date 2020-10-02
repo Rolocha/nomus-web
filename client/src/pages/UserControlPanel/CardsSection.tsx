@@ -23,6 +23,18 @@ const formatDate = (date: Date) => {
   )} ${dateObject.getDate()}, ${dateObject.getFullYear()}`
 }
 
+const sendReorderEmail = (cardId: string) => {
+  var link =
+    'mailto:hi@nomus.me' +
+    '?subject=' +
+    "I'd like to Reorder a Card!" +
+    '&body=' +
+    "Hi! I'd like to reorder a card please :) \n cardID: " +
+    cardId
+
+  window.location.href = link
+}
+
 export default () => {
   const { loading, data } = useQuery<UCPCardsSectionQuery>(
     gql`
@@ -124,10 +136,24 @@ export default () => {
                   `}
                 >
                   <Box px={1}>
-                    <Button variant="primary">Reorder card</Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        sendReorderEmail(defaultCardVersion.id)
+                      }}
+                    >
+                      Reorder card
+                    </Button>
                   </Box>
                   <Box px={1}>
-                    <Button variant="secondary">Modify card</Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        sendReorderEmail(defaultCardVersion.id)
+                      }}
+                    >
+                      Modify card
+                    </Button>
                   </Box>
                 </Box>
               </Box>
@@ -206,10 +232,24 @@ export default () => {
                     mx={-1}
                   >
                     <Box px={1}>
-                      <Button variant="primary">Reorder card</Button>
+                      <Button
+                        variant="primary"
+                        onClick={() => {
+                          sendReorderEmail(cv.id)
+                        }}
+                      >
+                        Reorder card
+                      </Button>
                     </Box>
                     <Box px={1}>
-                      <Button variant="secondary">Modify card</Button>
+                      <Button
+                        variant="secondary"
+                        onClick={() => {
+                          sendReorderEmail(cv.id)
+                        }}
+                      >
+                        Modify card
+                      </Button>
                     </Box>
                     <Box px={1}>
                       <Button
