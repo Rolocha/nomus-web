@@ -5,12 +5,8 @@ import { baseTextStyles } from 'src/styles/typography'
 import {
   color,
   ColorProps,
-  fontFamily,
-  FontFamilyProps,
-  fontSize,
-  FontSizeProps,
-  fontWeight,
-  FontWeightProps,
+  typography,
+  TypographyProps,
   lineHeight,
   LineHeightProps,
   ResponsiveValue,
@@ -27,26 +23,22 @@ export type TextProps = {
   variant?: keyof typeof theme.textStyles | null
   as?: string
   textAlign?: ResponsiveValue<ThemeValue<'textAlign', any>>
-} & FontSizeProps &
+} & TypographyProps &
   ColorProps &
-  FontFamilyProps &
   LineHeightProps &
-  FontWeightProps &
   SpaceProps &
   GridProps
 
 const Text = styled<'p', TextProps>('p')(
   baseTextStyles,
-  fontSize,
+  typography,
   variant({
     variants: theme.textStyles,
   }),
   color,
   space,
   grid,
-  fontFamily,
   lineHeight,
-  fontWeight,
   system({
     textAlign: {
       property: 'textAlign',

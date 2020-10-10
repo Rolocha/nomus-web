@@ -8,6 +8,7 @@ import morgan from 'morgan'
 
 import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
+import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
 // import { graphqlUploadExpress } from 'graphql-upload'
@@ -28,6 +29,8 @@ app.use('/auth', cookieMiddleware, bodyParser.json(), authRouter)
 // Set up GraphQL
 app.use(graphqlPath, cookieMiddleware, authMiddleware)
 gqlServer.applyMiddleware({ app, path: graphqlPath })
+
+app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
 app.listen(Number(appServerPort), () => {
   console.log(`⚡️ Express server is running on localhost:${appServerPort}`)

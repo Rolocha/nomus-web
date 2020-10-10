@@ -13,9 +13,9 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
   >
     <aside
       aria-modal={true}
-      className="css-f0vs8s-Box e1gi27mm0"
+      className="css-1m0a4o1-Box e1gi27mm0"
       display="flex"
-      height="100vh"
+      height={null}
       onClick={[Function]}
       width="100vw"
     >
@@ -27,6 +27,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
             "flexDirection": "column",
             "justifyContent": "center",
             "transform": "scale(0)",
+            "width": "100%",
           }
         }
       >
@@ -36,7 +37,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
           height="unset"
           width={
             Object {
-              "_": "95%",
+              "_": "100%",
               "md": "80%",
             }
           }

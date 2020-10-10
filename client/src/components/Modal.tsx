@@ -17,7 +17,8 @@ import { use100vh } from 'src/utils/ui'
 
 interface Action {
   text: string
-  handler: () => void
+  handler?: () => void
+  submitForm?: string
 }
 
 type Actions = {
@@ -221,7 +222,7 @@ const Modal = ({
                                 cursor: pointer;
                               `}
                             >
-                              <SVG.Close color={colors.midnightGray}/>
+                              <SVG.Close color={colors.midnightGray} />
                             </Box>
                           </Box>
 
@@ -245,6 +246,14 @@ const Modal = ({
                                     variant="secondary"
                                     mr={2}
                                     onClick={actions.secondary.handler}
+                                    form={
+                                      actions.secondary.submitForm ?? undefined
+                                    }
+                                    type={
+                                      actions.secondary.submitForm
+                                        ? 'submit'
+                                        : undefined
+                                    }
                                   >
                                     {actions.secondary.text}
                                   </Button>
@@ -254,6 +263,14 @@ const Modal = ({
                                     gridArea="primary"
                                     variant="primary"
                                     onClick={actions.primary.handler}
+                                    form={
+                                      actions.primary.submitForm ?? undefined
+                                    }
+                                    type={
+                                      actions.primary.submitForm
+                                        ? 'submit'
+                                        : undefined
+                                    }
                                   >
                                     {actions.primary.text}
                                   </Button>

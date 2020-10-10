@@ -78,7 +78,7 @@ export default ({ defaultValues, editIconOnlyBp }: Props) => {
         }}
       >
         <Box>
-          <Text.PageHeader mb={3}>Edit name and headline</Text.PageHeader>
+          <Text.CardHeader mb={3}>Edit name and headline</Text.CardHeader>
           <Text.Body mb={4}>
             Editing your name will change the name your profile visitors see on
             your public profile page. Keep in mind that if you change this, it

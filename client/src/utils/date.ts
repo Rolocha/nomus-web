@@ -36,3 +36,10 @@ export const getFormattedFullDate = (date: Date | number) => {
     dateObj.getMonth(),
   )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
 }
+
+export const getFormattedDateFromISODateOnly = (date: string) => {
+  const year = date.substr(0, 4)
+  const month = date.substr(5, 2)
+  const dateOfMonth = date.substr(8, 2)
+  return `${getMonthString(Number(month) - 1)} ${dateOfMonth}, ${year}`
+}

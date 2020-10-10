@@ -29,6 +29,12 @@ export interface CustomCardSpecInput {
   backImageDataUrl?: string | null
 }
 
+export interface NotesDataInput {
+  meetingPlace?: string | null
+  meetingDate?: any | null
+  additionalNotes?: string | null
+}
+
 /**
  * Input for udpating user profile
  */

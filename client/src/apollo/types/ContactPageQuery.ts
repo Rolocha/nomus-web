@@ -15,10 +15,22 @@ export interface ContactPageQuery_publicContact_name {
 }
 
 export interface ContactPageQuery_publicContact {
-  __typename: 'CardVersion'
-  frontImageUrl: string | null
-  vcfUrl: string
-  name: ContactPageQuery_publicContact_name | null
+  __typename: 'Contact'
+  id: any
+  username: string
+  name: ContactPageQuery_publicContact_name
+  phoneNumber: string | null
+  email: string | null
+  headline: string | null
+  bio: string | null
+  profilePicUrl: string | null
+  cardFrontImageUrl: string | null
+  cardBackImageUrl: string | null
+  vcfUrl: string | null
+  notes: string | null
+  meetingPlace: string | null
+  meetingDate: any | null
+  connected: boolean | null
 }
 
 export interface ContactPageQuery {
@@ -27,5 +39,4 @@ export interface ContactPageQuery {
 
 export interface ContactPageQueryVariables {
   username: string
-  cardNameOrId?: string | null
 }

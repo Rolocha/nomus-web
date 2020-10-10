@@ -1,10 +1,20 @@
 import { IApolloContext } from 'src/graphql/types'
-
+import { DocumentType } from '@typegoose/typegoose'
 import Connection from 'src/models/Connection'
 import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
 import { User } from 'src/models/User'
-import { Arg, Authorized, Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from 'type-graphql'
 import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
@@ -48,30 +58,51 @@ class Contact {
 
   //unique to the connections, notes taken by the user querying
   @Field({ nullable: true })
-  notes: string
+  notes?: string
 
   @Field({ nullable: true })
-  meetingPlace: string
+  meetingPlace?: string
 
   @Field({ nullable: true })
-  meetingDate: Date
+  meetingDate?: Date
+
+  @Field({ nullable: true })
+  connected?: boolean
 }
 
-const connectionToContact = (connection: Connection): Contact => {
-  const connectionUser = connection.to as User
-  return {
-    id: connectionUser._id,
-    name: connectionUser.name,
-    phoneNumber: connectionUser.phoneNumber,
-    email: connectionUser.email,
-    vcfUrl: connectionUser.vcfUrl,
-    cardFrontImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.frontImageUrl,
-    cardBackImageUrl: (connectionUser.defaultCardVersion as CardVersion | null)?.backImageUrl,
-    bio: connectionUser.bio,
-    headline: connectionUser.headline,
-    profilePicUrl: connectionUser.profilePicUrl,
-    username: connectionUser.username,
+@InputType()
+class NotesDataInput {
+  @Field({ nullable: true })
+  meetingPlace?: string
 
+  @Field({ nullable: true })
+  meetingDate?: Date
+
+  //unique to the connections, notes taken by the user querying
+  @Field({ nullable: true })
+  additionalNotes?: string
+}
+
+const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
+  return {
+    id: user._id,
+    name: user.name,
+    phoneNumber: user.phoneNumber,
+    email: user.email,
+    vcfUrl: user.vcfUrl,
+    cardFrontImageUrl: (user.defaultCardVersion as CardVersion | null)?.frontImageUrl,
+    cardBackImageUrl: (user.defaultCardVersion as CardVersion | null)?.backImageUrl,
+    bio: user.bio,
+    headline: user.headline,
+    profilePicUrl: await user.getProfilePicUrl(),
+    username: user.username,
+  }
+}
+
+const connectionToContact = async (connection: Connection): Promise<Contact> => {
+  const connectionUser = connection.to as DocumentType<User>
+  return {
+    ...(await userToContact(connectionUser)),
     meetingPlace: connection.meetingPlace,
     meetingDate: connection.meetingDate,
     notes: connection.notes,
@@ -102,7 +133,7 @@ class ContactsResolver {
         },
       })
 
-    return connections.map(connectionToContact)
+    return await Promise.all(connections.map(connectionToContact))
   }
 
   // The contact query returns a specific user's contact information
@@ -129,17 +160,61 @@ class ContactsResolver {
     return connectionToContact(connection)
   }
 
-  @Query(() => CardVersion)
-  async publicContact(
+  @Query(() => Contact)
+  async publicContact(@Arg('username') username: string, @Ctx() context: IApolloContext) {
+    const contactUser = await (await User.mongo.findOne({ username }))
+      .populate('defaultCardVersion')
+      .execPopulate()
+
+    let connected = false
+    if (context.user != null) {
+      const existingConnection = await Connection.mongo.findOne({
+        from: MUUID.from(context.user.id),
+        to: MUUID.from(contactUser.id),
+      })
+      if (existingConnection != null) {
+        connected = true
+      }
+    }
+
+    const contact = await userToContact(contactUser)
+    return { ...contact, connected }
+  }
+
+  @Mutation(() => Contact)
+  async saveContact(
     @Arg('username') username: string,
-    @Arg('cardNameOrId', { nullable: true }) cardNameOrId?: string
-  ) {
-    const cardVersion = cardNameOrId
-      ? // If cardNameOrId present, find the cardVersion directly, either with its id or its name + associated user
-        await CardVersion.mongo.findBySlugOrId(cardNameOrId, username)
-      : // Otherwise, just get the default card version for the provided username
-        await User.mongo.getDefaultCardVersionForUsername(username)
-    return cardVersion
+    @Arg('notesData', { nullable: true }) notesData: NotesDataInput | null,
+    @Ctx() context: IApolloContext
+  ): Promise<Contact> {
+    const contactUser = await User.mongo.findOne({
+      username,
+    })
+
+    if (contactUser == null) {
+      throw new Error(`No user found with the username ${username}`)
+    }
+
+    const existingConnection = await Connection.mongo.findOne({
+      from: MUUID.from(context.user.id),
+      to: MUUID.from(contactUser.id),
+    })
+
+    if (existingConnection != null) {
+      throw new Error('Contact already saved')
+    }
+
+    const connection = await Connection.mongo.create({
+      from: MUUID.from(context.user.id),
+      to: MUUID.from(contactUser.id),
+      meetingDate: notesData?.meetingDate ?? undefined,
+      meetingPlace: notesData?.meetingPlace ?? undefined,
+      notes: notesData?.additionalNotes ?? undefined,
+    })
+
+    await connection.populate('from').populate('to').execPopulate()
+
+    return connectionToContact(connection)
   }
 }
 
