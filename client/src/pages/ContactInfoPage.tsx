@@ -2,7 +2,7 @@ import { css } from '@emotion/core'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory, useParams } from 'react-router-dom'
-import { gql, useQuery } from 'src/apollo'
+import { useQuery } from 'src/apollo'
 import {
   ContactPageQuery,
   ContactPageQueryVariables,
@@ -19,6 +19,7 @@ import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
+import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
@@ -95,38 +96,11 @@ const ContactInfoPage = () => {
   const { loading, data, error } = useQuery<
     ContactPageQuery,
     ContactPageQueryVariables
-  >(
-    gql`
-      query ContactPageQuery($username: String!) {
-        publicContact(username: $username) {
-          id
-          username
-          name {
-            first
-            middle
-            last
-          }
-          phoneNumber
-          email
-          headline
-          bio
-          profilePicUrl
-          cardFrontImageUrl
-          cardBackImageUrl
-          vcfUrl
-          notes
-          meetingPlace
-          meetingDate
-          connected
-        }
-      }
-    `,
-    {
-      variables: {
-        username: username ?? '',
-      },
+  >(publicContactQuery, {
+    variables: {
+      username: username ?? '',
     },
-  )
+  })
 
   const notesParams = React.useMemo(() => {
     const params = new URLSearchParams()
@@ -558,7 +532,7 @@ const ContactInfoPage = () => {
               <Text.Body2 color="white">Save contact card</Text.Body2>
             </Link>
 
-            {contact.connected ? (
+            {false ? (
               <Button variant="secondary" size="big" disabled>
                 Saved
               </Button>

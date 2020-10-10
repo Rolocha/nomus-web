@@ -7,7 +7,9 @@ import LoadingPage from './LoadingPage'
 
 const ContactSaver = () => {
   const { search } = useLocation()
-  const [doneSaving, setDoneSaving] = React.useState(false)
+  const [saveState, setSaveState] = React.useState<
+    null | 'saving' | 'failed' | 'succeeded'
+  >(null)
   const [saveContact] = useMutation<SaveContactMutation>(saveContactMutation)
   const params = new URLSearchParams(search)
   const username = params.get('username')
@@ -22,21 +24,29 @@ const ContactSaver = () => {
           additionalNotes: params.get('additionalNotes'),
         },
       },
-    }).then(() => {
-      setDoneSaving(true)
     })
-    // eslint-disable-next-line
+      .then(() => {
+        setSaveState('succeeded')
+      })
+      .catch((error) => {
+        // Failure could be due to invalid username, attempted saving of existing contact, or server error
+        setSaveState('failed')
+      })
+    // Want an empty array of deps to ensure this runs just once on load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (username == null) {
-    return <Redirect to="/" />
+  if (username == null || saveState === 'failed') {
+    // TODO: Should this redirect somewhere more informative about the error?
+    // In reality, no user story should ever lead to this branch being true
+    return <Redirect to="/dashboard/contacts" />
   }
 
-  return doneSaving ? (
-    <Redirect to={`/dashboard/contacts/detail/${username}`} />
-  ) : (
-    <LoadingPage />
-  )
+  if (saveState === 'succeeded') {
+    return <Redirect to={`/dashboard/contacts/detail/${username}`} />
+  }
+
+  return <LoadingPage />
 }
 
 export default ContactSaver
