@@ -64,7 +64,7 @@ class UserResolver {
       .findOne({ _id: MUUID.from(requestedUserId) })
       .populate('defaultCardVersion')
 
-    const userObject = user.toObject() as DocumentType<User>
+    const userObject = user as DocumentType<User>
     return await this.sanitizeUser(userObject)
   }
 

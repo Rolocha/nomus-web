@@ -222,8 +222,8 @@ export class User {
 
   public async getProfilePicUrl(this: DocumentType<User>): Promise<string | null> {
     if (this.profilePicUrl) {
-      const signedProfilePicUrl = await S3.getSignedUrl(this.profilePicUrl)
-      return signedProfilePicUrl.value
+      const result = await S3.getSignedUrl(this.profilePicUrl)
+      return result.isSuccess ? result.value : null
     }
     return null
   }
@@ -231,7 +231,7 @@ export class User {
   public async getProfilePicDataUrl(this: DocumentType<User>): Promise<string | null> {
     if (this.profilePicUrl) {
       const result = await S3.getBase64Url(this.profilePicUrl)
-      return result.value
+      return result.isSuccess ? result.value : null
     }
     return null
   }

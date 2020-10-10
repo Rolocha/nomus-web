@@ -27,7 +27,6 @@ import { formatName } from 'src/utils/name'
 
 interface UrlParams {
   username?: string
-  cardNameOrId?: string
 }
 
 const bp = 'md'
@@ -40,7 +39,7 @@ interface NotesFormData {
 }
 
 const ContactInfoPage = () => {
-  const { username, cardNameOrId }: UrlParams = useParams()
+  const { username }: UrlParams = useParams()
   const history = useHistory()
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
   const [hasMadeEdits, setHasMadeEdits] = React.useState(false)
@@ -60,6 +59,8 @@ const ContactInfoPage = () => {
       meetingDate: new Date().toISOString().substring(0, 10),
     },
   })
+
+  const formFields = watch()
 
   const openNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(true)
@@ -96,8 +97,8 @@ const ContactInfoPage = () => {
     ContactPageQueryVariables
   >(
     gql`
-      query ContactPageQuery($username: String!, $cardNameOrId: String) {
-        publicContact(username: $username, cardNameOrId: $cardNameOrId) {
+      query ContactPageQuery($username: String!) {
+        publicContact(username: $username) {
           id
           username
           name {
@@ -116,16 +117,46 @@ const ContactInfoPage = () => {
           notes
           meetingPlace
           meetingDate
+          connected
         }
       }
     `,
     {
       variables: {
         username: username ?? '',
-        cardNameOrId,
       },
     },
   )
+
+  const notesParams = React.useMemo(() => {
+    const params = new URLSearchParams()
+    if (formFields.meetingDate)
+      params.set('meetingDate', formFields.meetingDate)
+    if (formFields.meetingPlace)
+      params.set('meetingPlace', formFields.meetingPlace)
+    if (formFields.additionalNotes)
+      params.set('additionalNotes', formFields.additionalNotes)
+
+    return params
+  }, [
+    formFields.meetingDate,
+    formFields.meetingPlace,
+    formFields.additionalNotes,
+  ])
+
+  const downloadLink = React.useMemo(
+    () => `/api/contact-card/${username}?${notesParams.toString()}`,
+    [notesParams, username],
+  )
+
+  const saveToNomusLink = React.useMemo(() => {
+    const params = new URLSearchParams(notesParams)
+    if (username) params.set('username', username)
+    const saveUrl = `/dashboard/contacts/save?${params.toString()}`
+    return loggedIn
+      ? saveUrl
+      : `/register?redirect_url=${encodeURIComponent(saveUrl)}`
+  }, [loggedIn, notesParams, username])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -152,8 +183,6 @@ const ContactInfoPage = () => {
     setHasInstantiatedNotes(true)
   }
 
-  const formFields = watch()
-
   const saveNotes = (data: NotesFormData) => {
     setHasMadeEdits(true)
     // Update form's default values so if they open the modal again,
@@ -164,17 +193,6 @@ const ContactInfoPage = () => {
     }
     closeNotesModal()
   }
-
-  const notesParams = new URLSearchParams()
-  if (formFields.meetingDate)
-    notesParams.set('meetingDate', formFields.meetingDate)
-  if (formFields.meetingPlace)
-    notesParams.set('meetingPlace', formFields.meetingPlace)
-  if (formFields.additionalNotes)
-    notesParams.set('additionalNotes', formFields.additionalNotes)
-  const downloadLink = `/api/contact-card/${
-    contact.username
-  }?${notesParams.toString()}`
 
   return contact ? (
     <Box>
@@ -540,9 +558,20 @@ const ContactInfoPage = () => {
               <Text.Body2 color="white">Save contact card</Text.Body2>
             </Link>
 
-            <Button variant="secondary" size="big">
-              <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
-            </Button>
+            {contact.connected ? (
+              <Button variant="secondary" size="big" disabled>
+                Saved
+              </Button>
+            ) : (
+              <Link
+                to={saveToNomusLink}
+                asButton
+                buttonStyle="secondary"
+                buttonSize="big"
+              >
+                <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
+              </Link>
+            )}
           </Box>
         </Box>
       </Box>

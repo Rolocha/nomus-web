@@ -10,6 +10,7 @@ import UserControlPanel from 'src/pages/UserControlPanel'
 import CardBuilder from 'src/pages/CardBuilder'
 import LoginPage from 'src/pages/LoginPage'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
+import ContactSaver from 'src/pages/ContactSaver'
 import AdminPanel from 'src/pages/AdminPanel'
 import FourOhFourPage from 'src/pages/FourOhFour'
 import ShopFront from 'src/pages/ShopFront'
@@ -43,6 +44,12 @@ export const pages: Array<PageType> = [
   },
   {
     name: 'dashboard',
+    path: '/dashboard/contacts/save',
+    component: ContactSaver,
+    requiredAuthLevel: Role.User,
+  },
+  {
+    name: 'dashboard',
     path: '/dashboard',
     component: UserControlPanel,
     requiredAuthLevel: Role.User,
@@ -63,7 +70,7 @@ export const pages: Array<PageType> = [
   // Has to be last so other routes can get accessed
   {
     name: 'contact info',
-    path: '/:username/:cardNameOrId?',
+    path: '/:username',
     component: ContactInfoPage,
   },
 

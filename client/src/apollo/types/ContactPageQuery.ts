@@ -30,6 +30,7 @@ export interface ContactPageQuery_publicContact {
   notes: string | null
   meetingPlace: string | null
   meetingDate: any | null
+  connected: boolean | null
 }
 
 export interface ContactPageQuery {
@@ -38,5 +39,4 @@ export interface ContactPageQuery {
 
 export interface ContactPageQueryVariables {
   username: string
-  cardNameOrId?: string | null
 }
