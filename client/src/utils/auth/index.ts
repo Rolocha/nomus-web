@@ -23,6 +23,7 @@ export interface SignupArgs {
 export interface UseAuthOutput {
   loggedIn: boolean
   userRoles: Role[] | null
+  id: string | null
 }
 
 export interface AuthData extends BaseAuthData {
@@ -74,10 +75,11 @@ const authManager = new AuthManager<
       return false
     }
   },
-  makeUseAuthOutput: (authData) => {
+  makeUseAuthOutput: (authData): UseAuthOutput => {
     return {
       loggedIn: authData != null,
       userRoles: authData ? authData.roles : null,
+      id: authData?.id ?? null,
     }
   },
 })

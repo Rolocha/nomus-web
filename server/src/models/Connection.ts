@@ -46,6 +46,10 @@ export class Connection {
   @prop({ required: false })
   @Field({ nullable: true })
   notes: string
+
+  @prop({ required: false, default: [] })
+  @Field(() => [String], { nullable: false })
+  tags: Array<string>
 }
 
 // Attach the mongoose model onto the core model itself

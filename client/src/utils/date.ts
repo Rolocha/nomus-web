@@ -30,16 +30,19 @@ export const getMonthString = (month: number) =>
     'December',
   ][month] || null
 
-export const getFormattedFullDate = (date: Date | number) => {
+export const getFormattedFullDate = (date: string | Date | number) => {
   const dateObj = new Date(date)
   return `${getMonthString(
     dateObj.getMonth(),
   )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
 }
 
-export const getFormattedDateFromISODateOnly = (date: string) => {
+export const getFormattedDateFromISODateString = (date: string) => {
   const year = date.substr(0, 4)
   const month = date.substr(5, 2)
   const dateOfMonth = date.substr(8, 2)
   return `${getMonthString(Number(month) - 1)} ${dateOfMonth}, ${year}`
 }
+
+export const getInputCompliantDate = (date: string | Date | number) =>
+  new Date(date).toISOString().substr(0, 10)

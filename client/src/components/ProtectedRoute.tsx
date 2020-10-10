@@ -5,17 +5,13 @@ import { AuthLevel } from 'src/config'
 import { useAuth } from 'src/utils/auth'
 
 interface Props {
-  component: React.ElementType<any>
+  children: React.ReactNode
   requiredAuthLevel: AuthLevel
   exact?: boolean
   path?: string
 }
 
-const ProtectedRoute = ({
-  requiredAuthLevel,
-  component: ProtectedComponent,
-  ...rest
-}: Props) => {
+const ProtectedRoute = ({ requiredAuthLevel, children, ...rest }: Props) => {
   const { loggedIn, userRoles } = useAuth()
   const location = useLocation()
 
@@ -42,7 +38,7 @@ const ProtectedRoute = ({
           return <Redirect to="/" />
         }
 
-        return <ProtectedComponent {...props} />
+        return children
       }}
     />
   )

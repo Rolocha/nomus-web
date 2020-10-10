@@ -88,7 +88,7 @@ export class AuthManager<
       return true
     }
 
-    // Looks like the token expired, try refreshing it
+    // Looks like the token expired (or the caller wants to force a refresh), try refreshing it
     const wasTokenRefreshed = await this._refreshToken(authData)
     return wasTokenRefreshed
   }
@@ -117,7 +117,7 @@ export class AuthManager<
 
     return {
       ...this.makeUseAuthOutput(authData),
-      loggedIn: authData != null,
+      loggedIn: authData != null && !this.tokenHasExpired(authData),
       logIn: this.logInAndSaveAuth,
       signUp: this.signUpAndSaveAuth,
       logOut: this.logOutAndClearData,

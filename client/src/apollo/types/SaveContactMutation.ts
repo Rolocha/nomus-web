@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { NotesDataInput } from './globalTypes'
+import { ContactInfoInput } from './globalTypes'
 
 // ====================================================
 // GraphQL mutation operation: SaveContactMutation
@@ -24,5 +24,5 @@ export interface SaveContactMutation {
 
 export interface SaveContactMutationVariables {
   username: string
-  notesData?: NotesDataInput | null
+  contactInfo?: ContactInfoInput | null
 }
