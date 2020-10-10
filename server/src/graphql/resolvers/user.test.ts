@@ -282,7 +282,7 @@ describe('UserResolver', () => {
           last: 'A',
         },
       })
-      expect(user.username.substring(0, 4)).toBe('A.A.')
+      expect(user.username.substring(0, 4)).toBe('a-a-')
       expect(user.username.length).toBe(10)
     })
   })
