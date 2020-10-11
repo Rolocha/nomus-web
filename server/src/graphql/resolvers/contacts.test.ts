@@ -312,6 +312,55 @@ describe('ContactsResolver', () => {
     })
   })
 
+  describe('updateNotes mutation', () => {
+    it("updates the notes of a user's connection", async () => {
+      const user_from = await createMockUser()
+      const user_to = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      const meetingDate = new Date()
+      await createMockConnection({
+        from: user_from._id,
+        to: user_to._id,
+        meetingDate,
+        meetingPlace: 'there',
+        notes: 'foo',
+      })
+
+      const response = await execQuery({
+        source: `
+          mutation UpdateContactInfoMutation($contactId: String!, $contactInfo: ContactInfoInput!) {
+            updateContactInfo(contactId: $contactId, contactInfo: $contactInfo) {
+              meetingDate
+              meetingPlace
+              notes
+              tags
+            }
+          }
+        `,
+        variableValues: {
+          contactId: user_to.id,
+          contactInfo: {
+            meetingPlace: 'here',
+            notes: 'lovely',
+            tags: ['foo', 'bar', 'baz'],
+          },
+        },
+        contextUser: user_from,
+      })
+
+      expect(response.data?.updateContactInfo?.meetingPlace).toBe('here')
+      expect(response.data?.updateContactInfo?.meetingDate).toBe(meetingDate.getTime())
+      expect(response.data?.updateContactInfo?.notes).toBe('lovely')
+      expect(response.data?.updateContactInfo?.tags).toHaveLength(3)
+      expect(response.data?.updateContactInfo?.tags).toEqual(
+        expect.arrayContaining(['foo', 'bar', 'baz'])
+      )
+    })
+  })
+
   describe('saveContact mutation', () => {
     it('saves a contact and associated notes to a connection', async () => {
       const user_a = await createMockUser({
@@ -326,8 +375,8 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace
@@ -337,10 +386,10 @@ describe('ContactsResolver', () => {
         `,
         variableValues: {
           username: user_b.username,
-          notesData: {
+          contactInfo: {
             meetingDate: '2020-01-01',
             meetingPlace: 'UCLA',
-            additionalNotes: 'more notes',
+            notes: 'more notes',
           },
         },
         contextUser: user_a,
@@ -376,8 +425,8 @@ describe('ContactsResolver', () => {
       const execSave = async () => {
         return await execQuery({
           source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace
@@ -407,8 +456,8 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace

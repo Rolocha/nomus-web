@@ -28,6 +28,7 @@ export interface ContactPageQuery_publicContact {
   cardBackImageUrl: string | null
   vcfUrl: string | null
   notes: string | null
+  tags: string[] | null
   meetingPlace: string | null
   meetingDate: any | null
   connected: boolean | null

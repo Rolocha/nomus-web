@@ -112,12 +112,14 @@ const Navbar = (props: Props) => {
         boxShadow="navbar"
       >
         <Box>
-          <SVG.LogoWithText
-            color={colors.nomusBlue}
-            css={css`
-              height: 60px;
-            `}
-          />
+          <Link to="/">
+            <SVG.LogoWithText
+              color={colors.nomusBlue}
+              css={css`
+                height: 60px;
+              `}
+            />
+          </Link>
         </Box>
 
         {/* Nav menu left-hand items */}

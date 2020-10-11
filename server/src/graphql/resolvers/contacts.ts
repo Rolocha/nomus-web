@@ -60,6 +60,9 @@ class Contact {
   @Field({ nullable: true })
   notes?: string
 
+  @Field(() => [String], { nullable: true })
+  tags?: Array<string>
+
   @Field({ nullable: true })
   meetingPlace?: string
 
@@ -70,8 +73,11 @@ class Contact {
   connected?: boolean
 }
 
-@InputType()
-class NotesDataInput {
+@InputType({
+  description:
+    'Information one user saves about another such as meeting date, meeting place, and tags',
+})
+class ContactInfoInput {
   @Field({ nullable: true })
   meetingPlace?: string
 
@@ -80,7 +86,10 @@ class NotesDataInput {
 
   //unique to the connections, notes taken by the user querying
   @Field({ nullable: true })
-  additionalNotes?: string
+  notes?: string
+
+  @Field(() => [String], { nullable: true })
+  tags?: Array<string>
 }
 
 const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
@@ -106,6 +115,7 @@ const connectionToContact = async (connection: Connection): Promise<Contact> => 
     meetingPlace: connection.meetingPlace,
     meetingDate: connection.meetingDate,
     notes: connection.notes,
+    tags: connection.tags,
   }
 }
 
@@ -166,25 +176,52 @@ class ContactsResolver {
       .populate('defaultCardVersion')
       .execPopulate()
 
-    let connected = false
     if (context.user != null) {
-      const existingConnection = await Connection.mongo.findOne({
-        from: MUUID.from(context.user.id),
-        to: MUUID.from(contactUser.id),
-      })
+      const existingConnection = await Connection.mongo
+        .findOne({
+          from: MUUID.from(context.user.id),
+          to: MUUID.from(contactUser.id),
+        })
+        .populate('from')
+        .populate('to')
       if (existingConnection != null) {
-        connected = true
+        const contact = await connectionToContact(existingConnection)
+        return { ...contact, connected: true }
       }
     }
 
     const contact = await userToContact(contactUser)
-    return { ...contact, connected }
+    return { ...contact, connected: false }
+  }
+
+  // The `updateNotes` mutation takes in note fields and inserts it into the db
+  @Authorized(Role.User)
+  @Mutation(() => Connection)
+  async updateContactInfo(
+    @Arg('contactId', { nullable: false }) contactId: string,
+    @Arg('contactInfo', { nullable: true }) contactInfo: ContactInfoInput,
+    @Ctx() context: IApolloContext
+  ): Promise<Connection> {
+    const connection = await Connection.mongo.findOne({
+      from: context.user._id,
+      to: MUUID.from(contactId),
+    })
+    if (connection == null) {
+      throw new Error('Contact not found')
+    }
+
+    connection.meetingDate = contactInfo.meetingDate ?? connection.meetingDate
+    connection.meetingPlace = contactInfo.meetingPlace ?? connection.meetingPlace
+    connection.notes = contactInfo.notes ?? connection.notes
+    connection.tags = contactInfo.tags ?? connection.tags
+
+    return await connection.save()
   }
 
   @Mutation(() => Contact)
   async saveContact(
     @Arg('username') username: string,
-    @Arg('notesData', { nullable: true }) notesData: NotesDataInput | null,
+    @Arg('contactInfo', { nullable: true }) contactInfo: ContactInfoInput | null,
     @Ctx() context: IApolloContext
   ): Promise<Contact> {
     const contactUser = await User.mongo.findOne({
@@ -207,9 +244,10 @@ class ContactsResolver {
     const connection = await Connection.mongo.create({
       from: MUUID.from(context.user.id),
       to: MUUID.from(contactUser.id),
-      meetingDate: notesData?.meetingDate ?? undefined,
-      meetingPlace: notesData?.meetingPlace ?? undefined,
-      notes: notesData?.additionalNotes ?? undefined,
+      meetingDate: contactInfo?.meetingDate ?? undefined,
+      meetingPlace: contactInfo?.meetingPlace ?? undefined,
+      notes: contactInfo?.notes ?? undefined,
+      tags: contactInfo?.tags ?? undefined,
     })
 
     await connection.populate('from').populate('to').execPopulate()

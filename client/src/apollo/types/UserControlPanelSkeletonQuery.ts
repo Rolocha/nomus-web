@@ -8,17 +8,17 @@
 // ====================================================
 
 export interface UserControlPanelSkeletonQuery_user_name {
-  __typename: "PersonName";
-  first: string;
-  middle: string | null;
-  last: string;
+  __typename: 'PersonName'
+  first: string
+  middle: string | null
+  last: string
 }
 
 export interface UserControlPanelSkeletonQuery_user {
-  __typename: "User";
-  name: UserControlPanelSkeletonQuery_user_name | null;
+  __typename: 'User'
+  name: UserControlPanelSkeletonQuery_user_name | null
 }
 
 export interface UserControlPanelSkeletonQuery {
-  user: UserControlPanelSkeletonQuery_user;
+  user: UserControlPanelSkeletonQuery_user
 }

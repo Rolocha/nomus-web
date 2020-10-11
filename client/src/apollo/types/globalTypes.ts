@@ -20,6 +20,16 @@ export enum OrderState {
 }
 
 /**
+ * Information one user saves about another such as meeting date, meeting place, and tags
+ */
+export interface ContactInfoInput {
+  meetingPlace?: string | null
+  meetingDate?: any | null
+  notes?: string | null
+  tags?: string[] | null
+}
+
+/**
  * Specification for a card built using custom assets
  */
 export interface CustomCardSpecInput {
@@ -27,12 +37,6 @@ export interface CustomCardSpecInput {
   vcfNotes?: string | null
   frontImageDataUrl: string
   backImageDataUrl?: string | null
-}
-
-export interface NotesDataInput {
-  meetingPlace?: string | null
-  meetingDate?: any | null
-  additionalNotes?: string | null
 }
 
 /**
