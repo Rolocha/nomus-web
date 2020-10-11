@@ -17,10 +17,9 @@ interface FormData {
   email: string
 }
 
-interface Props {}
 const bp = 'lg'
 
-const Footer = ({}: Props) => {
+const Footer = () => {
   const { register, handleSubmit } = useForm<FormData>()
 
   const onSubmit = async (data: FormData) => {

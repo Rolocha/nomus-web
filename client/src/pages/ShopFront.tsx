@@ -16,11 +16,9 @@ import { formatDollarAmount } from 'src/utils/money'
 import { colors } from 'src/styles'
 import Image from 'src/components/Image'
 
-interface Props {}
-
 const bp = 'lg'
 
-const ShopFront = ({}: Props) => {
+const ShopFront = () => {
   return (
     <Box position="relative" zIndex={0}>
       <Navbar />
