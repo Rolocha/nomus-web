@@ -1,6 +1,5 @@
 import * as express from 'express'
 import jwt from 'jsonwebtoken'
-import MUUID from 'uuid-mongodb'
 
 import { User, Token } from 'src/models'
 import { getUserFromToken } from './util'
@@ -101,7 +100,7 @@ const refreshToken = async (
     return res.status(401).end()
   }
 
-  const user = await User.mongo.findById(MUUID.from(userId))
+  const user = await User.mongo.findById(userId)
   if (user == null) {
     return res.status(401).end()
   }

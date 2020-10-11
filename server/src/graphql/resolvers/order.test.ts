@@ -3,7 +3,7 @@ import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 // import { execQuery } from 'src/test-utils/graphql'
 // import { createMockOrder } from 'src/__mocks__/models/Order'
 // import { createMockUser } from 'src/__mocks__/models/User'
-// import MUUID from 'uuid-mongodb'
+//
 // import { OrderState } from 'src/util/enums'
 
 beforeAll(async () => {
@@ -171,7 +171,7 @@ describe('OrderResolver', () => {
 
     //     const newOrder = await Order.mongo.findById(response.data?.createNewOrder?.orderId)
     //     const newCardVersion = await CardVersion.mongo.findById(
-    //       MUUID.from(response.data?.createNewOrder?.cardVersionId)
+    //       response.data?.createNewOrder?.cardVersionId
     //     )
 
     //     expect(newOrder.quantity).toEqual(orderPayload.quantity)
@@ -237,7 +237,7 @@ describe('OrderResolver', () => {
 
     //     const newOrder = await Order.mongo.findById(response.data?.createNewOrder?.orderId)
     //     const newCardVersion = await CardVersion.mongo.findById(
-    //       MUUID.from(response.data?.createNewOrder?.cardVersionId)
+    //       response.data?.createNewOrder?.cardVersionId
     //     )
 
     //     expect(newOrder.quantity).toEqual(orderPayload.quantity)

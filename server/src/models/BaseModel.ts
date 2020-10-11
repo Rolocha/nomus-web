@@ -17,8 +17,8 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
     @prop({ required: true, default: defaultId(prefix) })
     _id: string
 
-    // Override the 'id' virtual property getters/setters since Mongoose doesn't
-    // know how to handle our custom MUUID implementation
+    // Override the 'id' virtual property getters/setters,
+    // TODO: Investigate if this is still necessary, mongoose may auto-create this virtual getter
     @Field() // Expose the pretty underscore-less string version on GraphQL schema
     get id(): string {
       return this._id

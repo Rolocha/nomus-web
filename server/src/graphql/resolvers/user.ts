@@ -8,7 +8,7 @@ import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import * as S3 from 'src/util/s3'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
+
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 
@@ -60,9 +60,7 @@ class UserResolver {
   ) {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
-    const user = await User.mongo
-      .findOne({ _id: MUUID.from(requestedUserId) })
-      .populate('defaultCardVersion')
+    const user = await User.mongo.findOne({ _id: requestedUserId }).populate('defaultCardVersion')
 
     const userObject = user as DocumentType<User>
     return await this.sanitizeUser(userObject)
@@ -109,7 +107,7 @@ class UserResolver {
     const userBeingUpdated =
       requestedUserId === context.user._id
         ? context.user
-        : await User.mongo.findOne({ _id: MUUID.from(requestedUserId) })
+        : await User.mongo.findOne({ _id: requestedUserId })
 
     if (userUpdatePayload.username) {
       if (await validateUsername(userUpdatePayload.username)) {
@@ -142,8 +140,8 @@ class UserResolver {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
 
-    await User.mongo.deleteOne({ _id: MUUID.from(requestedUserId) })
-    return MUUID.from(requestedUserId).toString()
+    await User.mongo.deleteOne({ _id: requestedUserId })
+    return requestedUserId.toString()
   }
 
   @Authorized(Role.User)
@@ -166,7 +164,7 @@ class UserResolver {
       await CardVersion.mongo
         .find({
           user: context.user._id,
-          _id: MUUID.from(cardVersionId),
+          _id: cardVersionId,
         })
         .limit(1)
     )[0]
@@ -175,7 +173,7 @@ class UserResolver {
       throw new Error('Invalid card version id')
     }
 
-    context.user.defaultCardVersion = MUUID.from(cardVersionId)
+    context.user.defaultCardVersion = cardVersionId
     await context.user.save()
 
     const responseUser = await context.user.populate('defaultCardVersion').execPopulate()

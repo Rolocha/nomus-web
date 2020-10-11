@@ -3,7 +3,7 @@ import { UserModel, validateUsername } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
-import MUUID from 'uuid-mongodb'
+
 import { Result } from 'src/util/error'
 
 beforeAll(async () => {
@@ -103,7 +103,7 @@ describe('UserResolver', () => {
 
       expect(response.data.changePassword.id).toBe(user.id)
       // Can't just check the responde.data.user bc it doesn't include the password field
-      const updatedUser = await UserModel.findById(MUUID.from(response.data.changePassword.id))
+      const updatedUser = await UserModel.findById(response.data.changePassword.id)
       expect(await bcrypt.compare(newPassword, updatedUser.password)).toBe(true)
     })
 
@@ -232,7 +232,7 @@ describe('UserResolver', () => {
       })
 
       // We should assert on the DB user as well as the one on the GraphQL response
-      const updatedUser = await UserModel.findById(MUUID.from(response.data.updateProfile.id))
+      const updatedUser = await UserModel.findById(response.data.updateProfile.id)
       for (const userObject of [updatedUser, response.data.updateProfile]) {
         expect(userObject.name.first).toBe(updatePayload.firstName)
         expect(userObject.name.middle).toBe(updatePayload.middleName)
@@ -259,7 +259,7 @@ describe('UserResolver', () => {
       })
 
       expect(response.data.deleteUser).toBe(user.id)
-      const deletedUser = await UserModel.findById(MUUID.from(user.id))
+      const deletedUser = await UserModel.findById(user.id)
       expect(deletedUser).toBeNull()
     })
   })

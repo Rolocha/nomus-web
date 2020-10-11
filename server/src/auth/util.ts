@@ -1,4 +1,3 @@
-import MUUID from 'uuid-mongodb'
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 
 import { User } from 'src/models/User'
@@ -30,7 +29,7 @@ export const getUserFromToken = async (
     const data = jwt.verify(token, authTokenPrivateKey, {
       ignoreExpiration: _options.ignoreExpiration,
     }) as TokenBody
-    const user = await User.mongo.findOne({ _id: MUUID.from(data._id) })
+    const user = await User.mongo.findOne({ _id: data._id })
     if (!user) {
       return Result.fail('no-matching-user')
     }

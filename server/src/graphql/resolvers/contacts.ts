@@ -1,7 +1,6 @@
 import { IApolloContext } from 'src/graphql/types'
 import { DocumentType } from '@typegoose/typegoose'
 import Connection from 'src/models/Connection'
-import { UUIDScalar, UUIDType } from 'src/models/scalars'
 import { PersonName } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import {
@@ -15,7 +14,6 @@ import {
   Query,
   Resolver,
 } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
 import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
@@ -23,8 +21,8 @@ import { Role } from 'src/util/enums'
 @ObjectType()
 class Contact {
   //id of the user whose contact is being queried
-  @Field((type) => UUIDScalar)
-  id: UUIDType
+  @Field()
+  id: string
 
   @Field()
   username: string
@@ -93,8 +91,9 @@ class ContactInfoInput {
 }
 
 const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
+  await user.populate('defaultCardVersion').execPopulate()
   return {
-    id: user._id,
+    id: user.id,
     name: user.name,
     phoneNumber: user.phoneNumber,
     email: user.email,
@@ -108,7 +107,8 @@ const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
   }
 }
 
-const connectionToContact = async (connection: Connection): Promise<Contact> => {
+const connectionToContact = async (connection: DocumentType<Connection>): Promise<Contact> => {
+  await connection.populate('to').execPopulate()
   const connectionUser = connection.to as DocumentType<User>
   return {
     ...(await userToContact(connectionUser)),
@@ -134,14 +134,12 @@ class ContactsResolver {
     const requesterUserId = context.user._id
     const requestedUserId = userId ?? requesterUserId
 
-    const connections = await Connection.mongo
-      .find({ from: MUUID.from(requestedUserId) })
-      .populate({
-        path: 'to',
-        populate: {
-          path: 'defaultCardVersion',
-        },
-      })
+    const connections = await Connection.mongo.find({ from: requestedUserId }).populate({
+      path: 'to',
+      populate: {
+        path: 'defaultCardVersion',
+      },
+    })
 
     return await Promise.all(connections.map(connectionToContact))
   }
@@ -154,14 +152,7 @@ class ContactsResolver {
     @Arg('contactId', { nullable: false }) contactId: string,
     @Ctx() context: IApolloContext
   ): Promise<Contact> {
-    const connection = await Connection.mongo
-      .findOne({ from: context.user._id, to: MUUID.from(contactId) })
-      .populate({
-        path: 'to',
-        populate: {
-          path: 'defaultCardVersion',
-        },
-      })
+    const connection = await Connection.mongo.findOne({ from: context.user._id, to: contactId })
 
     if (!connection) {
       throw new Error('No connection exists between current user and queried user')
@@ -170,20 +161,20 @@ class ContactsResolver {
     return connectionToContact(connection)
   }
 
-  @Query(() => Contact)
+  @Query(() => Contact, {
+    description:
+      'A public-facing set of information about a user which includes additional connection-specific notes if the requesting user has already connected with them',
+  })
   async publicContact(@Arg('username') username: string, @Ctx() context: IApolloContext) {
     const contactUser = await (await User.mongo.findOne({ username }))
       .populate('defaultCardVersion')
       .execPopulate()
 
     if (context.user != null) {
-      const existingConnection = await Connection.mongo
-        .findOne({
-          from: MUUID.from(context.user.id),
-          to: MUUID.from(contactUser.id),
-        })
-        .populate('from')
-        .populate('to')
+      const existingConnection = await Connection.mongo.findOne({
+        from: context.user.id,
+        to: contactUser.id,
+      })
       if (existingConnection != null) {
         const contact = await connectionToContact(existingConnection)
         return { ...contact, connected: true }
@@ -196,15 +187,15 @@ class ContactsResolver {
 
   // The `updateNotes` mutation takes in note fields and inserts it into the db
   @Authorized(Role.User)
-  @Mutation(() => Connection)
+  @Mutation(() => Contact)
   async updateContactInfo(
     @Arg('contactId', { nullable: false }) contactId: string,
     @Arg('contactInfo', { nullable: true }) contactInfo: ContactInfoInput,
     @Ctx() context: IApolloContext
-  ): Promise<Connection> {
+  ): Promise<Contact> {
     const connection = await Connection.mongo.findOne({
       from: context.user._id,
-      to: MUUID.from(contactId),
+      to: contactId,
     })
     if (connection == null) {
       throw new Error('Contact not found')
@@ -215,7 +206,8 @@ class ContactsResolver {
     connection.notes = contactInfo.notes ?? connection.notes
     connection.tags = contactInfo.tags ?? connection.tags
 
-    return await connection.save()
+    await connection.save()
+    return await connectionToContact(connection)
   }
 
   @Mutation(() => Contact)
@@ -233,8 +225,8 @@ class ContactsResolver {
     }
 
     const existingConnection = await Connection.mongo.findOne({
-      from: MUUID.from(context.user.id),
-      to: MUUID.from(contactUser.id),
+      from: context.user.id,
+      to: contactUser.id,
     })
 
     if (existingConnection != null) {
@@ -242,8 +234,8 @@ class ContactsResolver {
     }
 
     const connection = await Connection.mongo.create({
-      from: MUUID.from(context.user.id),
-      to: MUUID.from(contactUser.id),
+      from: context.user.id,
+      to: contactUser.id,
       meetingDate: contactInfo?.meetingDate ?? undefined,
       meetingPlace: contactInfo?.meetingPlace ?? undefined,
       notes: contactInfo?.notes ?? undefined,

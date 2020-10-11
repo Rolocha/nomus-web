@@ -33,7 +33,7 @@
     "build": "webpack --mode none",
     "dev": "ts-node-dev --no-deps --respawn --poll --interval 1000 --nolazy --inspect=0.0.0.0:9229 -r tsconfig-paths/register -- src",
     "serve": "node dist",
-    "test": "jest",
+    "test": "jest --runInBand",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color"
   },
   "eslintConfig": {

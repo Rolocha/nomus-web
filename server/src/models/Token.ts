@@ -1,25 +1,23 @@
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
-import MUUID from 'uuid-mongodb'
 import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
 import User from './User'
-import { UUIDScalar, UUIDType } from './scalars'
+import { Ref } from './scalars'
 import { refreshTokenLifespan } from 'src/config'
+import { BaseModel } from './BaseModel'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class Token {
+class Token extends BaseModel({
+  prefix: 'tok',
+}) {
   static mongo: ReturnModelType<typeof Token>
 
-  @prop({ required: true, default: () => MUUID.v4() })
-  @Field((type) => UUIDScalar)
-  readonly _id: UUIDType
-
-  @prop({ required: true, ref: 'User', get: MUUID.from, set: MUUID.from })
+  @prop({ required: true, ref: 'User' })
   @Field(() => User, { nullable: false })
-  client: UUIDType
+  client: Ref<User>
 
   @prop({ default: () => crypto.randomBytes(40).toString('hex') })
   @Field()
@@ -35,7 +33,7 @@ class Token {
   @Field()
   forceInvalidated: boolean
 
-  public static async createNewTokenForUser(this: ReturnModelType<typeof Token>, user: UUIDType) {
+  public static async createNewTokenForUser(this: ReturnModelType<typeof Token>, user: string) {
     const preHashToken = crypto.randomBytes(40).toString('hex')
     const tokenObject = await this.create({
       client: user,
@@ -53,7 +51,7 @@ class Token {
   public static async verify(
     this: ReturnModelType<typeof Token>,
     proposedToken: string,
-    associatedUser: UUIDType
+    associatedUser: string
   ): Promise<boolean> {
     try {
       const tokensForThisUser = await this.find({ client: associatedUser })
@@ -77,7 +75,7 @@ class Token {
     this: ReturnModelType<typeof Token>,
     tokenIdToInvalidate: string
   ): Promise<boolean> {
-    const thisTokenToInvalidate = await this.findById(MUUID.from(tokenIdToInvalidate))
+    const thisTokenToInvalidate = await this.findById(tokenIdToInvalidate)
     thisTokenToInvalidate.forceInvalidated = true
     return true
   }
