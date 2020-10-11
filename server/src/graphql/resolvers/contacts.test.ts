@@ -331,27 +331,33 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-          mutation UpdateContactInfoMutation($contactId: String!, $contactInfoInput: ContactInfoInput!) {
-            updateContactInfo(contactId: $contactId, contactInfoInput: $contactInfoInput) {
+          mutation UpdateContactInfoMutation($contactId: String!, $contactInfo: ContactInfoInput!) {
+            updateContactInfo(contactId: $contactId, contactInfo: $contactInfo) {
               meetingDate
               meetingPlace
               notes
+              tags
             }
           }
         `,
         variableValues: {
           contactId: user_to.id,
-          contactInfoInput: {
+          contactInfo: {
             meetingPlace: 'here',
             notes: 'lovely',
+            tags: ['foo', 'bar', 'baz'],
           },
         },
         contextUser: user_from,
       })
 
-      expect(response.data?.updateNotes?.meetingPlace).toBe('here')
-      expect(response.data?.updateNotes?.meetingDate).toBe(meetingDate.getTime())
-      expect(response.data?.updateNotes?.notes).toBe('lovely')
+      expect(response.data?.updateContactInfo?.meetingPlace).toBe('here')
+      expect(response.data?.updateContactInfo?.meetingDate).toBe(meetingDate.getTime())
+      expect(response.data?.updateContactInfo?.notes).toBe('lovely')
+      expect(response.data?.updateContactInfo?.tags).toHaveLength(3)
+      expect(response.data?.updateContactInfo?.tags).toEqual(
+        expect.arrayContaining(['foo', 'bar', 'baz'])
+      )
     })
   })
 
@@ -369,8 +375,8 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace
@@ -380,10 +386,10 @@ describe('ContactsResolver', () => {
         `,
         variableValues: {
           username: user_b.username,
-          notesData: {
+          contactInfo: {
             meetingDate: '2020-01-01',
             meetingPlace: 'UCLA',
-            additionalNotes: 'more notes',
+            notes: 'more notes',
           },
         },
         contextUser: user_a,
@@ -419,8 +425,8 @@ describe('ContactsResolver', () => {
       const execSave = async () => {
         return await execQuery({
           source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace
@@ -450,8 +456,8 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation ContactTestQuery($username: String!, $notesData: NotesDataInput) {
-          saveContact(username: $username, notesData: $notesData) {
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
             id
             meetingDate
             meetingPlace
