@@ -1,3 +1,3 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { Ref as TypegooseRef } from '@typegoose/typegoose'
 
-export type Ref<T> = string | DocumentType<T>
+export type Ref<T> = TypegooseRef<T, string>

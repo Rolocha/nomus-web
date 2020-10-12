@@ -10,16 +10,16 @@ import { Ref } from './scalars'
 @ObjectType({
   description: 'Represents a single business card',
 })
-class Card extends BaseModel({
+export class Card extends BaseModel({
   prefix: 'card',
 }) {
   static mongo: ReturnModelType<typeof Card>
 
-  @prop({ _id: false, required: true, ref: 'CardVersion' })
+  @prop({ _id: false, required: true, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
-  @prop({ _id: false, required: true, ref: 'User' })
+  @prop({ _id: false, required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 }

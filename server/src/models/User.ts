@@ -6,6 +6,7 @@ import {
   prop,
   ReturnModelType,
 } from '@typegoose/typegoose'
+import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import bcrypt from 'bcryptjs'
 import * as fs from 'fs'
 import { FileUpload } from 'graphql-upload'
@@ -97,7 +98,8 @@ export const validateUsername = async (usernameVal: string): Promise<ValidateUse
   }
   next()
 })
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
+// @ts-ignore
+@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 @ObjectType()
 export class User extends BaseModel({
   prefix: 'user',
@@ -143,7 +145,7 @@ export class User extends BaseModel({
   @prop({ required: true })
   password: string
 
-  @prop({ type: Buffer, ref: 'CardVersion' })
+  @prop({ required: false, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
@@ -151,7 +153,7 @@ export class User extends BaseModel({
   @Field()
   vcfUrl: string
 
-  @prop({ default: [Role.User], required: true })
+  @prop({ default: [Role.User], enum: Role, type: String, required: true }, WhatIsIt.ARRAY)
   @Field((type) => [Role], { nullable: false })
   roles: Role[]
 
@@ -171,9 +173,9 @@ export class User extends BaseModel({
     this: ReturnModelType<typeof User>,
     username: string
   ) {
-    const user = await (await this.findOne({ username }))
+    const user = (await (await this.findOne({ username }))
       .populate('defaultCardVersion')
-      .execPopulate()
+      .execPopulate()) as DocumentType<User>
     return user.defaultCardVersion
   }
 
@@ -256,7 +258,7 @@ export class User extends BaseModel({
 
       const pictureLink = result.getValue()
       this.profilePicUrl = pictureLink
-      return Result.ok(await this.save())
+      return Result.ok((await this.save()) as DocumentType<User>)
     } catch (err) {
       throw new Error(`unknown error: ${err}`)
     } finally {

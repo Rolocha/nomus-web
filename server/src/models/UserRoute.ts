@@ -12,7 +12,7 @@ class UserRoute extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof UserRoute>
 
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, ref: () => User, required: true, type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 

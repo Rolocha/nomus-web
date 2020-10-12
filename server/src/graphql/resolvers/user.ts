@@ -176,7 +176,9 @@ class UserResolver {
     context.user.defaultCardVersion = cardVersionId
     await context.user.save()
 
-    const responseUser = await context.user.populate('defaultCardVersion').execPopulate()
+    const responseUser = (await context.user
+      .populate('defaultCardVersion')
+      .execPopulate()) as DocumentType<User>
     return responseUser
   }
 }

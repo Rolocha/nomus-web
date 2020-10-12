@@ -12,11 +12,11 @@ class Interaction extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Interaction>
 
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, required: true, ref: () => Card, type: String })
   @Field(() => Card, { nullable: false })
   sourceCard: Ref<Card>
 
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, required: true, ref: () => Card, type: String })
   @Field(() => Card, { nullable: false })
   receiverCard: Ref<Card>
 

@@ -166,9 +166,9 @@ class ContactsResolver {
       'A public-facing set of information about a user which includes additional connection-specific notes if the requesting user has already connected with them',
   })
   async publicContact(@Arg('username') username: string, @Ctx() context: IApolloContext) {
-    const contactUser = await (await User.mongo.findOne({ username }))
+    const contactUser = (await (await User.mongo.findOne({ username }))
       .populate('defaultCardVersion')
-      .execPopulate()
+      .execPopulate()) as DocumentType<User>
 
     if (context.user != null) {
       const existingConnection = await Connection.mongo.findOne({

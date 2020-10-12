@@ -1,4 +1,5 @@
 import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import { Field } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 
@@ -13,12 +14,12 @@ export class Connection extends BaseModel({
   static mongo: ReturnModelType<typeof Connection>
 
   //User initiating the connection: *a* -> b
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   from: Ref<User>
 
   //User connected to: a -> *b*
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   to: Ref<User>
 
@@ -35,7 +36,7 @@ export class Connection extends BaseModel({
   @Field({ nullable: true })
   notes: string
 
-  @prop({ required: false, default: [] })
+  @prop({ required: false, default: [], type: String }, WhatIsIt.ARRAY)
   @Field(() => [String], { nullable: false })
   tags: Array<string>
 }

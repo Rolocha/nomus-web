@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
-import User from './User'
+import { User } from './User'
 import { Ref } from './scalars'
 import { refreshTokenLifespan } from 'src/config'
 import { BaseModel } from './BaseModel'
@@ -15,7 +15,7 @@ class Token extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Token>
 
-  @prop({ required: true, ref: 'User' })
+  @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
   client: Ref<User>
 

@@ -4,10 +4,11 @@ import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 import { Address, PersonName } from './subschemas'
-import User from './User'
+import { User } from './User'
 import { validateEmail } from './utils'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
+// @ts-ignore
+@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 @ObjectType({
   description: 'Represents a single card design which may result in numerous printed Cards',
 })
@@ -24,7 +25,8 @@ export class CardVersion extends BaseModel({
   cardSlug: string
 
   @prop({
-    enum: [CardSpecBaseType.Custom, CardSpecBaseType.Template],
+    enum: CardSpecBaseType,
+    type: String,
     required: true,
     default: CardSpecBaseType.Custom,
   })
@@ -75,7 +77,7 @@ export class CardVersion extends BaseModel({
   @Field({ nullable: true })
   vcfUrl: string
 
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 
