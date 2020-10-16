@@ -1,20 +1,18 @@
-import MUUID from 'uuid-mongodb'
-import { prop, modelOptions, ReturnModelType, Ref, getModelForClass } from '@typegoose/typegoose'
+import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
+import { BaseModel } from './BaseModel'
 
-import { UUIDScalar, UUIDType } from './scalars'
+import { Ref } from './scalars'
 import User from './User'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class UserRoute {
+class UserRoute extends BaseModel({
+  prefix: 'usrrt',
+}) {
   static mongo: ReturnModelType<typeof UserRoute>
 
-  @prop({ required: true, default: () => MUUID.v4() })
-  @Field((type) => UUIDScalar)
-  readonly _id: UUIDType
-
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, ref: () => User, required: true, type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 

@@ -1,41 +1,32 @@
 import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
-import { Field, ObjectType } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
-import { Ref, UUIDScalar, UUIDType } from './scalars'
-import { Address, PersonName } from './subschemas'
-import User from './User'
-import { validateEmail } from './utils'
 import { CardSpecBaseType } from 'src/util/enums'
+import { Field, ObjectType } from 'type-graphql'
+import { BaseModel } from './BaseModel'
+import { Ref } from './scalars'
+import { Address, PersonName } from './subschemas'
+import { User } from './User'
+import { validateEmail } from './utils'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
-@ObjectType()
-export class CardVersion {
+// @ts-ignore
+@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
+@ObjectType({
+  description: 'Represents a single card design which may result in numerous printed Cards',
+})
+export class CardVersion extends BaseModel({
+  prefix: 'cardv',
+}) {
   static mongo: ReturnModelType<typeof CardVersion>
 
   @Field()
   createdAt: Date
-
-  @prop({ required: true, default: MUUID.v4 })
-  @Field((type) => UUIDScalar)
-  _id: UUIDType
-
-  // Override the 'id' virtual property getters/setters since Mongoose doesn't
-  // know how to handle our custom MUUID implementation
-  @Field() // Expose the pretty underscore-less string version on GraphQL schema
-  get id(): string {
-    return MUUID.from(this._id).toString()
-  }
-
-  set id(id: string) {
-    this._id = MUUID.from(id)
-  }
 
   @prop()
   @Field({ nullable: true })
   cardSlug: string
 
   @prop({
-    enum: [CardSpecBaseType.Custom, CardSpecBaseType.Template],
+    enum: CardSpecBaseType,
+    type: String,
     required: true,
     default: CardSpecBaseType.Custom,
   })
@@ -86,7 +77,7 @@ export class CardVersion {
   @Field({ nullable: true })
   vcfUrl: string
 
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 
@@ -103,7 +94,7 @@ export class CardVersion {
       const userWithThatUsername = await User.mongo.findOne({ username })
       const cardVersion = await this.findOne({
         cardSlug: slugOrId,
-        user: MUUID.from(userWithThatUsername._id),
+        user: userWithThatUsername.id,
       })
       return cardVersion
     }

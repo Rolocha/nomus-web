@@ -16,7 +16,7 @@ import {
   Query,
   Resolver,
 } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
+
 import { AdminOnlyArgs } from '../auth'
 
 @InputType({ description: 'Specification for a new Card Version object for Order' })
@@ -152,9 +152,7 @@ class OrderResolver {
     const requesterUserId = context.user._id
     const requestedUserId = userId ?? requesterUserId
 
-    const orders = await Order.mongo
-      .find({ user: MUUID.from(requestedUserId) })
-      .populate('cardVersion')
+    const orders = await Order.mongo.find({ user: requestedUserId }).populate('cardVersion')
 
     return orders
   }
@@ -169,7 +167,7 @@ class OrderResolver {
   ): Promise<UpsertOrderResponse> {
     const requestingUserId = context.user._id
     const userIdCheck = userId ?? requestingUserId
-    const requestedUser: User = await User.mongo.findById(MUUID.from(userIdCheck))
+    const requestedUser: User = await User.mongo.findById(userIdCheck)
 
     const { quantity, cardSpec } = payload
 

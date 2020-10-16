@@ -1,36 +1,25 @@
 import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
-import { Field, ObjectType } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
-import { Ref, UUIDScalar, UUIDType } from './scalars'
+import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
+import { Field } from 'type-graphql'
+import { BaseModel } from './BaseModel'
+
+import { Ref } from './scalars'
 import { User } from './User'
 
+// Not using @ObjectType() because we prefer to expose the Contact object rather than this Connection
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
-@ObjectType()
-export class Connection {
+export class Connection extends BaseModel({
+  prefix: 'cnxn',
+}) {
   static mongo: ReturnModelType<typeof Connection>
 
-  @prop({ required: true, default: MUUID.v4 })
-  @Field((type) => UUIDScalar)
-  _id: UUIDType
-
-  // Override the 'id' virtual property getters/setters since Mongoose doesn't
-  // know how to handle our custom MUUID implementation
-  @Field() // Expose the pretty underscore-less string version on GraphQL schema
-  get id(): string {
-    return MUUID.from(this._id).toString()
-  }
-
-  set id(id: string) {
-    this._id = MUUID.from(id)
-  }
-
   //User initiating the connection: *a* -> b
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   from: Ref<User>
 
   //User connected to: a -> *b*
-  @prop({ required: true, ref: 'User', type: Buffer })
+  @prop({ required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   to: Ref<User>
 
@@ -47,7 +36,7 @@ export class Connection {
   @Field({ nullable: true })
   notes: string
 
-  @prop({ required: false, default: [] })
+  @prop({ required: false, default: [], type: String }, WhatIsIt.ARRAY)
   @Field(() => [String], { nullable: false })
   tags: Array<string>
 }

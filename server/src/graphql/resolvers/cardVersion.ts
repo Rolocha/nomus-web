@@ -1,5 +1,4 @@
 import { Resolver, ObjectType, Field, Query, Ctx, Authorized, Arg, Int } from 'type-graphql'
-import MUUID from 'uuid-mongodb'
 
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
@@ -34,13 +33,11 @@ class CardVersionResolver {
 
     if (cardVersionId == null) {
       // Find the default card version for this user
-      const user = await User.mongo
-        .findById(MUUID.from(requestedUserId))
-        .populate('defaultCardVersion')
+      const user = await User.mongo.findById(requestedUserId).populate('defaultCardVersion')
 
       return (user.defaultCardVersion as CardVersion) || null
     } else {
-      return await CardVersion.mongo.findById(MUUID.from(cardVersionId))
+      return await CardVersion.mongo.findById(cardVersionId)
     }
   }
 
@@ -57,7 +54,7 @@ class CardVersionResolver {
     const requestedUserId = userId ?? requesterUserId
 
     const cardVersionsBelongingToUser = await CardVersion.mongo.find({
-      user: MUUID.from(requestedUserId),
+      user: requestedUserId,
     })
     return cardVersionsBelongingToUser
   }
@@ -81,7 +78,7 @@ class CardVersionResolver {
       cardVersionIds ??
       (
         await CardVersion.mongo.find({
-          user: MUUID.from(requestedUserId),
+          user: requestedUserId,
         })
       ).map((cardVersion) => cardVersion.id as string)
 

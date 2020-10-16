@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { prop } from '@typegoose/typegoose'
+import { modelOptions, prop } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
 const defaultId = (prefix: string) => () => {
@@ -12,13 +12,19 @@ export interface BaseModelArgs {
 }
 
 export const BaseModel = ({ prefix }: BaseModelArgs) => {
+  @modelOptions({
+    schemaOptions: {
+      // @ts-ignore Bad types from typegoose here falsely require a boolean
+      _id: String,
+    },
+  })
   @ObjectType()
   class BaseModel {
     @prop({ required: true, default: defaultId(prefix) })
     _id: string
 
-    // Override the 'id' virtual property getters/setters since Mongoose doesn't
-    // know how to handle our custom MUUID implementation
+    // Override the 'id' virtual property getters/setters,
+    // TODO: Investigate if this is still necessary, mongoose may auto-create this virtual getter
     @Field() // Expose the pretty underscore-less string version on GraphQL schema
     get id(): string {
       return this._id

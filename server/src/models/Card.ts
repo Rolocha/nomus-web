@@ -1,25 +1,25 @@
-import MUUID from 'uuid-mongodb'
 import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { ObjectType, Field } from 'type-graphql'
 
-import { UUIDScalar, UUIDType, Ref } from './scalars'
 import User from './User'
 import CardVersion from './CardVersion'
+import { BaseModel } from './BaseModel'
+import { Ref } from './scalars'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
-@ObjectType()
-class Card {
+@ObjectType({
+  description: 'Represents a single business card',
+})
+export class Card extends BaseModel({
+  prefix: 'card',
+}) {
   static mongo: ReturnModelType<typeof Card>
 
-  @prop({ required: true, default: () => MUUID.v4() })
-  @Field((type) => UUIDScalar)
-  readonly _id: UUIDType
-
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, required: true, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 }

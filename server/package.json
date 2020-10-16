@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@typegoose/typegoose": "^6.4.0",
+    "@typegoose/typegoose": "^7.4.1",
     "@types/vcards-js": "^2.10.0",
     "@types/zxcvbn": "^4.4.0",
     "apollo-server-express": "^2.12.0",
@@ -18,7 +18,7 @@
     "graphql-compose-mongoose": "^7.3.5",
     "graphql-upload": "^11.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.10.9",
     "morgan": "^1.10.0",
     "qrcode": "^1.4.4",
     "reflect-metadata": "^0.1.13",
@@ -33,7 +33,7 @@
     "build": "webpack --mode none",
     "dev": "ts-node-dev --no-deps --respawn --poll --interval 1000 --nolazy --inspect=0.0.0.0:9229 -r tsconfig-paths/register -- src",
     "serve": "node dist",
-    "test": "jest",
+    "test": "jest --runInBand",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color"
   },
   "eslintConfig": {
