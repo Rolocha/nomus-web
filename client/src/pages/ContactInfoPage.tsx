@@ -266,7 +266,7 @@ const ContactInfoPage = () => {
                 />
               </Box>
             )}
-            <Box gridArea="profilePic">
+            <Box gridArea="profilePic" placeSelf="center">
               <Image
                 borderRadius="50%"
                 width="100%"
