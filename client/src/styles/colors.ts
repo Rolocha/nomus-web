@@ -41,7 +41,7 @@ const colors = {
   activeRed: '#FFE5F1',
   outlineRed: '#FFB2D6',
 
-  hoverGreen: '#5A9E00',
+  hoverGreen: '#F0FFF7',
   activeGreen: '#E5FFF1',
   outlineGreen: '#B2FFD6',
 } as const

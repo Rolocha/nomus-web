@@ -14,9 +14,10 @@ import Button from 'src/components/Button'
 import { useAuth } from 'src/utils/auth'
 import { useHistory } from 'react-router-dom'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
-import ActivationEditor from './ActivationEditor'
+// import ActivationEditor from './ActivationEditor'
 import ProgressBar from './ProgressBar'
 import zxcvbn from 'zxcvbn'
+import SaveButton from 'src/components/SaveButton'
 
 const bp = 'lg'
 
@@ -179,7 +180,7 @@ export default () => {
         "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
       }}
-      gridColumnGap={2}
+      gridColumnGap={3}
       gridRowGap={3}
     >
       <Box gridArea="account" alignSelf={{ _: 'start', lg: 'center' }}>
@@ -189,7 +190,7 @@ export default () => {
       </Box>
 
       <Box gridArea="email">
-        <Text.Label mb={1}>EMAIL</Text.Label>
+        <Text.Label>EMAIL</Text.Label>
         {isEditingEmail ? (
           <Form.Form onSubmit={emailFormHandleSubmit(onSubmitEmail)}>
             <Form.Input
@@ -197,19 +198,20 @@ export default () => {
               name="email"
               type="email"
               autoComplete="email"
-              fontSize="14px"
-              width="100%"
+              fontSize="16px"
+              width="85%"
+              padding="2px 4px"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
         ) : (
-          <Text.Body2>{data.user.email}</Text.Body2>
+          <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
         )}
       </Box>
 
       <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
         {isEditingEmail ? (
-          <EditButton
+          <SaveButton
             onClick={emailFormHandleSubmit(onSubmitEmail)}
             iconOnlyBp={bp}
           />
@@ -236,20 +238,21 @@ export default () => {
         {isEditingUsername ? (
           <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
             <Box display="flex">
-              <Text.Body2>{'nomus.me/'}</Text.Body2>
+              <Text.Body2 mt={1}>{'nomus.me/'}</Text.Body2>
               <Form.Input
                 ref={usernameFormRegister()}
                 name="username"
                 type="username"
                 autoComplete="username"
-                fontSize="14px"
+                fontSize="16px"
                 width="100%"
+                padding="0px 6px"
               />
               <Form.Input type="submit" display="none" />
             </Box>
           </Form.Form>
         ) : (
-          <Text.Body2>{'nomus.me/' + data.user.username}</Text.Body2>
+          <Text.Body2 mt={2}>{'nomus.me/' + data.user.username}</Text.Body2>
         )}
       </Box>
 
@@ -258,7 +261,7 @@ export default () => {
         placeSelf={{ _: 'end', [bp]: 'start center' }}
       >
         {isEditingUsername ? (
-          <EditButton
+          <SaveButton
             onClick={usernameFormHandleSubmit(onSubmitUsername)}
             iconOnlyBp={bp}
           />
@@ -272,12 +275,10 @@ export default () => {
           />
         )}
       </Box>
-
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
         <Text.Body3>
-          This is the username associated with your account and the public URL
-          that leads to your profile. Changing your username will change your
-          public profile link.
+          This is your username for this account. Changing your username will
+          change your public profile link.
         </Text.Body3>
       </Box>
 
@@ -285,7 +286,6 @@ export default () => {
         <Button
           width={{ _: '100%', [bp]: '75%' }}
           variant="secondary"
-          mt={1}
           onClick={() => {
             logOut()
             history.push('/')
@@ -368,7 +368,7 @@ export default () => {
         </Button>
       </Box>
 
-      <Box
+      {/* <Box
         gridArea="deactivateProfileHeader"
         alignSelf={{ _: 'start', md: 'center' }}
       >
@@ -401,7 +401,7 @@ export default () => {
           who already have your contact wlil still have access to your profile.
           You will be able to Reactivate at any time in the future.
         </Text.Body3>
-      </Box>
+      </Box> */}
 
       {/* <Box
         gridArea="accountDeletionHeader"
