@@ -9,7 +9,7 @@ export async function init(options: Partial<typeof mongoCredentials> = {}) {
     hostname = mongoCredentials.hostname,
     port = mongoCredentials.port,
   } = options
-  const dbUri = `mongodb://${username}:${password}@${hostname}:${port}/${dbName}?authSource=admin`
+  const dbUri = `mongodb://${username}:${password}@${hostname}:${port}/${dbName}`
   let connection
   try {
     connection = await mongoose.connect(dbUri, {
