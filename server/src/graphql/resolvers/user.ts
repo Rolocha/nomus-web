@@ -6,7 +6,6 @@ import { IApolloContext } from 'src/graphql/types'
 import { User, validateUsername } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
-import * as S3 from 'src/util/s3'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 import zxcvbn from 'zxcvbn'
@@ -43,12 +42,12 @@ class ProfileUpdateInput implements Partial<User> {
 @Resolver()
 class UserResolver {
   // Performs any necessary changes to go from DB representation of User to public representation of User
-  private async sanitizeUser(user: DocumentType<User>) {
-    if (user.profilePicUrl) {
-      const profilePicUrl = await user.getProfilePicUrl()
-      user.profilePicUrl = profilePicUrl
+  private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
+    if (user.profilePicS3Key) {
+      user.profilePicUrl = await user.getProfilePicUrl()
     }
-    return user
+    await user.populate('defaultCardVersion').execPopulate()
+    return user as User
   }
 
   @Authorized(Role.User)
@@ -63,7 +62,7 @@ class UserResolver {
     const user = await User.mongo.findOne({ _id: requestedUserId }).populate('defaultCardVersion')
 
     const userObject = user as DocumentType<User>
-    return await this.sanitizeUser(userObject)
+    return await this.userFromMongoDocument(userObject)
   }
 
   @Authorized(Role.User)
@@ -90,7 +89,7 @@ class UserResolver {
     // Don't need to hash, a Mongoose pre-save hook will take care of that
     context.user.password = newPassword
     await context.user.save()
-    return await this.sanitizeUser(context.user)
+    return await this.userFromMongoDocument(context.user)
   }
 
   @Authorized(Role.User)
@@ -128,7 +127,7 @@ class UserResolver {
     userBeingUpdated.activated = userUpdatePayload.activated ?? userBeingUpdated.activated
 
     await userBeingUpdated.save()
-    return await this.sanitizeUser(userBeingUpdated)
+    return await this.userFromMongoDocument(userBeingUpdated)
   }
 
   @Authorized(Role.User)
@@ -151,7 +150,7 @@ class UserResolver {
     @Ctx() context: IApolloContext
   ): Promise<User> {
     await context.user.updateProfilePic(file)
-    return await this.sanitizeUser(context.user)
+    return await this.userFromMongoDocument(context.user)
   }
 
   @Authorized(Role.User)
@@ -176,10 +175,7 @@ class UserResolver {
     context.user.defaultCardVersion = cardVersionId
     await context.user.save()
 
-    const responseUser = (await context.user
-      .populate('defaultCardVersion')
-      .execPopulate()) as DocumentType<User>
-    return responseUser
+    return await this.userFromMongoDocument(context.user)
   }
 }
 export default UserResolver
