@@ -14,13 +14,6 @@ type SaveButtonProps = {
 const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
   <Button onClick={onClick} variant="success">
     <Box display="flex" flexDirection="row" alignItems="center">
-      <Box
-        display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
-      >
-        <Text.Body2 fontSize="14px" color="validGreen" ml={1}>
-          Save
-        </Text.Body2>
-      </Box>
       <SVG.Check
         css={css`
           width: 20px;
@@ -28,6 +21,13 @@ const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
         `}
         color={colors.validGreen}
       />
+      <Box
+        display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
+      >
+        <Text.Body2 fontSize="14px" color="validGreen" ml={1}>
+          Save
+        </Text.Body2>
+      </Box>
     </Box>
   </Button>
 )
