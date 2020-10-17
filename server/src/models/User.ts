@@ -118,9 +118,13 @@ export class User extends BaseModel({
   @Field({ nullable: true })
   bio: string
 
-  @prop()
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: "A URL pointing to the user's profile picture" })
   profilePicUrl: string
+
+  // The S3 key pointing to the user's profile pic, requires fetching server-side and attaching
+  // on profilePicUrl when sending to a client
+  @prop()
+  profilePicS3Key: string
 
   @prop({ match: /^\d{10,11}$/ })
   @Field({ nullable: true })
@@ -211,16 +215,18 @@ export class User extends BaseModel({
   }
 
   public async getProfilePicUrl(this: DocumentType<User>): Promise<string | null> {
-    if (this.profilePicUrl) {
-      const result = await S3.getSignedUrl(this.profilePicUrl)
+    if (this.profilePicUrl && this.profilePicUrl.length > 0) {
+      return this.profilePicUrl
+    } else if (this.profilePicS3Key) {
+      const result = await S3.getSignedUrl(this.profilePicS3Key)
       return result.isSuccess ? result.value : null
     }
     return null
   }
 
   public async getProfilePicDataUrl(this: DocumentType<User>): Promise<string | null> {
-    if (this.profilePicUrl) {
-      const result = await S3.getBase64Url(this.profilePicUrl)
+    if (this.profilePicS3Key) {
+      const result = await S3.getBase64Url(this.profilePicS3Key)
       return result.isSuccess ? result.value : null
     }
     return null
