@@ -46,12 +46,12 @@ export const pages: Array<PageType> = [
     path: '/register',
     Component: LoginPage,
   },
-  {
-    name: 'shop front',
-    exact: true,
-    path: '/shop',
-    Component: ShopFront,
-  },
+  // {
+  //   name: 'shop front',
+  //   exact: true,
+  //   path: '/shop',
+  //   Component: ShopFront,
+  // },
   {
     name: 'dashboard',
     path: '/dashboard/contacts/save',
@@ -64,12 +64,12 @@ export const pages: Array<PageType> = [
     Component: UserControlPanel,
     requiredAuthLevel: Role.User,
   },
-  {
-    name: 'card studio',
-    path: '/card-studio/:buildBaseType?',
-    Component: CardBuilder,
-    requiredAuthLevel: Role.User,
-  },
+  // {
+  //   name: 'card studio',
+  //   path: '/card-studio/:buildBaseType?',
+  //   Component: CardBuilder,
+  //   requiredAuthLevel: Role.User,
+  // },
   {
     name: 'admin panel',
     path: '/admin',
