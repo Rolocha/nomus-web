@@ -41,6 +41,12 @@ export const pages: Array<PageType> = [
     Component: LoginPage,
   },
   {
+    name: 'register',
+    exact: true,
+    path: '/register',
+    Component: LoginPage,
+  },
+  {
     name: 'shop front',
     exact: true,
     path: '/shop',
