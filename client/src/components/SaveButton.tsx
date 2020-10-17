@@ -24,7 +24,7 @@ const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
       <Box
         display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
       >
-        <Text.Body2 fontSize="14px" color="validGreen" ml={1}>
+        <Text.Body2 fontSize="14px" color="validGreen" mr={1}>
           Save
         </Text.Body2>
       </Box>
