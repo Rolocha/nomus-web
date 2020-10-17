@@ -24,14 +24,13 @@ const formatDate = (date: Date) => {
 }
 
 const sendReorderEmail = (cardId: string) => {
-  var link =
-    'mailto:hi@nomus.me' +
-    '?subject=' +
-    "I'd like to Reorder a Card!" +
-    '&body=' +
-    "Hi! I'd like to reorder a card please :) \n cardID: " +
-    cardId
-
+  const params = new URLSearchParams()
+  params.set('subject', "I'd like to Reorder a Card!")
+  params.set(
+    'body',
+    "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
+  )
+  const link = `mailto:hi@nomus.me?${params.toString()}`
   window.location.href = link
 }
 
