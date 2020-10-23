@@ -27,6 +27,9 @@ export interface UCPProfileSectionQuery_user {
   username: string | null
   name: UCPProfileSectionQuery_user_name | null
   defaultCardVersion: UCPProfileSectionQuery_user_defaultCardVersion | null
+  /**
+   * A URL pointing to the user's profile picture
+   */
   profilePicUrl: string | null
   headline: string | null
   phoneNumber: string | null

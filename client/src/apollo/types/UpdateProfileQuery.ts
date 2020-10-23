@@ -21,6 +21,9 @@ export interface UpdateProfileQuery_updateProfile {
   id: string
   username: string | null
   name: UpdateProfileQuery_updateProfile_name | null
+  /**
+   * A URL pointing to the user's profile picture
+   */
   profilePicUrl: string | null
   headline: string | null
   phoneNumber: string | null

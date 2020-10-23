@@ -16,7 +16,7 @@ export interface ContactPageQuery_publicContact_name {
 
 export interface ContactPageQuery_publicContact {
   __typename: 'Contact'
-  id: any
+  id: string
   username: string
   name: ContactPageQuery_publicContact_name
   phoneNumber: string | null
@@ -35,6 +35,10 @@ export interface ContactPageQuery_publicContact {
 }
 
 export interface ContactPageQuery {
+  /**
+   * A public-facing set of information about a user which includes additional
+   * connection-specific notes if the requesting user has already connected with them
+   */
   publicContact: ContactPageQuery_publicContact
 }
 

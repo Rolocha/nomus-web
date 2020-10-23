@@ -16,7 +16,7 @@ export interface UCPContactsSectionQuery_contacts_name {
 
 export interface UCPContactsSectionQuery_contacts {
   __typename: 'Contact'
-  id: any
+  id: string
   username: string
   name: UCPContactsSectionQuery_contacts_name
   phoneNumber: string | null

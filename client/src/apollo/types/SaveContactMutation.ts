@@ -11,7 +11,7 @@ import { ContactInfoInput } from './globalTypes'
 
 export interface SaveContactMutation_saveContact {
   __typename: 'Contact'
-  id: any
+  id: string
   username: string
   meetingDate: any | null
   meetingPlace: string | null
