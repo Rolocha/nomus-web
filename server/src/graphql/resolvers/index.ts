@@ -5,6 +5,7 @@ import CardVersionResolver from './cardVersion'
 import ContactsResolver from './contacts'
 import OrderResolver from './order'
 import SheetResolver from './sheet'
+import EncodingResolver from './encoding'
 
 export default [
   ContactsResolver,
@@ -12,4 +13,5 @@ export default [
   CardVersionResolver,
   OrderResolver,
   SheetResolver,
+  EncodingResolver,
 ] as NonEmptyArray<Function>

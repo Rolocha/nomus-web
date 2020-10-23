@@ -2,7 +2,6 @@ import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoos
 import { ObjectType, Field } from 'type-graphql'
 
 import User from './User'
-import CardVersion from './CardVersion'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 
@@ -15,13 +14,17 @@ export class Card extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Card>
 
-  @prop({ _id: false, required: true, ref: () => CardVersion, type: String })
-  @Field(() => CardVersion, { nullable: false })
-  cardVersion: Ref<CardVersion>
-
-  @prop({ _id: false, required: true, ref: () => User, type: String })
-  @Field(() => User, { nullable: false })
+  @prop({ _id: false, required: false, ref: () => User, type: String })
+  @Field(() => User, { nullable: true })
   user: Ref<User>
+
+  @prop({ required: false })
+  @Field({ nullable: true })
+  nfcUrl: string
+
+  @prop({ required: false })
+  @Field({ nullable: true })
+  qrUrl: string
 }
 
 // Attach the mongoose model onto the core model itself

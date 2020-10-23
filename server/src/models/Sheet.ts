@@ -17,10 +17,10 @@ export class Sheet extends BaseModel({
 
   @prop({ required: true }, WhatIsIt.ARRAY)
   @Field((type) => [Card], { nullable: false })
-  cards: Card[]
+  cards: Array<Ref<Card>>
 
-  @prop({ _id: false, required: true, ref: () => CardVersion, type: String })
-  @Field(() => CardVersion, { nullable: false })
+  @prop({ _id: false, required: false, ref: () => CardVersion, type: String })
+  @Field(() => CardVersion, { nullable: true })
   cardVersion: Ref<CardVersion>
 }
 
