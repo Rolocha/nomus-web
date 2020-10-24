@@ -8,6 +8,7 @@ export enum S3AssetCategory {
   ProfilePictures = 'profile-pictures',
   BusinessCards = 'business-cards',
   QRCodes = 'qr-codes',
+  EncodingCSV = 'encoding-csv',
 }
 
 type UploadObjectFailureType =
@@ -18,6 +19,49 @@ type UploadObjectFailureType =
 
 // Clean up the S3 object key we use so it matches up with what the ultimate result AWS uses
 const sanitizeKey = (key: string) => key.replace(' ', '+')
+
+export const uploadEncodingCSV = async (
+  filepath: string,
+  filename: string
+): EventualResult<string, UploadObjectFailureType> => {
+  try {
+    const buffer = await promisify(fs.readFile)(filepath).catch(() => {
+      throw new Error('failed-file-read')
+    })
+
+    let s3Service: AWS.S3 | null
+    try {
+      s3Service = new AWS.S3()
+    } catch (err) {
+      throw new Error('failed-aws-connection')
+    }
+
+    const ContentType = mime.lookup(filepath)
+    if (ContentType === false) {
+      throw new Error('failed-file-read')
+    }
+
+    const Key = sanitizeKey(`${S3AssetCategory.EncodingCSV}/${filename}`)
+    const params = {
+      Bucket: 'nomus-assets',
+      Key,
+      Body: buffer,
+      ContentType,
+    }
+
+    await s3Service
+      .putObject(params)
+      .promise()
+      .catch((err) => {
+        console.error(err)
+        throw new Error('failed-s3-upload')
+      })
+
+    return Result.ok(Key)
+  } catch (err) {
+    return Result.fail(err.message)
+  }
+}
 
 export const uploadProfilePicture = async (
   filepath: string,

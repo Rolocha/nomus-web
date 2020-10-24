@@ -2,6 +2,7 @@ import { Resolver, Authorized, Mutation, Arg, ObjectType, Field } from 'type-gra
 import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
 import { createArrayCsvWriter } from 'csv-writer'
+import * as S3 from 'src/util/s3'
 
 @ObjectType()
 class MassEncoding {
@@ -42,12 +43,18 @@ class EncodingResolver {
       url_records.push(card_urls)
     }
 
+    const filepath = `/tmp/${filename}`
     const csvWriter = createArrayCsvWriter({
-      path: `/tmp/${filename}`,
+      path: filepath,
     })
     await csvWriter.writeRecords(url_records)
 
-    return { s3_url: 's3 url' }
+    const result = await S3.uploadProfilePicture(filepath, filename)
+    if (!result.isSuccess) {
+      throw new Error(`Failed to upload to S3: ${result.error}`)
+    }
+
+    return { s3_url: result.getValue() }
   }
 }
 export default EncodingResolver
