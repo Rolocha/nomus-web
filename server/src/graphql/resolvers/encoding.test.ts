@@ -3,6 +3,10 @@ import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
+import AWS from 'aws-sdk'
+import * as AWSMock from 'aws-sdk-mock'
+import { uploadEncodingCSV } from 'src/util/s3'
+import { Result } from 'src/util/error'
 
 beforeAll(async () => {
   await initDB()
@@ -19,6 +23,12 @@ describe('EncodingResolver', () => {
 
   describe('createMassSheetEncoding', () => {
     it('creates a mass sheet encoding, 5 sheets for an admin', async () => {
+      AWSMock.setSDKInstance(AWS)
+      const putObjectMock = jest.fn().mockImplementation((_, cb) => {
+        cb()
+      })
+      AWSMock.mock('S3', 'putObject', putObjectMock)
+
       const admin_user = await createMockUser({ roles: [Role.User, Role.Admin] })
       const numSheets = 5
 
@@ -44,7 +54,10 @@ describe('EncodingResolver', () => {
       expect(created_cards.length).toBe(125)
       expect(created_cards[0].nfcUrl).toMatch(/sheet_.*-card.*/)
 
-      expect(response.data?.createMassSheetEncoding?.s3_url).toBe('s3 url')
+      expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
+      expect(putObjectMock.mock.calls[0][0].Key).toBe(
+        response.data?.createMassSheetEncoding?.s3_url
+      )
     })
   })
 })
