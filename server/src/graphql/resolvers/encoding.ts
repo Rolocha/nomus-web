@@ -19,7 +19,7 @@ class EncodingResolver {
     @Arg('numSheets', { nullable: false }) numSheets: Number
   ): Promise<MassEncoding> {
     const execution_date = new Date()
-    const filename = `sheet_encoding_${execution_date.getFullYear()}-${
+    const filename = `nomus_sheet_encoding_${execution_date.getFullYear()}-${
       execution_date.getMonth() + 1
     }-${execution_date.getDate()}.csv`
     let url_records = []
