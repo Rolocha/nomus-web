@@ -1,6 +1,7 @@
 import { Resolver, Authorized, Mutation, Arg, ObjectType, Field } from 'type-graphql'
 import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
+import { createArrayCsvWriter } from 'csv-writer'
 
 @ObjectType()
 class MassEncoding {
@@ -17,7 +18,12 @@ class EncodingResolver {
   async createMassSheetEncoding(
     @Arg('numSheets', { nullable: false }) numSheets: Number
   ): Promise<MassEncoding> {
-    let url_store = []
+    const execution_date = new Date()
+    const filename = `sheet_encoding_${execution_date.getFullYear()}-${
+      execution_date.getMonth() + 1
+    }-${execution_date.getDate()}.csv`
+    let url_records = []
+
     for (let i = 0; i < numSheets; i++) {
       let sheet = await Sheet.mongo.create({
         cards: [],
@@ -33,8 +39,14 @@ class EncodingResolver {
         await curr_card.save()
         await sheet.save()
       }
-      url_store.push(card_urls)
+      url_records.push(card_urls)
     }
+
+    const csvWriter = createArrayCsvWriter({
+      path: `/tmp/${filename}`,
+    })
+    await csvWriter.writeRecords(url_records)
+
     return { s3_url: 's3 url' }
   }
 }
