@@ -49,7 +49,7 @@ class EncodingResolver {
     })
     await csvWriter.writeRecords(url_records)
 
-    const result = await S3.uploadProfilePicture(filepath, filename)
+    const result = await S3.uploadEncodingCSV(filepath, filename)
     if (!result.isSuccess) {
       throw new Error(`Failed to upload to S3: ${result.error}`)
     }
