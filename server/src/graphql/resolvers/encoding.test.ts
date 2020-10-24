@@ -37,7 +37,13 @@ describe('EncodingResolver', () => {
       })
 
       const created_sheets = await Sheet.mongo.find({})
+      expect(created_sheets.length).toBe(5)
+      expect(created_sheets[0].cards.length).toBe(25)
+
       const created_cards = await Card.mongo.find({})
+      expect(created_cards.length).toBe(125)
+      expect(created_cards[0].nfcUrl).toMatch(/sheet_.*-card.*/)
+
       expect(response.data?.createMassSheetEncoding?.s3_url).toBe('s3 url')
     })
   })

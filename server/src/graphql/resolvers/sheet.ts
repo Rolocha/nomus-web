@@ -1,4 +1,4 @@
-import { Resolver, ObjectType, Field, Query, Ctx, Authorized, Arg, Int } from 'type-graphql'
+import { Resolver, Query, Authorized, Arg } from 'type-graphql'
 
 import { Role } from 'src/util/enums'
 import { Sheet } from 'src/models'
@@ -7,7 +7,7 @@ import { Sheet } from 'src/models'
 class SheetResolver {
   @Authorized(Role.Admin)
   @Query(() => Sheet, { nullable: true })
-  async sheet(@Arg('sheetId', { nullable: false }) sheetId: string) {
+  async sheet(@Arg('sheetId', { nullable: false }) sheetId: string): Promise<Sheet> {
     return await Sheet.mongo.findById(sheetId)
   }
 }
