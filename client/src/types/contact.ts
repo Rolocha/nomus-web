@@ -22,4 +22,5 @@ export interface Contact {
   meetingPlace: string | null
   meetingDate: Date | null
   notes: string | null
+  connected: boolean | null
 }
