@@ -322,7 +322,7 @@ const ContactInfoPage = () => {
             <Box gridArea="profileInfo">
               <Box mb={3}>
                 <Text.Label mb={1}>PHONE</Text.Label>
-                {/* <Text.Body2>{contact.phoneNumber}</Text.Body2> */}
+                <Text.Body2>{contact.phoneNumber}</Text.Body2>
               </Box>
 
               <Box mb={3}>

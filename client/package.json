@@ -134,7 +134,8 @@
       "react-app-polyfill/jsdom"
     ],
     "setupFilesAfterEnv": [
-      "<rootDir>/src/setupTests.ts"
+      "<rootDir>/src/setupTests.ts",
+      "jest-extended"
     ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
@@ -196,6 +197,7 @@
     "@types/styled-system": "^5.1.9",
     "babel-plugin-emotion": "^10.0.29",
     "husky": "^4.2.5",
+    "jest-extended": "^0.11.5",
     "jsonwebtoken": "^8.5.1",
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
