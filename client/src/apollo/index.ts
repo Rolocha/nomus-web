@@ -9,8 +9,8 @@ export const client = new ApolloClient({
 })
 
 const SPEC_SKIP_CACHE =
-  process.env.NODE_ENV === 'test' ? { fetchPolicy: 'no-cache' } : {}
-export const useQuery = (...args: any) => {
+  process.env.NODE_ENV === 'test' ? ({ fetchPolicy: 'no-cache' } as const) : {}
+export const useQuery: typeof _useQuery = (...args) => {
   return _useQuery(args[0], { ...SPEC_SKIP_CACHE, ...args[1] })
 }
 
