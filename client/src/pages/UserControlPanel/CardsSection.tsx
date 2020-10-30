@@ -32,7 +32,6 @@ const sendReorderEmail = (cardId: string) => {
     "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
   )
   return `mailto:hi@nomus.me?${params.toString()}`
-  // window.location.href = link
 }
 
 export default () => {
