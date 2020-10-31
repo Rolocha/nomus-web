@@ -19,10 +19,10 @@ class EncodingResolver {
   async createMassSheetEncoding(
     @Arg('numSheets', { nullable: false }) numSheets: Number
   ): Promise<MassEncoding> {
-    const execution_date = new Date()
-    const filename = `nomus_sheet_encoding_${execution_date.getFullYear()}-${
-      execution_date.getMonth() + 1
-    }-${execution_date.getDate()}.csv`
+    const executionDate = new Date()
+    const filename = `nomus_sheet_encoding_${executionDate.getFullYear()}-${
+      executionDate.getMonth() + 1
+    }-${executionDate.getDate()}.csv`
     let url_records = []
 
     for (let i = 0; i < numSheets; i++) {
