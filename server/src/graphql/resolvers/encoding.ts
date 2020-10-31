@@ -29,22 +29,21 @@ class EncodingResolver {
       let sheet = await Sheet.mongo.create({
         cards: [],
       })
-      let card_urls = []
-      for (let i = 0; i < NUM_CARDS_IN_SHEET; i++) {
+      for (let j = 0; j < NUM_CARDS_IN_SHEET; j++) {
         let curr_card = await Card.mongo.create({})
         const stored_url = sheet.id + '-' + curr_card.id
         const nfc_url = 'https://nomus.me/d/' + stored_url
-        card_urls.push(nfc_url)
+        url_records.push([nfc_url, i + 1])
         curr_card.nfcUrl = stored_url
         sheet.cards.push(curr_card._id)
         await curr_card.save()
         await sheet.save()
       }
-      url_records.push(card_urls)
     }
 
     const filepath = `/tmp/${filename}`
     const csvWriter = createArrayCsvWriter({
+      header: ['url', 'sheet-number'],
       path: filepath,
     })
     await csvWriter.writeRecords(url_records)
