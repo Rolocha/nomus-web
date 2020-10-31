@@ -2,7 +2,7 @@ import { Resolver, Authorized, Mutation, Arg, ObjectType, Field } from 'type-gra
 import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
 import { createArrayCsvWriter } from 'csv-writer'
-import { uploadEncodingCSV } from 'src/util/s3'
+import { S3AssetCategory, uploadFileToS3 } from 'src/util/s3'
 
 @ObjectType()
 class MassEncoding {
@@ -61,7 +61,7 @@ class ManufacturingResolver {
     //...
     await csvWriter.writeRecords(url_records)
 
-    const result = await uploadEncodingCSV(filepath, filename)
+    const result = await uploadFileToS3(filepath, filename, S3AssetCategory.EncodingCSV)
     if (!result.isSuccess) {
       throw new Error(`Failed to upload to S3: ${result.error}`)
     }
