@@ -197,6 +197,7 @@ const Navbar = (props: Props) => {
 
         {/* Nav menu right-hand items */}
         <Box placeSelf="center end" flexDirection="row" alignItems="center">
+          {/* Desktop */}
           <Box
             display={{ _: 'none', [bp]: 'flex' }}
             flexDirection="row"
@@ -239,12 +240,15 @@ const Navbar = (props: Props) => {
                 ]}
           </Box>
 
-          {/* Hamburger button (mobile-only) */}
+          {/* Mobile */}
           <Box display={{ _: 'flex', [bp]: 'none' }} cursor="pointer">
-            <Link key="dashboard" to="/dashboard" mr={3}>
-              <SVG.Profile />
-            </Link>
-            <Text.Body2
+            {loggedIn && (
+              <Link key="dashboard" to="/dashboard" mr={3}>
+                <SVG.Profile color={colors.nomusBlue} />
+              </Link>
+            )}
+            {/* Hamburger button */}
+            <Box
               cursor="pointer"
               role="button"
               onClick={() => {
@@ -256,7 +260,7 @@ const Navbar = (props: Props) => {
               ) : (
                 <SVG.Menu color={colors.nomusBlue} />
               )}
-            </Text.Body2>
+            </Box>
           </Box>
         </Box>
       </Box>
