@@ -321,16 +321,38 @@ const Navbar = (props: Props) => {
                             alignItems="stretch"
                             width="100%"
                           >
-                            <Link
-                              asButton
-                              buttonStyle="secondary"
-                              to="/register"
-                            >
-                              get started
-                            </Link>
-                            <Link asButton buttonStyle="tertiary" to="/login">
-                              sign in
-                            </Link>
+                            {loggedIn
+                              ? [
+                                  <Link key="dashboard" to="/dashboard">
+                                    <Box display="flex" alignItems="center">
+                                      <SVG.Profile />
+                                      <Text.Body
+                                        ml={2}
+                                        color={colors.nomusBlue}
+                                      >
+                                        profile
+                                      </Text.Body>
+                                    </Box>
+                                  </Link>,
+                                ]
+                              : [
+                                  <Link
+                                    asButton
+                                    buttonStyle="secondary"
+                                    to="/register"
+                                    key="register"
+                                  >
+                                    get started
+                                  </Link>,
+                                  <Link
+                                    asButton
+                                    buttonStyle="tertiary"
+                                    to="/login"
+                                    key="login"
+                                  >
+                                    sign in
+                                  </Link>,
+                                ]}
                           </Box>
                         </Box>
                       </animated.div>
