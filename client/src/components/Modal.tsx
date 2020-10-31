@@ -154,6 +154,7 @@ const Modal = ({
             <animated.div key={key} style={props}>
               <Box
                 as="aside"
+                data-testid="modal"
                 aria-modal
                 position="fixed"
                 top="0"

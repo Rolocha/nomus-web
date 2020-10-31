@@ -12,6 +12,7 @@ import {
 } from 'styled-system'
 
 interface Props {
+  nameForImageAlt?: string
   frontImageUrl?: string
   backImageUrl?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
@@ -63,6 +64,7 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
 )
 
 const BusinessCardImage = ({
+  nameForImageAlt,
   frontImageUrl,
   backImageUrl,
   width,
@@ -71,10 +73,22 @@ const BusinessCardImage = ({
   const [showBack, setShowBack] = React.useState(false)
 
   const frontImage = (
-    <Image boxShadow="businessCard" w={width} h={height} src={frontImageUrl} />
+    <Image
+      boxShadow="businessCard"
+      w={width}
+      h={height}
+      src={frontImageUrl}
+      alt={`front of ${nameForImageAlt}'s business card`}
+    />
   )
   const backImage = (
-    <Image boxShadow="businessCard" w={width} h={height} src={backImageUrl} />
+    <Image
+      boxShadow="businessCard"
+      w={width}
+      h={height}
+      src={backImageUrl}
+      alt={`back of ${nameForImageAlt}'s business card`}
+    />
   )
 
   if (backImageUrl == null && frontImageUrl == null) {
