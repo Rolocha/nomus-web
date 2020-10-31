@@ -1,5 +1,4 @@
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { ApolloClient } from 'apollo-client'
+import { ApolloClient, InMemoryCache } from '@apollo/client'
 import link from './links'
 import { useQuery as _useQuery } from '@apollo/react-hooks'
 

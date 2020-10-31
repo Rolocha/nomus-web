@@ -1,5 +1,5 @@
-import { onError } from 'apollo-link-error'
-import { Observable } from 'apollo-link'
+import { onError } from '@apollo/client/link/error'
+import { Observable } from '@apollo/client/core'
 
 import { ensureActiveToken, logOutAndClearData } from 'src/utils/auth'
 

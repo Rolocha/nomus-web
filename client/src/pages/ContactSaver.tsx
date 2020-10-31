@@ -21,7 +21,7 @@ const ContactSaver = () => {
         notesData: {
           meetingDate: params.get('meetingDate'),
           meetingPlace: params.get('meetingPlace'),
-          additionalNotes: params.get('additionalNotes'),
+          notes: params.get('notes'),
         },
       },
     })
