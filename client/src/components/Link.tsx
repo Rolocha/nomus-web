@@ -6,12 +6,12 @@ import { Link as ReactRouterLink } from 'react-router-dom'
 import * as buttonlikeStyles from 'src/styles/components/buttonlike'
 import theme from 'src/styles/theme'
 
-const linkBaseStyles = (props: LinkProps) => ({
+const linkBaseStyles = (props: LinkStyleProps) => ({
   textDecoration: props.underline ? 'underline' : 'none',
   color: props.color ?? theme.colors.linkBlue,
 })
 
-interface LinkProps extends SpaceProps, LayoutProps {
+interface LinkStyleProps extends SpaceProps, LayoutProps {
   asButton?: boolean
   // button variants are only used if asButton is true
   buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
@@ -33,7 +33,7 @@ interface LinkProps extends SpaceProps, LayoutProps {
 const args = [
   space,
   layout,
-  (props: LinkProps) =>
+  (props: LinkStyleProps) =>
     props.asButton
       ? {
           ...buttonlikeStyles.baseButtonStyles,
@@ -47,14 +47,16 @@ const args = [
           textDecoration: 'none',
         }
       : linkBaseStyles(props),
-  (props: LinkProps) => props.overrideStyles,
+  (props: LinkStyleProps) => props.overrideStyles,
 ] as const
 
-interface InternalLinkProps
-  extends React.ComponentProps<typeof ExternalLink>,
-    LinkProps {}
+type ExternalLinkProps = React.ComponentProps<typeof ExternalLink>
 
-const ExternalLink = styled<'a', LinkProps>('a', {
+interface InternalLinkProps
+  extends React.ComponentProps<typeof ReactRouterLink>,
+    LinkStyleProps {}
+
+const ExternalLink = styled<'a', LinkStyleProps>('a', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline',
 })(...args)
 const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
@@ -70,29 +72,42 @@ const defaultProps = {
 ExternalLink.defaultProps = defaultProps
 InternalLink.defaultProps = defaultProps
 
-interface UnifiedLinkProps extends InternalLinkProps, LinkProps {
-  to: string
+interface UnifiedLinkProps extends InternalLinkProps, LinkStyleProps {
+  to: React.ComponentProps<typeof ReactRouterLink>['to']
   type?: 'internal' | 'external'
+  ref?: any
+}
+
+const isExternalLink = (
+  to: React.ComponentProps<typeof ReactRouterLink>['to'],
+): to is string => {
+  return (
+    typeof to === 'string' && (to.startsWith('http') || to.startsWith('mailto'))
+  )
 }
 
 // An isomorphic Link component where the link is always passed in via the "to" prop so that you
 // don't have to decide whether to pass in "to" for the react-router InternalLink or "href" for
 // the traditional <a /> ExternalLink
-const UnifiedLink = ({ to, type, ref, ...props }: UnifiedLinkProps) => {
-  const linkTypes = {
-    internal: <InternalLink {...props} to={to} />,
-    external: <ExternalLink ref={ref} {...props} href={to} />,
-  }
-  if (type != null) {
-    return linkTypes[type]
-  }
-
-  const isLinkInternal = !(to.startsWith('http') || to.startsWith('mailto'))
-
-  return to != null && isLinkInternal
-    ? // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
-      linkTypes.internal
-    : linkTypes.external
+const UnifiedLink = ({
+  to,
+  ref,
+  defaultValue,
+  referrerPolicy,
+  ...props
+}: UnifiedLinkProps) => {
+  // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
+  return to != null && isExternalLink(to) ? (
+    // @ts-expect-error slight mismatch on style types, hopefully not a big deal
+    <ExternalLink ref={ref} {...props} href={to} />
+  ) : (
+    <InternalLink
+      {...props}
+      to={to}
+      defaultValue={defaultValue}
+      referrerPolicy={referrerPolicy}
+    />
+  )
 }
 
 export { ExternalLink, InternalLink }

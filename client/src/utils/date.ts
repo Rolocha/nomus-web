@@ -44,5 +44,10 @@ export const getFormattedDateFromISODateString = (date: string) => {
   return `${getMonthString(Number(month) - 1)} ${dateOfMonth}, ${year}`
 }
 
-export const getInputCompliantDate = (date: string | Date | number) =>
+export const getDateStringForDateInput = (date: string | Date | number) =>
   new Date(date).toISOString().substr(0, 10)
+
+export const getDateFromDateInputString = (date: string) => {
+  const dateObj = new Date(date)
+  return new Date(+dateObj + dateObj.getTimezoneOffset() * 60000)
+}

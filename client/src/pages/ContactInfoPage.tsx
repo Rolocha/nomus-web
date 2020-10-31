@@ -15,7 +15,7 @@ import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
 import Image from 'src/components/Image'
-import Link from 'src/components/Link'
+import { ExternalLink } from 'src/components/Link'
 import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
@@ -26,8 +26,9 @@ import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
+  getDateFromDateInputString,
+  getDateStringForDateInput,
   getFormattedDateFromISODateString,
-  getInputCompliantDate,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 
@@ -37,7 +38,7 @@ interface UrlParams {
 
 const bp = 'md'
 
-interface NotesFormData {
+export interface NotesFormData {
   meetingDate: string | null
   meetingPlace: string | null
   // Enforcing comma-separated tag values
@@ -52,7 +53,7 @@ const ContactInfoPage = () => {
   const [hasMadeEdits, setHasMadeEdits] = React.useState(false)
   const [hasInstantiatedNotes, setHasInstantiatedNotes] = React.useState(false)
 
-  const { loggedIn, id: ownUserId } = useAuth()
+  const { loggedIn } = useAuth()
 
   const meetingDateRef = React.useRef<HTMLInputElement | null>(null)
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
@@ -61,7 +62,7 @@ const ContactInfoPage = () => {
 
   const { handleSubmit, register, watch, reset } = useForm<NotesFormData>({
     defaultValues: {
-      meetingDate: getInputCompliantDate(Date.now()),
+      meetingDate: getDateStringForDateInput(Date.now()),
     },
   })
 
@@ -164,7 +165,7 @@ const ContactInfoPage = () => {
   if (!hasInstantiatedNotes) {
     reset({
       meetingDate: contact.meetingDate
-        ? getInputCompliantDate(contact.meetingDate)
+        ? getDateStringForDateInput(contact.meetingDate)
         : formFields.meetingDate,
       meetingPlace: contact.meetingPlace ?? formFields.meetingPlace,
       notes: contact.notes ?? formFields.notes,
@@ -179,17 +180,18 @@ const ContactInfoPage = () => {
     // it keeps the previous edits
     reset(watch())
     if (loggedIn) {
+      const meetingDate = data.meetingDate
+        ? getDateFromDateInputString(data.meetingDate)
+        : null
+      const tags = data?.tags ? data.tags.split(',').map((s) => s.trim()) : []
       await updateContactInfo({
         variables: {
           contactId: contact.id,
           contactInfo: {
-            meetingDate: data.meetingDate,
+            meetingDate,
             meetingPlace: data.meetingPlace,
             notes: data.notes,
-            tags: (() => {
-              const tags = data?.tags
-              return tags ? tags.split(',').map((s) => s.trim()) : []
-            })(),
+            tags,
           },
         },
       })
@@ -271,6 +273,7 @@ const ContactInfoPage = () => {
                 borderRadius="50%"
                 width="100%"
                 height="100%"
+                alt={`profile picture of ${formatName(contact.name)}`}
                 src={
                   contact.profilePicUrl ?? 'http://via.placeholder.com/500x500'
                 }
@@ -304,6 +307,7 @@ const ContactInfoPage = () => {
                     <BusinessCardImage
                       width="100%"
                       frontImageUrl={contact.cardFrontImageUrl}
+                      nameForImageAlt={formatName(contact.name)}
                     />
                   </Box>
                 )}
@@ -313,6 +317,7 @@ const ContactInfoPage = () => {
                     <BusinessCardImage
                       width="100%"
                       backImageUrl={contact.cardBackImageUrl}
+                      nameForImageAlt={formatName(contact.name)}
                     />
                   </Box>
                 )}
@@ -367,7 +372,7 @@ const ContactInfoPage = () => {
             <Box gridArea="meetingDate">
               <Text.Label>Meeting Date</Text.Label>
               {formFields.meetingDate ? (
-                <Text.Body2>
+                <Text.Body2 data-testid="meetingDate">
                   {getFormattedDateFromISODateString(formFields.meetingDate)}
                 </Text.Body2>
               ) : (
@@ -378,7 +383,9 @@ const ContactInfoPage = () => {
             <Box gridArea="meetingPlace">
               <Text.Label>Meeting Place</Text.Label>
               {formFields.meetingPlace ? (
-                <Text.Body2>{formFields.meetingPlace}</Text.Body2>
+                <Text.Body2 data-testid="meetingPlace">
+                  {formFields.meetingPlace}
+                </Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -401,7 +408,7 @@ const ContactInfoPage = () => {
               {formFields.hasOwnProperty('tags') &&
               formFields.tags &&
               formFields.tags.length > 0 ? (
-                <Box display="flex" flexWrap="wrap">
+                <Box display="flex" flexWrap="wrap" data-testid="tags">
                   {formFields.tags.split(',').map((tag) => (
                     <Box
                       borderRadius="1em"
@@ -435,7 +442,7 @@ const ContactInfoPage = () => {
             <Box gridArea="notes">
               <Text.Label>Additional Notes</Text.Label>
               {formFields.notes ? (
-                <Text.Body2>{formFields.notes}</Text.Body2>
+                <Text.Body2 data-testid="notes">{formFields.notes}</Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -580,30 +587,29 @@ const ContactInfoPage = () => {
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
-            <Link
+            <ExternalLink
               asButton
               buttonStyle="primary"
               buttonSize="big"
               download={`${contact.username}.vcf`}
-              type="external"
-              to={downloadLink}
+              href={downloadLink}
             >
               <Text.Body2 color="white">Save contact card</Text.Body2>
-            </Link>
+            </ExternalLink>
 
-            {contact.connected || contact.id === ownUserId ? (
+            {contact.connected ? (
               <Button variant="secondary" size="big" disabled>
                 Saved
               </Button>
             ) : (
-              <Link
-                to={saveToNomusLink}
+              <ExternalLink
+                href={saveToNomusLink}
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"
               >
                 <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
-              </Link>
+              </ExternalLink>
             )}
           </Box>
         </Box>

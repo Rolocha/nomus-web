@@ -14,6 +14,7 @@ exports[`<Modal /> renders a modal with the specified content 1`] = `
     <aside
       aria-modal={true}
       className="css-1m0a4o1-Box e1gi27mm0"
+      data-testid="modal"
       display="flex"
       height={null}
       onClick={[Function]}
