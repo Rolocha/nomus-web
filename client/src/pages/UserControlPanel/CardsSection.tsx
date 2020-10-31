@@ -13,6 +13,7 @@ import LoadingPage from 'src/pages/LoadingPage'
 import { getMonthAbbreviation } from 'src/utils/date'
 import { CHANGE_ACTIVE_CARD_VERSION } from './mutations'
 import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
+import Link from 'src/components/Link'
 
 const bp = 'md'
 
@@ -21,6 +22,16 @@ const formatDate = (date: Date) => {
   return `${getMonthAbbreviation(
     dateObject.getMonth(),
   )} ${dateObject.getDate()}, ${dateObject.getFullYear()}`
+}
+
+const sendReorderEmail = (cardId: string) => {
+  const params = new URLSearchParams()
+  params.set('subject', "I'd like to Reorder a Card!")
+  params.set(
+    'body',
+    "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
+  )
+  return `mailto:hi@nomus.me?${params.toString()}`
 }
 
 export default () => {
@@ -123,11 +134,23 @@ export default () => {
                     }
                   `}
                 >
-                  <Box px={1}>
-                    <Button variant="primary">Reorder card</Button>
+                  <Box px={1} display="flex" justifyContent="stretch">
+                    <Link
+                      asButton
+                      buttonStyle="primary"
+                      to={sendReorderEmail(defaultCardVersion.id)}
+                    >
+                      Reorder card
+                    </Link>
                   </Box>
-                  <Box px={1}>
-                    <Button variant="secondary">Modify card</Button>
+                  <Box px={1} display="flex" justifyContent="stretch">
+                    <Link
+                      asButton
+                      buttonStyle="secondary"
+                      to={sendReorderEmail(defaultCardVersion.id)}
+                    >
+                      Modify card
+                    </Link>
                   </Box>
                 </Box>
               </Box>
@@ -205,11 +228,29 @@ export default () => {
                     justifyContent="stretch"
                     mx={-1}
                   >
-                    <Box px={1}>
-                      <Button variant="primary">Reorder card</Button>
+                    <Box px={1} display="flex" justifyContent="stretch">
+                      <Link
+                        asButton
+                        buttonStyle="primary"
+                        to={sendReorderEmail(cv.id)}
+                        css={css`
+                          padding: 9.5px 6px;
+                        `}
+                      >
+                        Reorder card
+                      </Link>
                     </Box>
-                    <Box px={1}>
-                      <Button variant="secondary">Modify card</Button>
+                    <Box px={1} display="flex" justifyContent="stretch">
+                      <Link
+                        asButton
+                        buttonStyle="secondary"
+                        to={sendReorderEmail(cv.id)}
+                        css={css`
+                          padding: 9.5px 6px;
+                        `}
+                      >
+                        Modify card
+                      </Link>
                     </Box>
                     <Box px={1}>
                       <Button
