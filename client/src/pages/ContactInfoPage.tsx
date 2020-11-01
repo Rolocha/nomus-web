@@ -15,10 +15,11 @@ import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
 import Image from 'src/components/Image'
-import { ExternalLink } from 'src/components/Link'
+import Link, { ExternalLink } from 'src/components/Link'
 import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
+import * as SVG from 'src/components/SVG'
 import updateContactInfoMutation from 'src/mutations/updateContactInfoMutation'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
@@ -52,6 +53,10 @@ const ContactInfoPage = () => {
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
   const [hasMadeEdits, setHasMadeEdits] = React.useState(false)
   const [hasInstantiatedNotes, setHasInstantiatedNotes] = React.useState(false)
+  const [
+    closedUnsavedNotesBanner,
+    setClosedUnsavedNotesBanner,
+  ] = React.useState(false)
 
   const { loggedIn } = useAuth()
 
@@ -142,6 +147,12 @@ const ContactInfoPage = () => {
       : `/register?redirect_url=${encodeURIComponent(saveUrl)}`
   }, [loggedIn, contactInfoParams, username])
 
+  React.useEffect(() => {
+    return () => {
+      window.onbeforeunload = null
+    }
+  }, [])
+
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
     history.push('/')
@@ -195,7 +206,13 @@ const ContactInfoPage = () => {
           },
         },
       })
+      // Deactivate exit confirmation dialog
+      window.onbeforeunload = null
     } else {
+      // User tried to save while not logged in, changes are saved in browser memory but not to any account/contact
+      // Adding this onbeforeunload handler makes the browser pop up a confirm dialog if the user tries to close
+      // the window without saving
+      window.onbeforeunload = () => ''
     }
     closeNotesModal()
   }
@@ -225,7 +242,7 @@ const ContactInfoPage = () => {
             `,
             [bp]: `
               "info notes"
-              "buttons buttons"
+              "buttons notes"
             `,
           }}
           mb={{ _: '100px', [bp]: 0 }}
@@ -245,7 +262,6 @@ const ContactInfoPage = () => {
             }}
             gridTemplateAreas={{
               _: `
-              "banner banner"
               "profilePic nameplate"
               "cards cards"
               "profileInfo profileInfo"
@@ -259,12 +275,32 @@ const ContactInfoPage = () => {
             gridColumnGap={3}
             gridRowGap={3}
           >
-            {hasMadeEdits && !loggedIn && (
-              <Box gridArea="banner">
+            {hasMadeEdits && !loggedIn && !closedUnsavedNotesBanner && (
+              <Box
+                gridArea="banner"
+                css={css`
+                  position: fixed;
+                  bottom: calc(10px + 84px);
+                  width: calc(100% - 20px);
+                  left: 10px;
+                  ${mq[bp]} {
+                    position: static;
+                  }
+                `}
+              >
                 <Banner
                   type="warning"
                   title="Unsaved notes"
-                  description="Save to Nomus to avoid losing your notes."
+                  description={
+                    <span>
+                      <Link to={saveToNomusLink}> Create a Nomus account</Link>
+                      {` to save your notes about ${formatName(contact.name)}.`}
+                    </span>
+                  }
+                  closable
+                  onClickClose={() => {
+                    setClosedUnsavedNotesBanner(true)
+                  }}
                 />
               </Box>
             )}
@@ -282,9 +318,9 @@ const ContactInfoPage = () => {
 
             <Box gridArea="nameplate" alignSelf={{ _: 'center', md: 'center' }}>
               {contact.name && (
-                <Text.SectionHeader mb={1} mt={0}>
+                <Text.PageHeader mb={1} mt={0}>
                   {formatName(contact.name)}
-                </Text.SectionHeader>
+                </Text.PageHeader>
               )}
               <Text.Body2>{contact.headline}</Text.Body2>
             </Box>
@@ -344,13 +380,15 @@ const ContactInfoPage = () => {
 
           <Box
             gridArea="notes"
-            placeSelf="start stretch"
+            placeSelf="stretch"
             display="grid"
             gridTemplateColumns="2fr 1fr"
             gridColumnGap={3}
-            gridRowGap={2}
+            gridRowGap="24px"
             borderRadius={3}
+            ml={{ _: 0, [bp]: 4 }}
             borderTop={`16px solid ${colors.gold}`}
+            alignContent="flex-start"
             bg={colors.ivory}
             padding={{ _: '24px', [bp]: '50px' }}
             gridTemplateAreas={`
@@ -407,20 +445,23 @@ const ContactInfoPage = () => {
               <Text.Label>Tags</Text.Label>
               {formFields.hasOwnProperty('tags') &&
               formFields.tags &&
-              formFields.tags.length > 0 ? (
+              formFields.tags.trim().length > 0 ? (
                 <Box display="flex" flexWrap="wrap" data-testid="tags">
-                  {formFields.tags.split(',').map((tag) => (
-                    <Box
-                      borderRadius="1em"
-                      px={3}
-                      py={0}
-                      mr={1}
-                      mb={1}
-                      bg={colors.nomusBlue}
-                    >
-                      <Text.Body2 color="white">{tag.trim()}</Text.Body2>
-                    </Box>
-                  ))}
+                  {formFields.tags
+                    .trim()
+                    .split(',')
+                    .map((tag) => (
+                      <Box
+                        borderRadius="1em"
+                        px={3}
+                        py={0}
+                        mr={1}
+                        mb={1}
+                        bg={colors.nomusBlue}
+                      >
+                        <Text.Body2 color="white">{tag.trim()}</Text.Body2>
+                      </Box>
+                    ))}
                 </Box>
               ) : (
                 <Button
@@ -442,7 +483,12 @@ const ContactInfoPage = () => {
             <Box gridArea="notes">
               <Text.Label>Additional Notes</Text.Label>
               {formFields.notes ? (
-                <Text.Body2 data-testid="notes">{formFields.notes}</Text.Body2>
+                <Text.Body2
+                  css={css({ whiteSpace: 'pre-wrap' })}
+                  data-testid="notes"
+                >
+                  {formFields.notes}
+                </Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -583,7 +629,7 @@ const ContactInfoPage = () => {
             `}
             bg="white"
             boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 6fr' }}
+            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 1fr' }}
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
@@ -594,22 +640,29 @@ const ContactInfoPage = () => {
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              <Text.Body2 color="white">Save contact card</Text.Body2>
+              Save contact card
             </ExternalLink>
 
             {contact.connected ? (
-              <Button variant="secondary" size="big" disabled>
-                Saved
+              <Button variant="primary" size="big" disabled>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  width="100%"
+                  justifyContent="center"
+                >
+                  <SVG.Check /> <span>Saved to Nomus</span>
+                </Box>
               </Button>
             ) : (
-              <ExternalLink
-                href={saveToNomusLink}
+              <Link
+                to={saveToNomusLink}
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"
               >
-                <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
-              </ExternalLink>
+                Save to Nomus
+              </Link>
             )}
           </Box>
         </Box>

@@ -1,6 +1,7 @@
 import colors from '../colors'
 import typography from '../typography'
 import * as polished from 'polished'
+import { mq } from '../breakpoints'
 const { fontFamilies } = typography
 
 // Defining button styles centrally here since both <a /> and <button /> will consume them
@@ -184,7 +185,10 @@ export const styleVariants = {
 
 export const sizeVariants = {
   big: {
-    fontSize: '20px',
+    fontSize: '16px',
+    [mq.md]: {
+      fontSize: '20px',
+    },
     borderRadius: '2em',
     paddingTop: '13px',
     paddingBottom: '13px',
