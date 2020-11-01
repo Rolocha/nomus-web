@@ -104,23 +104,32 @@ const Navbar = (props: Props) => {
         css={css({
           alignItems: 'center',
         })}
-        gridColumnGap={4}
-        px={4}
-        height="100px"
+        gridColumnGap={{ _: 0, [bp]: 4 }}
+        px={{ _: 3, [bp]: 4 }}
+        height={{ _: '60px', [bp]: '100px' }}
         position="relative"
         zIndex={2}
         boxShadow="navbar"
       >
-        <Box>
-          <Link to="/">
+        {/* <Box> */}
+        <Link to="/" height="60%">
+          <Box
+            display="flex"
+            width="100%"
+            height="100%"
+            alignItems="center"
+            justifyContent="flex-start"
+          >
             <SVG.LogoWithText
               color={colors.nomusBlue}
               css={css`
-                height: 60px;
+                height: 100%;
+                width: auto;
               `}
             />
-          </Link>
-        </Box>
+          </Box>
+        </Link>
+        {/* </Box> */}
 
         {/* Nav menu left-hand items */}
         <Box
@@ -188,6 +197,7 @@ const Navbar = (props: Props) => {
 
         {/* Nav menu right-hand items */}
         <Box placeSelf="center end" flexDirection="row" alignItems="center">
+          {/* Desktop */}
           <Box
             display={{ _: 'none', [bp]: 'flex' }}
             flexDirection="row"
@@ -229,20 +239,28 @@ const Navbar = (props: Props) => {
                   </Link>,
                 ]}
           </Box>
-          <Box
-            display={{ _: 'block', [bp]: 'none' }}
-            cursor="pointer"
-            onClick={() => {
-              setMobileMenuOpen(!mobileMenuOpen)
-            }}
-          >
-            <Text.Body2>
+
+          {/* Mobile */}
+          <Box display={{ _: 'flex', [bp]: 'none' }} cursor="pointer">
+            {loggedIn && (
+              <Link key="dashboard" to="/dashboard" mr={3}>
+                <SVG.Profile color={colors.nomusBlue} />
+              </Link>
+            )}
+            {/* Hamburger button */}
+            <Box
+              cursor="pointer"
+              role="button"
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen)
+              }}
+            >
               {mobileMenuOpen ? (
                 <SVG.Close color={colors.nomusBlue} />
               ) : (
                 <SVG.Menu color={colors.nomusBlue} />
               )}
-            </Text.Body2>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -256,9 +274,12 @@ const Navbar = (props: Props) => {
                 onClick={handleOutsideClick}
                 zIndex={1}
                 position="fixed"
-                top="100px"
+                top={{ _: '60px', [bp]: '100px' }}
                 right="0"
-                height="calc(100vh - 100px)"
+                height={{
+                  _: 'calc(100vh - 60px)',
+                  [bp]: 'calc(100vh - 100px)',
+                }}
                 width="100vw"
                 bg={`${rgba(colors.nomusBlue, 0.5)}`}
               >
@@ -321,16 +342,24 @@ const Navbar = (props: Props) => {
                             alignItems="stretch"
                             width="100%"
                           >
-                            <Link
-                              asButton
-                              buttonStyle="secondary"
-                              to="/register"
-                            >
-                              get started
-                            </Link>
-                            <Link asButton buttonStyle="tertiary" to="/login">
-                              sign in
-                            </Link>
+                            {!loggedIn && [
+                              <Link
+                                asButton
+                                buttonStyle="secondary"
+                                to="/register"
+                                key="register"
+                              >
+                                get started
+                              </Link>,
+                              <Link
+                                asButton
+                                buttonStyle="tertiary"
+                                to="/login"
+                                key="login"
+                              >
+                                sign in
+                              </Link>,
+                            ]}
                           </Box>
                         </Box>
                       </animated.div>
