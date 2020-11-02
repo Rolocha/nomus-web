@@ -45,7 +45,9 @@ const jsonFetch = async (method: string, route: string, body?: object) => {
   if (res.status === 200) {
     return await res.json()
   } else {
-    throw new Error(`${method.toUpperCase()} ${route} failed`)
+    const err = new Error(
+      `${method.toUpperCase()} ${route} failed, Body: ${res.body}`,
+    )
   }
 }
 

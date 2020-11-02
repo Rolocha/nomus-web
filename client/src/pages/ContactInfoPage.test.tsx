@@ -276,7 +276,9 @@ describe('Contact Info Page', () => {
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       expect(renderResult.queryByText('Save to Nomus')).toBe(null)
-      const savedButton = renderResult.queryByText('Saved')?.closest('button')
+      const savedButton = renderResult
+        .queryByText('Saved to Nomus')
+        ?.closest('button')
       expect(savedButton).toBeInTheDocument()
       expect(savedButton?.disabled).toBe(true)
 

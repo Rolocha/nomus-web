@@ -13,6 +13,9 @@ export const baseButtonStyles = {
   cursor: 'pointer',
   border: 'none',
   textAlign: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   outline: 'none',
   '&:disabled': {
     cursor: 'not-allowed',
