@@ -50,7 +50,7 @@ describe('EncodingResolver', () => {
 
       const created_cards = await Card.mongo.find({})
       expect(created_cards.length).toBe(125)
-      expect(created_cards[0].nfcUrl).toMatch(/sheet_.*-card.*/)
+      expect(created_cards[0].nfcId).toMatch(/sheet_.*-card.*/)
 
       expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
       expect(putObjectMock.mock.calls[0][0].Key).toBe(

@@ -6,7 +6,7 @@ export const createMockCard = async (override: Partial<Card> = {}) => {
 
   const newOrderPayload: Partial<Card> = {
     user: override.user ?? userInPayload,
-    nfcUrl: override.nfcUrl ?? 'sheet_ABCD-card_ABCD',
+    nfcId: override.nfcId ?? 'sheet_ABCD-card_ABCD',
     qrUrl: override.qrUrl ?? 'cardv_abcd',
     ...override,
   }

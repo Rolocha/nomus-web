@@ -7,7 +7,7 @@ import { S3AssetCategory, uploadFileToS3 } from 'src/util/s3'
 @ObjectType()
 class MassEncoding {
   @Field()
-  s3_url: string
+  s3Url: string
 }
 
 const NUM_CARDS_IN_SHEET = 25
@@ -24,7 +24,7 @@ class ManufacturingResolver {
   ): Promise<MassEncoding> {
     const executionDate = new Date()
     const filename = `nomus_sheet_encoding_${executionDate.toISOString().substr(0, 10)}.csv`
-    const url_records = []
+    const urlRecords = []
 
     for (let i = 0; i < numSheets; i++) {
       // creates the sheet so the cards below can link to it
@@ -33,18 +33,18 @@ class ManufacturingResolver {
       })
       for (let j = 0; j < NUM_CARDS_IN_SHEET; j++) {
         //each sheet has 25 cards on it, so it will make a card then create it's url and store it on the card
-        let curr_card = await Card.mongo.create({})
-        const stored_url = `${sheet.id}-${curr_card.id}`
-        const nfc_url = 'https://nomus.me/d/' + stored_url
+        let currCard = await Card.mongo.create({})
+        const storedId = `${sheet.id}-${currCard.id}`
+        const nfcUrl = 'https://nomus.me/d/' + storedId
 
         //adds the url to the list of urls generated so far so to output the csv
-        url_records.push([nfc_url, i + 1])
+        urlRecords.push([nfcUrl, i + 1])
         //assigns the url to the nfcUrl
-        curr_card.nfcUrl = stored_url
+        currCard.nfcId = storedId
         //links the card to its parent sheet
-        sheet.cards.push(curr_card._id)
+        sheet.cards.push(currCard._id)
         //saves in the database
-        await curr_card.save()
+        await currCard.save()
         await sheet.save()
       }
     }
@@ -59,14 +59,14 @@ class ManufacturingResolver {
     //url, sheet-number
     //https://nomus.me/d/<sheet-id>-<card-id>, sheet#
     //...
-    await csvWriter.writeRecords(url_records)
+    await csvWriter.writeRecords(urlRecords)
 
     const result = await uploadFileToS3(filepath, filename, S3AssetCategory.EncodingCSV)
     if (!result.isSuccess) {
       throw new Error(`Failed to upload to S3: ${result.error}`)
     }
 
-    return { s3_url: result.getValue() }
+    return { s3Url: result.getValue() }
   }
 }
 export default ManufacturingResolver

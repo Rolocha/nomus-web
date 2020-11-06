@@ -20,7 +20,7 @@ export class Card extends BaseModel({
 
   @prop({ required: false })
   @Field({ nullable: true })
-  nfcUrl: string
+  nfcId: string
 
   @prop({ required: false })
   @Field({ nullable: true })
