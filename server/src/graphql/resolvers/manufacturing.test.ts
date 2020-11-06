@@ -27,35 +27,33 @@ describe('EncodingResolver', () => {
       })
       AWSMock.mock('S3', 'putObject', putObjectMock)
 
-      const admin_user = await createMockUser({ roles: [Role.User, Role.Admin] })
+      const adminUser = await createMockUser({ roles: [Role.User, Role.Admin] })
       const numSheets = 5
 
       const response = await execQuery({
         source: `
           mutation CreateMassSheetEncodingMutation($numSheets: Float!) {
             createMassSheetEncoding(numSheets: $numSheets) {
-              s3_url
+              s3Url
             }
           }
         `,
         variableValues: {
           numSheets: numSheets,
         },
-        contextUser: admin_user,
+        contextUser: adminUser,
       })
 
-      const created_sheets = await Sheet.mongo.find({})
-      expect(created_sheets.length).toBe(5)
-      expect(created_sheets[0].cards.length).toBe(25)
+      const createdSheets = await Sheet.mongo.find({})
+      expect(createdSheets.length).toBe(5)
+      expect(createdSheets[0].cards.length).toBe(25)
 
-      const created_cards = await Card.mongo.find({})
-      expect(created_cards.length).toBe(125)
-      expect(created_cards[0].nfcId).toMatch(/sheet_.*-card.*/)
+      const createdCards = await Card.mongo.find({})
+      expect(createdCards.length).toBe(125)
+      expect(createdCards[0].nfcId).toMatch(/sheet_.*-card.*/)
 
       expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
-      expect(putObjectMock.mock.calls[0][0].Key).toBe(
-        response.data?.createMassSheetEncoding?.s3_url
-      )
+      expect(putObjectMock.mock.calls[0][0].Key).toBe(response.data?.createMassSheetEncoding?.s3Url)
     })
   })
 })
