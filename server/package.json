@@ -37,7 +37,15 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "camelcase": [
+        2,
+        {
+          "properties": "always"
+        }
+      ]
+    }
   },
   "browserslist": {
     "production": [
