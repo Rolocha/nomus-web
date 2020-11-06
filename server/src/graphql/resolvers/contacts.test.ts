@@ -22,19 +22,19 @@ describe('ContactsResolver', () => {
 
   describe('contacts query', () => {
     it("get's user's connections", async () => {
-      const user_from = await createMockUser()
-      const user_to_1 = await createMockUser({
+      const userFrom = await createMockUser()
+      const userTo1 = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const user_to_2 = await createMockUser({
+      const userTo2 = await createMockUser({
         name: { first: 'Another', middle: 'Such', last: 'Person' },
         email: 'person2@greendale.com',
         password: 'save-greendale',
       })
-      const connection_1 = await createMockConnection({ from: user_from._id, to: user_to_1._id })
-      const connection_2 = await createMockConnection({ from: user_from._id, to: user_to_2._id })
+      const connection1 = await createMockConnection({ from: userFrom._id, to: userTo1._id })
+      const connection2 = await createMockConnection({ from: userFrom._id, to: userTo2._id })
 
       const response = await execQuery({
         source: `
@@ -55,29 +55,29 @@ describe('ContactsResolver', () => {
           }
         }
         `,
-        contextUser: user_from,
+        contextUser: userFrom,
       })
 
       const expectedData = [
         {
-          id: user_to_1.id,
-          name: (user_to_1.name as DocumentType<PersonName>).toObject(),
-          notes: connection_1.notes ?? null,
-          phoneNumber: user_to_1.phoneNumber ?? null,
-          email: user_to_1.email,
+          id: userTo1.id,
+          name: (userTo1.name as DocumentType<PersonName>).toObject(),
+          notes: connection1.notes ?? null,
+          phoneNumber: userTo1.phoneNumber ?? null,
+          email: userTo1.email,
           cardFrontImageUrl: null,
           cardBackImageUrl: null,
-          vcfUrl: user_to_1.vcfUrl ?? null,
+          vcfUrl: userTo1.vcfUrl ?? null,
         },
         {
-          id: user_to_2.id,
-          name: (user_to_2.name as DocumentType<PersonName>).toObject(),
-          notes: connection_2.notes ?? null,
-          phoneNumber: user_to_2.phoneNumber ?? null,
-          email: user_to_2.email,
+          id: userTo2.id,
+          name: (userTo2.name as DocumentType<PersonName>).toObject(),
+          notes: connection2.notes ?? null,
+          phoneNumber: userTo2.phoneNumber ?? null,
+          email: userTo2.email,
           cardFrontImageUrl: null,
           cardBackImageUrl: null,
-          vcfUrl: user_to_2.vcfUrl ?? null,
+          vcfUrl: userTo2.vcfUrl ?? null,
         },
       ]
 
@@ -85,7 +85,7 @@ describe('ContactsResolver', () => {
     })
 
     it('returns an empty list if no connections exists', async () => {
-      const user_from = await createMockUser()
+      const userFrom = await createMockUser()
 
       const response = await execQuery({
         source: `
@@ -106,15 +106,15 @@ describe('ContactsResolver', () => {
           }
         }
         `,
-        contextUser: user_from,
+        contextUser: userFrom,
       })
 
       expect(response.data?.contacts?.length).toBe(0)
     })
 
     it("doesn't let non-admins query a specific userId", async () => {
-      const user_from = await createMockUser()
-      const user_to = await createMockUser({
+      const userFrom = await createMockUser()
+      const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
@@ -144,26 +144,26 @@ describe('ContactsResolver', () => {
         }
         `,
         variableValues: {
-          userId: user_to.id,
+          userId: userTo.id,
         },
-        contextUser: user_from,
+        contextUser: userFrom,
       })
       expect(response.errors[0].message).toContain('denied!')
     })
 
     it("lets admins query other user's connections", async () => {
-      const user_admin = await createMockUser({ roles: [Role.User, Role.Admin] })
-      const user_from = await createMockUser({
+      const userAdmin = await createMockUser({ roles: [Role.User, Role.Admin] })
+      const userFrom = await createMockUser({
         name: { first: 'Annie', middle: 'Allison', last: 'Edison' },
         email: 'goody2shoes@greendale.com',
         password: 'save-greendale',
       })
-      const user_to = await createMockUser({
+      const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const connection = await createMockConnection({ from: user_from._id, to: user_to._id })
+      const connection = await createMockConnection({ from: userFrom._id, to: userTo._id })
 
       const response = await execQuery({
         source: `
@@ -189,21 +189,21 @@ describe('ContactsResolver', () => {
         }
         `,
         variableValues: {
-          userId: user_from.id,
+          userId: userFrom.id,
         },
-        contextUser: user_admin,
+        contextUser: userAdmin,
       })
 
       const expectedData = [
         {
-          id: user_to.id,
-          name: (user_to.name as DocumentType<PersonName>).toObject(),
+          id: userTo.id,
+          name: (userTo.name as DocumentType<PersonName>).toObject(),
           notes: connection.notes ?? null,
-          phoneNumber: user_to.phoneNumber ?? null,
-          email: user_to.email,
+          phoneNumber: userTo.phoneNumber ?? null,
+          email: userTo.email,
           cardFrontImageUrl: null,
           cardBackImageUrl: null,
-          vcfUrl: user_to.vcfUrl ?? null,
+          vcfUrl: userTo.vcfUrl ?? null,
         },
       ]
 
@@ -212,16 +212,16 @@ describe('ContactsResolver', () => {
   })
   describe('contact query', () => {
     it('gets a user contact where connection exists', async () => {
-      const user_from = await createMockUser()
-      const user_to = await createMockUser({
+      const userFrom = await createMockUser()
+      const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
       const meetingDate = new Date()
       const connection = await createMockConnection({
-        from: user_from._id,
-        to: user_to._id,
+        from: userFrom._id,
+        to: userTo._id,
         meetingDate,
         meetingPlace: 'there',
         notes: 'foo',
@@ -251,19 +251,19 @@ describe('ContactsResolver', () => {
         }
         `,
         variableValues: {
-          contactId: user_to.id,
+          contactId: userTo.id,
         },
-        contextUser: user_from,
+        contextUser: userFrom,
       })
 
       const expectedData = {
-        id: user_to.id,
-        name: (user_to.name as DocumentType<PersonName>).toObject(),
-        phoneNumber: user_to.phoneNumber ?? null,
-        email: user_to.email,
+        id: userTo.id,
+        name: (userTo.name as DocumentType<PersonName>).toObject(),
+        phoneNumber: userTo.phoneNumber ?? null,
+        email: userTo.email,
         cardFrontImageUrl: null,
         cardBackImageUrl: null,
-        vcfUrl: user_to.vcfUrl ?? null,
+        vcfUrl: userTo.vcfUrl ?? null,
         notes: connection.notes ?? null,
         meetingDate: meetingDate.getTime(),
         meetingPlace: connection.meetingPlace,
@@ -272,8 +272,8 @@ describe('ContactsResolver', () => {
       expect(response.data?.contact).toMatchObject(expectedData)
     })
     it('fails if no connection exists', async () => {
-      const user_from = await createMockUser()
-      const user_to = await createMockUser({
+      const userFrom = await createMockUser()
+      const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
@@ -303,9 +303,9 @@ describe('ContactsResolver', () => {
         }
         `,
         variableValues: {
-          contactId: user_to.id,
+          contactId: userTo.id,
         },
-        contextUser: user_from,
+        contextUser: userFrom,
       })
 
       expect(response.errors).toBeDefined()
@@ -314,16 +314,16 @@ describe('ContactsResolver', () => {
 
   describe('updateNotes mutation', () => {
     it("updates the notes of a user's connection", async () => {
-      const user_from = await createMockUser()
-      const user_to = await createMockUser({
+      const userFrom = await createMockUser()
+      const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
       const meetingDate = new Date()
       await createMockConnection({
-        from: user_from._id,
-        to: user_to._id,
+        from: userFrom._id,
+        to: userTo._id,
         meetingDate,
         meetingPlace: 'there',
         notes: 'foo',
@@ -341,14 +341,14 @@ describe('ContactsResolver', () => {
           }
         `,
         variableValues: {
-          contactId: user_to.id,
+          contactId: userTo.id,
           contactInfo: {
             meetingPlace: 'here',
             notes: 'lovely',
             tags: ['foo', 'bar', 'baz'],
           },
         },
-        contextUser: user_from,
+        contextUser: userFrom,
       })
 
       expect(response.data?.updateContactInfo?.meetingPlace).toBe('here')
@@ -363,10 +363,10 @@ describe('ContactsResolver', () => {
 
   describe('saveContact mutation', () => {
     it('saves a contact and associated notes to a connection', async () => {
-      const user_a = await createMockUser({
+      const userA = await createMockUser({
         username: 'user_a',
       })
-      const user_b = await createMockUser({
+      const userB = await createMockUser({
         username: 'user_b',
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
@@ -385,19 +385,19 @@ describe('ContactsResolver', () => {
         }
         `,
         variableValues: {
-          username: user_b.username,
+          username: userB.username,
           contactInfo: {
             meetingDate: '2020-01-01',
             meetingPlace: 'UCLA',
             notes: 'more notes',
           },
         },
-        contextUser: user_a,
+        contextUser: userA,
       })
 
       const connection = await Connection.mongo.findOne({
-        from: user_a._id,
-        to: user_b._id,
+        from: userA._id,
+        to: userB._id,
       })
 
       expect(connection).not.toBeNull()
@@ -412,10 +412,10 @@ describe('ContactsResolver', () => {
     })
 
     it('throws an error if saving a contact that was already saved', async () => {
-      const user_a = await createMockUser({
+      const userA = await createMockUser({
         username: 'user_a',
       })
-      const user_b = await createMockUser({
+      const userB = await createMockUser({
         username: 'user_b',
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
@@ -435,9 +435,9 @@ describe('ContactsResolver', () => {
         }
         `,
           variableValues: {
-            username: user_b.username,
+            username: userB.username,
           },
-          contextUser: user_a,
+          contextUser: userA,
         })
       }
 
@@ -450,7 +450,7 @@ describe('ContactsResolver', () => {
     })
 
     it('throws an error if saving a contact for invalid username', async () => {
-      const user_a = await createMockUser({
+      const userA = await createMockUser({
         username: 'user_a',
       })
 
@@ -468,7 +468,7 @@ describe('ContactsResolver', () => {
         variableValues: {
           username: 'nonexistent_person',
         },
-        contextUser: user_a,
+        contextUser: userA,
       })
 
       expect(response.errors[0].message).toBe('No user found with the username nonexistent_person')
