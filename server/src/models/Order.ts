@@ -1,10 +1,4 @@
-import {
-  arrayProp,
-  getModelForClass,
-  modelOptions,
-  prop,
-  ReturnModelType,
-} from '@typegoose/typegoose'
+import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
 import { Card } from './Card'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
