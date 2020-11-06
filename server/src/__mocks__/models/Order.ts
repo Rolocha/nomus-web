@@ -7,9 +7,7 @@ import { createMockUser } from './User'
 export const createMockOrder = async (override: Partial<Order> = {}) => {
   const userInPayload = await createMockUser()
   const cardVersionInPayload = await createMockCardVersion({ user: userInPayload._id })
-  const cardsInPayload = [
-    await createMockCard({ user: userInPayload._id, cardVersion: cardVersionInPayload }),
-  ]
+  const cardsInPayload = [await createMockCard({ user: userInPayload._id })]
 
   const newOrderPayload: Partial<Order> = {
     user: override.user ?? userInPayload,

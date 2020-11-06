@@ -108,7 +108,15 @@
     "storybook": "start-storybook"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "camelcase": [
+        2,
+        {
+          "properties": "always"
+        }
+      ]
+    }
   },
   "browserslist": {
     "production": [

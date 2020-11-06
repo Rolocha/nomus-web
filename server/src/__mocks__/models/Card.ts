@@ -1,13 +1,13 @@
 import { Card } from 'src/models'
 import { createMockUser } from './User'
-import { createMockCardVersion } from './CardVersion'
 
 export const createMockCard = async (override: Partial<Card> = {}) => {
   const userInPayload = await createMockUser()
 
   const newOrderPayload: Partial<Card> = {
     user: override.user ?? userInPayload,
-    cardVersion: override.cardVersion ?? (await createMockCardVersion({ user: userInPayload })),
+    nfcId: override.nfcId ?? 'sheet_ABCD-card_ABCD',
+    qrUrl: override.qrUrl ?? 'cardv_abcd',
     ...override,
   }
 

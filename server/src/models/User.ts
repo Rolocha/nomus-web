@@ -257,7 +257,7 @@ export class User extends BaseModel({
     }
 
     try {
-      const result = await S3.uploadProfilePicture(filepath, filename)
+      const result = await S3.uploadFileToS3(filepath, filename, S3.S3AssetCategory.ProfilePictures)
       if (!result.isSuccess) {
         throw new Error(`Failed to upload to S3: ${result.error}`)
       }

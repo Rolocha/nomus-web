@@ -10,11 +10,12 @@ import { ContactInfoInput } from './globalTypes'
 // ====================================================
 
 export interface UpdateContactInfoMutation_updateContactInfo {
-  __typename: 'Connection'
+  __typename: 'Contact'
   id: string
   meetingDate: any | null
   meetingPlace: string | null
   notes: string | null
+  tags: string[] | null
 }
 
 export interface UpdateContactInfoMutation {
