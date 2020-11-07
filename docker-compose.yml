@@ -19,13 +19,13 @@ services:
     env_file: .env
     networks:
       - app-network
-    depends_on:
-      - db
 
   db:
     container_name: db
     image: mongo
     env_file: .env
+    ports:
+      - 27017:27017
     volumes:
       - dbdata:/data/db
     networks:
@@ -34,6 +34,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  dbdata:

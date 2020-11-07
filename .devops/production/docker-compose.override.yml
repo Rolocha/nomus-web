@@ -10,13 +10,10 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
+
   server:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:production-latest
     restart: always
     command: yarn serve
-  client:
-    image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/client:production-latest
-    restart: always
-    command: yarn serve
-  db:
-    restart: always
+  # client is served from S3
+  # db is on MongoDB Atlas
