@@ -13,7 +13,7 @@
     "types:gen": "yarn types:clean && yarn types:codegen && yarn types:pretty",
     "test": "yarn test:client && yarn test:server",
     "test:server": "cd server && yarn && yarn test",
-    "test:client": "cd client && yarn && yarn test"
+    "test:client": "cd client && yarn && yarn test --watchAll=false"
   },
   "workspaces": [
     "client/",
