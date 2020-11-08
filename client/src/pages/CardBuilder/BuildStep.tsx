@@ -20,10 +20,6 @@ interface Props {
   handleOrderUpdate: () => Promise<void>
 }
 
-interface ParamsType {
-  selectedBaseType?: string
-}
-
 const BuildStep = React.forwardRef(
   (
     {

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { gql, useQuery, useMutation } from 'src/apollo'
 import {
   UCPCardsSectionQuery,
-  UCPCardsSectionQuery_cardVersionsStats,
+  UCPCardsSectionQuery_cardVersionsStats as UCPCardsSectionQueryCardVersionsStats,
 } from 'src/apollo/types/UCPCardsSectionQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
@@ -90,7 +90,7 @@ export default () => {
     (version) => version.id !== data.user.defaultCardVersion?.id,
   )
   const cardVersionStatsById = data.cardVersionsStats.reduce<
-    Record<string, UCPCardsSectionQuery_cardVersionsStats>
+    Record<string, UCPCardsSectionQueryCardVersionsStats>
   >((acc, cvs) => {
     acc[cvs.id] = cvs
     return acc

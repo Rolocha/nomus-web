@@ -50,8 +50,6 @@ const args = [
   (props: LinkStyleProps) => props.overrideStyles,
 ] as const
 
-type ExternalLinkProps = React.ComponentProps<typeof ExternalLink>
-
 interface InternalLinkProps
   extends React.ComponentProps<typeof ReactRouterLink>,
     LinkStyleProps {}

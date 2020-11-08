@@ -142,10 +142,12 @@ const CardBuilder = () => {
     const payload = await stripe.confirmCardPayment(
       orderCreateResult?.data?.upsertCustomOrder.clientSecret,
       {
+        // eslint-disable-next-line camelcase
         payment_method: {
           card: {
             token: stripeToken.id,
           },
+          // eslint-disable-next-line camelcase
           billing_details: {
             name: formData.name,
           },

@@ -9,10 +9,6 @@ import { ContactsSortOption } from './contact-sorting'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 
-interface ParamsType {
-  usernameOrId: string
-}
-
 interface Props {
   selectedContactSortOption: ContactsSortOption
   selectedContactUsernameOrId?: string

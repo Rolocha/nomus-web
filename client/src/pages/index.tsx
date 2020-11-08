@@ -1,20 +1,16 @@
 import * as React from 'react'
-import { Switch, BrowserRouter as Router, Route } from 'react-router-dom'
-
-import { AuthLevel } from 'src/config'
-import { ensureActiveToken, Role } from 'src/utils/auth'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import ProtectedRoute from 'src/components/ProtectedRoute'
-
-import LandingPage from 'src/pages/LandingPage'
-import UserControlPanel from 'src/pages/UserControlPanel'
-import CardBuilder from 'src/pages/CardBuilder'
-import LoginPage from 'src/pages/LoginPage'
+import { AuthLevel } from 'src/config'
+import AdminPanel from 'src/pages/AdminPanel'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import ContactSaver from 'src/pages/ContactSaver'
-import AdminPanel from 'src/pages/AdminPanel'
 import FourOhFourPage from 'src/pages/FourOhFour'
-import ShopFront from 'src/pages/ShopFront'
+import LandingPage from 'src/pages/LandingPage'
 import LoadingPage from 'src/pages/LoadingPage'
+import LoginPage from 'src/pages/LoginPage'
+import UserControlPanel from 'src/pages/UserControlPanel'
+import { ensureActiveToken, Role } from 'src/utils/auth'
 
 interface PageType {
   name: string
