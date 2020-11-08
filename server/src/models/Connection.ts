@@ -29,7 +29,7 @@ export class Connection extends BaseModel({
 
   @prop({ required: false })
   @Field({ nullable: true })
-  meetingDate: Date
+  meetingDate: string
 
   //Notes on meeting this User
   @prop({ required: false })

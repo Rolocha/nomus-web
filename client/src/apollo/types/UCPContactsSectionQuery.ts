@@ -29,7 +29,7 @@ export interface UCPContactsSectionQuery_contacts {
   notes: string | null
   vcfUrl: string | null
   meetingPlace: string | null
-  meetingDate: any | null
+  meetingDate: string | null
 }
 
 export interface UCPContactsSectionQuery {

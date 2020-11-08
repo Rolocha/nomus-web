@@ -18,7 +18,7 @@ const ContactSaver = () => {
     saveContact({
       variables: {
         username,
-        notesData: {
+        contactInfo: {
           meetingDate: params.get('meetingDate'),
           meetingPlace: params.get('meetingPlace'),
           notes: params.get('notes'),

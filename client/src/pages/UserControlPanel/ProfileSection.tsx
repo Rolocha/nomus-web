@@ -99,7 +99,7 @@ export default () => {
       <Box gridArea="profilePic">
         <EditableImage
           editable
-          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x300'}
+          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x500'}
           width="100%"
           onImageUpdate={handleProfilePictureUpdate}
         />

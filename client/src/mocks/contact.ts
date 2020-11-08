@@ -18,8 +18,9 @@ export const createMockContact = (contact: Partial<Contact> = {}): Contact => {
     cardBackImageUrl: 'https://placehold.it/500x300',
     vcfUrl: 'https://placehold.it/300x300',
     meetingPlace: 'Over there',
-    meetingDate: new Date('2020-10-26T04:42:19.141Z'),
+    meetingDate: '2020-10-26',
     notes: 'some notes here',
+    tags: ['nomus', 'roolz'],
     connected: false,
     ...contact,
   }

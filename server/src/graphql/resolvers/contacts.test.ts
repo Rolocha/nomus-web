@@ -218,7 +218,7 @@ describe('ContactsResolver', () => {
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const meetingDate = new Date()
+      const meetingDate = new Date().toISOString().substr(0, 10)
       const connection = await createMockConnection({
         from: userFrom._id,
         to: userTo._id,
@@ -265,7 +265,7 @@ describe('ContactsResolver', () => {
         cardBackImageUrl: null,
         vcfUrl: userTo.vcfUrl ?? null,
         notes: connection.notes ?? null,
-        meetingDate: meetingDate.getTime(),
+        meetingDate,
         meetingPlace: connection.meetingPlace,
       }
 
@@ -312,55 +312,6 @@ describe('ContactsResolver', () => {
     })
   })
 
-  describe('updateNotes mutation', () => {
-    it("updates the notes of a user's connection", async () => {
-      const userFrom = await createMockUser()
-      const userTo = await createMockUser({
-        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
-        email: 'fake_lawyer@greendale.com',
-        password: 'save-greendale',
-      })
-      const meetingDate = new Date()
-      await createMockConnection({
-        from: userFrom._id,
-        to: userTo._id,
-        meetingDate,
-        meetingPlace: 'there',
-        notes: 'foo',
-      })
-
-      const response = await execQuery({
-        source: `
-          mutation UpdateContactInfoMutation($contactId: String!, $contactInfo: ContactInfoInput!) {
-            updateContactInfo(contactId: $contactId, contactInfo: $contactInfo) {
-              meetingDate
-              meetingPlace
-              notes
-              tags
-            }
-          }
-        `,
-        variableValues: {
-          contactId: userTo.id,
-          contactInfo: {
-            meetingPlace: 'here',
-            notes: 'lovely',
-            tags: ['foo', 'bar', 'baz'],
-          },
-        },
-        contextUser: userFrom,
-      })
-
-      expect(response.data?.updateContactInfo?.meetingPlace).toBe('here')
-      expect(response.data?.updateContactInfo?.meetingDate).toBe(meetingDate.getTime())
-      expect(response.data?.updateContactInfo?.notes).toBe('lovely')
-      expect(response.data?.updateContactInfo?.tags).toHaveLength(3)
-      expect(response.data?.updateContactInfo?.tags).toEqual(
-        expect.arrayContaining(['foo', 'bar', 'baz'])
-      )
-    })
-  })
-
   describe('saveContact mutation', () => {
     it('saves a contact and associated notes to a connection', async () => {
       const userA = await createMockUser({
@@ -404,49 +355,11 @@ describe('ContactsResolver', () => {
 
       const expectedData = {
         notes: connection.notes,
-        meetingDate: connection.meetingDate.getTime(),
+        meetingDate: connection.meetingDate,
         meetingPlace: connection.meetingPlace,
       }
 
       expect(response.data?.saveContact).toMatchObject(expectedData)
-    })
-
-    it('throws an error if saving a contact that was already saved', async () => {
-      const userA = await createMockUser({
-        username: 'user_a',
-      })
-      const userB = await createMockUser({
-        username: 'user_b',
-        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
-        email: 'fake_lawyer@greendale.com',
-        password: 'save-greendale',
-      })
-
-      const execSave = async () => {
-        return await execQuery({
-          source: `
-        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
-          saveContact(username: $username, contactInfo: $contactInfo) {
-            id
-            meetingDate
-            meetingPlace
-            notes
-          }
-        }
-        `,
-          variableValues: {
-            username: userB.username,
-          },
-          contextUser: userA,
-        })
-      }
-
-      const response = await execSave()
-      expect(response.errors).toBeUndefined()
-
-      // Now try saving again and make sure it fails
-      const secondResponse = await execSave()
-      expect(secondResponse.errors[0].message).toBe('Contact already saved')
     })
 
     it('throws an error if saving a contact for invalid username', async () => {

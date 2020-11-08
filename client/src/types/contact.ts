@@ -20,7 +20,8 @@ export interface Contact {
   vcfUrl: string | null
 
   meetingPlace: string | null
-  meetingDate: Date | null
+  meetingDate: string | null
+  tags?: Array<string> | null
   notes: string | null
   connected?: boolean | null
 }

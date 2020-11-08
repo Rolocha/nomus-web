@@ -8,10 +8,18 @@ import Box from './Box'
 interface Props {
   type: 'success' | 'warning' | 'danger' | 'info'
   title: string
-  description: string
+  description: string | JSX.Element
+  closable?: boolean
+  onClickClose?: () => void
 }
 
-const Banner = ({ type, title, description }: Props) => {
+const Banner = ({
+  type,
+  title,
+  description,
+  closable,
+  onClickClose,
+}: Props) => {
   const color = {
     success: colors.validGreen,
     warning: colors.poppy,
@@ -29,26 +37,46 @@ const Banner = ({ type, title, description }: Props) => {
   return (
     <Box
       position="relative"
-      borderRadius={3}
+      borderRadius={2}
       display="flex"
       alignItems="center"
       boxShadow="banner"
+      bg={colors.white}
     >
       <Box
         bg={color}
         width="8px"
         alignSelf="stretch"
-        borderTopLeftRadius={3}
-        borderBottomLeftRadius={3}
+        borderTopLeftRadius={2}
+        borderBottomLeftRadius={2}
       />
-      <Box display="flex" p={3}>
-        <Icon color={color} css={css({ marginRight: '8px' })} />
-        <Text.Body2>
-          <span css={css({ fontWeight: 'bold', marginRight: '8px' })}>
-            {title}
-          </span>
-          {description}
-        </Text.Body2>
+      <Box
+        display="grid"
+        gridTemplateColumns={closable ? 'auto auto' : 'auto'}
+        gridColumnGap={2}
+        justifyContent="space-between"
+        alignItems="center"
+        p={2}
+      >
+        <Box display="flex">
+          <Icon color={color} css={css({ marginRight: '8px' })} />
+          <Text.Body2>
+            <span css={css({ fontWeight: 500, marginRight: '8px' })}>
+              {title}
+            </span>
+            {description}
+          </Text.Body2>
+        </Box>
+        {closable && (
+          <Box
+            cursor="pointer"
+            role="button"
+            aria-label="close banner"
+            onClick={onClickClose}
+          >
+            <SVG.Close color={colors.midnightGray} />
+          </Box>
+        )}
       </Box>
     </Box>
   )

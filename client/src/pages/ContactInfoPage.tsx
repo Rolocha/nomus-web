@@ -7,28 +7,30 @@ import {
   ContactPageQuery,
   ContactPageQueryVariables,
 } from 'src/apollo/types/ContactPageQuery'
-import { UpdateContactInfoMutation } from 'src/apollo/types/UpdateContactInfoMutation'
-import Banner from 'src/components/Banner'
+import { SaveContactMutation } from 'src/apollo/types/SaveContactMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
 import Image from 'src/components/Image'
-import { ExternalLink } from 'src/components/Link'
+import Link, { ExternalLink } from 'src/components/Link'
 import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
+import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import updateContactInfoMutation from 'src/mutations/updateContactInfoMutation'
+import saveContactMutation from 'src/mutations/saveContactMutation'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
+import { Contact } from 'src/types/contact'
 import { useAuth } from 'src/utils/auth'
 import {
-  getDateFromDateInputString,
   getDateStringForDateInput,
-  getFormattedDateFromISODateString,
+  getFormattedFullDate,
+  adjustDateByTZOffset,
+  getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 
@@ -50,7 +52,6 @@ const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()
   const history = useHistory()
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
-  const [hasMadeEdits, setHasMadeEdits] = React.useState(false)
   const [hasInstantiatedNotes, setHasInstantiatedNotes] = React.useState(false)
 
   const { loggedIn } = useAuth()
@@ -60,10 +61,14 @@ const ContactInfoPage = () => {
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
 
-  const { handleSubmit, register, watch, reset } = useForm<NotesFormData>({
-    defaultValues: {
-      meetingDate: getDateStringForDateInput(Date.now()),
-    },
+  const defaultFormValues = React.useRef({
+    meetingDate: getDateStringForDateInput(),
+  })
+
+  const { handleSubmit, register, watch, reset, formState } = useForm<
+    NotesFormData
+  >({
+    defaultValues: defaultFormValues.current,
   })
 
   const formFields = watch()
@@ -72,16 +77,22 @@ const ContactInfoPage = () => {
     setIsNotesModalOpen(true)
   }, [setIsNotesModalOpen])
 
-  const closeNotesModal = React.useCallback(() => setIsNotesModalOpen(false), [
-    setIsNotesModalOpen,
-  ])
+  const closeNotesModal = React.useCallback(() => {
+    setIsNotesModalOpen(false)
+  }, [setIsNotesModalOpen])
 
-  const setRefAndRegister = React.useCallback(
-    (refObject: React.MutableRefObject<any>) => (element: any) => {
-      refObject.current = element
-      register(element)
+  const resetNotesToPreEdit = React.useCallback(
+    (resetContact: Partial<Contact>) => {
+      reset({
+        meetingDate: resetContact.meetingDate
+          ? getDateStringForDateInput(resetContact.meetingDate)
+          : defaultFormValues.current.meetingDate,
+        meetingPlace: resetContact.meetingPlace,
+        notes: resetContact.notes,
+        tags: resetContact.tags ? resetContact.tags?.join(',') : '',
+      })
     },
-    [register],
+    [reset, defaultFormValues],
   )
 
   const openModalAndFocusOn = React.useCallback(
@@ -97,6 +108,14 @@ const ContactInfoPage = () => {
     [openNotesModal],
   )
 
+  const setRefAndRegister = React.useCallback(
+    (refObject: React.MutableRefObject<any>) => (element: any) => {
+      refObject.current = element
+      register(element)
+    },
+    [register],
+  )
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { loading, data, error } = useQuery<
     ContactPageQuery,
@@ -107,9 +126,7 @@ const ContactInfoPage = () => {
     },
   })
 
-  const [updateContactInfo] = useMutation<UpdateContactInfoMutation>(
-    updateContactInfoMutation,
-  )
+  const [saveContact] = useMutation<SaveContactMutation>(saveContactMutation)
 
   const contactInfoParams = React.useMemo(() => {
     const params = new URLSearchParams()
@@ -133,14 +150,26 @@ const ContactInfoPage = () => {
     [contactInfoParams, username],
   )
 
-  const saveToNomusLink = React.useMemo(() => {
-    const params = new URLSearchParams(contactInfoParams)
-    if (username) params.set('username', username)
-    const saveUrl = `/dashboard/contacts/save?${params.toString()}`
-    return loggedIn
-      ? saveUrl
-      : `/register?redirect_url=${encodeURIComponent(saveUrl)}`
-  }, [loggedIn, contactInfoParams, username])
+  const createSaveToNomusLink = React.useCallback(
+    (contactInfoParams) => {
+      const params = new URLSearchParams(contactInfoParams)
+      if (username) params.set('username', username)
+      const saveUrl = `/dashboard/contacts/save?${params.toString()}`
+      return loggedIn
+        ? saveUrl
+        : `/register?redirect_url=${encodeURIComponent(saveUrl)}`
+    },
+    [loggedIn, username],
+  )
+
+  React.useEffect(() => {
+    // While the notes modal is open and there are edits, make sure clicking
+    if (isNotesModalOpen && formState.dirty) {
+      window.onbeforeunload = () => true
+    } else {
+      window.onbeforeunload = null
+    }
+  }, [isNotesModalOpen, formState.dirty])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -175,27 +204,27 @@ const ContactInfoPage = () => {
   }
 
   const saveNotes = async (data: NotesFormData) => {
-    setHasMadeEdits(true)
     // Update form's default values so if they open the modal again,
     // it keeps the previous edits
     reset(watch())
     if (loggedIn) {
-      const meetingDate = data.meetingDate
-        ? getDateFromDateInputString(data.meetingDate)
-        : null
       const tags = data?.tags ? data.tags.split(',').map((s) => s.trim()) : []
-      await updateContactInfo({
+      await saveContact({
         variables: {
-          contactId: contact.id,
+          username,
           contactInfo: {
-            meetingDate,
+            meetingDate: data.meetingDate,
             meetingPlace: data.meetingPlace,
             notes: data.notes,
             tags,
           },
         },
       })
+      // Deactivate exit confirmation dialog
+      window.onbeforeunload = null
     } else {
+      // User trying to save while not logged in, redirect them to the /register page with URL params pre-filled
+      history.push(createSaveToNomusLink(data))
     }
     closeNotesModal()
   }
@@ -225,7 +254,7 @@ const ContactInfoPage = () => {
             `,
             [bp]: `
               "info notes"
-              "buttons buttons"
+              "buttons notes"
             `,
           }}
           mb={{ _: '100px', [bp]: 0 }}
@@ -245,7 +274,6 @@ const ContactInfoPage = () => {
             }}
             gridTemplateAreas={{
               _: `
-              "banner banner"
               "profilePic nameplate"
               "cards cards"
               "profileInfo profileInfo"
@@ -259,15 +287,6 @@ const ContactInfoPage = () => {
             gridColumnGap={3}
             gridRowGap={3}
           >
-            {hasMadeEdits && !loggedIn && (
-              <Box gridArea="banner">
-                <Banner
-                  type="warning"
-                  title="Unsaved notes"
-                  description="Save to Nomus to avoid losing your notes."
-                />
-              </Box>
-            )}
             <Box gridArea="profilePic" placeSelf="center">
               <Image
                 borderRadius="50%"
@@ -282,9 +301,9 @@ const ContactInfoPage = () => {
 
             <Box gridArea="nameplate" alignSelf={{ _: 'center', md: 'center' }}>
               {contact.name && (
-                <Text.SectionHeader mb={1} mt={0}>
+                <Text.PageHeader mb={1} mt={0}>
                   {formatName(contact.name)}
-                </Text.SectionHeader>
+                </Text.PageHeader>
               )}
               <Text.Body2>{contact.headline}</Text.Body2>
             </Box>
@@ -344,13 +363,15 @@ const ContactInfoPage = () => {
 
           <Box
             gridArea="notes"
-            placeSelf="start stretch"
+            placeSelf="stretch"
             display="grid"
             gridTemplateColumns="2fr 1fr"
             gridColumnGap={3}
-            gridRowGap={2}
+            gridRowGap="24px"
             borderRadius={3}
+            ml={{ _: 0, [bp]: 4 }}
             borderTop={`16px solid ${colors.gold}`}
+            alignContent="flex-start"
             bg={colors.ivory}
             padding={{ _: '24px', [bp]: '50px' }}
             gridTemplateAreas={`
@@ -373,7 +394,9 @@ const ContactInfoPage = () => {
               <Text.Label>Meeting Date</Text.Label>
               {formFields.meetingDate ? (
                 <Text.Body2 data-testid="meetingDate">
-                  {getFormattedDateFromISODateString(formFields.meetingDate)}
+                  {getFormattedFullDateFromDateInputString(
+                    formFields.meetingDate,
+                  )}
                 </Text.Body2>
               ) : (
                 <Text.Body2>ERROR</Text.Body2>
@@ -407,20 +430,23 @@ const ContactInfoPage = () => {
               <Text.Label>Tags</Text.Label>
               {formFields.hasOwnProperty('tags') &&
               formFields.tags &&
-              formFields.tags.length > 0 ? (
+              formFields.tags.trim().length > 0 ? (
                 <Box display="flex" flexWrap="wrap" data-testid="tags">
-                  {formFields.tags.split(',').map((tag) => (
-                    <Box
-                      borderRadius="1em"
-                      px={3}
-                      py={0}
-                      mr={1}
-                      mb={1}
-                      bg={colors.nomusBlue}
-                    >
-                      <Text.Body2 color="white">{tag.trim()}</Text.Body2>
-                    </Box>
-                  ))}
+                  {formFields.tags
+                    .trim()
+                    .split(',')
+                    .map((tag) => (
+                      <Box
+                        borderRadius="1em"
+                        px={3}
+                        py={0}
+                        mr={1}
+                        mb={1}
+                        bg={colors.nomusBlue}
+                      >
+                        <Text.Body2 color="white">{tag.trim()}</Text.Body2>
+                      </Box>
+                    ))}
                 </Box>
               ) : (
                 <Button
@@ -442,7 +468,12 @@ const ContactInfoPage = () => {
             <Box gridArea="notes">
               <Text.Label>Additional Notes</Text.Label>
               {formFields.notes ? (
-                <Text.Body2 data-testid="notes">{formFields.notes}</Text.Body2>
+                <Text.Body2
+                  css={css({ whiteSpace: 'pre-wrap' })}
+                  data-testid="notes"
+                >
+                  {formFields.notes}
+                </Text.Body2>
               ) : (
                 <Button
                   variant="tertiary"
@@ -463,9 +494,12 @@ const ContactInfoPage = () => {
           </Box>
 
           <Modal
+            confirmClose={() => formState.dirty}
             isOpen={isNotesModalOpen}
-            onClose={closeNotesModal}
-            onClickOutside={closeNotesModal}
+            onClose={() => {
+              closeNotesModal()
+              resetNotesToPreEdit(contact)
+            }}
             actions={{
               primary: {
                 text: 'Save',
@@ -473,7 +507,7 @@ const ContactInfoPage = () => {
               },
               secondary: {
                 text: 'Cancel',
-                handler: closeNotesModal,
+                close: true,
               },
             }}
             width="min(700px, 95%)"
@@ -583,7 +617,7 @@ const ContactInfoPage = () => {
             `}
             bg="white"
             boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 6fr' }}
+            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 1fr' }}
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
@@ -594,22 +628,29 @@ const ContactInfoPage = () => {
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              <Text.Body2 color="white">Save contact card</Text.Body2>
+              Save contact card
             </ExternalLink>
 
             {contact.connected ? (
               <Button variant="secondary" size="big" disabled>
-                Saved
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  width="100%"
+                  justifyContent="center"
+                >
+                  <SVG.Check /> <span>Saved to Nomus</span>
+                </Box>
               </Button>
             ) : (
-              <ExternalLink
-                href={saveToNomusLink}
+              <Link
+                to={createSaveToNomusLink(contactInfoParams)}
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"
               >
-                <Text.Body2 color="nomusBlue">Save to Nomus</Text.Body2>
-              </ExternalLink>
+                Save to Nomus
+              </Link>
             )}
           </Box>
         </Box>

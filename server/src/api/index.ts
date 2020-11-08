@@ -11,7 +11,7 @@ apiRouter.get('/contact-card/:username', async (req: express.Request, res: expre
   const meetingDate = req.query.meetingDate ? new Date(req.query.meetingDate as string) : null
   const meetingPlace = req.query.meetingPlace as string
   const tags = req.query.tags as string
-  const additionalNotes = req.query.additionalNotes as string
+  const notes = req.query.notes as string
 
   if (username == null) {
     return res.status(400).end()
@@ -33,7 +33,7 @@ apiRouter.get('/contact-card/:username', async (req: express.Request, res: expre
     meetingDate != null ? `Meeting Date: ${meetingDate.toDateString()}` : null,
     meetingPlace != null ? `Meeting Place: ${meetingPlace}` : null,
     tags ? `Tags: ${tags}` : null,
-    additionalNotes ? `Additional notes: ${additionalNotes}` : null,
+    notes ? `Additional notes:\n${notes}` : null,
   ]
     .filter(Boolean)
     .join('\n')

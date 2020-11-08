@@ -10,7 +10,10 @@
     "types:clean": "rm -f ./client/src/apollo/types/*",
     "types:pretty": "prettier --write --config client/package.json client/src/apollo/types",
     "types:codegen": "apollo client:codegen --outputFlat --target=typescript --config=apollo.config.js ./client/src/apollo/types",
-    "types:gen": "yarn types:clean && yarn types:codegen && yarn types:pretty"
+    "types:gen": "yarn types:clean && yarn types:codegen && yarn types:pretty",
+    "test": "yarn test:client && yarn test:server",
+    "test:server": "cd server && yarn && yarn test",
+    "test:client": "cd client && yarn && yarn test --watchAll=false"
   },
   "workspaces": [
     "client/",

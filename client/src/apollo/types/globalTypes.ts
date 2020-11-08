@@ -24,7 +24,7 @@ export enum OrderState {
  */
 export interface ContactInfoInput {
   meetingPlace?: string | null
-  meetingDate?: any | null
+  meetingDate?: string | null
   notes?: string | null
   tags?: string[] | null
 }
