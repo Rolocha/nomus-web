@@ -13,12 +13,15 @@ export interface SaveContactMutation_saveContact {
   __typename: 'Contact'
   id: string
   username: string
-  meetingDate: any | null
+  meetingDate: string | null
   meetingPlace: string | null
   notes: string | null
 }
 
 export interface SaveContactMutation {
+  /**
+   * Creates a new Contact or updates the information associated with an existing contact
+   */
   saveContact: SaveContactMutation_saveContact
 }
 

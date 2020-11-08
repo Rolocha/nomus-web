@@ -30,7 +30,7 @@ export interface ContactPageQuery_publicContact {
   notes: string | null
   tags: string[] | null
   meetingPlace: string | null
-  meetingDate: any | null
+  meetingDate: string | null
   connected: boolean | null
 }
 

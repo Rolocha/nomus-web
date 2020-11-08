@@ -1,45 +1,49 @@
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import {
   cleanup,
+  createEvent,
   fireEvent,
   render,
   RenderResult,
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import * as React from 'react'
-import { MemoryRouter, Route } from 'react-router-dom'
+import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom'
 import { ContactInfoInput } from 'src/apollo/types/globalTypes'
 import { createMockContact } from 'src/mocks/contact'
-import updateContactInfoMutation from 'src/mutations/updateContactInfoMutation'
+import saveContactMutation from 'src/mutations/saveContactMutation'
 import ContactInfoPage, { NotesFormData } from 'src/pages/ContactInfoPage'
 import publicContactQuery from 'src/queries/publicContact'
+import { validateUrl } from 'src/test-utils/url.test'
 import { Contact } from 'src/types/contact'
 import * as Auth from 'src/utils/auth'
 import {
-  getDateFromDateInputString,
-  getFormattedFullDate,
+  adjustDateByTZOffset,
   getDateStringForDateInput,
+  getFormattedFullDate,
+  getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
+import LoginPage from './LoginPage'
 
 afterEach(cleanup)
 
-const createUpdateContactInfoMock = (
+const createSaveContactMutationMock = (
   contact: Contact,
   newContactInfo: ContactInfoInput,
   resultingContact: Contact = contact,
 ) => {
   return {
     request: {
-      query: updateContactInfoMutation,
+      query: saveContactMutation,
       variables: {
-        contactId: contact.id,
+        username: contact.username,
         contactInfo: newContactInfo,
       },
     },
     result: {
       data: {
-        updateContactInfo: resultingContact,
+        saveContact: resultingContact,
       },
     },
   }
@@ -47,13 +51,9 @@ const createUpdateContactInfoMock = (
 
 const ui = {
   openNotesModal: (renderResult: RenderResult) => {
-    const editButton = renderResult
-      .getByText('Edit', { exact: false })
-      .closest('button')
-
     // Open the modal
     fireEvent(
-      editButton!,
+      renderResult.getByText('Edit', { exact: false }).closest('button')!,
       new MouseEvent('click', {
         bubbles: true,
         cancelable: true,
@@ -63,7 +63,31 @@ const ui = {
   saveNotesModal: (renderResult: RenderResult) => {
     // Hit Save
     fireEvent(
-      renderResult.getByText('Save'),
+      renderResult.getByRole('button', { name: 'Save' }).closest('button')!,
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    )
+  },
+  cancelNotesModal: (renderResult: RenderResult) => {
+    // Hit Cancel
+    fireEvent(
+      renderResult.getByRole('button', { name: 'Cancel' }).closest('button')!,
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    )
+  },
+  confirmDiscardNotes: (renderResult: RenderResult) => {
+    // Hit Discard
+    fireEvent(
+      renderResult
+        .getByRole('button', {
+          name: 'Discard',
+        })
+        .closest('button')!,
       new MouseEvent('click', {
         bubbles: true,
         cancelable: true,
@@ -76,34 +100,55 @@ const ui = {
       'input[name=meetingDate]',
     ) as HTMLInputElement
     if (values.meetingDate) {
-      meetingDateInput.value = getDateStringForDateInput(values.meetingDate)
+      fireEvent.input(
+        meetingDateInput,
+        createEvent.change(meetingDateInput, {
+          target: { value: values.meetingDate },
+        }),
+      )
     }
 
     const meetingPlaceInput = document.querySelector(
       'input[name=meetingPlace]',
     ) as HTMLInputElement
     if (values.meetingPlace) {
-      meetingPlaceInput.value = values.meetingPlace
+      fireEvent.input(
+        meetingPlaceInput,
+        createEvent.change(meetingPlaceInput, {
+          target: { value: values.meetingPlace },
+        }),
+      )
     }
 
     const tagsInput = document.querySelector(
       'input[name=tags]',
     ) as HTMLInputElement
     if (values.tags) {
-      tagsInput.value = values.tags
+      fireEvent.input(
+        tagsInput,
+        createEvent.change(tagsInput, {
+          target: { value: values.tags },
+        }),
+      )
     }
 
     const notesInput = document.querySelector(
       'textarea[name=notes]',
     ) as HTMLTextAreaElement
     if (values.notes) {
-      notesInput.value = values.notes
+      fireEvent.input(
+        notesInput,
+        createEvent.change(notesInput, {
+          target: { value: values.notes },
+        }),
+      )
     }
   },
 }
 
 describe('Contact Info Page', () => {
   let mockContact: Contact | null = null
+  let testLocation: ReturnType<typeof useLocation> | null = null
 
   interface RenderComponentProps {
     partialContact?: Partial<Contact> | null
@@ -133,8 +178,18 @@ describe('Contact Info Page', () => {
     const renderResult = render(
       <MemoryRouter initialEntries={[`/${mockContact.username}`]}>
         <MockedProvider mocks={mocks} addTypename={false}>
-          <Route path="/:username" component={ContactInfoPage} />
+          <Switch>
+            <Route path="/register" component={LoginPage} />
+            <Route path="/:username" component={ContactInfoPage} />
+          </Switch>
         </MockedProvider>
+        <Route
+          path="*"
+          render={({ location }) => {
+            testLocation = location
+            return null
+          }}
+        />
       </MemoryRouter>,
     )
 
@@ -213,14 +268,14 @@ describe('Contact Info Page', () => {
 
       const contact = createMockContact()
       const userEnteredNotes = {
-        meetingDate: getDateFromDateInputString('2021-01-01'),
+        meetingDate: '2021-01-01',
         meetingPlace: 'a new place',
         tags: ['some', 'new', 'tags'],
         notes: 'some new notes',
       }
       const { renderResult } = renderComponent({
         partialContact: contact,
-        mocks: [createUpdateContactInfoMock(contact, userEnteredNotes)],
+        mocks: [createSaveContactMutationMock(contact, userEnteredNotes)],
       })
 
       // Wait for first render
@@ -284,72 +339,6 @@ describe('Contact Info Page', () => {
 
       useAuthSpy.mockRestore()
     })
-
-    it('if logged out, links to the register page with the appropriate redirect_url', async () => {
-      const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
-        logIn: jest.fn(),
-        logOut: jest.fn(),
-        signUp: jest.fn(),
-        refreshToken: jest.fn(),
-        loggedIn: false,
-        id: null,
-        userRoles: null,
-      }))
-
-      const contact = createMockContact()
-      const userEnteredNotes = {
-        meetingDate: getDateFromDateInputString('2021-01-01'),
-        meetingPlace: 'a new place',
-        tags: ['some', 'new', 'tags'],
-        notes: 'some new notes',
-      }
-      const { renderResult } = renderComponent({
-        partialContact: contact,
-        mocks: [createUpdateContactInfoMock(contact, userEnteredNotes)],
-      })
-
-      // Wait for first render
-      await new Promise((resolve) => setTimeout(resolve, 0))
-
-      ui.openNotesModal(renderResult)
-
-      ui.setNotesModalFormValues({
-        ...userEnteredNotes,
-        tags: userEnteredNotes.tags.join(','),
-        meetingDate: getDateStringForDateInput(userEnteredNotes.meetingDate),
-      })
-
-      ui.saveNotesModal(renderResult)
-
-      // Wait for modal to close
-      waitForElementToBeRemoved(renderResult.getByTestId('modal'))
-      // and for mutation to complete
-      await new Promise((resolve) => setTimeout(resolve, 0))
-
-      const saveContactCardLink = renderResult
-        .getByText('Save to Nomus')
-        .closest('a')
-        ?.getAttribute('href')!
-
-      expect(saveContactCardLink).toStartWith('/register')
-
-      // Pull out the /register search params, then the search params of the redirect_uri
-      const registerURLParams = new URLSearchParams(
-        saveContactCardLink.split('register')[1],
-      )
-      const redirectURL = registerURLParams.get('redirect_url')
-      const urlParams = new URLSearchParams(redirectURL?.split('?')[1])
-
-      expect(urlParams.get('username')).toBe(contact.username)
-      expect(urlParams.get('meetingDate')).toBe(
-        getDateStringForDateInput(userEnteredNotes.meetingDate),
-      )
-      expect(urlParams.get('meetingPlace')).toBe(userEnteredNotes.meetingPlace)
-      expect(urlParams.get('tags')).toBe(userEnteredNotes.tags.join(','))
-      expect(urlParams.get('notes')).toBe(userEnteredNotes.notes)
-
-      useAuthSpy.mockRestore()
-    })
   })
 
   describe('Notes section', () => {
@@ -383,90 +372,27 @@ describe('Contact Info Page', () => {
       expect(renderResult.getByTestId('modal')).toBeInTheDocument()
     })
 
-    it.each([true, false])(
-      'updates the rendered notes if the user saves the notes modal when loggedIn is %s',
-      async (loggedIn) => {
-        const useAuthSpy = jest
-          .spyOn(Auth, 'useAuth')
-          .mockImplementation(() => ({
-            logIn: jest.fn(),
-            logOut: jest.fn(),
-            signUp: jest.fn(),
-            refreshToken: jest.fn(),
-            loggedIn,
-            id: null,
-            userRoles: null,
-          }))
-
-        const contact = createMockContact()
-        const newContactInfo = {
-          meetingDate: getDateFromDateInputString('2020-10-26'),
-          meetingPlace: 'UCLA',
-          tags: ['go', 'bruins', '8clap'],
-          notes: 'some more stuff',
-        }
-        const { renderResult } = renderComponent({
-          partialContact: contact,
-          mocks: [createUpdateContactInfoMock(contact, newContactInfo)],
-        })
-        await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
-
-        expect(renderResult.queryByTestId('modal')).toBeNull()
-
-        ui.openNotesModal(renderResult)
-
-        ui.setNotesModalFormValues({
-          ...newContactInfo,
-          tags: newContactInfo.tags.join(','),
-          meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
-        })
-
-        ui.saveNotesModal(renderResult)
-
-        // Wait for modal to close
-        waitForElementToBeRemoved(renderResult.getByTestId('modal'))
-        // and for mutation to complete
-        await new Promise((resolve) => setTimeout(resolve, 0))
-
-        // Ensure that the field values have changed properly
-        expect(renderResult.getByTestId('meetingDate').textContent).toBe(
-          getFormattedFullDate(newContactInfo.meetingDate),
-        )
-        expect(renderResult.getByTestId('meetingPlace').textContent).toBe(
-          newContactInfo.meetingPlace,
-        )
-        newContactInfo.tags.forEach((tag) => {
-          expect(renderResult.getByTestId('tags').textContent).toContain(tag)
-        })
-        expect(renderResult.getByTestId('notes').textContent).toBe(
-          newContactInfo.notes,
-        )
-
-        useAuthSpy.mockRestore()
-      },
-    )
-
-    it('shows the unsaved notes banner if the user saves the notes modal when logged out', async () => {
+    it('updates the rendered notes if the user saves the notes modal when logged in', async () => {
       const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
         logIn: jest.fn(),
         logOut: jest.fn(),
         signUp: jest.fn(),
         refreshToken: jest.fn(),
-        loggedIn: false,
+        loggedIn: true,
         id: null,
         userRoles: null,
       }))
 
       const contact = createMockContact()
       const newContactInfo = {
-        meetingDate: getDateFromDateInputString('2020-10-26'),
+        meetingDate: '2020-10-26',
         meetingPlace: 'UCLA',
         tags: ['go', 'bruins', '8clap'],
         notes: 'some more stuff',
       }
       const { renderResult } = renderComponent({
         partialContact: contact,
-        mocks: [createUpdateContactInfoMock(contact, newContactInfo)],
+        mocks: [createSaveContactMutationMock(contact, newContactInfo)],
       })
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
@@ -483,14 +409,127 @@ describe('Contact Info Page', () => {
       ui.saveNotesModal(renderResult)
 
       // Wait for modal to close
-      waitForElementToBeRemoved(renderResult.getByTestId('modal'))
+      await waitForElementToBeRemoved(renderResult.getByTestId('modal'))
       // and for mutation to complete
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      // Ensure that the "Unsaved notes" banner shows up
-      expect(
-        renderResult.getByText('Unsaved notes', { exact: false }),
-      ).toBeInTheDocument()
+      // Ensure that the field values have changed properly
+      expect(renderResult.getByTestId('meetingDate').textContent).toBe(
+        getFormattedFullDateFromDateInputString(newContactInfo.meetingDate),
+      )
+      expect(renderResult.getByTestId('meetingPlace').textContent).toBe(
+        newContactInfo.meetingPlace,
+      )
+      newContactInfo.tags.forEach((tag) => {
+        expect(renderResult.getByTestId('tags').textContent).toContain(tag)
+      })
+      expect(renderResult.getByTestId('notes').textContent).toBe(
+        newContactInfo.notes,
+      )
+
+      useAuthSpy.mockRestore()
+    })
+
+    it('shows a confirmation dialog then restores values to pre-editted copy if the user hits Cancel after making edits', async () => {
+      const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
+        logIn: jest.fn(),
+        logOut: jest.fn(),
+        signUp: jest.fn(),
+        refreshToken: jest.fn(),
+        loggedIn: false,
+        id: null,
+        userRoles: null,
+      }))
+
+      const contact = createMockContact()
+      const newContactInfo = {
+        meetingDate: '2020-11-10',
+        meetingPlace: 'UCLA',
+        tags: ['go', 'bruins', '8clap'],
+        notes: 'some more stuff',
+      }
+      const { renderResult } = renderComponent({
+        partialContact: contact,
+        mocks: [createSaveContactMutationMock(contact, newContactInfo)],
+      })
+      await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
+
+      ui.openNotesModal(renderResult)
+
+      const newFormValues = {
+        ...newContactInfo,
+        tags: newContactInfo.tags.join(','),
+        meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
+      }
+      ui.setNotesModalFormValues(newFormValues)
+
+      // Ensure discard confirmation dialog pops up
+      ui.cancelNotesModal(renderResult)
+      expect(await renderResult.findByText('Discard?')).toBeInTheDocument()
+
+      // Ensure discarding restores the notes state back to pre-edit version
+      ui.confirmDiscardNotes(renderResult)
+
+      expect(renderResult.getByTestId('meetingDate').textContent).toBe(
+        getFormattedFullDateFromDateInputString(contact.meetingDate!),
+      )
+      expect(renderResult.getByTestId('meetingPlace').textContent).toBe(
+        contact.meetingPlace,
+      )
+      contact.tags!.forEach((tag) => {
+        expect(renderResult.getByTestId('tags').textContent).toContain(tag)
+      })
+      expect(renderResult.getByTestId('notes').textContent).toBe(contact.notes)
+
+      useAuthSpy.mockRestore()
+    })
+
+    it('redirects the user to /register if the user saves the notes modal when logged out', async () => {
+      const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
+        logIn: jest.fn(),
+        logOut: jest.fn(),
+        signUp: jest.fn(),
+        refreshToken: jest.fn(),
+        loggedIn: false,
+        id: null,
+        userRoles: null,
+      }))
+
+      const contact = createMockContact()
+      const newContactInfo = {
+        meetingDate: '2020-10-26',
+        meetingPlace: 'UCLA',
+        tags: ['go', 'bruins', '8clap'],
+        notes: 'some more stuff',
+      }
+      const { renderResult } = renderComponent({
+        partialContact: contact,
+        mocks: [createSaveContactMutationMock(contact, newContactInfo)],
+      })
+      await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
+
+      ui.openNotesModal(renderResult)
+
+      const newFormValues = {
+        ...newContactInfo,
+        tags: newContactInfo.tags.join(','),
+        meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
+      }
+      ui.setNotesModalFormValues(newFormValues)
+
+      ui.saveNotesModal(renderResult)
+
+      // Wait for page to redirect away
+      await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
+
+      expect(testLocation?.pathname).toBe('/register')
+      const params = new URLSearchParams(testLocation?.search)
+      validateUrl(params.get('redirect_url')!, {
+        pathname: '/dashboard/contacts/save',
+        searchParams: {
+          ...newFormValues,
+        },
+      })
 
       useAuthSpy.mockRestore()
     })

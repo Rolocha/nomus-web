@@ -15,7 +15,13 @@ import {
 } from 'styled-system'
 import { use100vh } from 'src/utils/ui'
 
+export enum ActionType {
+  Cancel = 'cancel',
+  Submit = 'submit',
+}
+
 interface Action {
+  close?: boolean
   text: string
   handler?: () => void
   submitForm?: string
@@ -47,7 +53,7 @@ interface Props {
   >
   confirmClose: () => boolean
   actions?: Actions
-  allowCloseWithOutsideClick?: boolean
+  preventCloseWithOutsideClick?: boolean
   // Controls where the modal is anchored, currently either at center (typical) or anchored to the right edge
   anchorStyle: AnchorStyle
 }
@@ -60,7 +66,7 @@ const Modal = ({
   height,
   confirmClose,
   actions,
-  allowCloseWithOutsideClick,
+  preventCloseWithOutsideClick,
   anchorStyle,
 }: Props) => {
   const modalCardRef = React.useRef<HTMLDivElement>(null)
@@ -103,7 +109,7 @@ const Modal = ({
 
   const handleOutsideClick = (event: React.SyntheticEvent<any>) => {
     if (
-      allowCloseWithOutsideClick &&
+      !preventCloseWithOutsideClick &&
       !confirmingClose &&
       modalCardRef.current &&
       // @ts-ignore
@@ -246,7 +252,14 @@ const Modal = ({
                                     gridArea="secondary"
                                     variant="secondary"
                                     mr={2}
-                                    onClick={actions.secondary.handler}
+                                    onClick={() => {
+                                      if (actions.secondary?.handler) {
+                                        actions.secondary.handler()
+                                      }
+                                      if (actions.secondary?.close) {
+                                        tryToClose()
+                                      }
+                                    }}
                                     form={
                                       actions.secondary.submitForm ?? undefined
                                     }
@@ -286,7 +299,7 @@ const Modal = ({
                 {confirmClose() && (
                   <Box zIndex={30}>
                     <Modal
-                      allowCloseWithOutsideClick={false}
+                      preventCloseWithOutsideClick={true}
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
                       actions={{
@@ -322,7 +335,7 @@ const Modal = ({
 
 Modal.defaultProps = {
   anchorStyle: 'center',
-  allowCloseWithOutsideClick: true,
+  preventCloseWithOutsideClick: false,
   confirmClose: () => false,
   onClose: () => {},
 }

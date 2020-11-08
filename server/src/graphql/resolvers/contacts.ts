@@ -3,6 +3,7 @@ import { DocumentType } from '@typegoose/typegoose'
 import Connection from 'src/models/Connection'
 import { PersonName } from 'src/models/subschemas'
 import { User } from 'src/models/User'
+import { Matches } from 'class-validator'
 import {
   Arg,
   Authorized,
@@ -17,6 +18,7 @@ import {
 import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
+import { DATE } from 'src/util/regex'
 
 @ObjectType()
 class Contact {
@@ -65,7 +67,7 @@ class Contact {
   meetingPlace?: string
 
   @Field({ nullable: true })
-  meetingDate?: Date
+  meetingDate?: string
 
   @Field({ nullable: true })
   connected?: boolean
@@ -80,7 +82,8 @@ class ContactInfoInput {
   meetingPlace?: string
 
   @Field({ nullable: true })
-  meetingDate?: Date
+  @Matches(DATE['YYYY-MM-DD'])
+  meetingDate?: string
 
   //unique to the connections, notes taken by the user querying
   @Field({ nullable: true })
@@ -185,32 +188,29 @@ class ContactsResolver {
     return { ...contact, connected: false }
   }
 
-  // The `updateNotes` mutation takes in note fields and inserts it into the db
-  @Authorized(Role.User)
-  @Mutation(() => Contact)
-  async updateContactInfo(
-    @Arg('contactId', { nullable: false }) contactId: string,
-    @Arg('contactInfo', { nullable: true }) contactInfo: ContactInfoInput,
-    @Ctx() context: IApolloContext
+  private async createNewContact(
+    fromId: string,
+    toId: string,
+    contactInfo: ContactInfoInput
   ): Promise<Contact> {
-    const connection = await Connection.mongo.findOne({
-      from: context.user._id,
-      to: contactId,
+    const connection = await Connection.mongo.create({
+      from: fromId,
+      to: toId,
+      meetingDate: contactInfo?.meetingDate ?? undefined,
+      meetingPlace: contactInfo?.meetingPlace ?? undefined,
+      notes: contactInfo?.notes ?? undefined,
+      tags: contactInfo?.tags ?? undefined,
     })
-    if (connection == null) {
-      throw new Error('Contact not found')
-    }
 
-    connection.meetingDate = contactInfo.meetingDate ?? connection.meetingDate
-    connection.meetingPlace = contactInfo.meetingPlace ?? connection.meetingPlace
-    connection.notes = contactInfo.notes ?? connection.notes
-    connection.tags = contactInfo.tags ?? connection.tags
+    await connection.populate('from').populate('to').execPopulate()
 
-    await connection.save()
-    return await connectionToContact(connection)
+    return connectionToContact(connection)
   }
 
-  @Mutation(() => Contact)
+  @Mutation(() => Contact, {
+    description:
+      'Creates a new Contact or updates the information associated with an existing contact',
+  })
   async saveContact(
     @Arg('username') username: string,
     @Arg('contactInfo', { nullable: true }) contactInfo: ContactInfoInput | null,
@@ -229,22 +229,24 @@ class ContactsResolver {
       to: contactUser.id,
     })
 
-    if (existingConnection != null) {
-      throw new Error('Contact already saved')
+    if (existingConnection) {
+      if (contactInfo.meetingDate) {
+        existingConnection.meetingDate = contactInfo.meetingDate
+      }
+      if (contactInfo.meetingPlace) {
+        existingConnection.meetingPlace = contactInfo.meetingPlace
+      }
+      if (contactInfo.tags) {
+        existingConnection.tags = contactInfo.tags
+      }
+      if (contactInfo.notes) {
+        existingConnection.notes = contactInfo.notes
+      }
+      await existingConnection.save()
+      return await connectionToContact(existingConnection)
+    } else {
+      return await this.createNewContact(context.user.id, contactUser.id, contactInfo)
     }
-
-    const connection = await Connection.mongo.create({
-      from: context.user.id,
-      to: contactUser.id,
-      meetingDate: contactInfo?.meetingDate ?? undefined,
-      meetingPlace: contactInfo?.meetingPlace ?? undefined,
-      notes: contactInfo?.notes ?? undefined,
-      tags: contactInfo?.tags ?? undefined,
-    })
-
-    await connection.populate('from').populate('to').execPopulate()
-
-    return connectionToContact(connection)
   }
 }
 

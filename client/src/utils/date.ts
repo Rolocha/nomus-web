@@ -1,3 +1,7 @@
+export const REGEXP = {
+  'YYYY-MM-DD': /([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])/,
+}
+
 export const getMonthAbbreviation = (month: number) =>
   [
     'Jan',
@@ -37,17 +41,23 @@ export const getFormattedFullDate = (date: string | Date | number) => {
   )} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
 }
 
-export const getFormattedDateFromISODateString = (date: string) => {
-  const year = date.substr(0, 4)
-  const month = date.substr(5, 2)
-  const dateOfMonth = date.substr(8, 2)
-  return `${getMonthString(Number(month) - 1)} ${dateOfMonth}, ${year}`
+export const getFormattedFullDateFromDateInputString = (date: string) => {
+  const match = date.match(REGEXP['YYYY-MM-DD'])
+  if (match && match.length === 4) {
+    const [_, year, month, dayOfMonth] = match
+    return `${getMonthString(Number(month) - 1)} ${Number(dayOfMonth)}, ${year}`
+  } else {
+    return null
+  }
 }
 
-export const getDateStringForDateInput = (date: string | Date | number) =>
-  new Date(date).toISOString().substr(0, 10)
+export const getDateStringForDateInput = (date?: string | Date | number) => {
+  return (date ? new Date(date) : adjustDateByTZOffset(Date.now()))
+    .toISOString()
+    .substr(0, 10)
+}
 
-export const getDateFromDateInputString = (date: string) => {
+export const adjustDateByTZOffset = (date: string | Date | number) => {
   const dateObj = new Date(date)
-  return new Date(+dateObj + dateObj.getTimezoneOffset() * 60000)
+  return new Date(+dateObj - dateObj.getTimezoneOffset() * 60000)
 }
