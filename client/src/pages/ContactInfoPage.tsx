@@ -632,7 +632,7 @@ const ContactInfoPage = () => {
             </ExternalLink>
 
             {contact.connected ? (
-              <Button variant="primary" size="big" disabled>
+              <Button variant="secondary" size="big" disabled>
                 <Box
                   display="flex"
                   alignItems="center"
