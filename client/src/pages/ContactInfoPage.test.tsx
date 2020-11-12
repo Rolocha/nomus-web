@@ -18,8 +18,6 @@ import { validateUrl } from 'src/test-utils/url.test'
 import { Contact } from 'src/types/contact'
 import * as Auth from 'src/utils/auth'
 import {
-  adjustDateByTZOffset,
-  getDateStringForDateInput,
   getFormattedFullDate,
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
@@ -286,7 +284,7 @@ describe('Contact Info Page', () => {
       ui.setNotesModalFormValues({
         ...userEnteredNotes,
         tags: userEnteredNotes.tags.join(','),
-        meetingDate: getDateStringForDateInput(userEnteredNotes.meetingDate),
+        meetingDate: userEnteredNotes.meetingDate,
       })
 
       ui.saveNotesModal(renderResult)
@@ -304,9 +302,7 @@ describe('Contact Info Page', () => {
       expect(saveContactCardLink).toStartWith(contactSaveUrl)
       const urlParams = new URLSearchParams(saveContactCardLink.split('?')[1])
       expect(urlParams.get('username')).toBe(contact.username)
-      expect(urlParams.get('meetingDate')).toBe(
-        getDateStringForDateInput(userEnteredNotes.meetingDate),
-      )
+      expect(urlParams.get('meetingDate')).toBe(userEnteredNotes.meetingDate)
       expect(urlParams.get('meetingPlace')).toBe(userEnteredNotes.meetingPlace)
       expect(urlParams.get('tags')).toBe(userEnteredNotes.tags.join(','))
       expect(urlParams.get('notes')).toBe(userEnteredNotes.notes)
@@ -403,7 +399,7 @@ describe('Contact Info Page', () => {
       ui.setNotesModalFormValues({
         ...newContactInfo,
         tags: newContactInfo.tags.join(','),
-        meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
+        meetingDate: newContactInfo.meetingDate,
       })
 
       ui.saveNotesModal(renderResult)
@@ -459,7 +455,7 @@ describe('Contact Info Page', () => {
       const newFormValues = {
         ...newContactInfo,
         tags: newContactInfo.tags.join(','),
-        meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
+        meetingDate: newContactInfo.meetingDate,
       }
       ui.setNotesModalFormValues(newFormValues)
 
@@ -513,7 +509,7 @@ describe('Contact Info Page', () => {
       const newFormValues = {
         ...newContactInfo,
         tags: newContactInfo.tags.join(','),
-        meetingDate: getDateStringForDateInput(newContactInfo.meetingDate),
+        meetingDate: newContactInfo.meetingDate,
       }
       ui.setNotesModalFormValues(newFormValues)
 

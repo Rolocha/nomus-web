@@ -27,9 +27,7 @@ import { mq } from 'src/styles/breakpoints'
 import { Contact } from 'src/types/contact'
 import { useAuth } from 'src/utils/auth'
 import {
-  getDateStringForDateInput,
-  getFormattedFullDate,
-  adjustDateByTZOffset,
+  getCurrentDateForDateInput,
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
@@ -62,7 +60,7 @@ const ContactInfoPage = () => {
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
 
   const defaultFormValues = React.useRef({
-    meetingDate: getDateStringForDateInput(),
+    meetingDate: getCurrentDateForDateInput(),
   })
 
   const { handleSubmit, register, watch, reset, formState } = useForm<
@@ -85,7 +83,7 @@ const ContactInfoPage = () => {
     (resetContact: Partial<Contact>) => {
       reset({
         meetingDate: resetContact.meetingDate
-          ? getDateStringForDateInput(resetContact.meetingDate)
+          ? resetContact.meetingDate
           : defaultFormValues.current.meetingDate,
         meetingPlace: resetContact.meetingPlace,
         notes: resetContact.notes,
@@ -193,9 +191,7 @@ const ContactInfoPage = () => {
   // we just received from the server
   if (!hasInstantiatedNotes) {
     reset({
-      meetingDate: contact.meetingDate
-        ? getDateStringForDateInput(contact.meetingDate)
-        : formFields.meetingDate,
+      meetingDate: contact.meetingDate ?? formFields.meetingDate,
       meetingPlace: contact.meetingPlace ?? formFields.meetingPlace,
       notes: contact.notes ?? formFields.notes,
       tags: contact.tags ? contact.tags.join(', ') : formFields.tags,

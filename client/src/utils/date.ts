@@ -51,10 +51,8 @@ export const getFormattedFullDateFromDateInputString = (date: string) => {
   }
 }
 
-export const getDateStringForDateInput = (date?: string | Date | number) => {
-  return (date ? new Date(date) : adjustDateByTZOffset(Date.now()))
-    .toISOString()
-    .substr(0, 10)
+export const getCurrentDateForDateInput = () => {
+  return adjustDateByTZOffset(Date.now()).toISOString().substr(0, 10)
 }
 
 export const adjustDateByTZOffset = (date: string | Date | number) => {
