@@ -23,7 +23,7 @@ describe('linker', () => {
     it('given a sheet Ref and a user Ref it links all the cards in the sheet to that User', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
-        user: user,
+        user: user.id,
       })
       const card = await createMockCard({ user: null })
       const sheet = await createMockSheet({
@@ -34,7 +34,7 @@ describe('linker', () => {
       await linkSheetToCardVersion(sheet, cardVersion)
 
       const createdSheets = await Sheet.mongo.findById(sheet._id)
-      for (const cardId in createdSheets.cards) {
+      for (const cardId of createdSheets.cards) {
         const currcard = await Card.mongo.findById(cardId)
         expect(currcard.user).toBe(user.id)
       }
