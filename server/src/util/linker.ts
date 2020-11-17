@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { Card, CardVersion, Sheet } from 'src/models'
+import { Card, CardVersion, Order, Sheet } from 'src/models'
 
 export const linkSheetToCardVersion = async (
   sheet: DocumentType<Sheet>,
@@ -15,4 +15,7 @@ export const linkSheetToCardVersion = async (
   }
 }
 
-// export const getCardVersionFromShortId = async (shortId: string): Promise<CardVersion> => {}
+export const getCardVersionFromShortId = async (shortId: string): Promise<CardVersion> => {
+  const order = await Order.mongo.findOne({ shortId: shortId })
+  return await CardVersion.mongo.findById(order.cardVersion)
+}

@@ -1,13 +1,18 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
-import { Card } from './Card'
+import { getModelForClass, modelOptions, pre, prop, ReturnModelType } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
 import { OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
-import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 
+@pre<Order>('save', async function (next) {
+  if (this.isNew && this.shortId == null) {
+    this.shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
+    next()
+  }
+  next()
+})
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 class Order extends BaseModel({
@@ -24,7 +29,7 @@ class Order extends BaseModel({
   user: Ref<User>
 
   //Card Version that was ordered
-  @prop({ required: true, ref: () => CardVersion, _id: false })
+  @prop({ required: true, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
@@ -38,10 +43,6 @@ class Order extends BaseModel({
   @Field({ nullable: false })
   price: number
 
-  @prop({ _id: false, ref: () => Card, required: false }, WhatIsIt.ARRAY)
-  @Field(() => [Card], { nullable: true })
-  cards: Array<Ref<Card>>
-
   //This correlates with OrderState at server/src/util/enums.ts
   @prop({ enum: OrderState, type: String, required: true })
   @Field((type) => OrderState, { nullable: false })
@@ -52,10 +53,14 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  //Stripe PaymentIntent id. For now, this is null but futre work will replace this
+  //Stripe PaymentIntent id. For now, this is null but future work will replace this
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
+
+  @prop({ required: false, unique: true })
+  @Field({ nullable: true })
+  shortId: string
 }
 
 Order.mongo = getModelForClass(Order)
