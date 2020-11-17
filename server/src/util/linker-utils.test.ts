@@ -5,7 +5,7 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { getCardVersionFromShortId, linkSheetToCardVersion } from './linker'
+import { getCardVersionFromShortId, linkSheetToCardVersion } from './linker-utils'
 
 beforeAll(async () => {
   await initDB()

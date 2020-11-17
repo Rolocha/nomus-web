@@ -15,7 +15,9 @@ export const linkSheetToCardVersion = async (
   }
 }
 
-export const getCardVersionFromShortId = async (shortId: string): Promise<CardVersion> => {
+export const getCardVersionFromShortId = async (
+  shortId: string
+): Promise<DocumentType<CardVersion>> => {
   const order = await Order.mongo.findOne({ shortId: shortId })
   return await CardVersion.mongo.findById(order.cardVersion)
 }
