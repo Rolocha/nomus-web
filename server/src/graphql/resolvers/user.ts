@@ -10,6 +10,7 @@ import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } fro
 
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
+import { isValidUserCheckpointKey, USER_CHECKPOINT_KEYS } from 'src/models/subschemas'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -175,6 +176,22 @@ class UserResolver {
     context.user.defaultCardVersion = cardVersionId
     await context.user.save()
 
+    return await this.userFromMongoDocument(context.user)
+  }
+
+  @Authorized(Role.User)
+  @Mutation(() => User)
+  async updateUserCheckpoints(
+    @Arg('checkpointsReached', (type) => [String], { nullable: false })
+    checkpointsReached: Array<string>,
+    @Ctx() context: IApolloContext
+  ): Promise<User> {
+    for (const checkpointName of checkpointsReached) {
+      if (isValidUserCheckpointKey(checkpointName)) {
+        context.user.checkpoints[checkpointName] = true
+      }
+    }
+    await context.user.save()
     return await this.userFromMongoDocument(context.user)
   }
 }

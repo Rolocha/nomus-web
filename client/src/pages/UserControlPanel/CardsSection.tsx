@@ -5,15 +5,23 @@ import {
   UCPCardsSectionQuery,
   UCPCardsSectionQuery_cardVersionsStats as UCPCardsSectionQueryCardVersionsStats,
 } from 'src/apollo/types/UCPCardsSectionQuery'
+import { UpdateUserCheckpoints } from 'src/apollo/types/UpdateUserCheckpoints'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
+import * as SVG from 'src/components/SVG'
 import LoadingPage from 'src/pages/LoadingPage'
 import { getMonthAbbreviation } from 'src/utils/date'
-import { CHANGE_ACTIVE_CARD_VERSION } from './mutations'
+import {
+  CHANGE_ACTIVE_CARD_VERSION,
+  UPDATE_USER_CHECKPOINTS,
+} from './mutations'
 import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
 import Link from 'src/components/Link'
+import cardsEmptyStateSvg from './cards_empty_state.svg'
+import Image from 'src/components/Image'
+import { colors } from 'src/styles'
 
 const bp = 'md'
 
@@ -43,6 +51,9 @@ export default () => {
           defaultCardVersion {
             id
           }
+          checkpoints {
+            expressedInterestInOrderingNomusCard
+          }
         }
 
         cardVersions {
@@ -64,6 +75,9 @@ export default () => {
   const [changeActiveCardVersion] = useMutation<ChangeActiveCardVersion>(
     CHANGE_ACTIVE_CARD_VERSION,
   )
+  const [updateUserCheckpoints] = useMutation<UpdateUserCheckpoints>(
+    UPDATE_USER_CHECKPOINTS,
+  )
 
   const createCardActivationHandler = React.useCallback(
     (cardVersionId: string) => async (_: any) =>
@@ -74,6 +88,14 @@ export default () => {
       }),
     [changeActiveCardVersion],
   )
+
+  const handleNomusCardInterestClick = React.useCallback(() => {
+    updateUserCheckpoints({
+      variables: {
+        checkpointsReached: ['expressedInterestInOrderingNomusCard'],
+      },
+    })
+  }, [updateUserCheckpoints])
 
   if (loading || !data) {
     return <LoadingPage />
@@ -214,13 +236,15 @@ export default () => {
                     backImageUrl={cv.backImageUrl || ''}
                     width={{ _: '60vw', [bp]: '300px' }}
                   />
-                  <Text.Body3>
-                    {[
-                      `Created ${formattedCreationDate}`,
-                      `${cardVersionStatsById[cv.id].numCardsOrdered} cards`,
-                      `${cardVersionStatsById[cv.id].numTaps} taps`,
-                    ].join(' / ')}
-                  </Text.Body3>
+                  {cardVersionStatsById[cv.id] && (
+                    <Text.Body3>
+                      {[
+                        `Created ${formattedCreationDate}`,
+                        `${cardVersionStatsById[cv.id].numCardsOrdered} cards`,
+                        `${cardVersionStatsById[cv.id].numTaps} taps`,
+                      ].join(' / ')}
+                    </Text.Body3>
+                  )}
                   <Box
                     mt={2}
                     display="flex"
@@ -265,6 +289,46 @@ export default () => {
               )
             })}
           </Box>
+        </Box>
+      )}
+
+      {defaultCardVersion == null && nonDefaultCardVersions.length === 0 && (
+        <Box
+          display="grid"
+          gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+          gridRowGap="16px"
+          justifyItems="center"
+          css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}
+        >
+          <Text.SectionHeader>
+            Normal business cards are cool...
+          </Text.SectionHeader>
+          <Image src={cardsEmptyStateSvg} />
+          <Text.Body2>
+            But Nomus cards are even cooler. Take your professional game to the
+            next level. Reach out to request a Nomus card of your own.
+          </Text.Body2>
+
+          {data.user.checkpoints?.expressedInterestInOrderingNomusCard ? (
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <SVG.Check
+                color={colors.nomusBlue}
+                css={css({ width: '50px', height: '50px' })}
+              />{' '}
+              <Text.Body3>
+                Thanks for expressing interest. We'll reach out soon!
+              </Text.Body3>
+            </Box>
+          ) : (
+            <Button
+              variant="primary"
+              size="big"
+              width="100%"
+              onClick={handleNomusCardInterestClick}
+            >
+              I'm interested!
+            </Button>
+          )}
         </Box>
       )}
     </Box>

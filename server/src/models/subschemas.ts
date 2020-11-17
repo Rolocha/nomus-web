@@ -16,6 +16,26 @@ export class PersonName {
   last: string
 }
 
+// A dictionary of flags to indicate whether the user has already seen/encountered UI scenarios
+interface IUserCheckpoints {
+  expressedInterestInOrderingNomusCard: boolean
+}
+@ObjectType()
+export class UserCheckpoints implements IUserCheckpoints {
+  @prop({ default: false })
+  @Field()
+  expressedInterestInOrderingNomusCard: boolean
+}
+
+type UserCheckpointKey = keyof Required<IUserCheckpoints>
+export const USER_CHECKPOINT_KEYS: Array<UserCheckpointKey> = [
+  'expressedInterestInOrderingNomusCard',
+]
+
+export const isValidUserCheckpointKey = (s: string): s is UserCheckpointKey => {
+  return (USER_CHECKPOINT_KEYS as string[]).includes(s)
+}
+
 @ObjectType()
 export class Address {
   @prop()
