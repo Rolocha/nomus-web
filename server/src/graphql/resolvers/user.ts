@@ -10,7 +10,7 @@ import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } fro
 
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
-import { isValidUserCheckpointKey, USER_CHECKPOINT_KEYS } from 'src/models/subschemas'
+import { isValidUserCheckpointKey } from 'src/models/subschemas'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
