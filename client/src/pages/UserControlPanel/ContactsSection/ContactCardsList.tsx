@@ -8,8 +8,9 @@ import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
-import { ContactsSortOption } from './contact-sorting'
+import { ContactsSortOption } from './utils'
 import BusinessCardImage from 'src/components/BusinessCardImage'
+import { filterContactListBySearchQuery } from 'src/utils/contacts'
 
 type SortDirection = 'normal' | 'reverse'
 
@@ -17,7 +18,6 @@ interface Props {
   selectedContactSortOption: ContactsSortOption
   selectedContactUsernameOrId?: string
   contacts: Contact[]
-  searchQuery: string
   viewMode: 'grid' | 'linear'
 }
 
@@ -40,7 +40,6 @@ const ContactCardsList = ({
   selectedContactSortOption,
   contacts,
   selectedContactUsernameOrId,
-  searchQuery,
   viewMode,
 }: Props) => {
   const hasAutoscrolledToContact = React.useRef(false)
@@ -68,16 +67,8 @@ const ContactCardsList = ({
       [ContactsSortOption.Alphabetical]: formatName(c.name),
       [ContactsSortOption.MeetingPlace]: c.meetingPlace ?? '',
     }[selectedContactSortOption])
-  const groupedContacts = contacts
-    .filter(
-      (contact) =>
-        formatName(contact.name)
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (contact.username &&
-          contact.username.toLowerCase().includes(searchQuery.toLowerCase())),
-    )
-    .reduce<Record<string, Contact[]>>((acc, contact) => {
+  const groupedContacts = contacts.reduce<Record<string, Contact[]>>(
+    (acc, contact) => {
       const groupKey = {
         [ContactsSortOption.MeetingDateNewest]: contact.meetingDate
           ? getFormattedFullDate(contact.meetingDate)
@@ -95,7 +86,9 @@ const ContactCardsList = ({
         acc[groupKey] = [contact]
       }
       return acc
-    }, {})
+    },
+    {},
+  )
 
   const sortByDirection: SortDirection = {
     [ContactsSortOption.Alphabetical]: 'normal' as SortDirection,

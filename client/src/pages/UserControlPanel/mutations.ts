@@ -13,3 +13,14 @@ export const CHANGE_ACTIVE_CARD_VERSION = gql`
     }
   }
 `
+
+export const UPDATE_USER_CHECKPOINTS = gql`
+  mutation UpdateUserCheckpoints($checkpointsReached: [String!]!) {
+    updateUserCheckpoints(checkpointsReached: $checkpointsReached) {
+      id
+      checkpoints {
+        expressedInterestInOrderingNomusCard
+      }
+    }
+  }
+`

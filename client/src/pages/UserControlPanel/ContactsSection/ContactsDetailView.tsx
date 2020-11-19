@@ -5,7 +5,7 @@ import * as Text from 'src/components/Text'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
-import { ContactsSortOption } from './contact-sorting'
+import { ContactsSortOption } from './utils'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 
@@ -13,7 +13,6 @@ interface Props {
   selectedContactSortOption: ContactsSortOption
   selectedContactUsernameOrId?: string
   contacts: Contact[]
-  searchQueryValue: string
 }
 
 const bp = 'md'
@@ -22,7 +21,6 @@ const ContactsDetailView = ({
   selectedContactSortOption,
   selectedContactUsernameOrId,
   contacts,
-  searchQueryValue,
 }: Props) => {
   const selectedContact =
     selectedContactUsernameOrId != null
@@ -60,7 +58,6 @@ const ContactsDetailView = ({
           contacts={contacts}
           selectedContactSortOption={selectedContactSortOption}
           selectedContactUsernameOrId={selectedContactUsernameOrId}
-          searchQuery={searchQueryValue}
           viewMode="linear"
         />
       </Box>

@@ -12,7 +12,7 @@ import SegmentedController, {
 } from 'src/components/SegmentedController'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { allContactsSortOptions, ContactsSortOption } from './contact-sorting'
+import { allContactsSortOptions, ContactsSortOption } from './utils'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption

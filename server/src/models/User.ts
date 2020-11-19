@@ -19,7 +19,7 @@ import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import { Ref } from './scalars'
-import { PersonName } from './subschemas'
+import { PersonName, UserCheckpoints } from './subschemas'
 import Token from './Token'
 import { validateEmail } from './utils'
 
@@ -164,6 +164,10 @@ export class User extends BaseModel({
   @prop({ default: true, required: true })
   @Field({ nullable: false })
   activated: boolean
+
+  @prop({ _id: false, required: true, default: {} })
+  @Field(() => UserCheckpoints, { nullable: false })
+  checkpoints: UserCheckpoints
 
   public static async newUser(
     this: ReturnModelType<typeof User>,

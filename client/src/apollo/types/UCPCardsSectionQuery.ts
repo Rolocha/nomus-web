@@ -12,10 +12,16 @@ export interface UCPCardsSectionQuery_user_defaultCardVersion {
   id: string
 }
 
+export interface UCPCardsSectionQuery_user_checkpoints {
+  __typename: 'UserCheckpoints'
+  expressedInterestInOrderingNomusCard: boolean
+}
+
 export interface UCPCardsSectionQuery_user {
   __typename: 'User'
   id: string
   defaultCardVersion: UCPCardsSectionQuery_user_defaultCardVersion | null
+  checkpoints: UCPCardsSectionQuery_user_checkpoints
 }
 
 export interface UCPCardsSectionQuery_cardVersions {
