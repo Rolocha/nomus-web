@@ -32,6 +32,24 @@ gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
+app.get('/d/:id', (req, res) => {
+  const id = req.params.id
+
+  /*
+  verifyIfHasUser(id)
+  if (yes) {
+    redirect to /username
+  }
+  else if {
+    redirect /technician/id
+    res.redirect(302, `technician-page/${id}`)
+  }
+  else {
+    redirect 404
+  }
+  */
+})
+
 app.listen(Number(appServerPort), () => {
   console.log(`⚡️ Express server is running on localhost:${appServerPort}`)
 })

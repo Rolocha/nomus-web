@@ -5,7 +5,7 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { getCardVersionFromShortId, linkSheetToCardVersion } from './linker-utils'
+import { getCardVersionFromShortId, linkSheetToCardVersion, spliceRouteStr } from './linker-utils'
 
 beforeAll(async () => {
   await initDB()
@@ -21,6 +21,27 @@ describe('linker', () => {
   })
 
   describe('linking sheet to user', () => {
+    it('fails incorrectly formatted routeStr, miss-spelled', async () => {
+      const badRoute = 'sheet_jsdldnfskl-card_fsfljs'
+      expect(() => {
+        spliceRouteStr(badRoute)
+      }).toThrow(`Incorrectly formatted routeStr: ${badRoute}`)
+    })
+
+    it('fails incorrectly formatted routeStr, repeated', async () => {
+      const repeatedRoute =
+        'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345-sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
+      expect(() => {
+        spliceRouteStr(repeatedRoute)
+      }).toThrow(`Incorrectly formatted routeStr: ${repeatedRoute}`)
+    })
+
+    it('returns the split of a routeStr', async () => {
+      const routeStr = 'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
+      const [esheet, ecard] = routeStr.split('-')
+      expect(spliceRouteStr(routeStr)).toStrictEqual({ sheetId: esheet, cardId: ecard })
+    })
+
     it('gets the cardVersion from a shortId in an Order', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
