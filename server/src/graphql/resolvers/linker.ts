@@ -5,13 +5,12 @@ import {
   linkSheetToCardVersion,
   spliceRouteStr,
 } from 'src/util/linker-utils'
-import { Sheet, User } from 'src/models'
-import { Ref } from '@typegoose/typegoose'
+import { Sheet } from 'src/models'
 
 @ObjectType()
 class LinkedInfo {
   @Field()
-  userId: Ref<User>
+  userId: string
 
   @Field()
   sheetId: string
@@ -35,7 +34,7 @@ class LinkerResolver {
 
     await linkSheetToCardVersion(sheet, cardVersion)
 
-    return { userId: cardVersion.user, sheetId: sheetId }
+    return { userId: cardVersion.user.toString(), sheetId: sheetId }
   }
 }
 
