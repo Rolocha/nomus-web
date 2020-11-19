@@ -5,7 +5,12 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { getCardVersionFromShortId, linkSheetToCardVersion, spliceRouteStr } from './linker-utils'
+import {
+  getCardVersionFromShortId,
+  getUserFromCardId,
+  linkSheetToCardVersion,
+  spliceRouteStr,
+} from './linker-utils'
 
 beforeAll(async () => {
   await initDB()
@@ -76,6 +81,19 @@ describe('linker', () => {
         const currcard = await Card.mongo.findById(cardId)
         expect(currcard.user).toBe(user.id)
       }
+    })
+
+    it("returns a non-registered card's user as null", async () => {
+      const card = await createMockCard({ user: null })
+      const res = await getUserFromCardId(card.id)
+      expect(res).toBe(null)
+    })
+
+    it("returns a registered card's user as userId", async () => {
+      const user = await createMockUser()
+      const card = await createMockCard({ user })
+      const res = await getUserFromCardId(card.id)
+      expect(res).toBe(user.id)
     })
   })
 })

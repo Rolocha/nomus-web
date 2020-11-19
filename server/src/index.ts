@@ -11,6 +11,8 @@ import authRouter, { authMiddleware } from 'src/auth'
 import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
+import { getUserFromCardId, spliceRouteStr } from './util/linker-utils'
+import { User } from './models'
 // import { graphqlUploadExpress } from 'graphql-upload'
 
 db.init()
@@ -32,22 +34,20 @@ gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
-app.get('/d/:id', (req, res) => {
-  const id = req.params.id
-
-  /*
-  verifyIfHasUser(id)
-  if (yes) {
-    redirect to /username
+app.get('/d/:routeStr', async (req, res) => {
+  try {
+    const routeStr = req.params.routeStr
+    const { cardId } = spliceRouteStr(routeStr)
+    const userId = await getUserFromCardId(cardId)
+    const user = await User.mongo.findById(userId)
+    if (userId) {
+      res.redirect(302, `/:${user.username}`)
+    } else {
+      res.redirect(302, `linker/:${routeStr}`)
+    }
+  } catch (e) {
+    res.redirect(404, '404')
   }
-  else if {
-    redirect /technician/id
-    res.redirect(302, `technician-page/${id}`)
-  }
-  else {
-    redirect 404
-  }
-  */
 })
 
 app.listen(Number(appServerPort), () => {

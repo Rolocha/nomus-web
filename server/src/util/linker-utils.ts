@@ -1,7 +1,8 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { Card, CardVersion, Order, Sheet } from 'src/models'
+import { Card, CardVersion, Order, Sheet, User } from 'src/models'
+import { Ref } from 'src/models/scalars'
 
-const ROUTE_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
+export const ROUTE_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
 
 export const linkSheetToCardVersion = async (
   sheet: DocumentType<Sheet>,
@@ -34,4 +35,7 @@ export const spliceRouteStr = (routeStr: string): { sheetId: string; cardId: str
   throw new Error(`Incorrectly formatted routeStr: ${routeStr}`)
 }
 
-export const getUserFromCard = async (cardId: string) => {}
+export const getUserFromCardId = async (cardId: string): Promise<Ref<User>> => {
+  const cardModel = await Card.mongo.findById(cardId)
+  return cardModel.user
+}

@@ -28,6 +28,7 @@ class LinkerResolver {
     @Arg('shortId', { nullable: false }) shortId: string
   ): Promise<LinkedInfo> {
     const { sheetId } = spliceRouteStr(routeStr)
+
     const cardVersion = await getCardVersionFromShortId(shortId)
 
     const sheet = await Sheet.mongo.findById(sheetId)
