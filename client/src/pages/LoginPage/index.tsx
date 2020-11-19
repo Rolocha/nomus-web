@@ -5,10 +5,13 @@ import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
+import * as SVG from 'src/components/SVG'
 import { useAuth } from 'src/utils/auth'
 import illustration from './login-illustration.svg'
 import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
+import logoFull from './logo-full.svg'
+import { colors } from 'src/styles'
 
 const bp = 'lg'
 
@@ -37,6 +40,44 @@ const LoginPage = () => {
     }
     return null
   }
+
+  const infoLines =
+    {
+      login: [
+        {
+          title: 'See your network expand',
+          subtitle:
+            'Monitor how many taps your Nomus cards generate and watch your contact collection grow',
+        },
+        {
+          title: 'Handle your Nomus Card orders',
+          subtitle:
+            'Track existing orders, reorder Nomus Cards, and view previous orders',
+        },
+        {
+          title: 'Take control of your data',
+          subtitle:
+            'Edit your contact info, set preferences, and temporarily hide your public profile',
+        },
+      ],
+      register: [
+        {
+          title: 'Leverage NFC technology',
+          subtitle:
+            'Create NFC-enabled Nomus Cards with our customizable templates or upload your own design',
+        },
+        {
+          title: 'Activate your digital identity',
+          subtitle:
+            'Add your contact details to build up your sleek, unique profile and share it with people you meet',
+        },
+        {
+          title: 'Shape a stronger network',
+          subtitle:
+            'Sort through your contacts easily and add meeting details, notes, and tags for each contact',
+        },
+      ],
+    }[mode] || []
 
   return (
     <Box
@@ -76,7 +117,7 @@ const LoginPage = () => {
           <Text.PageHeader>
             {{ login: 'Sign in', register: 'Get started' }[mode]}
           </Text.PageHeader>
-          <Box>
+          <Box mb={3}>
             {
               {
                 login: <LoginForm />,
@@ -108,9 +149,26 @@ const LoginPage = () => {
         <Box
           position="relative"
           display={{ _: 'none', [bp]: 'block' }}
+          height="auto"
           gridColumn="4/5"
         >
-          TODO: Right hand side
+          <Image src={logoFull} mb="32px" />
+          {infoLines.map((line) => (
+            <Box placeSelf="start" mb={3} display="flex">
+              <Box px="8px">
+                <SVG.Check
+                  color={colors.midnightGray}
+                  css={css({ width: '32px', height: '32px' })}
+                />
+              </Box>
+              <Box px="16px">
+                <Text.SectionSubheader mb={2}>
+                  {line.title}
+                </Text.SectionSubheader>
+                <Text.Body2>{line.subtitle}</Text.Body2>
+              </Box>
+            </Box>
+          ))}
         </Box>
       </Box>
     </Box>

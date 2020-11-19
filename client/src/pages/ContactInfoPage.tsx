@@ -162,12 +162,12 @@ const ContactInfoPage = () => {
 
   React.useEffect(() => {
     // While the notes modal is open and there are edits, make sure clicking
-    if (isNotesModalOpen && formState.dirty) {
+    if (isNotesModalOpen && formState.isDirty) {
       window.onbeforeunload = () => true
     } else {
       window.onbeforeunload = null
     }
-  }, [isNotesModalOpen, formState.dirty])
+  }, [isNotesModalOpen, formState.isDirty])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -490,7 +490,7 @@ const ContactInfoPage = () => {
           </Box>
 
           <Modal
-            confirmClose={() => formState.dirty}
+            confirmClose={() => formState.isDirty}
             isOpen={isNotesModalOpen}
             onClose={() => {
               closeNotesModal()

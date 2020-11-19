@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
@@ -5,6 +6,7 @@ import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import * as Text from 'src/components/Text'
 import { useAuth } from 'src/utils/auth'
+import * as yup from 'yup'
 
 interface LoginFormData {
   email: string
@@ -17,13 +19,21 @@ const showRequiredError = (
   errors: Record<string, any>,
 ) =>
   fieldKey in errors && errors[fieldKey] ? (
-    <Text.Body color="brightCoral" m={1}>
+    <Text.Body3 color="brightCoral" m={1}>
       {`${fieldName} is required`}
-    </Text.Body>
+    </Text.Body3>
   ) : null
 
 const LoginForm = () => {
-  const { register, handleSubmit, errors } = useForm<LoginFormData>()
+  const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
+    mode: 'onChange',
+    resolver: yupResolver(
+      yup.object().shape({
+        email: yup.string().email().required(),
+        password: yup.string().required(),
+      }),
+    ),
+  })
   const { logIn } = useAuth()
   const onSubmit = (formData: LoginFormData) => {
     logIn(formData)
@@ -51,7 +61,13 @@ const LoginForm = () => {
           />
           {showRequiredError('password', 'Password', errors)}
         </Form.Item>
-        <Button type="submit" width="100%" variant="primary" size="big">
+        <Button
+          type="submit"
+          width="100%"
+          variant="primary"
+          size="big"
+          disabled={!formState.isValid}
+        >
           Continue
         </Button>
       </Form.Form>

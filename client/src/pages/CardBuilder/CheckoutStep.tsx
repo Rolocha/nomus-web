@@ -1,7 +1,7 @@
 import { css } from '@emotion/core'
 import * as stripeJs from '@stripe/stripe-js'
 import * as React from 'react'
-import { FormContextValues } from 'react-hook-form'
+import { UseFormMethods } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Card from 'src/components/Card'
 import CreditCardInput from 'src/components/CreditCardInput'
@@ -19,7 +19,7 @@ interface Props {
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
   handleCardSubmit: () => Promise<void>
   handleOrderUpdate: () => Promise<void>
-  checkoutFormMethods: FormContextValues<any>
+  checkoutFormMethods: UseFormMethods<any>
 }
 
 const CheckoutStep = React.forwardRef(
