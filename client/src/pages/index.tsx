@@ -11,6 +11,7 @@ import LoadingPage from 'src/pages/LoadingPage'
 import LoginPage from 'src/pages/LoginPage'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
+import ComingSoonPage from './ComingSoonPage'
 
 interface PageType {
   name: string
@@ -27,7 +28,12 @@ export const pages: Array<PageType> = [
     name: 'landing',
     exact: true,
     path: '/',
-    Component: LandingPage,
+    Component:
+      // Show the ComingSoonPage in production but the (in-progress) LandingPage otherwise (unless URL param ?viewAsProd provided)
+      process.env.NODE_ENV === 'production' ||
+      new URLSearchParams(window.location.search).get('viewAsProd') != null
+        ? ComingSoonPage
+        : LandingPage,
     noLoginRequired: true,
   },
   {
