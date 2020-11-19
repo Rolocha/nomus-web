@@ -1,3 +1,4 @@
+import { Card, Sheet } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { Role } from 'src/util/enums'
@@ -56,6 +57,12 @@ describe('LinkerResolver', () => {
       })
 
       expect(response.data?.linkSheetToUser).toMatchObject({ userId: user.id, sheetId: sheet.id })
+
+      const resSheet = await Sheet.mongo.findById(sheet.id)
+      const resCard = await Card.mongo.findById(card.id)
+
+      expect(resSheet.cardVersion).toBe(cardVersion.id)
+      expect(resCard.user).toBe(user.id)
     })
   })
 })
