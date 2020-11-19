@@ -31,10 +31,11 @@ export type TextProps = {
 
 const Text = styled<'p', TextProps>('p')(
   baseTextStyles,
-  typography,
+  // Make sure the variant appears before others so that variant-set fields (e.g. fontWeight) can be overridden on a case-by-case basis
   variant({
     variants: theme.textStyles,
   }),
+  typography,
   color,
   space,
   grid,

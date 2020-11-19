@@ -8,11 +8,14 @@ import {
 import { gql, useQuery } from 'src/apollo'
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
-import { ContactsSortOption } from './contact-sorting'
+import { ContactsSortOption } from './utils'
 import ContactsDetailView from './ContactsDetailView'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
 import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
+import { filterContactListBySearchQuery } from 'src/utils/contacts'
+import { Contact } from 'src/types/contact'
+import ContactsSemptyState from './ContactsEmptyState'
 
 interface ParamsType {
   viewMode?: string
@@ -51,7 +54,7 @@ export default () => {
     lastViewMode.current = viewMode
   }, [viewMode, lastViewMode])
 
-  const { loading, data } = useQuery<UCPContactsSectionQuery>(
+  let { loading, data } = useQuery<UCPContactsSectionQuery>(
     gql`
       query UCPContactsSectionQuery {
         contacts {
@@ -95,6 +98,12 @@ export default () => {
     ? contactSearchQueryPair[1]
     : ''
 
+  const searchFilteredContacts = filterContactListBySearchQuery(
+    data.contacts,
+    contactSearchQuery,
+  )
+  // const searchFilteredContacts: Contact[] = []
+
   return (
     <Box
       p={{ _: '24px', md: '48px' }}
@@ -118,21 +127,24 @@ export default () => {
           }}
         />
       </Box>
+      {searchFilteredContacts.length === 0 && (
+        <Box py="70px">
+          <ContactsSemptyState />
+        </Box>
+      )}
       {params.viewMode === 'glance' || params.viewMode === 'detail' ? (
         {
           glance: (
             <ContactsGlanceView
               selectedContactSortOption={contactSortOption}
-              contacts={data.contacts}
-              searchQueryValue={contactSearchQuery}
+              contacts={searchFilteredContacts}
             />
           ),
           detail: (
             <ContactsDetailView
               selectedContactSortOption={contactSortOption}
               selectedContactUsernameOrId={params.usernameOrId}
-              contacts={data.contacts}
-              searchQueryValue={contactSearchQuery}
+              contacts={searchFilteredContacts}
             />
           ),
         }[params.viewMode]
