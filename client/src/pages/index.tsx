@@ -114,7 +114,7 @@ export const pages: Array<PageType> = [
   },
   {
     name: 'linker',
-    path: '/linker:routeStr',
+    path: '/linker/:routeStr',
     Component: Linker,
     requiredAuthLevel: Role.Admin,
   },
