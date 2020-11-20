@@ -14,6 +14,7 @@ import LoginPage from 'src/pages/LoginPage'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import ComingSoonPage from './ComingSoonPage'
+import Linker from './Linker'
 
 interface PageType {
   name: string
@@ -110,6 +111,12 @@ export const pages: Array<PageType> = [
     name: '404 page',
     path: '/404',
     Component: FourOhFourPage,
+  },
+  {
+    name: 'linker',
+    path: '/linker:routeStr',
+    Component: Linker,
+    requiredAuthLevel: Role.Admin,
   },
   // Has to be last so other routes can get accessed
   {
