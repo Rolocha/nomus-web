@@ -92,9 +92,7 @@ const BusinessCardImage = ({
   )
 
   if (backImageUrl == null && frontImageUrl == null) {
-    throw new Error(
-      'Provide at least one side of the business card image to <BusinessCardImage />',
-    )
+    return frontImage
   }
   if (frontImageUrl == null) {
     return backImage

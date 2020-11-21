@@ -94,10 +94,8 @@ export class AuthManager<
   }
 
   public logOutAndClearData = async () => {
-    const response = await this.logOut()
-    if (response) {
-      this.updateAuthData(null)
-    }
+    this.updateAuthData(null)
+    await this.logOut()
   }
 
   public useAuth() {

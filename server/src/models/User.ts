@@ -12,12 +12,14 @@ import * as fs from 'fs'
 import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
 import { accessTokenLifespan, authTokenPrivateKey } from 'src/config'
+import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
+import { Connection } from './Connection'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
 import Token from './Token'
@@ -169,11 +171,16 @@ export class User extends BaseModel({
   @Field(() => UserCheckpoints, { nullable: false })
   checkpoints: UserCheckpoints
 
-  public static async newUser(
+  public static async createNewUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
   ): Promise<DocumentType<User>> {
     const user = await this.create(userInfo)
+    await Connection.mongo.create({
+      from: user.id,
+      to: user.id,
+      meetingDate: getCurrentDateForDateInput(),
+    })
     return user
   }
 

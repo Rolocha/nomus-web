@@ -62,7 +62,7 @@ authRouter.post('/login', async (req, res: express.Response<Failable<AuthRespons
 authRouter.post('/signup', async (req, res: express.Response<Failable<AuthResponse>>) => {
   const { firstName, middleName, lastName, email, password } = req.body
   try {
-    const user = await User.mongo.newUser({
+    const user = await User.mongo.createNewUser({
       name: {
         first: firstName,
         middle: middleName,

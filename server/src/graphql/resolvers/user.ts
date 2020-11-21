@@ -57,7 +57,7 @@ class UserResolver {
   async user(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
-  ) {
+  ): Promise<User> {
     const requestingUserId = context.user._id
     const requestedUserId = userId ?? requestingUserId
     const user = await User.mongo.findOne({ _id: requestedUserId }).populate('defaultCardVersion')

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
@@ -35,9 +36,12 @@ const LoginForm = () => {
     ),
   })
   const { logIn } = useAuth()
+  const [passwordVisible, setPasswordVisible] = React.useState(false)
+
   const onSubmit = (formData: LoginFormData) => {
     logIn(formData)
   }
+
   return (
     <Box display="flex" flexDirection="column" mt={4}>
       <Form.Form onSubmit={handleSubmit(onSubmit)}>
@@ -52,11 +56,25 @@ const LoginForm = () => {
           {showRequiredError('email', 'Email', errors)}
         </Form.Item>
         <Form.Item mb="20px">
-          <Form.Label htmlFor="password">PASSWORD</Form.Label>
+          <Box display="flex" justifyContent="space-between">
+            <Form.Label htmlFor="password">PASSWORD</Form.Label>
+            <Box
+              role="button"
+              cursor="pointer"
+              display="flex"
+              alignItems="center"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+            >
+              <SVG.Eye />{' '}
+              <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
+                {passwordVisible ? 'Hide' : 'Show'} password
+              </Text.Body3>
+            </Box>
+          </Box>
           <Form.Input
             name="password"
             ref={register({ required: true })}
-            type="password"
+            type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
           />
           {showRequiredError('password', 'Password', errors)}

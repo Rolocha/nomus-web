@@ -117,7 +117,7 @@ const LoginPage = () => {
           <Text.PageHeader>
             {{ login: 'Sign in', register: 'Get started' }[mode]}
           </Text.PageHeader>
-          <Box mb={3}>
+          <Box mb={3} minWidth="300px">
             {
               {
                 login: <LoginForm />,
