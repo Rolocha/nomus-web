@@ -29,11 +29,11 @@ export const pages: Array<PageType> = [
     exact: true,
     path: '/',
     Component:
-      // Show the ComingSoonPage in production but the (in-progress) LandingPage otherwise (unless URL param ?viewAsProd provided)
-      process.env.NODE_ENV === 'production' ||
-      new URLSearchParams(window.location.search).get('viewAsProd') != null
-        ? ComingSoonPage
-        : LandingPage,
+      // Show the ComingSoonPage unless we're looking at dev/staging and the showInProgress query param is provided
+      process.env.NODE_ENV !== 'production' &&
+      new URLSearchParams(window.location.search).get('showInProgress') != null
+        ? LandingPage
+        : ComingSoonPage,
     noLoginRequired: true,
   },
   {

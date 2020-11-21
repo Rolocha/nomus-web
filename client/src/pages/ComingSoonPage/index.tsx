@@ -10,8 +10,6 @@ import * as Text from 'src/components/Text'
 import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import background from './background.svg'
 import coffeeCupIllustration from './coffee-cup-illustration.svg'
-import nomusLogoIcon from './nomus-logo-icon.svg'
-import nomusLogoText from './nomus-logo-text.svg'
 import Navbar from 'src/components/Navbar'
 
 interface FormData {
@@ -73,25 +71,16 @@ const ComingSoonPage = () => {
         }}
         gridTemplateAreas={{
           _: `
-            "logoIcon logoText . ."
             ". copy copy ."
             ". . coffeeCup coffeeCup"
           `,
           [bp]: `
-          "logoIcon logoText . coffeeCup"
+          ". . . coffeeCup"
           ". copy copy coffeeCup"
           `,
         }}
         gridColumnGap={{ _: 2, [bp]: 3 }}
       >
-        <Box gridArea="logoIcon" placeSelf="end">
-          <Image h={{ _: '48px', [bp]: 'unset' }} src={nomusLogoIcon} />
-        </Box>
-
-        <Box gridArea="logoText" placeSelf="center start">
-          <Image h={{ _: '18px', [bp]: 'unset' }} src={nomusLogoText} />
-        </Box>
-
         <Box gridArea="copy">
           {isDesktop ? (
             <Text.PageHeader mb={3}>Something awesome brewing</Text.PageHeader>
