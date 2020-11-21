@@ -14,12 +14,12 @@ export class Connection extends BaseModel({
   static mongo: ReturnModelType<typeof Connection>
 
   //User initiating the connection: *a* -> b
-  @prop({ required: true, ref: () => User, type: String })
+  @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
   from: Ref<User>
 
   //User connected to: a -> *b*
-  @prop({ required: true, ref: () => User, type: String })
+  @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
   to: Ref<User>
 

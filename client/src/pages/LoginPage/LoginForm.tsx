@@ -1,10 +1,13 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { useAuth } from 'src/utils/auth'
+import * as yup from 'yup'
 
 interface LoginFormData {
   email: string
@@ -17,17 +20,28 @@ const showRequiredError = (
   errors: Record<string, any>,
 ) =>
   fieldKey in errors && errors[fieldKey] ? (
-    <Text.Body color="brightCoral" m={1}>
+    <Text.Body3 color="brightCoral" m={1}>
       {`${fieldName} is required`}
-    </Text.Body>
+    </Text.Body3>
   ) : null
 
 const LoginForm = () => {
-  const { register, handleSubmit, errors } = useForm<LoginFormData>()
+  const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
+    mode: 'onChange',
+    resolver: yupResolver(
+      yup.object().shape({
+        email: yup.string().email().required(),
+        password: yup.string().required(),
+      }),
+    ),
+  })
   const { logIn } = useAuth()
+  const [passwordVisible, setPasswordVisible] = React.useState(false)
+
   const onSubmit = (formData: LoginFormData) => {
     logIn(formData)
   }
+
   return (
     <Box display="flex" flexDirection="column" mt={4}>
       <Form.Form onSubmit={handleSubmit(onSubmit)}>
@@ -42,16 +56,36 @@ const LoginForm = () => {
           {showRequiredError('email', 'Email', errors)}
         </Form.Item>
         <Form.Item mb="20px">
-          <Form.Label htmlFor="password">PASSWORD</Form.Label>
+          <Box display="flex" justifyContent="space-between">
+            <Form.Label htmlFor="password">PASSWORD</Form.Label>
+            <Box
+              role="button"
+              cursor="pointer"
+              display="flex"
+              alignItems="center"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+            >
+              <SVG.Eye />{' '}
+              <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
+                {passwordVisible ? 'Hide' : 'Show'} password
+              </Text.Body3>
+            </Box>
+          </Box>
           <Form.Input
             name="password"
             ref={register({ required: true })}
-            type="password"
+            type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
           />
           {showRequiredError('password', 'Password', errors)}
         </Form.Item>
-        <Button type="submit" width="100%" variant="primary" size="big">
+        <Button
+          type="submit"
+          width="100%"
+          variant="primary"
+          size="big"
+          disabled={!formState.isValid}
+        >
           Continue
         </Button>
       </Form.Form>

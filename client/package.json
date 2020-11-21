@@ -9,6 +9,7 @@
     "@emotion/babel-preset-css-prop": "^10.0.27",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
+    "@hookform/resolvers": "^1.0.1",
     "@stripe/react-stripe-js": "^1.1.2",
     "@stripe/stripe-js": "^1.9.0",
     "@svgr/webpack": "4.3.3",
@@ -81,7 +82,7 @@
     "react-contenteditable": "^3.3.4",
     "react-dev-utils": "^10.2.0",
     "react-dom": "^16.13.1",
-    "react-hook-form": "^5.6.3",
+    "react-hook-form": "^6.11.3",
     "react-router-dom": "^5.1.2",
     "react-spring": "^8.0.27",
     "resolve": "1.15.0",
@@ -98,6 +99,7 @@
     "webpack-dev-server": "3.10.2",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "4.3.1",
+    "yup": "^0.29.3",
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
@@ -206,6 +208,7 @@
     "@types/deep-equal": "^1.0.1",
     "@types/react-test-renderer": "^16.9.2",
     "@types/styled-system": "^5.1.9",
+    "@types/yup": "^0.29.9",
     "babel-plugin-emotion": "^10.0.29",
     "husky": "^4.2.5",
     "jest-extended": "^0.11.5",
