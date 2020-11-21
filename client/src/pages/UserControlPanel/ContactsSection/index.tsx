@@ -101,7 +101,6 @@ export default () => {
     data.contacts,
     contactSearchQuery,
   )
-  // const searchFilteredContacts: Contact[] = []
 
   return (
     <Box
@@ -110,7 +109,7 @@ export default () => {
       height="100%"
       width="100%"
     >
-      <Box mb={3}>
+      <Box mb={3} position="relative" zIndex={1}>
         <ContactsViewMenuBar
           selectedContactSortOption={contactSortOption}
           onSelectedContactSortOptionChange={setContactSortOption}
@@ -126,30 +125,34 @@ export default () => {
           }}
         />
       </Box>
-      {searchFilteredContacts.length === 0 && (
+
+      {searchFilteredContacts.length === 0 ? (
         <Box py="70px">
           <ContactsSemptyState />
         </Box>
+      ) : (
+        <Box position="relative" zIndex={0}>
+          {params.viewMode === 'glance' || params.viewMode === 'detail' ? (
+            {
+              glance: (
+                <ContactsGlanceView
+                  selectedContactSortOption={contactSortOption}
+                  contacts={searchFilteredContacts}
+                />
+              ),
+              detail: (
+                <ContactsDetailView
+                  selectedContactSortOption={contactSortOption}
+                  selectedContactUsernameOrId={params.usernameOrId}
+                  contacts={searchFilteredContacts}
+                />
+              ),
+            }[params.viewMode]
+          ) : rootRouteMatch ? (
+            <Redirect to={`${rootRouteMatch.url}/glance`} />
+          ) : null}
+        </Box>
       )}
-      {params.viewMode === 'glance' || params.viewMode === 'detail' ? (
-        {
-          glance: (
-            <ContactsGlanceView
-              selectedContactSortOption={contactSortOption}
-              contacts={searchFilteredContacts}
-            />
-          ),
-          detail: (
-            <ContactsDetailView
-              selectedContactSortOption={contactSortOption}
-              selectedContactUsernameOrId={params.usernameOrId}
-              contacts={searchFilteredContacts}
-            />
-          ),
-        }[params.viewMode]
-      ) : rootRouteMatch ? (
-        <Redirect to={`${rootRouteMatch.url}/glance`} />
-      ) : null}
     </Box>
   )
 }
