@@ -4,13 +4,13 @@ local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
 
-local publishDockerImage(app, env, when) = {
+local publishServerDockerImage(env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
   "when": when,
   "settings": {
-    "dockerfile": "./" + app + "/Dockerfile",
-    "context": "./" + app,
+    "dockerfile": "./server/Dockerfile",
+    "context": "./server",
     "build_args": [
       "ENV=" + env
     ],
@@ -22,7 +22,7 @@ local publishDockerImage(app, env, when) = {
     },
     "region": "us-east-1",
     "registry": ECR_REGISTRY,
-    "repo": "nomus/" + app,
+    "repo": "nomus/server",
     "tags": [
       env + "-latest"
     ],
@@ -53,7 +53,7 @@ local deployEC2(env, host, when) = {
 };
 
 local installNodeModules(app, when) = {
-  "name": "install dependencies",
+  "name": "install dependencies in " + app,
   "image": "node:12",
   "when": when,
   "commands": [
@@ -63,7 +63,7 @@ local installNodeModules(app, when) = {
 };
 
 local test(app, when) = {
-  "name": "test",
+  "name": "test " + app,
   "image": "node:12",
   "when": when,
   "commands": [
@@ -72,23 +72,24 @@ local test(app, when) = {
   ],
 };
 
-local build(app, when) = {
-  "name": "build client",
+local buildClient(when) = {
+  "name": "build client app" ,
   "image": "node:12",
   "when": when,
   "commands": [
-    "cd " + app,
+    "cd client",
     "yarn install --production=false",
     "yarn build"
   ]
 };
 
-local syncToBucket(when) = {
-  "name": "deploy client to S3",
+local syncToBucket(bucket, region, when) = {
+  "name": "sync client bundle to " + bucket,
   "image": "plugins/s3-sync:1",
   "when": when,
   "settings": {
-    "bucket": "stage.nomus.me",
+    "bucket": bucket,
+    "region": region,
     "access_key": {
       "from_secret": "AWS_ACCESS_KEY_ID"
     },
@@ -102,7 +103,7 @@ local syncToBucket(when) = {
 };
 
 local updateDeployConfig(env, host, when) = {
-  "name": "update deployment config",
+  "name": "update " + env + " deployment config",
   "image": "node:12",
   "when": when,
   "environment": {
@@ -126,6 +127,7 @@ local updateDeployConfig(env, host, when) = {
 
 local STAGING_DEPLOY_CONDITION = { "branch": ["master"] };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local STAGING_OR_PRODUCTION_DEPLOY_CONDITION = { "branch": ["master", "production"] };
 local ALWAYS_CONDITION = {};
 
 
@@ -139,8 +141,14 @@ local ALWAYS_CONDITION = {};
     "steps": [
       installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
-      build("client", STAGING_DEPLOY_CONDITION),
-      syncToBucket(STAGING_DEPLOY_CONDITION)
+
+      buildClient(STAGING_OR_PRODUCTION_DEPLOY_CONDITION),
+
+      // Staging
+      syncToBucket("stage.nomus.me", "us-east-1", STAGING_DEPLOY_CONDITION),
+
+      // Production
+      syncToBucket("nomus.me", "us-west-1", PRODUCTION_DEPLOY_CONDITION)
     ],
     "trigger": {
       "event": {
@@ -159,9 +167,16 @@ local ALWAYS_CONDITION = {};
     "steps": [
       installNodeModules("server", ALWAYS_CONDITION),
       test("server", ALWAYS_CONDITION),
-      publishDockerImage("server", "staging", STAGING_DEPLOY_CONDITION),
+
+      // Staging
+      publishServerDockerImage("staging", STAGING_DEPLOY_CONDITION),
       updateDeployConfig("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
       deployEC2("staging", STAGING_EC2_HOST, STAGING_DEPLOY_CONDITION),
+      
+      // Production
+      publishServerDockerImage("production", PRODUCTION_DEPLOY_CONDITION),
+      updateDeployConfig("production", PRODUCTION_EC2_HOST, PRODUCTION_DEPLOY_CONDITION),
+      deployEC2("production", PRODUCTION_EC2_HOST, PRODUCTION_DEPLOY_CONDITION),
     ],
     "trigger": {
       "event": {
