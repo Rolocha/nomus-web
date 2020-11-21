@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-const FourOhFour = () => {
+const FourOhFourPage = () => {
   return <div>404 Not Found</div>
 }
 
-export default FourOhFour
+export default FourOhFourPage
