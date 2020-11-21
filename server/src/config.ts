@@ -7,6 +7,9 @@ export const mongoCredentials = {
   hostname: process.env.MONGO_HOSTNAME,
   port: process.env.MONGO_PORT,
   dbName: process.env.MONGO_DB_NAME,
+  dbUri: process.env.MONGO_DB_URI,
+  // Manually defined host string, if omitted, falls back to `${hostname}:${ports}`
+  hosts: process.env.MONGO_HOSTS,
 }
 export const nodeEnv = process.env.NODE_ENV ?? 'development'
 export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
