@@ -157,11 +157,11 @@ export default () => {
         "email editEmail"
         "username editUsername"
         "signOut signOut"
-        "resetPassword ."
+        "changePassword ."
         "passwordForm passwordForm"
         "passwordForm passwordForm"
         "passwordForm passwordForm"
-        "resetPasswordButton resetPasswordButton"
+        "changePasswordButton changePasswordButton"
         "deactivateProfileHeader ."
         "deactivateProfileQuestion deactivateProfileQuestion"
         "deactivateProfileButton deactivateProfileButton"
@@ -171,11 +171,11 @@ export default () => {
         "email editEmail emailCopy"
         "username editUsername usernameCopy"
         "signOut . ."
-        "resetPassword . ."
+        "changePassword . ."
         "passwordForm . passwordCopy1"
         "passwordForm . passwordCopy1"
         "passwordForm . passwordCopy1"
-        "resetPasswordButton . ."
+        "changePasswordButton . ."
         "deactivateProfileHeader . ."
         "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
@@ -299,9 +299,9 @@ export default () => {
         </Button>
       </Box>
 
-      <Box gridArea="resetPassword" alignSelf={{ _: 'start', md: 'center' }}>
+      <Box gridArea="changePassword" alignSelf={{ _: 'start', md: 'center' }}>
         <Text.SectionHeader mb={1} mt={0}>
-          Reset password
+          Change password
         </Text.SectionHeader>
       </Box>
 
@@ -354,7 +354,7 @@ export default () => {
         </Box>
       )}
 
-      <Box gridArea="resetPasswordButton">
+      <Box gridArea="changePasswordButton">
         <Button
           width={{ _: '100%', [bp]: '75%' }}
           variant="secondary"
@@ -362,7 +362,7 @@ export default () => {
         >
           <Box alignItems="center" justifySelf="center">
             <Text.Plain fontSize="14px" color="nomusBlue">
-              Reset password
+              Change password
             </Text.Plain>
           </Box>
         </Button>
