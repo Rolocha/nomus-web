@@ -22,3 +22,6 @@ services:
       - dbdata:/data/db
     networks:
       - app-network
+
+volumes:
+  dbdata:

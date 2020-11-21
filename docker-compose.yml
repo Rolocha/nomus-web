@@ -20,17 +20,6 @@ services:
     networks:
       - app-network
 
-  db:
-    container_name: db
-    image: mongo
-    env_file: .env
-    ports:
-      - 27017:27017
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
