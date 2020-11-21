@@ -44,11 +44,11 @@ class ProfileUpdateInput implements Partial<User> {
 class UserResolver {
   // Performs any necessary changes to go from DB representation of User to public representation of User
   private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
-    if (user.profilePicS3Key) {
-      user.profilePicUrl = await user.getProfilePicUrl()
-    }
     await user.populate('defaultCardVersion').execPopulate()
-    return user as User
+    return {
+      ...user.toObject(),
+      profilePicUrl: await user.getProfilePicUrl(),
+    }
   }
 
   @Authorized(Role.User)
