@@ -6,16 +6,15 @@ import {
   useRouteMatch,
 } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
+import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
 import Box from 'src/components/Box'
 import LoadingPage from 'src/pages/LoadingPage'
-import { ContactsSortOption } from './utils'
+import { filterContactListBySearchQuery } from 'src/utils/contacts'
 import ContactsDetailView from './ContactsDetailView'
+import ContactsSemptyState from './ContactsEmptyState'
 import ContactsGlanceView from './ContactsGlanceView'
 import ContactsViewMenuBar from './ContactsViewMenuBar'
-import { UCPContactsSectionQuery } from 'src/apollo/types/UCPContactsSectionQuery'
-import { filterContactListBySearchQuery } from 'src/utils/contacts'
-import { Contact } from 'src/types/contact'
-import ContactsSemptyState from './ContactsEmptyState'
+import { ContactsSortOption } from './utils'
 
 interface ParamsType {
   viewMode?: string

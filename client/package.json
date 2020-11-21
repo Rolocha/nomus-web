@@ -99,7 +99,7 @@
     "webpack-dev-server": "3.10.2",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "4.3.1",
-    "yup": "^0.29.3",
+    "yup": "^0.30.0",
     "zxcvbn": "^4.4.2"
   },
   "scripts": {

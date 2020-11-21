@@ -1,6 +1,7 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
 import Box from 'src/components/Box'
+import BusinessCardImage from 'src/components/BusinessCardImage'
 import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
@@ -9,8 +10,6 @@ import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import { ContactsSortOption } from './utils'
-import BusinessCardImage from 'src/components/BusinessCardImage'
-import { filterContactListBySearchQuery } from 'src/utils/contacts'
 
 type SortDirection = 'normal' | 'reverse'
 

@@ -44,7 +44,7 @@ export const getFormattedFullDate = (date: string | Date | number) => {
 export const getFormattedFullDateFromDateInputString = (date: string) => {
   const match = date.match(REGEXP['YYYY-MM-DD'])
   if (match && match.length === 4) {
-    const [_, year, month, dayOfMonth] = match
+    const [year, month, dayOfMonth] = match.slice(1)
     return `${getMonthString(Number(month) - 1)} ${Number(dayOfMonth)}, ${year}`
   } else {
     return null

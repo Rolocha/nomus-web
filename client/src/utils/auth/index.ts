@@ -45,9 +45,11 @@ const jsonFetch = async (method: string, route: string, body?: object) => {
   if (res.status === 200) {
     return await res.json()
   } else {
-    const err = new Error(
-      `${method.toUpperCase()} ${route} failed, Body: ${res.body}`,
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.error(
+        new Error(`${method.toUpperCase()} ${route} failed, Body: ${res.body}`),
+      )
+    }
   }
 }
 
