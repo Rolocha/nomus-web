@@ -315,7 +315,7 @@ const ContactInfoPage = () => {
                 flexShrink={0}
               >
                 {/* Front of business card */}
-                {contact.cardFrontImageUrl && (
+                {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
                   <Box
                     width={{ _: '50%', [bp]: '100%' }}
                     mb={{ _: 0, [bp]: 2 }}
@@ -324,15 +324,6 @@ const ContactInfoPage = () => {
                     <BusinessCardImage
                       width="100%"
                       frontImageUrl={contact.cardFrontImageUrl}
-                      nameForImageAlt={formatName(contact.name)}
-                    />
-                  </Box>
-                )}
-                {contact.cardBackImageUrl && (
-                  <Box width={{ _: '50%', [bp]: '100%' }}>
-                    {/* Back of business card */}
-                    <BusinessCardImage
-                      width="100%"
                       backImageUrl={contact.cardBackImageUrl}
                       nameForImageAlt={formatName(contact.name)}
                     />
