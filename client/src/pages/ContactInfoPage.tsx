@@ -1,7 +1,7 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useHistory, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'src/apollo'
 import {
   ContactPageQuery,
@@ -31,6 +31,7 @@ import {
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
+import FourOhFourPage from './FourOhFourPage'
 
 interface UrlParams {
   username?: string
@@ -171,17 +172,18 @@ const ContactInfoPage = () => {
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
-    history.push('/')
-    return null
+    return <Redirect to="/" />
   }
 
   if (loading || data == null) {
-    return <LoadingPage />
+    return <LoadingPage fullscreen />
   }
 
-  if ((!loading && data == null) || error) {
-    history.push('/')
-    return null
+  if (error) {
+    return <Redirect to="/" />
+  }
+  if (data.publicContact == null) {
+    return <FourOhFourPage />
   }
 
   // Data is loaded at this point

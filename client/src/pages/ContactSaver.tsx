@@ -46,7 +46,7 @@ const ContactSaver = () => {
     return <Redirect to={`/dashboard/contacts/detail/${username}`} />
   }
 
-  return <LoadingPage />
+  return <LoadingPage fullscreen />
 }
 
 export default ContactSaver
