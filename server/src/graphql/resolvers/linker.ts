@@ -1,11 +1,6 @@
 import { Resolver, Authorized, Mutation, Arg, ObjectType, Field } from 'type-graphql'
 import { Role } from 'src/util/enums'
-import {
-  getCardVersionFromShortId,
-  linkSheetToCardVersion,
-  spliceRouteStr,
-} from 'src/util/linker-utils'
-import { Sheet } from 'src/models'
+import { linkSheetToUser } from 'src/util/linker'
 
 @ObjectType()
 class LinkedInfo {
@@ -26,15 +21,7 @@ class LinkerResolver {
     @Arg('routeStr', { nullable: false }) routeStr: string,
     @Arg('shortId', { nullable: false }) shortId: string
   ): Promise<LinkedInfo> {
-    const { sheetId } = spliceRouteStr(routeStr)
-
-    const cardVersion = await getCardVersionFromShortId(shortId)
-
-    const sheet = await Sheet.mongo.findById(sheetId)
-
-    await linkSheetToCardVersion(sheet, cardVersion)
-
-    return { userId: cardVersion.user.toString(), sheetId: sheetId }
+    return await linkSheetToUser(routeStr, shortId)
   }
 }
 

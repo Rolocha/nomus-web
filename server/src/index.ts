@@ -11,7 +11,7 @@ import authRouter, { authMiddleware } from 'src/auth'
 import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
-import { getUserFromCardId, spliceRouteStr } from './util/linker-utils'
+import { getUserFromCardId, spliceRouteStr } from './util/linker'
 import { User } from './models'
 // import { graphqlUploadExpress } from 'graphql-upload'
 
@@ -43,7 +43,7 @@ app.get('/d/:routeStr', async (req, res) => {
     if (userId) {
       res.redirect(302, `/:${user.username}`)
     } else {
-      res.redirect(302, `linker/:${routeStr}`)
+      res.redirect(302, `/admin/linker/:${routeStr}`)
     }
   } catch (e) {
     res.redirect(404, '404')

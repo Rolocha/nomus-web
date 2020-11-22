@@ -10,7 +10,7 @@ import {
   getUserFromCardId,
   linkSheetToCardVersion,
   spliceRouteStr,
-} from './linker-utils'
+} from './linker'
 
 beforeAll(async () => {
   await initDB()

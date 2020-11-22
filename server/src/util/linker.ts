@@ -39,3 +39,18 @@ export const getUserFromCardId = async (cardId: string): Promise<Ref<User>> => {
   const cardModel = await Card.mongo.findById(cardId)
   return cardModel.user
 }
+
+export const linkSheetToUser = async (
+  routeStr: string,
+  shortId: string
+): Promise<{ userId: string; sheetId: string }> => {
+  const { sheetId } = spliceRouteStr(routeStr)
+
+  const cardVersion = await getCardVersionFromShortId(shortId)
+
+  const sheet = await Sheet.mongo.findById(sheetId)
+
+  await linkSheetToCardVersion(sheet, cardVersion)
+
+  return { userId: cardVersion.user.toString(), sheetId: sheet.id }
+}
