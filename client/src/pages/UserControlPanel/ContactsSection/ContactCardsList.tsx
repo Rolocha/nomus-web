@@ -15,7 +15,7 @@ type SortDirection = 'normal' | 'reverse'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
-  selectedContactUsernameOrId?: string
+  selectedContact?: Contact | null
   contacts: Contact[]
   viewMode: 'grid' | 'linear'
 }
@@ -38,22 +38,22 @@ const POINTY_TAB_INDICATOR = css`
 const ContactCardsList = ({
   selectedContactSortOption,
   contacts,
-  selectedContactUsernameOrId,
+  selectedContact,
   viewMode,
 }: Props) => {
   const hasAutoscrolledToContact = React.useRef(false)
   const contactListRef = React.useRef<HTMLDivElement | null>(null)
   React.useEffect(() => {
-    if (selectedContactUsernameOrId != null) {
+    if (selectedContact != null) {
       if (!hasAutoscrolledToContact.current) {
         const target = document.getElementById(
-          `contact-${selectedContactUsernameOrId}`,
+          `contact-${selectedContact.username}`,
         )
         target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         hasAutoscrolledToContact.current = true
       }
     }
-  }, [contactListRef, contacts, selectedContactUsernameOrId])
+  }, [contactListRef, contacts, selectedContact])
 
   const makeContactSortKey = (c: Contact) =>
     ({
@@ -154,9 +154,7 @@ const ContactCardsList = ({
                 mx={{ _: 0, [bp]: -2 }}
               >
                 {groupedContacts[groupKey].map((contact) => {
-                  const isSelectedContact =
-                    contact.username === selectedContactUsernameOrId ||
-                    contact.id === selectedContactUsernameOrId
+                  const isSelectedContact = contact.id === selectedContact?.id
                   return (
                     <Box
                       id={`contact-${contact.username ?? contact.id}`}

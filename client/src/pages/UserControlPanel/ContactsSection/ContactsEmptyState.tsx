@@ -11,7 +11,7 @@ const ContactsEmptyState = () => {
   return (
     <Box
       display="grid"
-      gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+      // gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
       gridRowGap="16px"
       justifyItems="center"
       css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}

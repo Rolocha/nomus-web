@@ -13,12 +13,14 @@ import SegmentedController, {
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { allContactsSortOptions, ContactsSortOption } from './utils'
+import { Contact } from 'src/types/contact'
+import { useLocation } from 'react-router-dom'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
   onSelectedContactSortOptionChange: (newOption: ContactsSortOption) => void
   selectedViewMode?: string
-  selectedContactUsernameOrId?: string
+  selectedContact?: Contact | null
   searchQueryValue?: string | null
   onChangeSearchQueryValue: (newValue: string) => void
 }
@@ -29,7 +31,7 @@ const ContactCardsList = ({
   selectedContactSortOption,
   onSelectedContactSortOptionChange,
   selectedViewMode,
-  selectedContactUsernameOrId,
+  selectedContact,
   searchQueryValue,
   onChangeSearchQueryValue,
 }: Props) => {
@@ -38,8 +40,10 @@ const ContactCardsList = ({
     onChangeSearchQueryValue(event.target.value)
   }
 
+  const location = useLocation()
+
   const hideSearchBarInMobile =
-    selectedViewMode === 'detail' && selectedContactUsernameOrId != null
+    selectedViewMode === 'detail' && selectedContact != null
 
   return (
     <Box
@@ -150,10 +154,10 @@ const ContactCardsList = ({
         gridArea="userPageLink"
         placeSelf="stretch start"
       >
-        {selectedContactUsernameOrId && (
+        {selectedContact && (
           <InternalLink
             asButton
-            to={`/${selectedContactUsernameOrId}`}
+            to={`/${selectedContact.username}`}
             buttonStyle="secondary"
             overrideStyles={{
               display: 'flex',
@@ -163,7 +167,7 @@ const ContactCardsList = ({
           >
             <Box display="flex" flexDirection="row" alignItems="center">
               <Text.Body2 mr={3} color="linkBlue">
-                nomus.me/{selectedContactUsernameOrId}
+                nomus.me/{selectedContact.username}
               </Text.Body2>
               <Box>
                 <Icon color="linkBlue" size={0.8} icon="external" />
@@ -190,7 +194,7 @@ const ContactCardsList = ({
                 onSelectedContactSortOptionChange(
                   ContactsSortOption.MeetingDateNewest,
                 ),
-              linkTo: '/dashboard/contacts/glance',
+              linkTo: `/dashboard/contacts/glance${location.search}`,
             },
             {
               id: 'detail',
@@ -201,7 +205,7 @@ const ContactCardsList = ({
                 onSelectedContactSortOptionChange(
                   ContactsSortOption.Alphabetical,
                 ),
-              linkTo: '/dashboard/contacts/detail',
+              linkTo: `/dashboard/contacts/detail${location.search}`,
             },
           ]}
           selectedTabId={selectedViewMode}
