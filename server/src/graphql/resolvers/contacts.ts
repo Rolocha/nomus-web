@@ -167,11 +167,17 @@ class ContactsResolver {
   @Query(() => Contact, {
     description:
       'A public-facing set of information about a user which includes additional connection-specific notes if the requesting user has already connected with them',
+    nullable: true,
   })
-  async publicContact(@Arg('username') username: string, @Ctx() context: IApolloContext) {
-    const contactUser = (await (await User.mongo.findOne({ username }))
-      .populate('defaultCardVersion')
-      .execPopulate()) as DocumentType<User>
+  async publicContact(
+    @Arg('username') username: string,
+    @Ctx() context: IApolloContext
+  ): Promise<Contact | null> {
+    const contactUser = (await User.mongo.findOne({ username })) as DocumentType<User>
+
+    if (contactUser == null) {
+      return null
+    }
 
     if (context.user != null) {
       const existingConnection = await Connection.mongo.findOne({

@@ -93,14 +93,19 @@ export const pages: Array<PageType> = [
     Component: AdminPanel,
     requiredAuthLevel: Role.Admin,
   },
+
+  {
+    name: '404 page',
+    path: '/404',
+    Component: FourOhFourPage,
+  },
   // Has to be last so other routes can get accessed
   {
     name: 'contact info',
     path: '/:username',
     Component: ContactInfoPage,
   },
-
-  // 404 page
+  // fallback to 404 page if nothing else matched
   {
     name: '404 page',
     Component: FourOhFourPage,
@@ -119,7 +124,7 @@ const AttemptLogin = ({ children }: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return attempted ? children : <LoadingPage />
+  return attempted ? children : <LoadingPage fullscreen />
 }
 
 export const PageRouter = () => {

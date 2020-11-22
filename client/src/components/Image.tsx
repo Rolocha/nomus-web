@@ -32,6 +32,7 @@ const Image = styled<'img', ImageProps>('img')(
   position,
   border,
   layout,
+  // Need to use 'w' and 'h' for width/height for Image components to avoid clashing with <img />'s width/height attributes
   system({
     w: {
       property: 'width',

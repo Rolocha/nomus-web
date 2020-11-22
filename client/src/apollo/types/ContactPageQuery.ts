@@ -39,7 +39,7 @@ export interface ContactPageQuery {
    * A public-facing set of information about a user which includes additional
    * connection-specific notes if the requesting user has already connected with them
    */
-  publicContact: ContactPageQuery_publicContact
+  publicContact: ContactPageQuery_publicContact | null
 }
 
 export interface ContactPageQueryVariables {

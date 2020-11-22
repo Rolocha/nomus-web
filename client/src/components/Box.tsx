@@ -35,6 +35,7 @@ type BoxProps = {
   as?: string
   container?: ResponsiveValue<ThemeValue<'container', any>>
   placeSelf?: ResponsiveValue<ThemeValue<'placeSelf', any>>
+  placeContent?: ResponsiveValue<ThemeValue<'placeContent', any>>
   justifySelf?: ResponsiveValue<ThemeValue<'justifySelf', any>>
   transform?: ResponsiveValue<ThemeValue<'transform', any>>
   cursor?: ResponsiveValue<ThemeValue<'cursor', any>>
@@ -73,6 +74,9 @@ const Box = styled<'div', BoxProps>('div')(
     },
     placeSelf: {
       property: 'placeSelf',
+    },
+    placeContent: {
+      property: 'placeContent',
     },
     justifySelf: {
       property: 'justifySelf',

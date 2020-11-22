@@ -108,5 +108,5 @@ const UnifiedLink = ({
   )
 }
 
-export { ExternalLink, InternalLink }
+export { ExternalLink, InternalLink, UnifiedLink as Link }
 export default UnifiedLink

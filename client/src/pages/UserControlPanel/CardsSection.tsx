@@ -98,7 +98,7 @@ export default () => {
   }, [updateUserCheckpoints])
 
   if (loading || !data) {
-    return <LoadingPage />
+    return <LoadingPage fullscreen />
   }
 
   const defaultCardVersion = data.cardVersions.find(

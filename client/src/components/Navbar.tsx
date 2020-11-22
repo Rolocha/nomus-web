@@ -97,6 +97,7 @@ const Navbar = (props: Props) => {
         />
       )}
       <Box
+        container
         bg="white"
         width="100%"
         display="grid"
@@ -105,13 +106,11 @@ const Navbar = (props: Props) => {
           alignItems: 'center',
         })}
         gridColumnGap={{ _: 0, [bp]: 4 }}
-        px={{ _: 3, [bp]: 4 }}
         height={{ _: '60px', [bp]: '100px' }}
         position="relative"
         zIndex={2}
         boxShadow="navbar"
       >
-        {/* <Box> */}
         <Link to="/" height="60%">
           <Box
             display="flex"
@@ -129,7 +128,6 @@ const Navbar = (props: Props) => {
             />
           </Box>
         </Link>
-        {/* </Box> */}
 
         {/* Nav menu left-hand items */}
         <Box
