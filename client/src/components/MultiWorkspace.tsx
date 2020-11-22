@@ -124,6 +124,7 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         borderBottomLeftRadius={{ [bp]: 3 }}
         position="relative"
         height="100%"
+        minHeight="60vh"
       >
         {tabs.map(({ matchPath, key, content }, index) => (
           <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>

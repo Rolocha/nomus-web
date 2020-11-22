@@ -18,7 +18,7 @@ import { ContactsSortOption } from './utils'
 
 interface ParamsType {
   viewMode?: string
-  usernameOrId?: string
+  username?: string
 }
 
 const isValidViewMode = (viewMode: string): viewMode is 'glance' | 'detail' => {
@@ -44,6 +44,7 @@ export default () => {
     path: '/dashboard/contacts',
     exact: true,
   })
+
   const history = useHistory()
 
   React.useEffect(() => {
@@ -102,6 +103,16 @@ export default () => {
     contactSearchQuery,
   )
 
+  const selectedContact =
+    params.username != null
+      ? data.contacts.find(
+          (user) =>
+            user.username === params.username || user.id === params.username,
+        ) ?? null
+      : null
+
+  const fallbackRedirect = <Redirect to="/dashboard/contacts/glance" />
+
   return (
     <Box
       p={{ _: '24px', md: '48px' }}
@@ -114,7 +125,7 @@ export default () => {
           selectedContactSortOption={contactSortOption}
           onSelectedContactSortOptionChange={setContactSortOption}
           selectedViewMode={params.viewMode}
-          selectedContactUsernameOrId={params.usernameOrId}
+          selectedContact={selectedContact}
           searchQueryValue={contactSearchQuery}
           onChangeSearchQueryValue={(newValue) => {
             history.replace(
@@ -126,14 +137,16 @@ export default () => {
         />
       </Box>
 
-      {searchFilteredContacts.length === 0 ? (
-        <Box py="70px">
-          <ContactsSemptyState />
-        </Box>
-      ) : (
-        <Box position="relative" zIndex={0}>
-          {params.viewMode === 'glance' || params.viewMode === 'detail' ? (
-            {
+      <Box position="relative" zIndex={0}>
+        {/* If URL is just /dashboard/contacts */}
+        {rootRouteMatch && fallbackRedirect}
+        {/* If URL is /dashboard/contacts/glance/:username (there's no way to view a specific user in glance view) */}
+        {params.viewMode === 'glance' && params.username && fallbackRedirect}
+        {/* If a username was provided in URL but there's no contact matching it */}
+        {params.username && selectedContact == null && fallbackRedirect}
+
+        {params.viewMode === 'glance' || params.viewMode === 'detail'
+          ? {
               glance: (
                 <ContactsGlanceView
                   selectedContactSortOption={contactSortOption}
@@ -143,16 +156,13 @@ export default () => {
               detail: (
                 <ContactsDetailView
                   selectedContactSortOption={contactSortOption}
-                  selectedContactUsernameOrId={params.usernameOrId}
+                  selectedContact={selectedContact}
                   contacts={searchFilteredContacts}
                 />
               ),
             }[params.viewMode]
-          ) : rootRouteMatch ? (
-            <Redirect to={`${rootRouteMatch.url}/glance`} />
-          ) : null}
-        </Box>
-      )}
+          : fallbackRedirect}
+      </Box>
     </Box>
   )
 }
