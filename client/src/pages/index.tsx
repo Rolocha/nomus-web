@@ -105,7 +105,7 @@ export const pages: Array<PageType> = [
     path: '/:username',
     Component: ContactInfoPage,
   },
-  // fallback to 404 page if nothing else matched
+  // fallback to 404 page if nothing else matched, this is unlikely to ever be reached since the /:username route consumes ~everything but keeping it just in case
   {
     name: '404 page',
     Component: FourOhFourPage,
