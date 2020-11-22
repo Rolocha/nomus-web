@@ -5,12 +5,7 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
-import {
-  getCardVersionFromShortId,
-  getUserFromCardId,
-  linkSheetToCardVersion,
-  spliceRouteStr,
-} from './linker'
+import { getUserFromCardId, linkSheetToUser, spliceRouteStr } from './linker'
 
 beforeAll(async () => {
   await initDB()
@@ -47,42 +42,6 @@ describe('linker', () => {
       expect(spliceRouteStr(routeStr)).toStrictEqual({ sheetId: esheet, cardId: ecard })
     })
 
-    it('gets the cardVersion from a shortId in an Order', async () => {
-      const user = await createMockUser()
-      const cardVersion = await createMockCardVersion({
-        user: user._id,
-      })
-      const order = await createMockOrder({
-        user: user._id,
-        cardVersion: cardVersion._id,
-      })
-      const shortId = order.shortId
-
-      const result = await getCardVersionFromShortId(shortId)
-
-      expect(result._id).toBe(cardVersion._id)
-    })
-
-    it('given a sheet Ref and a user Ref it links all the cards in the sheet to that User', async () => {
-      const user = await createMockUser()
-      const cardVersion = await createMockCardVersion({
-        user: user.id,
-      })
-      const card = await createMockCard({ user: null })
-      const sheet = await createMockSheet({
-        cardVersion: null,
-        cards: [card._id],
-      })
-
-      await linkSheetToCardVersion(sheet, cardVersion)
-
-      const createdSheets = await Sheet.mongo.findById(sheet._id)
-      for (const cardId of createdSheets.cards) {
-        const currcard = await Card.mongo.findById(cardId)
-        expect(currcard.user).toBe(user.id)
-      }
-    })
-
     it("returns a non-registered card's user as null", async () => {
       const card = await createMockCard({ user: null })
       const res = await getUserFromCardId(card.id)
@@ -94,6 +53,34 @@ describe('linker', () => {
       const card = await createMockCard({ user })
       const res = await getUserFromCardId(card.id)
       expect(res).toBe(user.id)
+    })
+
+    it('links a sheet from a routeStr to a user with a shortId', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion({
+        user: user.id,
+      })
+      const card = await createMockCard({ user: null })
+      const sheet = await createMockSheet({
+        cardVersion: null,
+        cards: [card._id],
+      })
+      const order = await createMockOrder({
+        user: user._id,
+        cardVersion: cardVersion._id,
+      })
+
+      const routeStr = sheet.id + '-' + card.id
+
+      const ret = await linkSheetToUser(routeStr, order.shortId)
+
+      expect(ret).toMatchObject({ userId: user.id, sheetId: sheet.id })
+
+      const resSheet = await Sheet.mongo.findById(sheet.id)
+      const resCard = await Card.mongo.findById(card.id)
+
+      expect(resSheet.cardVersion).toBe(cardVersion.id)
+      expect(resCard.user).toBe(user.id)
     })
   })
 })

@@ -4,7 +4,7 @@ import { Ref } from 'src/models/scalars'
 
 export const ROUTE_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
 
-export const linkSheetToCardVersion = async (
+const linkSheetToCardVersion = async (
   sheet: DocumentType<Sheet>,
   cardVersion: DocumentType<CardVersion>
 ) => {
@@ -18,9 +18,7 @@ export const linkSheetToCardVersion = async (
   }
 }
 
-export const getCardVersionFromShortId = async (
-  shortId: string
-): Promise<DocumentType<CardVersion>> => {
+const getCardVersionFromShortId = async (shortId: string): Promise<DocumentType<CardVersion>> => {
   const order = await Order.mongo.findOne({ shortId: shortId })
   return await CardVersion.mongo.findById(order.cardVersion)
 }
