@@ -31,6 +31,7 @@ import {
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
+import FourOhFourPage from './FourOhFourPage'
 
 interface UrlParams {
   username?: string
@@ -171,7 +172,7 @@ const ContactInfoPage = () => {
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
-    return <Redirect to="/404" />
+    return <Redirect to="/" />
   }
 
   if (loading || data == null) {
@@ -179,10 +180,10 @@ const ContactInfoPage = () => {
   }
 
   if (error) {
-    return <Redirect to="/404" />
+    return <Redirect to="/" />
   }
   if (data.publicContact == null) {
-    return <Redirect to="/404" />
+    return <FourOhFourPage />
   }
 
   // Data is loaded at this point
