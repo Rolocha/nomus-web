@@ -38,12 +38,12 @@ const navItems: Array<NavLink> = [
   {
     name: 'about',
     linkType: 'external',
-    path: ABOUT_PAGE_NOTION_LINK,
+    path: '/about',
   },
   {
     name: 'faq',
     linkType: 'external',
-    path: FAQ_PAGE_NOTION_LINK,
+    path: '/faq',
   },
 ]
 

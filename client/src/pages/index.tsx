@@ -5,7 +5,9 @@ import { AuthLevel } from 'src/config'
 import AdminPanel from 'src/pages/AdminPanel'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import ContactSaver from 'src/pages/ContactSaver'
-import FourOhFourPage from 'src/pages/FourOhFour'
+import FAQPage from 'src/pages/FAQPage'
+import AboutPage from 'src/pages/AboutPage'
+import FourOhFourPage from 'src/pages/FourOhFourPage'
 import LandingPage from 'src/pages/LandingPage'
 import LoadingPage from 'src/pages/LoadingPage'
 import LoginPage from 'src/pages/LoginPage'
@@ -47,6 +49,18 @@ export const pages: Array<PageType> = [
     exact: true,
     path: '/register',
     Component: LoginPage,
+  },
+  {
+    name: 'faq',
+    exact: true,
+    path: '/faq',
+    Component: FAQPage,
+  },
+  {
+    name: 'about',
+    exact: true,
+    path: '/about',
+    Component: AboutPage,
   },
   // {
   //   name: 'shop front',
