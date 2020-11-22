@@ -8,10 +8,11 @@ import { formatName } from 'src/utils/name'
 import { ContactsSortOption } from './utils'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
+import ContactsEmptyState from './ContactsEmptyState'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
-  selectedContactUsernameOrId?: string
+  selectedContact?: Contact | null
   contacts: Contact[]
 }
 
@@ -19,17 +20,9 @@ const bp = 'md'
 
 const ContactsDetailView = ({
   selectedContactSortOption,
-  selectedContactUsernameOrId,
+  selectedContact,
   contacts,
 }: Props) => {
-  const selectedContact =
-    selectedContactUsernameOrId != null
-      ? contacts.find(
-          (user) =>
-            user.username === selectedContactUsernameOrId ||
-            user.id === selectedContactUsernameOrId,
-        ) ?? null
-      : null
   return (
     <Box
       display={{ _: undefined, [bp]: 'grid' }}
@@ -45,7 +38,7 @@ const ContactsDetailView = ({
     >
       <Box
         display={{
-          _: selectedContactUsernameOrId ? 'none' : 'block',
+          _: selectedContact ? 'none' : 'block',
           [bp]: 'block',
         }}
         gridArea="list"
@@ -54,12 +47,18 @@ const ContactsDetailView = ({
         // Required to allow selected contact caret (>) to be visible
         overflow="visible"
       >
-        <ContactCardsList
-          contacts={contacts}
-          selectedContactSortOption={selectedContactSortOption}
-          selectedContactUsernameOrId={selectedContactUsernameOrId}
-          viewMode="linear"
-        />
+        {contacts.length === 0 ? (
+          <Box py="70px">
+            <ContactsEmptyState />
+          </Box>
+        ) : (
+          <ContactCardsList
+            contacts={contacts}
+            selectedContactSortOption={selectedContactSortOption}
+            selectedContact={selectedContact}
+            viewMode="linear"
+          />
+        )}
       </Box>
       {selectedContact && (
         <Box

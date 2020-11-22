@@ -92,7 +92,7 @@ const ProfilePage = () => {
                 {
                   key: 'contacts',
                   linkPath: 'contacts',
-                  matchPath: 'contacts/:viewMode?/:usernameOrId?',
+                  matchPath: 'contacts/:viewMode?/:username?',
                   label: 'Contacts',
                   Icon: SVG.Contacts,
                   content: <ContactsSection />,

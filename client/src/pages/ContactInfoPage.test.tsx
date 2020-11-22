@@ -224,10 +224,10 @@ describe('Contact Info Page', () => {
     ).toBeInTheDocument()
 
     expect(
-      renderResult.queryByAltText(`front of ${formattedName}'s business card`),
+      renderResult.queryByAltText(`front of ${formattedName}'s Nomus card`),
     ).toBeInTheDocument()
     expect(
-      renderResult.queryByAltText(`back of ${formattedName}'s business card`),
+      renderResult.queryByAltText(`back of ${formattedName}'s Nomus card`),
     ).toBeInTheDocument()
   })
 

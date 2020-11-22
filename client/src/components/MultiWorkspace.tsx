@@ -1,6 +1,12 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
-import { Redirect, Route, useLocation, useRouteMatch } from 'react-router-dom'
+import {
+  Redirect,
+  Route,
+  Switch,
+  useLocation,
+  useRouteMatch,
+} from 'react-router-dom'
 import Box from 'src/components/Box'
 import { InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
@@ -124,36 +130,27 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         borderBottomLeftRadius={{ [bp]: 3 }}
         position="relative"
         height="100%"
+        minHeight="60vh"
       >
-        {tabs.map(({ matchPath, key, content }, index) => (
-          <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
-            {({ match }) => (
-              <Box
-                overflowY="hidden"
-                height="100%"
-                // Rather than mounting/unmounting the different pages, we simply adjust the
-                // display block so that their inner state doesn't get lost. Not the most performant
-                // but it'll do fine for now
-                display={(() => {
-                  // debugger
-                  return match?.path.endsWith(matchPath ?? key)
-                    ? 'block'
-                    : 'none'
-                })()}
-              >
+        <Switch>
+          {tabs.map(({ matchPath, key, content }, index) => (
+            <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
+              {({ match }) => (
                 <Box overflowY="hidden" height="100%">
-                  {content}
+                  <Box overflowY="hidden" height="100%">
+                    {content}
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
+            </Route>
+          ))}
+          {/* If user lands on a route that doesn't match any, redirect to the first one */}
+          <Route>
+            <Redirect
+              to={`${routeMatch.path}/${tabs[0].linkPath ?? tabs[0].key}`}
+            />
           </Route>
-        ))}
-        {/* If user lands on a route that doesn't match any, redirect to the first one */}
-        <Route exact path={`${routeMatch.path}`}>
-          <Redirect
-            to={`${routeMatch.path}/${tabs[0].linkPath ?? tabs[0].key}`}
-          />
-        </Route>
+        </Switch>
       </Box>
     </Box>
   )

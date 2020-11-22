@@ -4,7 +4,6 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import * as SVG from 'src/components/SVG'
-import { rotateNoShow, rotateShow } from 'src/styles/animations'
 import {
   RequiredTheme,
   ResponsiveValue,
@@ -22,19 +21,6 @@ interface Props {
   >
   width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
 }
-
-const faceStyles = css({
-  perspectiveOrigin: 'top center',
-  animationDuration: '0.3s',
-  animationTimingFunction: 'linear',
-  transitionProperty: 'transform',
-  animationFillMode: 'forwards',
-  // Enable visiblity of card's box shadow
-  overflow: 'visible',
-  perspective: '1000px',
-  position: 'relative',
-  display: 'inline-block',
-})
 
 const FlipButton = ({ onClick }: { onClick: () => void }) => (
   <Box
@@ -63,6 +49,24 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
   </Box>
 )
 
+const faceStyles = css({
+  transition: 'opacity 0.3s ease, transform 0.3s ease',
+  backfaceVisibility: 'hidden',
+})
+
+const visibleStyles = css({
+  opacity: 1,
+  transform: 'rotateY(0deg)',
+})
+
+const hiddenStyles = css({
+  opacity: 0,
+  transform: 'rotateY(-180deg)',
+})
+
+const createAltText = (side: string | null, name: string | null | undefined) =>
+  `${side} of ${name ?? 'user'}'s Nomus card`
+
 const BusinessCardImage = ({
   nameForImageAlt,
   frontImageUrl,
@@ -78,7 +82,7 @@ const BusinessCardImage = ({
       w={width}
       h={height}
       src={frontImageUrl}
-      alt={`front of ${nameForImageAlt}'s business card`}
+      alt={createAltText('front', nameForImageAlt)}
     />
   )
   const backImage = (
@@ -87,7 +91,7 @@ const BusinessCardImage = ({
       w={width}
       h={height}
       src={backImageUrl}
-      alt={`back of ${nameForImageAlt}'s business card`}
+      alt={createAltText('back', nameForImageAlt)}
     />
   )
 
@@ -106,20 +110,16 @@ const BusinessCardImage = ({
     <Box position="relative" display="inline-block" width={width}>
       <Box
         width={width}
-        css={css(faceStyles, {
-          zIndex: 2,
-          transform: 'rotateY(0deg)',
-          animationName: showBack ? rotateNoShow : rotateShow,
-        })}
+        css={css(faceStyles, showBack ? hiddenStyles : visibleStyles)}
       >
         {frontImage}
       </Box>
       <Box
         width={width}
-        css={css(faceStyles, {
-          zIndex: 1,
-          transform: 'rotateY(-180deg)',
-          animationName: showBack ? rotateShow : rotateNoShow,
+        css={css(faceStyles, showBack ? visibleStyles : hiddenStyles, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
         })}
       >
         {backImage}
