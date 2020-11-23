@@ -34,7 +34,7 @@ const ProfilePage = () => {
   )
 
   if (loading || !data) {
-    return <LoadingPage />
+    return <LoadingPage fullscreen />
   }
 
   return (

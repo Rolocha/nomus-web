@@ -25,6 +25,7 @@ interface Action {
   text: string
   handler?: () => void
   submitForm?: string
+  inProgress?: boolean
 }
 
 type Actions = {
@@ -263,6 +264,7 @@ const Modal = ({
                                     form={
                                       actions.secondary.submitForm ?? undefined
                                     }
+                                    inProgress={actions.secondary.inProgress}
                                     type={
                                       actions.secondary.submitForm
                                         ? 'submit'
@@ -280,6 +282,7 @@ const Modal = ({
                                     form={
                                       actions.primary.submitForm ?? undefined
                                     }
+                                    inProgress={actions.primary.inProgress}
                                     type={
                                       actions.primary.submitForm
                                         ? 'submit'

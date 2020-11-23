@@ -1,3 +1,4 @@
+import * as React from 'react'
 import styled from '@emotion/styled'
 import isPropValid from '@emotion/is-prop-valid'
 import {
@@ -15,16 +16,18 @@ import {
   SpaceProps,
   variant,
 } from 'styled-system'
+import Spinner from './Spinner'
 
-type ButtonProps = {
+type InternalButtonProps = {
   variant?: keyof typeof styleVariants
   size?: keyof typeof sizeVariants
   as?: string
 } & SpaceProps &
   LayoutProps &
-  GridProps
+  GridProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const Button = styled<'button', ButtonProps>('button', {
+export const InternalButton = styled<'button', InternalButtonProps>('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
 })(
   baseButtonStyles,
@@ -40,10 +43,32 @@ const Button = styled<'button', ButtonProps>('button', {
   ({ size, ...props }) => layout(props),
 )
 
-Button.defaultProps = {
+InternalButton.defaultProps = {
   color: theme.colors.ivory,
   variant: 'primary',
   size: 'normal',
+}
+
+type ButtonProps = InternalButtonProps & {
+  inProgress?: boolean
+}
+
+const Button = React.forwardRef(
+  ({ inProgress, children, disabled, ...internalProps }: ButtonProps, ref) => {
+    return (
+      <InternalButton
+        {...internalProps}
+        ref={ref as React.MutableRefObject<HTMLButtonElement>}
+        disabled={inProgress || disabled}
+      >
+        {inProgress ? <Spinner size="1em" /> : children}
+      </InternalButton>
+    )
+  },
+)
+
+Button.defaultProps = {
+  inProgress: false,
 }
 
 export default Button

@@ -59,7 +59,7 @@ const Hero = () => (
         <Box
           mb="30px"
           css={css`
-            & > ${Button}:first-of-type {
+            & > button:first-of-type {
               margin-right: 10px;
               margin-bottom: 10px;
             }

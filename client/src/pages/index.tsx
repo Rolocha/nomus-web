@@ -62,6 +62,18 @@ export const pages: Array<PageType> = [
     path: '/about',
     Component: AboutPage,
   },
+  // Non-prod-only routes
+  ...(process.env.NODE_ENV !== 'production'
+    ? [
+        // /loading route to test the LoadingPage
+        {
+          name: 'loading',
+          exact: true,
+          path: '/loading',
+          Component: () => <LoadingPage fullscreen />,
+        },
+      ]
+    : []),
   // {
   //   name: 'shop front',
   //   exact: true,

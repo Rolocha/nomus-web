@@ -131,15 +131,24 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         position="relative"
         height="100%"
         minHeight="60vh"
+        display="flex"
+        alignItems="stretch"
+        justifyContent="stretch"
       >
         <Switch>
           {tabs.map(({ matchPath, key, content }, index) => (
             <Route key={key} path={`${routeMatch.path}/${matchPath ?? key}`}>
               {({ match }) => (
-                <Box overflowY="hidden" height="100%">
-                  <Box overflowY="hidden" height="100%">
-                    {content}
-                  </Box>
+                <Box
+                  overflowY="hidden"
+                  height="100%"
+                  minHeight="inherit"
+                  width="100%"
+                  display="flex"
+                  alignItems="stretch"
+                  justifyContent="stretch"
+                >
+                  {content}
                 </Box>
               )}
             </Route>
