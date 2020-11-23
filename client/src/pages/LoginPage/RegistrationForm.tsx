@@ -46,9 +46,15 @@ const RegistrationForm = () => {
   })
   const { signUp } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
+  const [submittingForm, setSubmittingForm] = React.useState(false)
 
-  const onSubmit = (formData: RegistrationFormData) => {
-    signUp(formData)
+  const onSubmit = async (formData: RegistrationFormData) => {
+    setSubmittingForm(true)
+    try {
+      await signUp(formData)
+    } finally {
+      setSubmittingForm(false)
+    }
   }
 
   return (
@@ -113,6 +119,8 @@ const RegistrationForm = () => {
         <Button
           variant="primary"
           size="big"
+          inProgress={submittingForm}
+          inProgressText="Creating your account"
           disabled={!formState.isValid}
           type="submit"
           width="100%"

@@ -16,6 +16,7 @@ export default ({ className, fullscreen }: Props) => {
       alignItems="center"
       width={`100${fullscreen ? 'vw' : '%'}`}
       height={`100${fullscreen ? 'vh' : '%'}`}
+      minHeight="inherit"
       className={className}
     >
       <Spinner />

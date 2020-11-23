@@ -1,3 +1,4 @@
+import * as React from 'react'
 import styled from '@emotion/styled'
 import isPropValid from '@emotion/is-prop-valid'
 import {
@@ -5,6 +6,7 @@ import {
   sizeVariants,
   styleVariants,
 } from 'src/styles/components/buttonlike'
+import * as Text from 'src/components/Text'
 import theme from 'src/styles/theme'
 import {
   grid,
@@ -15,16 +17,19 @@ import {
   SpaceProps,
   variant,
 } from 'styled-system'
+import Spinner from './Spinner'
+import Box from './Box'
 
-type ButtonProps = {
+type InternalButtonProps = {
   variant?: keyof typeof styleVariants
   size?: keyof typeof sizeVariants
   as?: string
 } & SpaceProps &
   LayoutProps &
-  GridProps
+  GridProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const Button = styled<'button', ButtonProps>('button', {
+export const InternalButton = styled<'button', InternalButtonProps>('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
 })(
   baseButtonStyles,
@@ -40,10 +45,49 @@ const Button = styled<'button', ButtonProps>('button', {
   ({ size, ...props }) => layout(props),
 )
 
-Button.defaultProps = {
+InternalButton.defaultProps = {
   color: theme.colors.ivory,
   variant: 'primary',
   size: 'normal',
+}
+
+type ButtonProps = InternalButtonProps & {
+  inProgress?: boolean
+  inProgressText?: string
+}
+
+const Button = React.forwardRef(
+  (
+    {
+      inProgress,
+      children,
+      disabled,
+      inProgressText,
+      ...internalProps
+    }: ButtonProps,
+    ref,
+  ) => {
+    return (
+      <InternalButton
+        {...internalProps}
+        ref={ref as React.MutableRefObject<HTMLButtonElement>}
+        disabled={inProgress || disabled}
+      >
+        {inProgress ? (
+          <Box display="flex" alignItems="center">
+            <Spinner size="1em" />
+            {inProgressText && <Text.Plain ml={1}>{inProgressText}</Text.Plain>}
+          </Box>
+        ) : (
+          children
+        )}
+      </InternalButton>
+    )
+  },
+)
+
+Button.defaultProps = {
+  inProgress: false,
 }
 
 export default Button

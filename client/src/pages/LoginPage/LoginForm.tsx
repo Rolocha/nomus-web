@@ -37,9 +37,15 @@ const LoginForm = () => {
   })
   const { logIn } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
+  const [loggingIn, setLoggingIn] = React.useState(false)
 
-  const onSubmit = (formData: LoginFormData) => {
-    logIn(formData)
+  const onSubmit = async (formData: LoginFormData) => {
+    setLoggingIn(true)
+    try {
+      await logIn(formData)
+    } finally {
+      setLoggingIn(false)
+    }
   }
 
   return (
@@ -84,6 +90,8 @@ const LoginForm = () => {
           width="100%"
           variant="primary"
           size="big"
+          inProgress={loggingIn}
+          inProgressText="Logging in"
           disabled={!formState.isValid}
         >
           Continue

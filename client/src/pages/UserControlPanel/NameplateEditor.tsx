@@ -25,6 +25,7 @@ interface Props {
 
 export default ({ defaultValues, editIconOnlyBp }: Props) => {
   const [isEditing, setIsEditing] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { register, handleSubmit, getValues, reset } = useForm<
     NameplateFormData
   >({
@@ -36,15 +37,20 @@ export default ({ defaultValues, editIconOnlyBp }: Props) => {
 
   const onFormSubmit = React.useCallback(
     async (formData: NameplateFormData) => {
-      const { errors } = await updateProfile({
-        variables: {
-          updatedUser: formData,
-        },
-      })
-      if (errors == null) {
-        setIsEditing(false)
-        // Reset form so pre-filled values are updated on next modal opening
-        reset(getValues())
+      setIsSubmitting(true)
+      try {
+        const { errors } = await updateProfile({
+          variables: {
+            updatedUser: formData,
+          },
+        })
+        if (errors == null) {
+          setIsEditing(false)
+          // Reset form so pre-filled values are updated on next modal opening
+          reset(getValues())
+        }
+      } finally {
+        setIsSubmitting(false)
       }
     },
     [updateProfile, setIsEditing, reset, getValues],
@@ -70,6 +76,8 @@ export default ({ defaultValues, editIconOnlyBp }: Props) => {
           primary: {
             text: 'Save',
             handler: handleSubmit(onFormSubmit),
+            inProgress: isSubmitting,
+            inProgressText: 'Saving',
           },
           secondary: {
             text: 'Cancel',
@@ -79,12 +87,12 @@ export default ({ defaultValues, editIconOnlyBp }: Props) => {
       >
         <Box>
           <Text.CardHeader mb={3}>Edit name and headline</Text.CardHeader>
-          <Text.Body mb={4}>
+          <Text.Body2 mb={4}>
             Editing your name will change the name your profile visitors see on
             your public profile page. Keep in mind that if you change this, it
             may create a mismatch between your physical card and your digital
             identity.
-          </Text.Body>
+          </Text.Body2>
           <Form.Form onSubmit={handleSubmit(onFormSubmit)}>
             <Box
               display="flex"
