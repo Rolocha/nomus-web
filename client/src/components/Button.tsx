@@ -6,6 +6,7 @@ import {
   sizeVariants,
   styleVariants,
 } from 'src/styles/components/buttonlike'
+import * as Text from 'src/components/Text'
 import theme from 'src/styles/theme'
 import {
   grid,
@@ -17,6 +18,7 @@ import {
   variant,
 } from 'styled-system'
 import Spinner from './Spinner'
+import Box from './Box'
 
 type InternalButtonProps = {
   variant?: keyof typeof styleVariants
@@ -51,17 +53,34 @@ InternalButton.defaultProps = {
 
 type ButtonProps = InternalButtonProps & {
   inProgress?: boolean
+  inProgressText?: string
 }
 
 const Button = React.forwardRef(
-  ({ inProgress, children, disabled, ...internalProps }: ButtonProps, ref) => {
+  (
+    {
+      inProgress,
+      children,
+      disabled,
+      inProgressText,
+      ...internalProps
+    }: ButtonProps,
+    ref,
+  ) => {
     return (
       <InternalButton
         {...internalProps}
         ref={ref as React.MutableRefObject<HTMLButtonElement>}
         disabled={inProgress || disabled}
       >
-        {inProgress ? <Spinner size="1em" /> : children}
+        {inProgress ? (
+          <Box display="flex" alignItems="center">
+            <Spinner size="1em" />
+            {inProgressText && <Text.Plain ml={1}>{inProgressText}</Text.Plain>}
+          </Box>
+        ) : (
+          children
+        )}
       </InternalButton>
     )
   },

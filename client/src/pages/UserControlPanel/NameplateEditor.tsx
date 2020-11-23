@@ -77,6 +77,7 @@ export default ({ defaultValues, editIconOnlyBp }: Props) => {
             text: 'Save',
             handler: handleSubmit(onFormSubmit),
             inProgress: isSubmitting,
+            inProgressText: 'Saving',
           },
           secondary: {
             text: 'Cancel',

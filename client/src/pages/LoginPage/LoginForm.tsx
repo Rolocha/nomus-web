@@ -91,6 +91,7 @@ const LoginForm = () => {
           variant="primary"
           size="big"
           inProgress={loggingIn}
+          inProgressText="Logging in"
           disabled={!formState.isValid}
         >
           Continue
