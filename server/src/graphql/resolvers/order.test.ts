@@ -1,7 +1,7 @@
 // import { Order, CardVersion, User } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 // import { execQuery } from 'src/test-utils/graphql'
-// import { createMockOrder } from 'src/__mocks__/models/Order'
+import { createMockOrder } from 'src/__mocks__/models/Order'
 // import { createMockUser } from 'src/__mocks__/models/User'
 //
 // import { OrderState } from 'src/util/enums'
@@ -267,5 +267,20 @@ describe('OrderResolver', () => {
     //     expect(orderUser.id).toBe(user.id)
     //     expect(cardVersionUser.id).toBe(user.id)
     //   })
+  })
+})
+
+describe('OrderModel', () => {
+  afterEach(async () => {
+    await dropAllCollections()
+  })
+
+  describe('order', () => {
+    it('detects a shortId collision and retries', async () => {
+      const order1 = await createMockOrder({ shortId: 'SJC123' })
+      const order2 = await createMockOrder({ shortId: 'SJC123' })
+      expect(order1.shortId).toBe('SJC123')
+      expect(order1.shortId).not.toEqual(order2.shortId)
+    })
   })
 })

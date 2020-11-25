@@ -7,8 +7,19 @@ import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 
 @pre<Order>('save', async function (next) {
-  if (this.isNew && this.shortId == null) {
-    this.shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
+  if (this.isNew) {
+    let checkDuplicate = true
+    let shortId = this.shortId ?? Math.random().toString(36).substring(2, 8).toUpperCase()
+    while (checkDuplicate) {
+      const order = await Order.mongo.findOne({ shortId: shortId })
+      if (!order) {
+        this.shortId = shortId
+        checkDuplicate = false
+        break
+      }
+      shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
+    }
+
     next()
   }
   next()

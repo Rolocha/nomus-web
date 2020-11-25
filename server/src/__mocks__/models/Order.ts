@@ -14,6 +14,7 @@ export const createMockOrder = async (override: Partial<Order> = {}) => {
     price: override.price ?? 27.99,
     state: override.state ?? OrderState.Captured,
     trackingNumber: override.trackingNumber ?? '0000000000000',
+    shortId: override.shortId ?? 'SJC123',
     ...override,
   }
 
