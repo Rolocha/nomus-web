@@ -5,6 +5,7 @@ import { AUTH_DATA_KEY } from 'src/config'
 export enum Role {
   User = 'user',
   Admin = 'admin',
+  Vendor = 'vendor',
 }
 
 export interface LoginArgs {

@@ -24,7 +24,7 @@ describe('LinkerResolver', () => {
   describe('linkSheetToUser', () => {
     it('takes in a routeStr and shortId then links the cards to a user', async () => {
       const user = await createMockUser()
-      const userAdmin = await createMockUser({ roles: [Role.User, Role.Admin] })
+      const userVendor = await createMockUser({ roles: [Role.User, Role.Vendor] })
       const cardVersion = await createMockCardVersion({
         user: user.id,
       })
@@ -53,7 +53,7 @@ describe('LinkerResolver', () => {
           routeStr: routeStr,
           shortId: order.shortId,
         },
-        contextUser: userAdmin,
+        contextUser: userVendor,
       })
 
       expect(response.data?.linkSheetToUser).toMatchObject({ userId: user.id, sheetId: sheet.id })
