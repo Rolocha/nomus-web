@@ -14,7 +14,6 @@ class LinkedInfo {
 @Resolver()
 class LinkerResolver {
   @Authorized(Role.Vendor)
-  @Authorized(Role.Admin)
   @Mutation(() => LinkedInfo, {
     description: 'When a technician is done printing, link the cards to their user',
   })
