@@ -5,13 +5,10 @@ import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import contactsEmptyStateSvg from './contacts_empty_state.svg'
 
-const bp = 'md'
-
 const ContactsEmptyState = () => {
   return (
     <Box
       display="grid"
-      // gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
       gridRowGap="16px"
       justifyItems="center"
       css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}

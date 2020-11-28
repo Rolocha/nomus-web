@@ -9,7 +9,6 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import PopoverButton from './Popover'
-import { ABOUT_PAGE_NOTION_LINK, FAQ_PAGE_NOTION_LINK } from 'src/constants'
 
 interface Props {}
 
