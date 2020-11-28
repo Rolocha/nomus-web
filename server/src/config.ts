@@ -12,6 +12,7 @@ export const mongoCredentials = {
 }
 export const nodeEnv = process.env.NODE_ENV ?? 'development'
 export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
+export const sendgridToken = process.env.SENDGRID_TOKEN
 
 // Internal Config (not sourced from env vars)
 export const graphqlPath = '/graphql'

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@sendgrid/client": "^7.4.0",
     "@typegoose/typegoose": "^7.4.1",
     "@types/vcards-js": "^2.10.0",
     "@types/zxcvbn": "^4.4.0",
