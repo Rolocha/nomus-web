@@ -55,7 +55,7 @@ describe('linker', () => {
       expect(res).toBe(user.id)
     })
 
-    it.only('links a sheet from a routeStr to a user with a shortId', async () => {
+    it('links a sheet from a routeStr to a user with a shortId', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
         user: user.id,
