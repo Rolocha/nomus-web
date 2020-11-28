@@ -1,8 +1,12 @@
-import * as fs from 'fs'
+import sendgrid from '@sendgrid/client'
 import * as express from 'express'
+import * as fs from 'fs'
+import { sendgridToken } from 'src/config'
 import { User } from 'src/models'
-import vCards from 'vcards-js'
 import { saveVCFToFile } from 'src/util/vcf'
+import vCards from 'vcards-js'
+
+sendgrid.setApiKey(sendgridToken)
 
 const apiRouter = express.Router()
 
@@ -49,6 +53,33 @@ apiRouter.get('/contact-card/:username', async (req: express.Request, res: expre
       fs.unlinkSync(filePath)
     }
   })
+})
+
+apiRouter.post('/sendgrid/interest-form', async (req, res) => {
+  const { email } = req.body
+
+  if (email.trim() === '') {
+    return res.status(400).json({
+      message: 'Missing an email',
+    })
+  }
+
+  try {
+    const [response] = await sendgrid.request({
+      method: 'PUT',
+      url: '/v3/marketing/contacts',
+      body: {
+        // Add to our pre-launch list
+        // eslint-disable-next-line camelcase
+        list_ids: ['3b0df4ae-aca5-4c4d-bf65-cd70eb9fba4c'],
+        contacts: [{ email }],
+      },
+    })
+    res.status(response.statusCode === 202 ? 200 : 500).end()
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
+  }
 })
 
 export default apiRouter

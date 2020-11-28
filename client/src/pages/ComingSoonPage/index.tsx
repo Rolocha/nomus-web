@@ -11,7 +11,8 @@ import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import background from './background.svg'
 import coffeeCupIllustration from './coffee-cup-illustration.svg'
 import Navbar from 'src/components/Navbar'
-
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
 interface FormData {
   email: string
 }
@@ -19,7 +20,14 @@ interface FormData {
 const bp = 'lg'
 
 const ComingSoonPage = () => {
-  const { register, handleSubmit } = useForm<FormData>()
+  const { register, handleSubmit, formState } = useForm<FormData>({
+    mode: 'onChange',
+    resolver: yupResolver(
+      yup.object().shape({
+        email: yup.string().email().required(),
+      }),
+    ),
+  })
   const [submitState, setSubmitState] = React.useState<
     'unsubmitted' | 'submitting' | 'success' | 'failure'
   >('unsubmitted')
@@ -128,7 +136,7 @@ const ComingSoonPage = () => {
                   `}
                   variant="primary"
                   type="submit"
-                  disabled={submitState === 'submitting'}
+                  disabled={submitState === 'submitting' || !formState.isValid}
                 >
                   <Box
                     display="flex"
