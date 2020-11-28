@@ -100,6 +100,12 @@ export const pages: Array<PageType> = [
   //   requiredAuthLevel: Role.User,
   // },
   {
+    name: 'linker',
+    path: '/admin/linker/:routeStr',
+    Component: Linker,
+    requiredAuthLevel: Role.Vendor,
+  },
+  {
     name: 'admin panel',
     path: '/admin',
     exact: false,
