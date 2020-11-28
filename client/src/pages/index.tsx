@@ -14,7 +14,7 @@ import LoginPage from 'src/pages/LoginPage'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import ComingSoonPage from './ComingSoonPage'
-import Linker from './Linker'
+import Linker from './Linker/LinkerPage'
 
 interface PageType {
   name: string
