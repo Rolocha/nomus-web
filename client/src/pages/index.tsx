@@ -118,12 +118,6 @@ export const pages: Array<PageType> = [
     path: '/404',
     Component: FourOhFourPage,
   },
-  {
-    name: 'linker',
-    path: '/linker/:routeStr',
-    Component: Linker,
-    requiredAuthLevel: Role.Admin,
-  },
   // Has to be last so other routes can get accessed
   {
     name: 'contact info',
