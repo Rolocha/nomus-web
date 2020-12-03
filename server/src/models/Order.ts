@@ -1,4 +1,11 @@
-import { getModelForClass, modelOptions, pre, prop, ReturnModelType } from '@typegoose/typegoose'
+import {
+  getModelForClass,
+  index,
+  modelOptions,
+  pre,
+  prop,
+  ReturnModelType,
+} from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
@@ -11,7 +18,7 @@ import { BaseModel } from './BaseModel'
     let checkDuplicate = true
     let shortId = this.shortId ?? Math.random().toString(36).substring(2, 8).toUpperCase()
     while (checkDuplicate) {
-      const order = await Order.mongo.findOne({ shortId: shortId })
+      const order = await Order.mongo.exists({ shortId: shortId })
       if (!order) {
         this.shortId = shortId
         checkDuplicate = false
@@ -24,6 +31,7 @@ import { BaseModel } from './BaseModel'
   }
   next()
 })
+@index({ shortId: 1 })
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 class Order extends BaseModel({
