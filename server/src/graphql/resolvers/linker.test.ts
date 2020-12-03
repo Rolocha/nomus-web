@@ -24,7 +24,7 @@ describe('LinkerResolver', () => {
   describe('linkSheetToUser', () => {
     it('takes in a routeStr and shortId then links the cards to a user', async () => {
       const user = await createMockUser()
-      const userVendor = await createMockUser({ roles: [Role.User, Role.Vendor] })
+      const userVendor = await createMockUser({ roles: [Role.User, Role.PrintTech] })
       const cardVersion = await createMockCardVersion({
         user: user.id,
       })
