@@ -62,6 +62,16 @@ local installNodeModules(app, when) = {
   ],
 };
 
+local lint(app, when) = {
+  "name": "lint",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd " + app,
+    "yarn lint:ci"
+  ],
+};
+
 local test(app, when) = {
   "name": "test " + app,
   "image": "node:12",
@@ -69,7 +79,6 @@ local test(app, when) = {
   "commands": [
     "cd " + app,
     "yarn test",
-    "yarn lint:ci"
   ],
 };
 
@@ -140,6 +149,7 @@ local ALWAYS_CONDITION = {};
     "type": "docker",
     "name": "client",
     "steps": [
+      lint("client", ALWAYS_CONDITION),
       installNodeModules("client", ALWAYS_CONDITION),
       test("client", ALWAYS_CONDITION),
 
