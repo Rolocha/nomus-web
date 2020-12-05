@@ -65,7 +65,7 @@ local installNodeModules(app, when) = {
 
 
 local runCmd(app, cmd, when) = {
-  "name": "running " + cmd,
+  "name": cmd,
   "image": "node:12",
   "when": when,
   "commands": [
