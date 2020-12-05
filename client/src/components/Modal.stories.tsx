@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
-import Modal, { ActionType as ModalActionType } from 'src/components/Modal'
+import Modal from 'src/components/Modal'
 import Button from 'src/components/Button'
 import * as Form from './Form'
 

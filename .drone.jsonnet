@@ -62,14 +62,15 @@ local installNodeModules(app, when) = {
   ],
 };
 
-local test(app, when) = {
+
+
+local runYarnCommand(app, cmd, when) = {
   "name": "test " + app,
   "image": "node:12",
   "when": when,
   "commands": [
     "cd " + app,
-    "yarn lint:ci",
-    "yarn test",
+    cmd,
   ],
 };
 
@@ -141,7 +142,8 @@ local ALWAYS_CONDITION = {};
     "name": "client",
     "steps": [
       installNodeModules("client", ALWAYS_CONDITION),
-      test("client", ALWAYS_CONDITION),
+      runYarnCommand("client", "yarn lint:ci", ALWAYS_CONDITION),
+      runYarnCommand("client", "yarn test", ALWAYS_CONDITION),
 
       buildClient(STAGING_OR_PRODUCTION_DEPLOY_CONDITION),
 
@@ -167,7 +169,7 @@ local ALWAYS_CONDITION = {};
     "name": "server",
     "steps": [
       installNodeModules("server", ALWAYS_CONDITION),
-      test("server", ALWAYS_CONDITION),
+      runYarnCommand("server", "yarn test", ALWAYS_CONDITION),
 
       // Staging
       publishServerDockerImage("staging", STAGING_DEPLOY_CONDITION),
