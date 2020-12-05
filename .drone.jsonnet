@@ -68,7 +68,8 @@ local test(app, when) = {
   "when": when,
   "commands": [
     "cd " + app,
-    "yarn test"
+    "yarn test",
+    "yarn lint:ci"
   ],
 };
 
