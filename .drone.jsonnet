@@ -4,6 +4,11 @@ local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
 
+local CLIENT_NODE_MODULES_CACHE = {
+  "name": "client node_modules",
+  "path": "/drone/src/client/node_modules"
+};
+
 local publishServerDockerImage(env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
@@ -56,6 +61,9 @@ local installNodeModules(app, when) = {
   "name": "install dependencies in " + app,
   "image": "node:12",
   "when": when,
+  "volumes": [
+    CLIENT_NODE_MODULES_CACHE,
+  ],
   "commands": [
     "cd " + app,
     "yarn install --production=false",
@@ -68,6 +76,9 @@ local runCmd(app, cmd, when) = {
   "name": cmd,
   "image": "node:12",
   "when": when,
+  "volumes": [
+    CLIENT_NODE_MODULES_CACHE,
+  ],
   "commands": [
     "cd " + app,
     cmd,
@@ -78,6 +89,9 @@ local buildClient(when) = {
   "name": "build client app" ,
   "image": "node:12",
   "when": when,
+  "volumes": [
+    CLIENT_NODE_MODULES_CACHE,
+  ],
   "commands": [
     "cd client",
     "yarn install --production=false",
@@ -152,6 +166,14 @@ local ALWAYS_CONDITION = {};
 
       // Production
       syncToBucket("nomus.me", "us-west-1", PRODUCTION_DEPLOY_CONDITION)
+    ],
+    "volumes": [
+      {
+        "name": 'client node_modules',
+        "host": {
+          "path": '/tmp/drone/cache/node_modules'
+        },
+      },
     ],
     "trigger": {
       "event": {
