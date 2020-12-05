@@ -11,7 +11,6 @@ import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
-import { ABOUT_PAGE_NOTION_LINK, FAQ_PAGE_NOTION_LINK } from 'src/constants'
 
 interface FormData {
   email: string
@@ -73,10 +72,10 @@ const Footer = () => {
               <Link to="/">
                 <Text.Body2 color={colors.white}>Home</Text.Body2>
               </Link>
-              <Link to={ABOUT_PAGE_NOTION_LINK}>
+              <Link to="/about">
                 <Text.Body2 color={colors.white}>About</Text.Body2>
               </Link>
-              <Link to={FAQ_PAGE_NOTION_LINK}>
+              <Link to="/faq">
                 <Text.Body2 color={colors.white}>FAQ</Text.Body2>
               </Link>
             </Box>
@@ -209,10 +208,14 @@ const Footer = () => {
           >{`© ${new Date().getFullYear()} Nomus, Inc.  /  Registered in the United States of America`}</Text.Body2>
 
           <Box display="flex" flexDirection="row" mt={{ _: 4, [bp]: 'unset' }}>
-            <Text.Body2 color="white" mr={3}>
-              Terms of service
-            </Text.Body2>
-            <Text.Body2 color="white">Privacy policy</Text.Body2>
+            <Link to="/terms-of-service">
+              <Text.Body2 color="white" mr={3}>
+                Terms of service
+              </Text.Body2>
+            </Link>
+            <Link to="/privacy-policy">
+              <Text.Body2 color="white">Privacy policy</Text.Body2>
+            </Link>
           </Box>
         </Box>
       </Container>
