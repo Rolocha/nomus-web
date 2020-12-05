@@ -1,12 +1,15 @@
 import * as React from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom'
 import ProtectedRoute from 'src/components/ProtectedRoute'
 import { AuthLevel } from 'src/config'
 import AdminPanel from 'src/pages/AdminPanel'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import ContactSaver from 'src/pages/ContactSaver'
-import FAQPage from 'src/pages/FAQPage'
-import AboutPage from 'src/pages/AboutPage'
 import FourOhFourPage from 'src/pages/FourOhFourPage'
 import LandingPage from 'src/pages/LandingPage'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -15,19 +18,26 @@ import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import ComingSoonPage from './ComingSoonPage'
 
-interface PageType {
-  name: string
-  path?: string
+interface RouteCommon {
+  path: string | null // null to handle 404
   exact?: boolean // default is false
-  Component: (...args: any) => JSX.Element | null
+}
+interface ComponentRouteType extends RouteCommon {
   requiredAuthLevel?: AuthLevel
   // Annotation for pages that are totally public and thus have no need for user to be authenticated (e.g. landing page)
   noLoginRequired?: boolean
+  Component: (...args: any) => JSX.Element | null
 }
 
-export const pages: Array<PageType> = [
+interface RedirectRouteType extends RouteCommon {
+  path: string
+  redirect?: { to: string; type: 'internal' | 'external' }
+}
+
+type RouteType = ComponentRouteType | RedirectRouteType
+
+export const routes: Array<RouteType> = [
   {
-    name: 'landing',
     exact: true,
     path: '/',
     Component:
@@ -39,35 +49,62 @@ export const pages: Array<PageType> = [
     noLoginRequired: true,
   },
   {
-    name: 'login',
     exact: true,
     path: '/login',
     Component: LoginPage,
   },
   {
-    name: 'register',
     exact: true,
     path: '/register',
     Component: LoginPage,
   },
   {
-    name: 'faq',
-    exact: true,
     path: '/faq',
-    Component: FAQPage,
+    exact: true,
+    redirect: {
+      to: 'https://www.notion.so/FAQ-4cb5ad040eb34b939e279bc15adf929a',
+      type: 'external',
+    },
   },
   {
-    name: 'about',
-    exact: true,
     path: '/about',
-    Component: AboutPage,
+    exact: true,
+    redirect: {
+      to: 'https://www.notion.so/About-Us-34bb756e6b10412786a720cd9a081d1f',
+      type: 'external',
+    },
+  },
+  {
+    path: '/terms-of-service',
+    exact: true,
+    redirect: {
+      to:
+        'https://www.notion.so/nomus/Terms-of-Service-da49ae4ac6554bc182f742a03c1000fd',
+      type: 'external',
+    },
+  },
+  {
+    path: '/privacy-policy',
+    exact: true,
+    redirect: {
+      to:
+        'https://www.notion.so/nomus/Privacy-Policy-7fc0ed2852fe4d9d8f962d47ca0e5129',
+      type: 'external',
+    },
+  },
+  {
+    path: '/instructional-card',
+    exact: true,
+    redirect: {
+      to: '/faq',
+      type: 'internal',
+    },
   },
   // Non-prod-only routes
   ...(process.env.NODE_ENV !== 'production'
     ? [
         // /loading route to test the LoadingPage
         {
-          name: 'loading',
           exact: true,
           path: '/loading',
           Component: () => <LoadingPage fullscreen />,
@@ -75,31 +112,27 @@ export const pages: Array<PageType> = [
       ]
     : []),
   // {
-  //   name: 'shop front',
   //   exact: true,
   //   path: '/shop',
   //   Component: ShopFront,
   // },
   {
-    name: 'dashboard',
     path: '/dashboard/contacts/save',
     Component: ContactSaver,
     requiredAuthLevel: Role.User,
   },
   {
-    name: 'dashboard',
     path: '/dashboard',
     Component: UserControlPanel,
     requiredAuthLevel: Role.User,
   },
   // {
-  //   name: 'card studio',
+
   //   path: '/card-studio/:buildBaseType?',
   //   Component: CardBuilder,
   //   requiredAuthLevel: Role.User,
   // },
   {
-    name: 'admin panel',
     path: '/admin',
     exact: false,
     Component: AdminPanel,
@@ -107,25 +140,23 @@ export const pages: Array<PageType> = [
   },
 
   {
-    name: '404 page',
     path: '/404',
     Component: FourOhFourPage,
   },
   // Has to be last so other routes can get accessed
   {
-    name: 'contact info',
     path: '/:username',
     Component: ContactInfoPage,
   },
   // fallback to 404 page if nothing else matched, this is unlikely to ever be reached since the /:username route consumes ~everything but keeping it just in case
   {
-    name: '404 page',
     Component: FourOhFourPage,
+    path: null,
   },
 ]
 
 // A wrapper Component that triggers an access token refresh if necessary to make sure user has a non-expired access token
-// TODO: A future optimization would be to avoid wrapping with this for certain public-only routes like the landing page
+// We skip this for certain pages that we needn't attepmt a login check for, like the landing page
 const AttemptLogin = ({ children }: any) => {
   const [attempted, setAttempted] = React.useState(false)
   React.useEffect(() => {
@@ -143,14 +174,30 @@ export const PageRouter = () => {
   return (
     <Router>
       <Switch>
-        {pages.map(
-          ({
-            name,
-            requiredAuthLevel,
-            noLoginRequired,
-            Component,
-            ...rest
-          }) => {
+        {routes.map((routeConfig) => {
+          if ('redirect' in routeConfig && routeConfig.redirect) {
+            const { redirect, path } = routeConfig
+            return (
+              <Route key={path} path={path}>
+                {() => {
+                  switch (redirect.type) {
+                    case 'internal':
+                      return <Redirect to={redirect.to} />
+                    case 'external':
+                      window.location.replace(redirect.to)
+                      return
+                  }
+                }}
+              </Route>
+            )
+          } else if ('Component' in routeConfig) {
+            const {
+              path,
+              requiredAuthLevel,
+              noLoginRequired,
+              Component,
+              ...rest
+            } = routeConfig
             const componentToRender = noLoginRequired ? (
               <Component />
             ) : (
@@ -161,12 +208,13 @@ export const PageRouter = () => {
 
             const routeElement =
               requiredAuthLevel == null ? (
-                <Route key={name} {...rest}>
+                <Route key={path ?? '404'} path={path ?? undefined} {...rest}>
                   {componentToRender}
                 </Route>
               ) : (
                 <ProtectedRoute
-                  key={name}
+                  key={path}
+                  path={path ?? undefined}
                   requiredAuthLevel={requiredAuthLevel}
                   {...rest}
                 >
@@ -174,11 +222,12 @@ export const PageRouter = () => {
                 </ProtectedRoute>
               )
             return routeElement
-          },
-        )}
+          }
+          return null
+        })}
       </Switch>
     </Router>
   )
 }
 
-export default pages
+export default routes
