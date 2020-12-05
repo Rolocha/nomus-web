@@ -1,16 +1,15 @@
 import { css } from '@emotion/core'
-import * as CSS from 'csstype'
 import styled from '@emotion/styled'
-import * as React from 'react'
-import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
-import Box from 'src/components/Box'
-import Image from 'src/components/Image'
-import { colors, animations } from 'src/styles'
+import * as CSS from 'csstype'
 import { rgba } from 'polished'
+import * as React from 'react'
+import Box from 'src/components/Box'
+import * as SVG from 'src/components/SVG'
+import * as Text from 'src/components/Text'
+import { animations, colors } from 'src/styles'
 import {
-  ResponsiveValue,
   RequiredTheme,
+  ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
 
@@ -24,7 +23,7 @@ const HiddenUploadInput = styled.input`
 `
 
 interface Props {
-  src: string
+  src: string | null
   editable: boolean
   width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
   height?: ResponsiveValue<
@@ -33,6 +32,7 @@ interface Props {
   >
   // eslint-disable-next-line flowtype/no-weak-types
   onImageUpdate: (image: File) => Promise<void>
+  fallbackImage?: React.ReactNode
 }
 
 const MAX_SIZE_MB = 3
@@ -41,9 +41,8 @@ const TOO_LARGE_MESSAGE = `Profile pictures may not exceed ${MAX_SIZE_MB}MB. Ple
 const EditableImage = ({
   src,
   editable,
-  width,
-  height,
   onImageUpdate,
+  fallbackImage,
 }: Props) => {
   const [updating, setUpdating] = React.useState(false)
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -69,26 +68,36 @@ const EditableImage = ({
   return (
     <Box
       position="relative"
-      width={width}
-      height={height}
+      width="100%"
+      pb="100%"
       overflow="hidden"
       borderRadius="50%"
       css={css``}
     >
-      <Image
-        src={src}
-        position="relative"
-        w={width}
-        h={height}
-        borderRadius="50%"
-        css={css`
-          overflow: hidden;
-          animation: ${updating &&
-          css`
-            ${animations.fadeIn} 0.5s ease infinite alternate
-          `};
-        `}
-      />
+      {src ? (
+        <Box
+          role="img"
+          position="absolute"
+          top="50%"
+          left="50%"
+          background={`url(${src}) 50% 50% no-repeat`}
+          css={css({
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            transform: 'translate(-50%, -50%)',
+            overflow: 'hidden',
+            animation: updating
+              ? `${animations.fadeIn} 0.5s ease infinite alternate`
+              : undefined,
+          })}
+          borderRadius="50%"
+          width="100%"
+          height="100%"
+          alt="profile picture"
+        />
+      ) : (
+        fallbackImage
+      )}
       {editable && (
         <Box
           css={css`

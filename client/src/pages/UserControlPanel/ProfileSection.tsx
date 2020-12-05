@@ -13,6 +13,7 @@ import { formatName } from 'src/utils/name'
 import NameplateEditor from './NameplateEditor'
 import ProfileEditor from './ProfileEditor'
 import EditableImage from 'src/components/EditableImage'
+import ProfilePicture from 'src/components/ProfilePicture'
 
 const bp = 'md'
 
@@ -96,13 +97,15 @@ export default () => {
       gridRowGap={3}
       p={{ _: '24px', md: '48px' }}
     >
-      <Box gridArea="profilePic">
-        <EditableImage
-          editable
-          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x500'}
-          width="100%"
-          onImageUpdate={handleProfilePictureUpdate}
-        />
+      <Box gridArea="profilePic" placeSelf="center" width="100%">
+        {data.user.name && (
+          <EditableImage
+            editable
+            src={data.user.profilePicUrl}
+            fallbackImage={<ProfilePicture name={data.user.name} />}
+            onImageUpdate={handleProfilePictureUpdate}
+          />
+        )}
       </Box>
 
       <Box gridArea="nameplate" alignSelf={{ _: 'start', md: 'center' }}>
