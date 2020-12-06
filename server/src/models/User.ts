@@ -274,7 +274,7 @@ export class User extends BaseModel({
       }
 
       const pictureLink = result.getValue()
-      this.profilePicUrl = pictureLink
+      this.profilePicS3Key = pictureLink
       return Result.ok((await this.save()) as DocumentType<User>)
     } catch (err) {
       throw new Error(`unknown error: ${err}`)
