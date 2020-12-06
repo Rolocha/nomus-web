@@ -1,11 +1,11 @@
 import { AuthManager, BaseAuthData } from './auth-manager'
 import { AUTH_DATA_KEY } from 'src/config'
 
-// Needs to stay in sync with the enum at server/src/models/User.ts
+// Needs to stay in sync with the enum at server/src/util/enums.ts
 export enum Role {
   User = 'user',
   Admin = 'admin',
-  PrintTech = 'printtech',
+  PrintTech = 'print-tech',
 }
 
 export interface LoginArgs {

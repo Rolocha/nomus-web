@@ -9,7 +9,7 @@ const linkSheetToCardVersion = async (
   cardVersion: DocumentType<CardVersion>
 ) => {
   sheet.cardVersion = cardVersion
-  sheet.save()
+  await sheet.save()
 
   for (const cardId of sheet.cards) {
     const currCard = await Card.mongo.findById(cardId[0])

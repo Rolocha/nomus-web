@@ -20,7 +20,7 @@ registerEnumType(OrderState, {
 export enum Role {
   User = 'user',
   Admin = 'admin',
-  PrintTech = 'printtech',
+  PrintTech = 'print-tech',
 }
 
 registerEnumType(Role, {
