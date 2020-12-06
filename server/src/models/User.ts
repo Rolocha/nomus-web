@@ -273,8 +273,7 @@ export class User extends BaseModel({
         throw new Error(`Failed to upload to S3: ${result.error}`)
       }
 
-      const pictureLink = result.getValue()
-      this.profilePicUrl = pictureLink
+      this.profilePicS3Key = result.getValue()
       return Result.ok((await this.save()) as DocumentType<User>)
     } catch (err) {
       throw new Error(`unknown error: ${err}`)
