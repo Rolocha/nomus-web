@@ -1,20 +1,25 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, CardVersion, Order, Sheet, User } from 'src/models'
 import { Ref } from 'src/models/scalars'
+import { Result } from './error'
 
 export const ROUTE_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
 
 const linkSheetToCardVersion = async (
   sheet: DocumentType<Sheet>,
   cardVersion: DocumentType<CardVersion>
-) => {
+): Promise<Result<undefined, 'save-error'>> => {
   sheet.cardVersion = cardVersion
-  await sheet.save()
-
-  for (const cardId of sheet.cards) {
-    const currCard = await Card.mongo.findById(cardId[0])
+  const res = sheet.cards.map(async (cardId) => {
+    const currCard = await Card.mongo.findById(cardId)
     currCard.user = cardVersion.user
-    await currCard.save()
+    return await currCard.save()
+  })
+  try {
+    await Promise.all(res.concat(sheet.save()))
+    return Result.ok()
+  } catch (e) {
+    return Result.fail('save-error')
   }
 }
 
@@ -23,32 +28,40 @@ const getCardVersionFromShortId = async (shortId: string): Promise<DocumentType<
   return await CardVersion.mongo.findById(order.cardVersion)
 }
 
-export const spliceRouteStr = (routeStr: string): { sheetId: string; cardId: string } => {
+export const spliceRouteStr = (
+  routeStr: string
+): Result<{ sheetId: string; cardId: string }, string> => {
   const res = routeStr.match(ROUTE_REGEX)
 
   if (res && res.length === 3 && res[0] === routeStr) {
-    return { sheetId: res[1], cardId: res[2] }
+    return Result.ok({ sheetId: res[1], cardId: res[2] })
   }
 
-  throw new Error(`Incorrectly formatted routeStr: ${routeStr}`)
+  return Result.fail(`Incorrectly formatted routeStr: ${routeStr}`)
 }
 
-export const getUserFromCardId = async (cardId: string): Promise<Ref<User>> => {
+export const getUserFromCardId = async (cardId: string): Promise<User> => {
   const cardModel = await Card.mongo.findById(cardId)
-  return cardModel.user
+  return User.mongo.findById(cardModel.user)
 }
 
 export const linkSheetToUser = async (
   routeStr: string,
   shortId: string
-): Promise<{ userId: string; sheetId: string }> => {
-  const { sheetId } = spliceRouteStr(routeStr)
+): Promise<Result<{ userId: string; sheetId: string }, 'cv-not-found' | 'sheet-not-found'>> => {
+  const { sheetId } = spliceRouteStr(routeStr).getValue()
 
   const cardVersion = await getCardVersionFromShortId(shortId)
+  if (!cardVersion) {
+    return Result.fail('cv-not-found')
+  }
 
   const sheet = await Sheet.mongo.findById(sheetId)
+  if (!sheet) {
+    return Result.fail('sheet-not-found')
+  }
 
   await linkSheetToCardVersion(sheet, cardVersion)
 
-  return { userId: cardVersion.user.toString(), sheetId: sheet.id }
+  return Result.ok({ userId: cardVersion.user.toString(), sheetId: sheet.id })
 }

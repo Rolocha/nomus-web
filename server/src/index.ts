@@ -35,18 +35,18 @@ gqlServer.applyMiddleware({ app, path: graphqlPath })
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
 app.get('/d/:routeStr', async (req, res) => {
-  try {
-    const routeStr = req.params.routeStr
-    const { cardId } = spliceRouteStr(routeStr)
-    const userId = await getUserFromCardId(cardId)
-    const user = await User.mongo.findById(userId)
-    if (userId) {
-      res.redirect(302, `/:${user.username}`)
-    } else {
-      res.redirect(302, `/admin/linker/:${routeStr}`)
-    }
-  } catch (e) {
+  const routeStr = req.params.routeStr
+  const routeStrResult = spliceRouteStr(routeStr)
+  if (!routeStrResult.isSuccess) {
     res.redirect(404, '404')
+    return
+  }
+  const { cardId } = routeStrResult.getValue()
+  const user = await getUserFromCardId(cardId)
+  if (user) {
+    res.redirect(307, `/${user.username}`)
+  } else {
+    res.redirect(302, `/admin/linker/${routeStr}`)
   }
 })
 

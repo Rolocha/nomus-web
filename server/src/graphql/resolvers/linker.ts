@@ -21,7 +21,7 @@ class LinkerResolver {
     @Arg('routeStr', { nullable: false }) routeStr: string,
     @Arg('shortId', { nullable: false }) shortId: string
   ): Promise<LinkedInfo> {
-    return await linkSheetToUser(routeStr, shortId)
+    return (await linkSheetToUser(routeStr, shortId)).value
   }
 }
 

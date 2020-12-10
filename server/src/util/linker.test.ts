@@ -5,6 +5,7 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
+import { NamedError } from './error'
 import { getUserFromCardId, linkSheetToUser, spliceRouteStr } from './linker'
 
 beforeAll(async () => {
@@ -23,23 +24,25 @@ describe('linker', () => {
   describe('linking sheet to user', () => {
     it('fails incorrectly formatted routeStr, miss-spelled', async () => {
       const badRoute = 'sheet_jsdldnfskl-card_fsfljs'
-      expect(() => {
-        spliceRouteStr(badRoute)
-      }).toThrow(`Incorrectly formatted routeStr: ${badRoute}`)
+      expect(spliceRouteStr(badRoute).isSuccess).toBeFalsy()
+      expect(spliceRouteStr(badRoute).error).toEqual(
+        new NamedError(`Incorrectly formatted routeStr: ${badRoute}`)
+      )
     })
 
     it('fails incorrectly formatted routeStr, repeated', async () => {
       const repeatedRoute =
         'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345-sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
-      expect(() => {
-        spliceRouteStr(repeatedRoute)
-      }).toThrow(`Incorrectly formatted routeStr: ${repeatedRoute}`)
+      expect(spliceRouteStr(repeatedRoute).isSuccess).toBeFalsy()
+      expect(spliceRouteStr(repeatedRoute).error).toEqual(
+        new NamedError(`Incorrectly formatted routeStr: ${repeatedRoute}`)
+      )
     })
 
     it('returns the split of a routeStr', async () => {
       const routeStr = 'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
       const [esheet, ecard] = routeStr.split('-')
-      expect(spliceRouteStr(routeStr)).toStrictEqual({ sheetId: esheet, cardId: ecard })
+      expect(spliceRouteStr(routeStr).value).toStrictEqual({ sheetId: esheet, cardId: ecard })
     })
 
     it("returns a non-registered card's user as null", async () => {
@@ -48,11 +51,12 @@ describe('linker', () => {
       expect(res).toBe(null)
     })
 
-    it("returns a registered card's user as userId", async () => {
+    it("returns a registered card's user", async () => {
       const user = await createMockUser()
       const card = await createMockCard({ user })
       const res = await getUserFromCardId(card.id)
-      expect(res).toBe(user.id)
+      expect(res.id).toBe(user.id)
+      expect(res.name.first).toBe(user.name.first)
     })
 
     it('links a sheet from a routeStr to a user with a shortId', async () => {
@@ -63,16 +67,16 @@ describe('linker', () => {
       const card = await createMockCard({ user: null })
       const sheet = await createMockSheet({
         cardVersion: null,
-        cards: [card._id],
+        cards: [card.id],
       })
       const order = await createMockOrder({
-        user: user._id,
-        cardVersion: cardVersion._id,
+        user: user.id,
+        cardVersion: cardVersion.id,
       })
 
       const routeStr = sheet.id + '-' + card.id
 
-      const ret = await linkSheetToUser(routeStr, order.shortId)
+      const ret = (await linkSheetToUser(routeStr, order.shortId)).value
 
       expect(ret).toMatchObject({ userId: user.id, sheetId: sheet.id })
 
@@ -81,6 +85,27 @@ describe('linker', () => {
 
       expect(resSheet.cardVersion).toBe(cardVersion.id)
       expect(resCard.user).toBe(user.id)
+    })
+
+    it.only('tries to link a sheet but fails because there is no sheet', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion({
+        user: user.id,
+      })
+      const card = await createMockCard({ user: null })
+
+      const order = await createMockOrder({
+        user: user.id,
+        cardVersion: cardVersion.id,
+      })
+      const sheetId = 'sheet_5f9caf60c9b90b8674941e7f'
+
+      const routeStr = sheetId + '-' + card.id
+
+      const ret = await linkSheetToUser(routeStr, order.shortId)
+
+      expect(ret.isSuccess).toBe(false)
+      expect(ret.error).toEqual(new NamedError('sheet-not-found'))
     })
   })
 })
