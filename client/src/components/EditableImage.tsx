@@ -4,6 +4,7 @@ import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
+import Image from 'src/components/Image'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { animations, colors } from 'src/styles'
@@ -66,38 +67,28 @@ const EditableImage = ({
   }, [uploadInputRef, setUpdating, onImageUpdate])
 
   return (
-    <Box
-      position="relative"
-      width="100%"
-      pb="100%"
-      overflow="hidden"
-      borderRadius="50%"
-      css={css``}
-    >
+    <Box position="relative" width="100%" overflow="hidden" borderRadius="50%">
       {src ? (
         <Box
           role="img"
-          position="absolute"
-          top="50%"
-          left="50%"
           background={`url(${src}) 50% 50% no-repeat`}
+          borderRadius="50%"
+          width="100%"
+          pb="100%"
+          alt="profile picture"
+          overflow="hidden"
+          backgroundPosition="center"
+          backgroundSize="cover"
           css={css({
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            transform: 'translate(-50%, -50%)',
-            overflow: 'hidden',
             animation: updating
               ? `${animations.fadeIn} 0.5s ease infinite alternate`
               : undefined,
           })}
-          borderRadius="50%"
-          width="100%"
-          height="100%"
-          alt="profile picture"
         />
       ) : (
         fallbackImage
       )}
+
       {editable && (
         <Box
           css={css`
