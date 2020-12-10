@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import Image from 'src/components/Image'
 import * as Text from 'src/components/Text'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
