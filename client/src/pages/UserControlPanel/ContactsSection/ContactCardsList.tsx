@@ -191,12 +191,26 @@ const ContactCardsList = ({
                           {
                             {
                               grid: (
-                                <BusinessCardImage
-                                  frontImageUrl={
-                                    contact.cardFrontImageUrl ?? undefined
-                                  }
-                                  height="125px"
-                                />
+                                <Box position="relative">
+                                  <BusinessCardImage
+                                    frontImageUrl={
+                                      contact.cardFrontImageUrl ?? undefined
+                                    }
+                                    placeholder={!contact.cardFrontImageUrl}
+                                    height="125px"
+                                  />
+                                  <Box
+                                    position="absolute"
+                                    bottom="-5px"
+                                    right="-5px"
+                                    width="40px"
+                                  >
+                                    <ProfilePicture
+                                      name={contact.name}
+                                      profilePicUrl={contact.profilePicUrl}
+                                    />
+                                  </Box>
+                                </Box>
                               ),
                               linear: (
                                 <Box width="40px">
