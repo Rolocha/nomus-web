@@ -9,6 +9,9 @@ class LinkedInfo {
 
   @Field()
   sheetId: string
+
+  @Field()
+  error: string
 }
 
 @Resolver()
@@ -21,7 +24,19 @@ class LinkerResolver {
     @Arg('routeStr', { nullable: false }) routeStr: string,
     @Arg('shortId', { nullable: false }) shortId: string
   ): Promise<LinkedInfo> {
-    return (await linkSheetToUser(routeStr, shortId)).value
+    const res = await linkSheetToUser(routeStr, shortId)
+    if (res.isSuccess) {
+      return {
+        error: null,
+        ...res.value,
+      }
+    } else {
+      return {
+        error: res.error.name + ': ' + res.error.message,
+        userId: null,
+        sheetId: null,
+      }
+    }
   }
 }
 
