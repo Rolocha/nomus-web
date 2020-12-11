@@ -12,7 +12,6 @@ import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
 import { getUserFromCardId, spliceRouteStr } from './util/linker'
-import { User } from './models'
 // import { graphqlUploadExpress } from 'graphql-upload'
 
 db.init()
