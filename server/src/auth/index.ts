@@ -9,15 +9,6 @@ import { Role } from 'src/util/enums'
 
 const authRouter = express.Router()
 
-interface ServerErrorResponse {
-  error: {
-    code: string
-    message?: string
-  }
-}
-
-type Failable<T> = T | ServerErrorResponse
-
 interface AuthResponse {
   data?: {
     tokenExp: number
@@ -80,7 +71,7 @@ authRouter.post('/login', async (req, res: express.Response<AuthResponse>) => {
   }
 })
 
-authRouter.post('/signup', async (req, res: express.Response<Failable<AuthResponse>>) => {
+authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
   const { firstName, middleName, lastName, email, password } = req.body
   try {
     const user = await User.mongo.createNewUser({
@@ -130,10 +121,7 @@ authRouter.post('/logout', async (req, res: express.Response<boolean>) => {
   res.end()
 })
 
-const refreshToken = async (
-  req: express.Request,
-  res: express.Response<Failable<AuthResponse>>
-) => {
+const refreshToken = async (req: express.Request, res: express.Response<AuthResponse>) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
   const userId = req.body.id
 

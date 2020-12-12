@@ -172,7 +172,7 @@ export class AuthManager<
   private async _refreshToken(authData: AuthData): Promise<boolean> {
     try {
       const response = await this.refreshToken(authData)
-      if ('data' in response && response.data) {
+      if (response.data) {
         this.updateAuthData(response.data)
         return true
       }

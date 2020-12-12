@@ -30,14 +30,16 @@ const showRequiredError = (
 type SubmissionErrorType = 'incorrect-credentials'
 
 const renderSubmissionError = (type: SubmissionErrorType) => {
-  if (type === 'incorrect-credentials') {
-    return (
-      <Text.Body3 color="brightCoral">
-        The username and password you entered did not match our records. Please
-        double-check and try again.
-      </Text.Body3>
-    )
-  }
+  return (
+    <Text.Body3 color="brightCoral">
+      {
+        {
+          'incorrect-credentials':
+            'The username and password you entered did not match our records. Please double-check and try again.',
+        }[type]
+      }
+    </Text.Body3>
+  )
 }
 
 const LoginForm = () => {

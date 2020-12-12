@@ -72,20 +72,11 @@ const authManager = new AuthManager<
     return res.body
   },
   logIn: async (args: LoginArgs) => {
-    const res = await fetch('/auth/login', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(args),
-    })
-    return res.json()
+    const res = await jsonFetch('post', '/auth/login', args)
+    return res.body
   },
   signUp: async (args: SignupArgs) => {
     const res = await jsonFetch('post', '/auth/signup', args)
-    if (res.status === 401) {
-      throw new Error(res.body.code)
-    }
     return res.body
   },
   logOut: async () => {
