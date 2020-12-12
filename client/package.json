@@ -223,7 +223,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint && pretty-quick --staged"
+      "pre-commit": "yarn lint:ci && pretty-quick --staged"
     }
   },
   "prettier": {

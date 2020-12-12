@@ -4,16 +4,15 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import * as SVG from 'src/components/SVG'
+import businessCardFallback from 'src/images/business-card-fallback.svg'
 import {
   RequiredTheme,
   ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
 
-interface Props {
+interface CommonProps {
   nameForImageAlt?: string
-  frontImageUrl?: string
-  backImageUrl?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
   height?: ResponsiveValue<
     CSS.HeightProperty<TLengthStyledSystem>,
@@ -21,6 +20,16 @@ interface Props {
   >
   width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
 }
+
+type ImagesPresentProps = {
+  frontImageUrl?: string | null
+  backImageUrl?: string | null
+}
+interface PlaceholderProps {
+  placeholder: boolean
+}
+
+type Props = CommonProps & (ImagesPresentProps | PlaceholderProps)
 
 const FlipButton = ({ onClick }: { onClick: () => void }) => (
   <Box
@@ -67,55 +76,67 @@ const hiddenStyles = css({
 const createAltText = (side: string | null, name: string | null | undefined) =>
   `${side} of ${name ?? 'user'}'s Nomus card`
 
-const BusinessCardImage = ({
-  nameForImageAlt,
-  frontImageUrl,
-  backImageUrl,
-  width,
-  height,
-}: Props) => {
+const BusinessCardImage = (props: Props) => {
   const [showBack, setShowBack] = React.useState(false)
 
-  const frontImage = (
-    <Image
-      boxShadow="businessCard"
-      w={width}
-      h={height}
-      src={frontImageUrl}
-      alt={createAltText('front', nameForImageAlt)}
-    />
-  )
-  const backImage = (
-    <Image
-      boxShadow="businessCard"
-      w={width}
-      h={height}
-      src={backImageUrl}
-      alt={createAltText('back', nameForImageAlt)}
-    />
-  )
-
-  if (backImageUrl == null && frontImageUrl == null) {
-    return frontImage
+  if ('placeholder' in props && props.placeholder) {
+    return (
+      <Image
+        src={businessCardFallback}
+        alt="placeholder business card"
+        boxShadow="businessCard"
+        w={props.width}
+        h={props.height}
+      />
+    )
   }
-  if (frontImageUrl == null) {
+
+  const frontImage =
+    'frontImageUrl' in props && props.frontImageUrl ? (
+      <Image
+        boxShadow="businessCard"
+        w={props.width}
+        h={props.height}
+        src={props.frontImageUrl}
+        alt={createAltText('front', props.nameForImageAlt)}
+      />
+    ) : null
+  const backImage =
+    'backImageUrl' in props && props.backImageUrl ? (
+      <Image
+        boxShadow="businessCard"
+        w={props.width}
+        h={props.height}
+        src={props.backImageUrl}
+        alt={createAltText('back', props.nameForImageAlt)}
+      />
+    ) : null
+
+  if (frontImage == null && backImage == null) {
+    console.error(
+      'BusinessCardImage used without providing images or placeholder flag',
+    )
+    return null
+  }
+
+  if (!('frontImageUrl' in props) || props.frontImageUrl == null) {
     return backImage
   }
 
-  if (backImageUrl == null) {
+  if (!('backImageUrl' in props) || props.backImageUrl == null) {
     return frontImage
   }
 
   return (
-    <Box position="relative" display="inline-block" width={width}>
+    <Box position="relative" display="inline-block" width={props.width}>
       <Box
-        width={width}
+        width={props.width}
         css={css(faceStyles, showBack ? hiddenStyles : visibleStyles)}
       >
         {frontImage}
       </Box>
       <Box
-        width={width}
+        width={props.width}
         css={css(faceStyles, showBack ? visibleStyles : hiddenStyles, {
           position: 'absolute',
           top: 0,

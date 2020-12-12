@@ -3,6 +3,7 @@ import { gql, useQuery, useMutation } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import { InternalLink } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
@@ -13,6 +14,7 @@ import { formatName } from 'src/utils/name'
 import NameplateEditor from './NameplateEditor'
 import ProfileEditor from './ProfileEditor'
 import EditableImage from 'src/components/EditableImage'
+import ProfilePicture from 'src/components/ProfilePicture'
 
 const bp = 'md'
 
@@ -75,7 +77,7 @@ export default () => {
       }}
       gridTemplateRows={{
         _: '',
-        [bp]: 'auto 1fr',
+        [bp]: undefined,
       }}
       gridTemplateAreas={{
         _: `
@@ -96,13 +98,15 @@ export default () => {
       gridRowGap={3}
       p={{ _: '24px', md: '48px' }}
     >
-      <Box gridArea="profilePic">
-        <EditableImage
-          editable
-          src={data.user.profilePicUrl ?? 'http://via.placeholder.com/500x500'}
-          width="100%"
-          onImageUpdate={handleProfilePictureUpdate}
-        />
+      <Box gridArea="profilePic" placeSelf="center" width="100%">
+        {data.user.name && (
+          <EditableImage
+            editable
+            src={data.user.profilePicUrl}
+            fallbackImage={<ProfilePicture name={data.user.name} />}
+            onImageUpdate={handleProfilePictureUpdate}
+          />
+        )}
       </Box>
 
       <Box gridArea="nameplate" alignSelf={{ _: 'start', md: 'center' }}>
@@ -126,38 +130,61 @@ export default () => {
         />
       </Box>
 
-      {data.user.defaultCardVersion && (
-        <Box
-          gridArea="cards"
-          display="flex"
-          flexDirection={{ _: 'row', [bp]: 'column' }}
-          alignItems={{ _: 'center', [bp]: 'flex-end' }}
-          flexShrink={0}
-        >
-          {/* Front of business card */}
-          {data.user.defaultCardVersion.frontImageUrl && (
-            <Box
-              width={{ _: '50%', [bp]: '100%' }}
-              mb={{ _: 0, [bp]: 2 }}
-              mr={{ _: 2, [bp]: 0 }}
-            >
-              <BusinessCardImage
-                width="100%"
-                frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
-              />
+      <Box gridArea="cards">
+        {data.user.defaultCardVersion &&
+        (data.user.defaultCardVersion.frontImageUrl ||
+          data.user.defaultCardVersion.backImageUrl) ? (
+          <Box
+            display="flex"
+            flexDirection={{ _: 'row', [bp]: 'column' }}
+            alignItems={{ _: 'center', [bp]: 'flex-end' }}
+            flexShrink={0}
+          >
+            {/* Front of business card */}
+            {data.user.defaultCardVersion.frontImageUrl && (
+              <Box
+                width={{ _: '50%', [bp]: '100%' }}
+                mb={{ _: 0, [bp]: 2 }}
+                mr={{ _: 2, [bp]: 0 }}
+              >
+                <BusinessCardImage
+                  width="100%"
+                  frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
+                />
+              </Box>
+            )}
+            {/* Back of business card */}
+            {data.user.defaultCardVersion.backImageUrl && (
+              <Box
+                width={{ _: '50%', [bp]: '100%' }}
+                display="flex"
+                flexDirection="column"
+                alignItems="stretch"
+              >
+                <BusinessCardImage
+                  width="100%"
+                  backImageUrl={data.user.defaultCardVersion.backImageUrl}
+                />
+              </Box>
+            )}
+          </Box>
+        ) : (
+          // User has no defaultCardVersion, show the placeholder and a button to get Nomus card
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="stretch"
+            justifyContent="flex-start"
+          >
+            <BusinessCardImage width="100%" placeholder />
+            <Box mt={2} flexGrow={0}>
+              <Button variant="secondary" width="100%">
+                Get a Nomus card
+              </Button>
             </Box>
-          )}
-          {data.user.defaultCardVersion.backImageUrl && (
-            <Box width={{ _: '50%', [bp]: '100%' }}>
-              {/* Back of business card */}
-              <BusinessCardImage
-                width="100%"
-                backImageUrl={data.user.defaultCardVersion.backImageUrl}
-              />
-            </Box>
-          )}
-        </Box>
-      )}
+          </Box>
+        )}
+      </Box>
 
       <Box gridArea="phoneNumber">
         <Box>

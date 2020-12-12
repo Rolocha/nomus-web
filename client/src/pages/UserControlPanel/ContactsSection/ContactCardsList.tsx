@@ -2,8 +2,8 @@ import { css } from '@emotion/core'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import Image from 'src/components/Image'
 import { InternalLink } from 'src/components/Link'
+import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
@@ -184,26 +184,40 @@ const ContactCardsList = ({
                           display="flex"
                           flexDirection="row"
                           alignItems="center"
+                          width="100%"
                           boxShadow={viewMode === 'grid' ? 0 : undefined}
                         >
                           {
                             {
                               grid: (
-                                <BusinessCardImage
-                                  frontImageUrl={
-                                    contact.cardFrontImageUrl ?? undefined
-                                  }
-                                  height="125px"
-                                />
+                                <Box position="relative">
+                                  <BusinessCardImage
+                                    frontImageUrl={
+                                      contact.cardFrontImageUrl ?? undefined
+                                    }
+                                    placeholder={!contact.cardFrontImageUrl}
+                                    height="125px"
+                                  />
+                                  <Box
+                                    position="absolute"
+                                    bottom="-5px"
+                                    right="-5px"
+                                    width="40px"
+                                  >
+                                    <ProfilePicture
+                                      name={contact.name}
+                                      profilePicUrl={contact.profilePicUrl}
+                                    />
+                                  </Box>
+                                </Box>
                               ),
                               linear: (
-                                <Image
-                                  // TODO: Come up with a default profile pic
-                                  src={contact.profilePicUrl ?? undefined}
-                                  borderRadius="100%"
-                                  height="40px"
-                                  width="40px"
-                                />
+                                <Box width="40px">
+                                  <ProfilePicture
+                                    name={contact.name}
+                                    profilePicUrl={contact.profilePicUrl}
+                                  />
+                                </Box>
                               ),
                             }[viewMode]
                           }

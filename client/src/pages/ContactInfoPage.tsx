@@ -13,10 +13,10 @@ import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
-import Image from 'src/components/Image'
 import Link, { ExternalLink } from 'src/components/Link'
 import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
+import ProfilePicture from 'src/components/ProfilePicture'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import saveContactMutation from 'src/mutations/saveContactMutation'
@@ -285,15 +285,10 @@ const ContactInfoPage = () => {
             gridColumnGap={3}
             gridRowGap={3}
           >
-            <Box gridArea="profilePic" placeSelf="center">
-              <Image
-                borderRadius="50%"
-                width="100%"
-                height="100%"
-                alt={`profile picture of ${formatName(contact.name)}`}
-                src={
-                  contact.profilePicUrl ?? 'http://via.placeholder.com/500x500'
-                }
+            <Box gridArea="profilePic" placeSelf="center" width="100%">
+              <ProfilePicture
+                name={contact.name}
+                profilePicUrl={contact.profilePicUrl}
               />
             </Box>
 

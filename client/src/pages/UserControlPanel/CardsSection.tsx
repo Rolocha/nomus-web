@@ -231,11 +231,18 @@ export default () => {
                   py={2}
                   px={2}
                 >
-                  <BusinessCardImage
-                    frontImageUrl={cv.frontImageUrl || ''}
-                    backImageUrl={cv.backImageUrl || ''}
-                    width={{ _: '60vw', [bp]: '300px' }}
-                  />
+                  {cv.frontImageUrl || cv.backImageUrl ? (
+                    <BusinessCardImage
+                      frontImageUrl={cv.frontImageUrl}
+                      backImageUrl={cv.backImageUrl}
+                      width={{ _: '60vw', [bp]: '300px' }}
+                    />
+                  ) : (
+                    <BusinessCardImage
+                      placeholder
+                      width={{ _: '60vw', [bp]: '300px' }}
+                    />
+                  )}
                   {cardVersionStatsById[cv.id] && (
                     <Text.Body3>
                       {[

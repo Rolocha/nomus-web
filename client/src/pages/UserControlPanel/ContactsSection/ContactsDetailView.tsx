@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import Image from 'src/components/Image'
 import * as Text from 'src/components/Text'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
@@ -9,6 +8,7 @@ import { ContactsSortOption } from './utils'
 import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import ContactsEmptyState from './ContactsEmptyState'
+import ProfilePicture from 'src/components/ProfilePicture'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -90,14 +90,10 @@ const ContactsDetailView = ({
           overflowX="hidden"
           overflowY="auto"
         >
-          <Box gridArea="profilePic">
-            <Image
-              width="100%"
-              borderRadius="50%"
-              src={
-                selectedContact.profilePicUrl ??
-                'http://via.placeholder.com/500x300'
-              }
+          <Box gridArea="profilePic" width="100%" placeSelf="center">
+            <ProfilePicture
+              name={selectedContact.name}
+              profilePicUrl={selectedContact.profilePicUrl}
             />
           </Box>
 
