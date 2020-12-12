@@ -7,6 +7,13 @@ export interface BaseAuthData {
   tokenExp: number
 }
 
+interface AuthResponse<Data> {
+  data?: Data
+  error?: {
+    code: string
+  }
+}
+
 export interface AuthManagerOptions<
   LoginArgs,
   SignupArgs,
@@ -20,13 +27,13 @@ export interface AuthManagerOptions<
   // The key in localStorage under which to store the auth data
   authDataKey: string
   // An async function that hits your login endpoint and responds with auth data
-  logIn: (args: LoginArgs) => Promise<AuthData>
+  logIn: (args: LoginArgs) => Promise<AuthResponse<AuthData>>
   // An async function that hits your signup endpoint and responds with auth data
-  signUp: (args: SignupArgs) => Promise<AuthData>
+  signUp: (args: SignupArgs) => Promise<AuthResponse<AuthData>>
   // An async function that logs the user out and returns true on success, false otherwise
   logOut: () => Promise<boolean>
   // An async function that hits your refresh endpoint and responds with a new access token
-  refreshToken: (authData: AuthData) => Promise<AuthData>
+  refreshToken: (authData: AuthData) => Promise<AuthResponse<AuthData>>
   // A function for converting your auth data into the object you want useAuth to return
   // The auth manager will also include your logIn, signUp, and refreshToken methods in
   // the useAuth output, in addition to what you specify in this function
@@ -40,10 +47,10 @@ export class AuthManager<
   AuthData extends BaseAuthData = BaseAuthData
 > {
   // Consumer supplied configuration via constructor
-  private logIn: (args: LoginArgs) => Promise<AuthData>
-  private signUp: (args: SignupArgs) => Promise<AuthData>
+  private logIn: (args: LoginArgs) => Promise<AuthResponse<AuthData>>
+  private signUp: (args: SignupArgs) => Promise<AuthResponse<AuthData>>
   private logOut: () => Promise<boolean>
-  private refreshToken: (args: AuthData) => Promise<AuthData>
+  private refreshToken: (args: AuthData) => Promise<AuthResponse<AuthData>>
   private makeUseAuthOutput: (authData: AuthData | null) => UseAuthOutput
   private authDataKey: string
   private expirationHeadstart: number
@@ -139,12 +146,18 @@ export class AuthManager<
 
   private logInAndSaveAuth = async (args: LoginArgs) => {
     const response = await this.logIn(args)
-    this.updateAuthData(response)
+    if (response.data) {
+      this.updateAuthData(response.data)
+    }
+    return response
   }
 
   private signUpAndSaveAuth = async (args: SignupArgs) => {
     const response = await this.signUp(args)
-    this.updateAuthData(response)
+    if (response.data) {
+      this.updateAuthData(response.data)
+    }
+    return response
   }
 
   private tokenHasExpired(authData: AuthData) {
@@ -158,9 +171,12 @@ export class AuthManager<
   // Resolves to a boolean specifying whether the token was refreshed
   private async _refreshToken(authData: AuthData): Promise<boolean> {
     try {
-      const newAuthData = await this.refreshToken(authData)
-      this.updateAuthData(newAuthData)
-      return true
+      const response = await this.refreshToken(authData)
+      if ('data' in response && response.data) {
+        this.updateAuthData(response.data)
+        return true
+      }
+      return false
     } catch (err) {
       return false
     }
