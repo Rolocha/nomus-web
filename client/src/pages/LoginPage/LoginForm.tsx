@@ -6,6 +6,7 @@ import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
 
@@ -71,7 +72,7 @@ const LoginForm = () => {
               alignItems="center"
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
-              <SVG.Eye />{' '}
+              <SVG.Eye color={colors.nomusBlue} />{' '}
               <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
                 {passwordVisible ? 'Hide' : 'Show'} password
               </Text.Body3>
