@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import { Link } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -26,6 +27,19 @@ const showRequiredError = (
     </Text.Body3>
   ) : null
 
+type SubmissionErrorType = 'incorrect-credentials'
+
+const renderSubmissionError = (type: SubmissionErrorType) => {
+  if (type === 'incorrect-credentials') {
+    return (
+      <Text.Body3 color="brightCoral">
+        The username and password you entered did not match our records. Please
+        double-check and try again.
+      </Text.Body3>
+    )
+  }
+}
+
 const LoginForm = () => {
   const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
     mode: 'onChange',
@@ -39,11 +53,19 @@ const LoginForm = () => {
   const { logIn } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [loggingIn, setLoggingIn] = React.useState(false)
+  const [
+    submissionError,
+    setSubmissionError,
+  ] = React.useState<SubmissionErrorType | null>(null)
 
   const onSubmit = async (formData: LoginFormData) => {
+    setSubmissionError(null)
     setLoggingIn(true)
     try {
-      await logIn(formData)
+      const authResponse = await logIn(formData)
+      if (authResponse.error) {
+        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+      }
     } finally {
       setLoggingIn(false)
     }
@@ -97,6 +119,9 @@ const LoginForm = () => {
         >
           Continue
         </Button>
+        {submissionError && (
+          <Box my={2}>{renderSubmissionError(submissionError)}</Box>
+        )}
       </Form.Form>
     </Box>
   )

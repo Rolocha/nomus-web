@@ -30,6 +30,24 @@ const showRequiredError = (
     </Text.Body3>
   ) : null
 
+type SubmissionErrorType = 'invalid-email' | 'account-already-exists'
+
+const renderSubmissionError = (type: SubmissionErrorType) => {
+  return (
+    <Text.Body3 color="brightCoral">
+      {
+        {
+          // This case should pretty much never be reached since we do client-side regex email validation too.
+          'invalid-email':
+            'The email address you entered is invalid. Please use a valid email address.',
+          'account-already-exists':
+            'An account with that email address already exists.',
+        }[type]
+      }
+    </Text.Body3>
+  )
+}
+
 const RegistrationForm = () => {
   const { register, handleSubmit, formState, errors } = useForm<
     RegistrationFormData
@@ -48,11 +66,19 @@ const RegistrationForm = () => {
   const { signUp } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [submittingForm, setSubmittingForm] = React.useState(false)
+  const [
+    submissionError,
+    setSubmissionError,
+  ] = React.useState<SubmissionErrorType | null>(null)
 
   const onSubmit = async (formData: RegistrationFormData) => {
+    setSubmissionError(null)
     setSubmittingForm(true)
     try {
-      await signUp(formData)
+      const authResponse = await signUp(formData)
+      if (authResponse.error) {
+        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+      }
     } finally {
       setSubmittingForm(false)
     }
@@ -128,6 +154,9 @@ const RegistrationForm = () => {
         >
           Create free account
         </Button>
+        {submissionError && (
+          <Box my={2}>{renderSubmissionError(submissionError)}</Box>
+        )}
       </Form.Form>
       <Text.Body2 textAlign="center" mt={2}>
         By clicking Create free account, you agree to our{' '}
