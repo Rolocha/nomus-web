@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { render, act } from '@testing-library/react'
 
-import { AuthManager, AuthManagerOptions, BaseAuthData } from './auth-manager'
+import {
+  AuthManager,
+  AuthManagerOptions,
+  BaseAuthData,
+  AuthResponse,
+} from './auth-manager'
 
 enum Role {
   User = 'user',
@@ -34,12 +39,14 @@ const AUTH_DATA_KEY = 'AUTH_DATA'
 const makeExpTimeInSeconds = (secondsFromNow: number) =>
   (Date.now() + secondsFromNow * 1000) / 1000
 
-const makeMockAuthData = ({
+const makeMockAuthResponse = ({
   tokenExp,
   roles,
-}: Partial<AuthData> = {}): AuthData => ({
-  tokenExp: tokenExp ?? makeExpTimeInSeconds(15 * 60), // in 15 minutes
-  roles: roles ?? [Role.User],
+}: Partial<AuthData> = {}): AuthResponse<AuthData> => ({
+  data: {
+    tokenExp: tokenExp ?? makeExpTimeInSeconds(15 * 60), // in 15 minutes
+    roles: roles ?? [Role.User],
+  },
 })
 
 const setup = (useAuth: () => any) => {
@@ -62,14 +69,14 @@ const makeTestManager = ({
 }: Partial<
   AuthManagerOptions<LoginArgs, SignupArgs, UseAuthOutput, AuthData>
 > = {}) => {
-  const mockAuthData = makeMockAuthData()
+  const mockAuthResponse = makeMockAuthResponse()
   return new AuthManager<LoginArgs, SignupArgs, UseAuthOutput, AuthData>({
     expirationHeadstart: expirationHeadstart ?? '0',
     authDataKey: AUTH_DATA_KEY,
-    refreshToken: refreshToken ?? jest.fn().mockResolvedValue(mockAuthData),
-    logIn: logIn ?? jest.fn().mockResolvedValue(mockAuthData),
-    logOut: logOut ?? jest.fn().mockResolvedValue(mockAuthData),
-    signUp: signUp ?? jest.fn().mockResolvedValue(mockAuthData),
+    refreshToken: refreshToken ?? jest.fn().mockResolvedValue(mockAuthResponse),
+    logIn: logIn ?? jest.fn().mockResolvedValue(mockAuthResponse),
+    logOut: logOut ?? jest.fn().mockResolvedValue(mockAuthResponse),
+    signUp: signUp ?? jest.fn().mockResolvedValue(mockAuthResponse),
     makeUseAuthOutput: makeUseAuthOutput ?? jest.fn().mockReturnValue({}),
   })
 }
@@ -196,8 +203,8 @@ describe('AuthManager', () => {
     })
 
     it('returns true without invoking a refresh if auth data exists and is not about to expire', async () => {
-      const mockAuthData = makeMockAuthData()
-      localStorage.setItem(AUTH_DATA_KEY, JSON.stringify(mockAuthData))
+      const mockAuthResponse = makeMockAuthResponse()
+      localStorage.setItem(AUTH_DATA_KEY, JSON.stringify(mockAuthResponse.data))
 
       const refreshToken = jest.fn()
       const am = makeTestManager({
@@ -212,16 +219,16 @@ describe('AuthManager', () => {
 
     it('returns true after invoking a refresh if auth data exists and is about to expire', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
-      const mockAuthDataThatExpiresSoon = makeMockAuthData({
+      const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
         tokenExp: makeExpTimeInSeconds(9),
       })
       localStorage.setItem(
         AUTH_DATA_KEY,
-        JSON.stringify(mockAuthDataThatExpiresSoon),
+        JSON.stringify(mockAuthResponseThatExpiresSoon.data),
       )
 
-      const newAuthData = makeMockAuthData()
-      const refreshToken = jest.fn().mockResolvedValue(newAuthData)
+      const newAuthResponse = makeMockAuthResponse()
+      const refreshToken = jest.fn().mockResolvedValue(newAuthResponse)
       const am = makeTestManager({
         logIn: jest.fn(),
         refreshToken,
@@ -235,12 +242,12 @@ describe('AuthManager', () => {
 
     it('returns false after invoking a refresh if auth data exists and is about to expire but refresh failed', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
-      const mockAuthDataThatExpiresSoon = makeMockAuthData({
+      const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
         tokenExp: makeExpTimeInSeconds(9),
       })
       localStorage.setItem(
         AUTH_DATA_KEY,
-        JSON.stringify(mockAuthDataThatExpiresSoon),
+        JSON.stringify(mockAuthResponseThatExpiresSoon.data),
       )
 
       const refreshToken = jest.fn().mockRejectedValue(new Error('failed!'))

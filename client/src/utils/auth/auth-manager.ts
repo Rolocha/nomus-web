@@ -7,7 +7,7 @@ export interface BaseAuthData {
   tokenExp: number
 }
 
-interface AuthResponse<Data> {
+export interface AuthResponse<Data> {
   data?: Data
   error?: {
     code: string
