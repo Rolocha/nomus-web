@@ -198,17 +198,17 @@ export class User extends BaseModel({
     this: ReturnModelType<typeof User>,
     email: string,
     password: string
-  ) {
+  ): EventualResult<User, 'invalid-login-credentials'> {
     // Search for a user by email and password.
     const user = await this.findOne({ email })
     if (!user) {
-      throw new Error('Invalid login credentials')
+      return Result.fail('invalid-login-credentials')
     }
     const doesPasswordMatch = await bcrypt.compare(password, user.password)
     if (!doesPasswordMatch) {
-      throw new Error('Invalid login credentials')
+      return Result.fail('invalid-login-credentials')
     }
-    return user
+    return Result.ok(user)
   }
 
   public generateAccessToken(): string {
