@@ -30,14 +30,14 @@ const getCardVersionFromShortId = async (shortId: string): Promise<DocumentType<
 
 export const spliceRouteStr = (
   routeStr: string
-): Result<{ sheetId: string; cardId: string }, string> => {
+): Result<{ sheetId: string; cardId: string }, 'invalid-format'> => {
   const res = routeStr.match(ROUTE_REGEX)
 
   if (res && res.length === 3 && res[0] === routeStr) {
     return Result.ok({ sheetId: res[1], cardId: res[2] })
   }
 
-  return Result.fail(`Incorrectly formatted routeStr: ${routeStr}`)
+  return Result.fail('invalid-format')
 }
 
 export const getUserFromCardId = async (cardId: string): Promise<User> => {
