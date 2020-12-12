@@ -4,6 +4,7 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { IName, formatName, getInitials } from 'src/utils/name'
 import Box from './Box'
+import Image from './Image'
 
 interface Props {
   name: IName
@@ -41,21 +42,19 @@ const ProfilePicture = ({ name, profilePicUrl }: Props) => {
       position="relative"
     >
       {profilePicUrl && (
-        <Box
-          role="img"
+        <Image
+          src={profilePicUrl}
+          alt={alt}
           position="absolute"
-          top="50%"
-          left="50%"
-          background={`url(${profilePicUrl}) 50% 50% no-repeat`}
-          css={css({
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            transform: 'translate(-50%, -50%)',
-          })}
+          backgroundPosition="center"
+          backgroundSize="cover"
           borderRadius="50%"
           width="100%"
           height="100%"
-          alt={alt}
+          css={css({
+            objectFit: 'cover',
+            objectPosition: '50% 50%',
+          })}
         />
       )}
       {!profilePicUrl && (
