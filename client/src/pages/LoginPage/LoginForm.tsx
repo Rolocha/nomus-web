@@ -15,17 +15,6 @@ interface LoginFormData {
   password: string
 }
 
-const showRequiredError = (
-  fieldKey: string,
-  fieldName: string,
-  errors: Record<string, any>,
-) =>
-  fieldKey in errors && errors[fieldKey] ? (
-    <Text.Body3 color="brightCoral" m={1}>
-      {`${fieldName} is required`}
-    </Text.Body3>
-  ) : null
-
 type SubmissionErrorType = 'incorrect-credentials'
 
 const renderSubmissionError = (type: SubmissionErrorType) => {
@@ -43,11 +32,14 @@ const renderSubmissionError = (type: SubmissionErrorType) => {
 
 const LoginForm = () => {
   const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
-    mode: 'onChange',
+    mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
-        email: yup.string().email().required(),
-        password: yup.string().required(),
+        email: yup
+          .string()
+          .email('Please enter a valid email address.')
+          .required('Email is required.'),
+        password: yup.string().required('Password is required.'),
       }),
     ),
   })
@@ -82,8 +74,9 @@ const LoginForm = () => {
             ref={register({ required: true })}
             type="text"
             autoComplete="email"
+            error={errors.email}
           />
-          {showRequiredError('email', 'Email', errors)}
+          <Form.FieldError fieldError={errors.email} />
         </Form.Item>
         <Form.Item mb="20px">
           <Box display="flex" justifyContent="space-between">
@@ -106,8 +99,9 @@ const LoginForm = () => {
             ref={register({ required: true })}
             type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
+            error={errors.password}
           />
-          {showRequiredError('password', 'Password', errors)}
+          <Form.FieldError fieldError={errors.password} />
         </Form.Item>
         <Button
           type="submit"
