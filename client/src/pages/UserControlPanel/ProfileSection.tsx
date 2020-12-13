@@ -5,7 +5,7 @@ import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePict
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import { InternalLink, Link } from 'src/components/Link'
+import { Link } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -215,7 +215,7 @@ export default () => {
         gridArea="previewButton"
         justifySelf={{ _: 'stretch', [bp]: 'stretch' }}
       >
-        <InternalLink
+        <Link
           display="inline-block"
           width="100%"
           to={`/${data.user.username}`}
@@ -231,7 +231,7 @@ export default () => {
             <Text.Body2 color="linkBlue">{`nomus.com/${data.user.username}`}</Text.Body2>
             <SVG.ExternalLink color={colors.linkBlue} />
           </Box>
-        </InternalLink>
+        </Link>
       </Box>
 
       <Box gridArea="editProfile">
