@@ -5,7 +5,7 @@ import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePict
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import { InternalLink } from 'src/components/Link'
+import { InternalLink, Link } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -189,14 +189,20 @@ export default () => {
       <Box gridArea="phoneNumber">
         <Box>
           <Text.Label mb={1}>PHONE</Text.Label>
-          <Text.Body2>{data.user.phoneNumber}</Text.Body2>
+          <Text.Body2>
+            <Link to={`tel:${data.user.phoneNumber}`}>
+              {data.user.phoneNumber}
+            </Link>
+          </Text.Body2>
         </Box>
       </Box>
 
       <Box gridArea="profileInfo">
         <Box mb={3}>
           <Text.Label>EMAIL</Text.Label>
-          <Text.Body2>{data.user.email}</Text.Body2>
+          <Text.Body2>
+            <Link to={`mailto:${data.user.email}`}>{data.user.email}</Link>
+          </Text.Body2>
         </Box>
 
         <Box mb={4}>

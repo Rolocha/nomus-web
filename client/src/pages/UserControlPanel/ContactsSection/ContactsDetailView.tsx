@@ -9,6 +9,7 @@ import ContactCardsList from './ContactCardsList'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import ContactsEmptyState from './ContactsEmptyState'
 import ProfilePicture from 'src/components/ProfilePicture'
+import { Link } from 'src/components/Link'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -113,13 +114,21 @@ const ContactsDetailView = ({
             {selectedContact.phoneNumber && (
               <Box px={3}>
                 <Text.Label>Phone</Text.Label>
-                <Text.Body2>{selectedContact.phoneNumber}</Text.Body2>
+                <Text.Body2>
+                  <Link to={`tel:${selectedContact.phoneNumber}`}>
+                    {selectedContact.phoneNumber}
+                  </Link>
+                </Text.Body2>
               </Box>
             )}
             {selectedContact.email && (
               <Box px={3}>
                 <Text.Label>Email</Text.Label>
-                <Text.Body2>{selectedContact.email}</Text.Body2>
+                <Text.Body2>
+                  <Link to={`tel:${selectedContact.email}`}>
+                    {selectedContact.email}
+                  </Link>
+                </Text.Body2>
               </Box>
             )}
           </Box>
