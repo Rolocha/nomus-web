@@ -5,6 +5,7 @@ export interface PersonName {
 }
 
 export interface Contact {
+  __typename: string | null
   //id of the user whose contact is being queried
   id: string
   username: string | null

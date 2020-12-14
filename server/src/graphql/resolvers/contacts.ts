@@ -213,6 +213,7 @@ class ContactsResolver {
     return connectionToContact(connection)
   }
 
+  @Authorized(Role.User)
   @Mutation(() => Contact, {
     description:
       'Creates a new Contact or updates the information associated with an existing contact',

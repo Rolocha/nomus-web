@@ -2,6 +2,7 @@ import { Contact } from 'src/types/contact'
 
 export const createMockContact = (contact: Partial<Contact> = {}): Contact => {
   return {
+    __typename: 'Contact',
     id: 'user_1234',
     username: 'ippudo',
     name: {

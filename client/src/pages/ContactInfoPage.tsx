@@ -1,25 +1,23 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
 import { Redirect, useHistory, useParams } from 'react-router-dom'
-import { useMutation, useQuery } from 'src/apollo'
+import { useQuery } from 'src/apollo'
 import {
   ContactPageQuery,
   ContactPageQueryVariables,
 } from 'src/apollo/types/ContactPageQuery'
-import { SaveContactMutation } from 'src/apollo/types/SaveContactMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
-import * as Form from 'src/components/Form'
 import Link, { ExternalLink } from 'src/components/Link'
-import Modal from 'src/components/Modal'
 import Navbar from 'src/components/Navbar'
+import NotesEditingModal, {
+  NotesFormData,
+} from 'src/components/NotesEditingModal'
 import ProfilePicture from 'src/components/ProfilePicture'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import saveContactMutation from 'src/mutations/saveContactMutation'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
@@ -39,38 +37,25 @@ interface UrlParams {
 
 const bp = 'md'
 
-export interface NotesFormData {
-  meetingDate: string | null
-  meetingPlace: string | null
-  // Enforcing comma-separated tag values
-  tags: string | null
-  notes: string | null
+const getNotesFormDataFromContact = (contact: Contact): NotesFormData => {
+  return {
+    meetingDate: contact.meetingDate,
+    meetingPlace: contact.meetingPlace,
+    tags: contact?.tags?.join(', ') ?? '',
+    notes: contact?.notes,
+  }
 }
 
 const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()
-  const history = useHistory()
+
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
-  const [hasInstantiatedNotes, setHasInstantiatedNotes] = React.useState(false)
-
   const { loggedIn } = useAuth()
-
+  const history = useHistory()
   const meetingDateRef = React.useRef<HTMLInputElement | null>(null)
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
-
-  const defaultFormValues = React.useRef({
-    meetingDate: getCurrentDateForDateInput(),
-  })
-
-  const { handleSubmit, register, watch, reset, formState } = useForm<
-    NotesFormData
-  >({
-    defaultValues: defaultFormValues.current,
-  })
-
-  const formFields = watch()
 
   const openNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(true)
@@ -79,20 +64,6 @@ const ContactInfoPage = () => {
   const closeNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(false)
   }, [setIsNotesModalOpen])
-
-  const resetNotesToPreEdit = React.useCallback(
-    (resetContact: Partial<Contact>) => {
-      reset({
-        meetingDate: resetContact.meetingDate
-          ? resetContact.meetingDate
-          : defaultFormValues.current.meetingDate,
-        meetingPlace: resetContact.meetingPlace,
-        notes: resetContact.notes,
-        tags: resetContact.tags ? resetContact.tags?.join(',') : '',
-      })
-    },
-    [reset, defaultFormValues],
-  )
 
   const openModalAndFocusOn = React.useCallback(
     (refObject: React.MutableRefObject<any>) => () => {
@@ -107,15 +78,6 @@ const ContactInfoPage = () => {
     [openNotesModal],
   )
 
-  const setRefAndRegister = React.useCallback(
-    (refObject: React.MutableRefObject<any>) => (element: any) => {
-      refObject.current = element
-      register(element)
-    },
-    [register],
-  )
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { loading, data, error } = useQuery<
     ContactPageQuery,
     ContactPageQueryVariables
@@ -125,24 +87,22 @@ const ContactInfoPage = () => {
     },
   })
 
-  const [saveContact] = useMutation<SaveContactMutation>(saveContactMutation)
+  const publicContact = data?.publicContact
 
   const contactInfoParams = React.useMemo(() => {
     const params = new URLSearchParams()
-    if (formFields.meetingDate)
-      params.set('meetingDate', formFields.meetingDate)
-    if (formFields.meetingPlace)
-      params.set('meetingPlace', formFields.meetingPlace)
-    if (formFields.notes) params.set('notes', formFields.notes)
-    if (formFields.tags) params.set('tags', formFields.tags)
+    params.set(
+      'meetingDate',
+      publicContact?.meetingDate ?? getCurrentDateForDateInput(),
+    )
+
+    if (publicContact?.meetingPlace)
+      params.set('meetingPlace', publicContact?.meetingPlace)
+    if (publicContact?.notes) params.set('notes', publicContact?.notes)
+    if (publicContact?.tags) params.set('tags', publicContact?.tags.join(','))
 
     return params
-  }, [
-    formFields.meetingDate,
-    formFields.meetingPlace,
-    formFields.notes,
-    formFields.tags,
-  ])
+  }, [publicContact])
 
   const downloadLink = React.useMemo(
     () => `/api/contact-card/${username}?${contactInfoParams.toString()}`,
@@ -150,8 +110,10 @@ const ContactInfoPage = () => {
   )
 
   const createSaveToNomusLink = React.useCallback(
-    (contactInfoParams) => {
-      const params = new URLSearchParams(contactInfoParams)
+    (data: NotesFormData) => {
+      const params = new URLSearchParams(
+        (data as unknown) as Record<string, string>,
+      )
       if (username) params.set('username', username)
       const saveUrl = `/dashboard/contacts/save?${params.toString()}`
       return loggedIn
@@ -160,15 +122,6 @@ const ContactInfoPage = () => {
     },
     [loggedIn, username],
   )
-
-  React.useEffect(() => {
-    // While the notes modal is open and there are edits, make sure clicking
-    if (isNotesModalOpen && formState.isDirty) {
-      window.onbeforeunload = () => true
-    } else {
-      window.onbeforeunload = null
-    }
-  }, [isNotesModalOpen, formState.isDirty])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -188,44 +141,6 @@ const ContactInfoPage = () => {
 
   // Data is loaded at this point
   const { publicContact: contact } = data
-
-  // If we haven't done so yet, update the form state with the contact info
-  // we just received from the server
-  if (!hasInstantiatedNotes) {
-    reset({
-      meetingDate: contact.meetingDate ?? formFields.meetingDate,
-      meetingPlace: contact.meetingPlace ?? formFields.meetingPlace,
-      notes: contact.notes ?? formFields.notes,
-      tags: contact.tags ? contact.tags.join(', ') : formFields.tags,
-    })
-    setHasInstantiatedNotes(true)
-  }
-
-  const saveNotes = async (data: NotesFormData) => {
-    // Update form's default values so if they open the modal again,
-    // it keeps the previous edits
-    reset(watch())
-    if (loggedIn) {
-      const tags = data?.tags ? data.tags.split(',').map((s) => s.trim()) : []
-      await saveContact({
-        variables: {
-          username,
-          contactInfo: {
-            meetingDate: data.meetingDate,
-            meetingPlace: data.meetingPlace,
-            notes: data.notes,
-            tags,
-          },
-        },
-      })
-      // Deactivate exit confirmation dialog
-      window.onbeforeunload = null
-    } else {
-      // User trying to save while not logged in, redirect them to the /register page with URL params pre-filled
-      history.push(createSaveToNomusLink(data))
-    }
-    closeNotesModal()
-  }
 
   return contact ? (
     <Box>
@@ -376,22 +291,18 @@ const ContactInfoPage = () => {
 
             <Box gridArea="meetingDate">
               <Text.Label>Meeting Date</Text.Label>
-              {formFields.meetingDate ? (
-                <Text.Body2 data-testid="meetingDate">
-                  {getFormattedFullDateFromDateInputString(
-                    formFields.meetingDate,
-                  )}
-                </Text.Body2>
-              ) : (
-                <Text.Body2>ERROR</Text.Body2>
-              )}
+              <Text.Body2 data-testid="meetingDate">
+                {getFormattedFullDateFromDateInputString(
+                  contact.meetingDate ?? getCurrentDateForDateInput(),
+                )}
+              </Text.Body2>
             </Box>
 
             <Box gridArea="meetingPlace">
               <Text.Label>Meeting Place</Text.Label>
-              {formFields.meetingPlace ? (
+              {contact.meetingPlace ? (
                 <Text.Body2 data-testid="meetingPlace">
-                  {formFields.meetingPlace}
+                  {contact.meetingPlace}
                 </Text.Body2>
               ) : (
                 <Button
@@ -412,25 +323,20 @@ const ContactInfoPage = () => {
 
             <Box gridArea="tags">
               <Text.Label>Tags</Text.Label>
-              {formFields.hasOwnProperty('tags') &&
-              formFields.tags &&
-              formFields.tags.trim().length > 0 ? (
+              {contact.tags && contact.tags.length > 0 ? (
                 <Box display="flex" flexWrap="wrap" data-testid="tags">
-                  {formFields.tags
-                    .trim()
-                    .split(',')
-                    .map((tag) => (
-                      <Box
-                        borderRadius="1em"
-                        px={3}
-                        py={0}
-                        mr={1}
-                        mb={1}
-                        bg={colors.nomusBlue}
-                      >
-                        <Text.Body2 color="white">{tag.trim()}</Text.Body2>
-                      </Box>
-                    ))}
+                  {contact.tags.map((tag) => (
+                    <Box
+                      borderRadius="1em"
+                      px={3}
+                      py={0}
+                      mr={1}
+                      mb={1}
+                      bg={colors.nomusBlue}
+                    >
+                      <Text.Body2 color="white">{tag.trim()}</Text.Body2>
+                    </Box>
+                  ))}
                 </Box>
               ) : (
                 <Button
@@ -451,12 +357,12 @@ const ContactInfoPage = () => {
 
             <Box gridArea="notes">
               <Text.Label>Additional Notes</Text.Label>
-              {formFields.notes ? (
+              {contact.notes ? (
                 <Text.Body2
                   css={css({ whiteSpace: 'pre-wrap' })}
                   data-testid="notes"
                 >
-                  {formFields.notes}
+                  {contact.notes}
                 </Text.Body2>
               ) : (
                 <Button
@@ -477,112 +383,26 @@ const ContactInfoPage = () => {
             </Box>
           </Box>
 
-          <Modal
-            confirmClose={() => formState.isDirty}
-            isOpen={isNotesModalOpen}
-            onClose={() => {
+          <NotesEditingModal
+            contact={contact}
+            isModalOpen={isNotesModalOpen}
+            onCancel={() => {
               closeNotesModal()
-              resetNotesToPreEdit(contact)
             }}
-            actions={{
-              primary: {
-                text: 'Save',
-                submitForm: 'notes-form',
-              },
-              secondary: {
-                text: 'Cancel',
-                close: true,
-              },
+            onSave={(data) => {
+              if (!loggedIn) {
+                history.push(createSaveToNomusLink(data))
+              }
+              closeNotesModal()
             }}
-            width="min(700px, 95%)"
-          >
-            <Text.CardHeader mb={3}>
-              Edit your notes about {formatName(contact.name)}
-            </Text.CardHeader>
-            <Text.Body2 mb={4}>
-              Jotting down a couple of quick details about your connection will
-              help you better remember them and why they matter to you.
-            </Text.Body2>
-            <Form.Form onSubmit={handleSubmit(saveNotes)} id="notes-form">
-              <Box
-                display="grid"
-                gridTemplateColumns={{ _: '1fr', [bp]: '1fr 1fr 1fr' }}
-                gridTemplateAreas={{
-                  _: `
-                  "meetingDate"
-                  "meetingPlace"
-                  "tags"
-                  "notes"
-                  `,
-                  [bp]: `
-
-                  "meetingDate meetingPlace tags"
-                  "notes notes notes"
-                `,
-                }}
-                gridColumnGap={3}
-                gridRowGap={3}
-                css={css({
-                  placeItems: 'center stretch',
-                })}
-              >
-                <Box gridArea="meetingDate">
-                  <Form.Label>Meeting Date</Form.Label>
-                  <Form.Input
-                    width="100%"
-                    type="date"
-                    name="meetingDate"
-                    placeholder="YYYY-MM-DD"
-                    defaultValue={formFields.meetingDate ?? ''}
-                    ref={setRefAndRegister(meetingDateRef)}
-                  ></Form.Input>
-                </Box>
-
-                <Box gridArea="meetingPlace">
-                  <Form.Label>Meeting Place</Form.Label>
-                  <Form.Input
-                    width="100%"
-                    type="text"
-                    name="meetingPlace"
-                    defaultValue={formFields.meetingPlace ?? ''}
-                    ref={setRefAndRegister(meetingPlaceRef)}
-                  ></Form.Input>
-                </Box>
-
-                <Box gridArea="tags">
-                  <Form.Label>
-                    Tags{' '}
-                    <Text.Body3
-                      css={css({
-                        textTransform: 'none',
-                      })}
-                      as="span"
-                      color={colors.midnightGray}
-                    >
-                      (comma-separated)
-                    </Text.Body3>
-                  </Form.Label>
-                  <Form.Input
-                    width="100%"
-                    type="text"
-                    name="tags"
-                    defaultValue={formFields.tags ?? ''}
-                    ref={setRefAndRegister(tagsRef)}
-                  ></Form.Input>
-                </Box>
-
-                <Box gridArea="notes">
-                  <Form.Label>Additional Notes</Form.Label>
-                  <Form.TextArea
-                    name="notes"
-                    width="100%"
-                    rows={4}
-                    ref={setRefAndRegister(notesRef)}
-                  />
-                </Box>
-              </Box>
-            </Form.Form>
-          </Modal>
+            defaultValues={getNotesFormDataFromContact(contact)}
+            fieldRefs={{
+              meetingDate: meetingDateRef,
+              meetingPlace: meetingPlaceRef,
+              tags: tagsRef,
+              notes: notesRef,
+            }}
+          />
 
           <Box
             // Only upper margin in desktop mode
@@ -628,7 +448,7 @@ const ContactInfoPage = () => {
               </Button>
             ) : (
               <Link
-                to={createSaveToNomusLink(contactInfoParams)}
+                to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"
