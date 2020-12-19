@@ -1,7 +1,6 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useHistory } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
 import { SaveContactMutation } from 'src/apollo/types/SaveContactMutation'
 import Box from 'src/components/Box'
@@ -41,6 +40,17 @@ export interface NotesFormData {
   notes: string | null
 }
 
+export const getNotesFormDataFromContact = (
+  contact: Contact,
+): NotesFormData => {
+  return {
+    meetingDate: contact.meetingDate,
+    meetingPlace: contact.meetingPlace,
+    tags: contact?.tags?.join(', ') ?? '',
+    notes: contact?.notes,
+  }
+}
+
 const bp = 'md'
 
 const NotesEditingModal = ({
@@ -53,9 +63,11 @@ const NotesEditingModal = ({
   onSave,
   fieldRefs,
 }: Props) => {
+  const wasModalJustClosed = React.useRef(false)
   const { handleSubmit, register, watch, reset, formState } = useForm<
     NotesFormData
   >({
+    mode: 'onChange',
     defaultValues: {
       ...defaultValues,
       meetingDate: getCurrentDateForDateInput(),
@@ -79,8 +91,8 @@ const NotesEditingModal = ({
     (refObject?: React.MutableRefObject<any>) => (element: any) => {
       if (refObject) {
         refObject.current = element
-        register(element)
       }
+      register(element)
     },
     [register],
   )
@@ -109,11 +121,25 @@ const NotesEditingModal = ({
     window.onbeforeunload = null
   }
 
+  // If we haven't done so yet, update the form state with the contact info
+  // we just received from the server
+  React.useEffect(() => {
+    if (isModalOpen && wasModalJustClosed.current) {
+      reset({
+        meetingDate: defaultValues?.meetingDate ?? formFields.meetingDate,
+        meetingPlace: defaultValues?.meetingPlace ?? formFields.meetingPlace,
+        notes: defaultValues?.notes ?? formFields.notes,
+        tags: defaultValues?.tags ?? formFields.tags,
+      })
+      wasModalJustClosed.current = false
+    }
+  }, [isModalOpen, wasModalJustClosed, defaultValues, formFields, reset])
   return (
     <Modal
       confirmClose={() => formState.isDirty}
       isOpen={isModalOpen}
       onClose={() => {
+        wasModalJustClosed.current = true
         onCancel(formFields)
       }}
       actions={{

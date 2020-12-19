@@ -13,6 +13,7 @@ import EditButton from 'src/components/EditButton'
 import Link, { ExternalLink } from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
+  getNotesFormDataFromContact,
   NotesFormData,
 } from 'src/components/NotesEditingModal'
 import ProfilePicture from 'src/components/ProfilePicture'
@@ -22,7 +23,6 @@ import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
-import { Contact } from 'src/types/contact'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -36,15 +36,6 @@ interface UrlParams {
 }
 
 const bp = 'md'
-
-const getNotesFormDataFromContact = (contact: Contact): NotesFormData => {
-  return {
-    meetingDate: contact.meetingDate,
-    meetingPlace: contact.meetingPlace,
-    tags: contact?.tags?.join(', ') ?? '',
-    notes: contact?.notes,
-  }
-}
 
 const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()

@@ -1,14 +1,19 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
+import BusinessCardImage from 'src/components/BusinessCardImage'
+import EditButton from 'src/components/EditButton'
+import NotesEditingModal, {
+  getNotesFormDataFromContact,
+} from 'src/components/NotesEditingModal'
+import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
-import { ContactsSortOption } from './utils'
 import ContactCardsList from './ContactCardsList'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import ContactsEmptyState from './ContactsEmptyState'
-import ProfilePicture from 'src/components/ProfilePicture'
+import { ContactsSortOption } from './utils'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -23,6 +28,16 @@ const ContactsDetailView = ({
   selectedContact,
   contacts,
 }: Props) => {
+  const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
+
+  const openNotesModal = React.useCallback(() => {
+    setIsNotesModalOpen(true)
+  }, [setIsNotesModalOpen])
+
+  const closeNotesModal = React.useCallback(() => {
+    setIsNotesModalOpen(false)
+  }, [setIsNotesModalOpen])
+
   return (
     <Box
       display={{ _: undefined, [bp]: 'grid' }}
@@ -67,7 +82,7 @@ const ContactsDetailView = ({
           display="grid"
           gridTemplateColumns={{
             _: '4fr 8fr',
-            [bp]: '2fr 6fr',
+            [bp]: '11em 6fr',
           }}
           gridTemplateAreas={{
             _: `
@@ -149,17 +164,21 @@ const ContactsDetailView = ({
           <Box
             gridArea="notes"
             display="grid"
-            gridTemplateColumns="2fr 6fr"
+            gridTemplateColumns="11em 1fr"
             gridColumnGap={3}
             gridRowGap="24px"
             gridTemplateAreas={`
-            "title title"
+            "title editButton"
             "meetingDate meetingPlace"
             "tags additionalNotes"
           `}
           >
             <Box gridArea="title">
               <Text.SectionHeader>Your notes</Text.SectionHeader>
+            </Box>
+
+            <Box gridArea="editButton">
+              <EditButton iconOnlyBp={bp} onClick={openNotesModal} />
             </Box>
 
             <Box gridArea="meetingDate">
@@ -178,13 +197,40 @@ const ContactsDetailView = ({
 
             <Box gridArea="tags">
               <Text.Label>Tags</Text.Label>
-              <Text.Body2>TODO</Text.Body2>
+              {selectedContact.tags && selectedContact.tags.length > 0 ? (
+                <Box display="flex" flexWrap="wrap" data-testid="tags">
+                  {selectedContact.tags.map((tag) => (
+                    <Box
+                      borderRadius="1em"
+                      px={3}
+                      py={0}
+                      mr={1}
+                      mb={1}
+                      bg={colors.nomusBlue}
+                    >
+                      <Text.Body2 color="white">{tag.trim()}</Text.Body2>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Text.Body2>No tags</Text.Body2>
+              )}
             </Box>
 
             <Box gridArea="additionalNotes">
               <Text.Label>Additional Notes</Text.Label>
               <Text.Body2>{selectedContact.notes ?? ''}</Text.Body2>
             </Box>
+          </Box>
+
+          <Box position="relative" zIndex={2}>
+            <NotesEditingModal
+              contact={selectedContact}
+              isModalOpen={isNotesModalOpen}
+              onCancel={closeNotesModal}
+              onSave={closeNotesModal}
+              defaultValues={getNotesFormDataFromContact(selectedContact)}
+            />
           </Box>
         </Box>
       )}
