@@ -318,6 +318,7 @@ const ContactInfoPage = () => {
                 <Box display="flex" flexWrap="wrap" data-testid="tags">
                   {contact.tags.map((tag) => (
                     <Box
+                      key={tag}
                       borderRadius="1em"
                       px={3}
                       py={0}

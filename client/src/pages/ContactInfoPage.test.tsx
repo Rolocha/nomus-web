@@ -52,46 +52,30 @@ const createSaveContactMutationMock = (
 const ui = {
   openNotesModal: (renderResult: RenderResult) => {
     // Open the modal
-    fireEvent(
+    fireEvent.click(
       renderResult.getByText('Edit', { exact: false }).closest('button')!,
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-      }),
     )
   },
   saveNotesModal: (renderResult: RenderResult) => {
     // Hit Save
-    fireEvent(
+    fireEvent.click(
       renderResult.getByRole('button', { name: 'Save' }).closest('button')!,
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-      }),
     )
   },
   cancelNotesModal: (renderResult: RenderResult) => {
     // Hit Cancel
-    fireEvent(
+    fireEvent.click(
       renderResult.getByRole('button', { name: 'Cancel' }).closest('button')!,
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-      }),
     )
   },
   confirmDiscardNotes: (renderResult: RenderResult) => {
     // Hit Discard
-    fireEvent(
+    fireEvent.click(
       renderResult
         .getByRole('button', {
           name: 'Discard',
         })
         .closest('button')!,
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-      }),
     )
   },
   setNotesModalFormValues: (values: Partial<NotesFormData>) => {
@@ -462,6 +446,7 @@ describe('Contact Info Page', () => {
         meetingDate: newContactInfo.meetingDate,
       }
       ui.setNotesModalFormValues(newFormValues)
+      await new Promise((resolve) => setTimeout(resolve, 0)) // wait for values to propagate
 
       // Ensure discard confirmation dialog pops up
       ui.cancelNotesModal(renderResult)
