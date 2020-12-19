@@ -10,6 +10,7 @@ export default gql`
       username
       meetingDate
       meetingPlace
+      tags
       notes
     }
   }
