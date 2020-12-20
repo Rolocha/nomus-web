@@ -29,6 +29,16 @@ describe('<Modal />', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  it('renders the modal to a portal', () => {
+    renderer.create(
+      <Modal isOpen={true} onClose={() => {}}>
+        <PageHeader>Test Modal</PageHeader>
+        <Body>Some content</Body>
+      </Modal>,
+    )
+    expect(ReactDOM.createPortal).toHaveBeenCalled()
+  })
+
   it('if confirmClose is true, show confirmation modal when trying to close', () => {
     const closeModal = jest.fn()
 
