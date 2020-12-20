@@ -1,42 +1,29 @@
 import * as React from 'react'
-import renderer from 'react-test-renderer'
 import { render, cleanup } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import { PageHeader, Body } from 'src/components/Text'
 import Modal from 'src/components/Modal'
+import { setUpModalPortal } from 'src/test-utils/modal.test'
 
 describe('<Modal />', () => {
   beforeAll(() => {
-    // Mock out ReactDOM.createPortal to just return the element directly rather than portaling
-    // which would fail since there's no DOM and no div#modal-root to portal to
-    // @ts-ignore
-    ReactDOM.createPortal = jest.fn((element) => element)
+    jest.spyOn(ReactDOM, 'createPortal')
+    setUpModalPortal()
   })
 
   afterEach(() => {
-    // @ts-ignore
-    ReactDOM.createPortal.mockClear()
     cleanup()
   })
 
-  it('renders a modal with the specified content', () => {
-    const component = renderer.create(
+  it('renders a modal with the specified content in a portal', () => {
+    render(
       <Modal isOpen={true} onClose={() => {}}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,
     )
-    const tree = component.toJSON()
-    expect(tree).toMatchSnapshot()
-  })
-
-  it('renders the modal to a portal', () => {
-    renderer.create(
-      <Modal isOpen={true} onClose={() => {}}>
-        <PageHeader>Test Modal</PageHeader>
-        <Body>Some content</Body>
-      </Modal>,
-    )
+    const modalRoot = document.querySelector('div#modal-root')
+    expect(modalRoot).toMatchSnapshot()
     expect(ReactDOM.createPortal).toHaveBeenCalled()
   })
 
