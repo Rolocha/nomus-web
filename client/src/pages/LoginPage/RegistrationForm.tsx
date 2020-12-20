@@ -7,6 +7,7 @@ import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
 
@@ -18,40 +19,58 @@ interface RegistrationFormData {
   lastName: string
 }
 
-const showRequiredError = (
-  fieldKey: string,
-  fieldName: string,
-  errors: Record<string, any>,
-) =>
-  fieldKey in errors && errors[fieldKey] ? (
-    <Text.Body3 color="brightCoral" m={1}>
-      {`${fieldName} is required`}
+type SubmissionErrorType = 'invalid-email' | 'account-already-exists'
+
+const renderSubmissionError = (type: SubmissionErrorType) => {
+  return (
+    <Text.Body3 color="brightCoral">
+      {
+        {
+          // This case should pretty much never be reached since we do client-side regex email validation too.
+          'invalid-email':
+            'The email address you entered is invalid. Please use a valid email address.',
+          'account-already-exists':
+            'An account with that email address already exists.',
+        }[type]
+      }
     </Text.Body3>
-  ) : null
+  )
+}
 
 const RegistrationForm = () => {
   const { register, handleSubmit, formState, errors } = useForm<
     RegistrationFormData
   >({
-    mode: 'onChange',
+    mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
-        firstName: yup.string().required(),
+        firstName: yup.string().required('First name is required.'),
         middleName: yup.string(),
-        lastName: yup.string().required(),
-        email: yup.string().email().required(),
-        password: yup.string().required(),
+        lastName: yup.string().required('Last name is required.'),
+        email: yup
+          .string()
+          .email('Please enter a valid email address.')
+          .required('Email is required.'),
+        password: yup.string().required('Password is required.'),
       }),
     ),
   })
   const { signUp } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [submittingForm, setSubmittingForm] = React.useState(false)
+  const [
+    submissionError,
+    setSubmissionError,
+  ] = React.useState<SubmissionErrorType | null>(null)
 
   const onSubmit = async (formData: RegistrationFormData) => {
+    setSubmissionError(null)
     setSubmittingForm(true)
     try {
-      await signUp(formData)
+      const authResponse = await signUp(formData)
+      if (authResponse.error) {
+        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+      }
     } finally {
       setSubmittingForm(false)
     }
@@ -68,8 +87,9 @@ const RegistrationForm = () => {
               ref={register({ required: true })}
               type="text"
               autoComplete="firstName"
+              error={errors.firstName}
             />
-            {showRequiredError('firstName', 'First name', errors)}
+            <Form.FieldError fieldError={errors.firstName} />
           </Form.Item>
           <Form.Item mb="20px">
             <Form.Label htmlFor="email">LAST NAME</Form.Label>
@@ -78,8 +98,9 @@ const RegistrationForm = () => {
               ref={register({ required: true })}
               type="text"
               autoComplete="lastName"
+              error={errors.lastName}
             />
-            {showRequiredError('lastName', 'Last name', errors)}
+            <Form.FieldError fieldError={errors.lastName} />
           </Form.Item>
         </Box>
         <Form.Item mb="20px">
@@ -89,8 +110,9 @@ const RegistrationForm = () => {
             ref={register({ required: true })}
             type="text"
             autoComplete="email"
+            error={errors.email}
           />
-          {showRequiredError('email', 'Email', errors)}
+          <Form.FieldError fieldError={errors.email} />
         </Form.Item>
         <Form.Item mb="20px">
           <Box display="flex" justifyContent="space-between">
@@ -102,7 +124,7 @@ const RegistrationForm = () => {
               alignItems="center"
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
-              <SVG.Eye />{' '}
+              <SVG.Eye color={colors.nomusBlue} />{' '}
               <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
                 {passwordVisible ? 'Hide' : 'Show'} password
               </Text.Body3>
@@ -113,8 +135,9 @@ const RegistrationForm = () => {
             ref={register({ required: true })}
             type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
+            error={errors.password}
           />
-          {showRequiredError('password', 'Password', errors)}
+          <Form.FieldError fieldError={errors.password} />
         </Form.Item>
         <Button
           variant="primary"
@@ -127,6 +150,9 @@ const RegistrationForm = () => {
         >
           Create free account
         </Button>
+        {submissionError && (
+          <Box my={2}>{renderSubmissionError(submissionError)}</Box>
+        )}
       </Form.Form>
       <Text.Body2 textAlign="center" mt={2}>
         By clicking Create free account, you agree to our{' '}

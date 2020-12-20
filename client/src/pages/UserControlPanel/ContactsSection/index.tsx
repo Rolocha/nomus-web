@@ -73,6 +73,7 @@ export default () => {
           cardFrontImageUrl
           cardBackImageUrl
           notes
+          tags
           vcfUrl
 
           meetingPlace

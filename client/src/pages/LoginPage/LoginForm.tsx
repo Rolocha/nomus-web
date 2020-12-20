@@ -6,6 +6,7 @@ import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
 
@@ -14,35 +15,50 @@ interface LoginFormData {
   password: string
 }
 
-const showRequiredError = (
-  fieldKey: string,
-  fieldName: string,
-  errors: Record<string, any>,
-) =>
-  fieldKey in errors && errors[fieldKey] ? (
-    <Text.Body3 color="brightCoral" m={1}>
-      {`${fieldName} is required`}
+type SubmissionErrorType = 'incorrect-credentials'
+
+const renderSubmissionError = (type: SubmissionErrorType) => {
+  return (
+    <Text.Body3 color="brightCoral">
+      {
+        {
+          'incorrect-credentials':
+            'The username and password you entered did not match our records. Please double-check and try again.',
+        }[type]
+      }
     </Text.Body3>
-  ) : null
+  )
+}
 
 const LoginForm = () => {
   const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
-    mode: 'onChange',
+    mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
-        email: yup.string().email().required(),
-        password: yup.string().required(),
+        email: yup
+          .string()
+          .email('Please enter a valid email address.')
+          .required('Email is required.'),
+        password: yup.string().required('Password is required.'),
       }),
     ),
   })
   const { logIn } = useAuth()
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [loggingIn, setLoggingIn] = React.useState(false)
+  const [
+    submissionError,
+    setSubmissionError,
+  ] = React.useState<SubmissionErrorType | null>(null)
 
   const onSubmit = async (formData: LoginFormData) => {
+    setSubmissionError(null)
     setLoggingIn(true)
     try {
-      await logIn(formData)
+      const authResponse = await logIn(formData)
+      if (authResponse.error) {
+        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+      }
     } finally {
       setLoggingIn(false)
     }
@@ -58,8 +74,9 @@ const LoginForm = () => {
             ref={register({ required: true })}
             type="text"
             autoComplete="email"
+            error={errors.email}
           />
-          {showRequiredError('email', 'Email', errors)}
+          <Form.FieldError fieldError={errors.email} />
         </Form.Item>
         <Form.Item mb="20px">
           <Box display="flex" justifyContent="space-between">
@@ -71,7 +88,7 @@ const LoginForm = () => {
               alignItems="center"
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
-              <SVG.Eye />{' '}
+              <SVG.Eye color={colors.nomusBlue} />{' '}
               <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
                 {passwordVisible ? 'Hide' : 'Show'} password
               </Text.Body3>
@@ -82,8 +99,9 @@ const LoginForm = () => {
             ref={register({ required: true })}
             type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
+            error={errors.password}
           />
-          {showRequiredError('password', 'Password', errors)}
+          <Form.FieldError fieldError={errors.password} />
         </Form.Item>
         <Button
           type="submit"
@@ -96,6 +114,9 @@ const LoginForm = () => {
         >
           Continue
         </Button>
+        {submissionError && (
+          <Box my={2}>{renderSubmissionError(submissionError)}</Box>
+        )}
       </Form.Form>
     </Box>
   )

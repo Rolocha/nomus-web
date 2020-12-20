@@ -53,7 +53,7 @@ const ProfilePage = () => {
       <Box
         zIndex={0}
         pb={{ [bp]: 4 }}
-        container
+        container={{ _: false, [bp]: true }}
         width="100%"
         display="flex"
         flexDirection="column"

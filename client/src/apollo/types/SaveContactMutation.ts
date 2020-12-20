@@ -15,6 +15,7 @@ export interface SaveContactMutation_saveContact {
   username: string
   meetingDate: string | null
   meetingPlace: string | null
+  tags: string[] | null
   notes: string | null
 }
 
