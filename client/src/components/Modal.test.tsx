@@ -8,6 +8,7 @@ import Modal from 'src/components/Modal'
 describe('<Modal />', () => {
   beforeAll(() => {
     // Mock out ReactDOM.createPortal to just return the element directly rather than portaling
+    // which would fail since there's no DOM and no div#modal-root to portal to
     // @ts-ignore
     ReactDOM.createPortal = jest.fn((element) => element)
   })
