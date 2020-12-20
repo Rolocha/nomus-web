@@ -315,6 +315,7 @@ const Modal = ({
                       preventCloseWithOutsideClick={true}
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
+                      width="400px"
                       actions={{
                         primary: {
                           text: 'No thanks',
@@ -328,11 +329,11 @@ const Modal = ({
                     >
                       <Box>
                         <Box>
-                          <Text.PageHeader mb={3}>Discard?</Text.PageHeader>
+                          <Text.CardHeader mb={3}>Discard?</Text.CardHeader>
 
-                          <Text.Body>
+                          <Text.Body2>
                             Changes you have made won't be saved.
-                          </Text.Body>
+                          </Text.Body2>
                         </Box>
                       </Box>
                     </Modal>
