@@ -10,7 +10,7 @@ import { useAuth } from 'src/utils/auth'
 import illustration from './login-illustration.svg'
 import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
-import logoFull from './logo-full.svg'
+import logoFull from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
 
 const bp = 'lg'
