@@ -10,10 +10,12 @@ import {
 import * as React from 'react'
 import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom'
 import { ContactInfoInput } from 'src/apollo/types/globalTypes'
+import { NotesFormData } from 'src/components/NotesEditingModal'
 import { createMockContact } from 'src/mocks/contact'
 import saveContactMutation from 'src/mutations/saveContactMutation'
-import ContactInfoPage, { NotesFormData } from 'src/pages/ContactInfoPage'
+import ContactInfoPage from 'src/pages/ContactInfoPage'
 import publicContactQuery from 'src/queries/publicContact'
+import { setUpModalPortal } from 'src/test-utils/modal.test'
 import { validateUrl } from 'src/test-utils/url.test'
 import { Contact } from 'src/types/contact'
 import * as Auth from 'src/utils/auth'
@@ -24,6 +26,9 @@ import {
 import { formatName } from 'src/utils/name'
 import LoginPage from './LoginPage'
 
+beforeAll(() => {
+  setUpModalPortal()
+})
 afterEach(cleanup)
 
 const createSaveContactMutationMock = (
