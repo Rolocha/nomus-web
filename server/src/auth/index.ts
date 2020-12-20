@@ -9,21 +9,21 @@ import { Role } from 'src/util/enums'
 
 const authRouter = express.Router()
 
-interface ServerErrorResponse {
-  message: string
-}
-
-type Failable<T> = T | ServerErrorResponse
-
 interface AuthResponse {
-  tokenExp: number
-  roles: Role[]
+  data?: {
+    tokenExp: number
+    roles: Role[]
+  }
+  error?: {
+    code: string
+    message?: string
+  }
 }
 
 const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
 const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
 
-const getPublicResponseForAccessToken = (accessToken: string) => {
+const getAuthDataForAccessToken = (accessToken: string) => {
   const accessTokenBody = jwt.decode(accessToken) as TokenBody
   return {
     tokenExp: accessTokenBody.exp,
@@ -44,22 +44,34 @@ const setCookies = (res: express.Response, accessToken: string, refreshToken?: s
   }
 }
 
-authRouter.post('/login', async (req, res: express.Response<Failable<AuthResponse>>) => {
+authRouter.post('/login', async (req, res: express.Response<AuthResponse>) => {
   const { email, password } = req.body
   try {
-    const user = await User.mongo.findByCredentials(email, password)
+    const userResult = await User.mongo.findByCredentials(email, password)
+    if (!userResult.isSuccess) {
+      if (userResult.error.name === 'invalid-login-credentials') {
+        res.status(401).json({
+          error: {
+            code: 'incorrect-credentials',
+            message: 'Incorrect email or password.',
+          },
+        })
+        return
+      }
+    }
+    const user = userResult.getValue()
     const accessToken = user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
 
     setCookies(res, accessToken, refreshToken)
-    res.json(getPublicResponseForAccessToken(accessToken))
+    res.json({ data: getAuthDataForAccessToken(accessToken) })
   } catch (err) {
     console.log(err)
     res.status(500).end()
   }
 })
 
-authRouter.post('/signup', async (req, res: express.Response<Failable<AuthResponse>>) => {
+authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
   const { firstName, middleName, lastName, email, password } = req.body
   try {
     const user = await User.mongo.createNewUser({
@@ -75,8 +87,28 @@ authRouter.post('/signup', async (req, res: express.Response<Failable<AuthRespon
     const refreshToken = await user.generateRefreshToken()
 
     setCookies(res, accessToken, refreshToken)
-    res.json(getPublicResponseForAccessToken(accessToken))
+    res.json({ data: getAuthDataForAccessToken(accessToken) })
   } catch (err) {
+    // Check for trying to create an account that already exists
+    if (err.code === 11000) {
+      res.status(400).json({
+        error: {
+          code: 'account-already-exists',
+        },
+      })
+      return
+    }
+    // Check for malformed email address
+    if (err.name === 'ValidationError') {
+      if (err.errors.email) {
+        res.status(400).json({
+          error: {
+            code: 'invalid-email',
+          },
+        })
+        return
+      }
+    }
     console.log(err)
     res.status(500).end()
   }
@@ -89,10 +121,7 @@ authRouter.post('/logout', async (req, res: express.Response<boolean>) => {
   res.end()
 })
 
-const refreshToken = async (
-  req: express.Request,
-  res: express.Response<Failable<AuthResponse>>
-) => {
+const refreshToken = async (req: express.Request, res: express.Response<AuthResponse>) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
   const userId = req.body.id
 
@@ -109,13 +138,16 @@ const refreshToken = async (
   const isTokenValid = await Token.mongo.verify(refreshToken, user._id)
   if (!isTokenValid) {
     return res.status(401).json({
-      message: 'Invalid refresh token',
+      error: {
+        code: 'invalid-refresh-token',
+        message: 'Invalid refresh token',
+      },
     })
   }
 
   const accessToken = user.generateAccessToken()
   setCookies(res, accessToken)
-  res.json(getPublicResponseForAccessToken(accessToken))
+  res.json({ data: getAuthDataForAccessToken(accessToken) })
 }
 
 authRouter.post('/refresh', refreshToken)

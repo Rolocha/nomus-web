@@ -43,14 +43,17 @@ const jsonFetch = async (method: string, route: string, body?: object) => {
     options.body = JSON.stringify(body)
   }
   const res = await fetch(route, options)
-  if (res.status === 200) {
-    return await res.json()
-  } else {
+  const responseBody = await res.json()
+  if (res.status !== 200) {
     if (process.env.NODE_ENV === 'development') {
-      console.error(
-        new Error(`${method.toUpperCase()} ${route} failed, Body: ${res.body}`),
+      console.log(
+        `${method.toUpperCase()} ${route} failed with status ${res.status}`,
       )
     }
+  }
+  return {
+    status: res.status,
+    body: responseBody,
   }
 }
 
@@ -62,12 +65,20 @@ const authManager = new AuthManager<
 >({
   expirationHeadstart: '10s',
   authDataKey: AUTH_DATA_KEY,
-  refreshToken: (authData: AuthData) =>
-    jsonFetch('post', '/auth/refresh', {
+  refreshToken: async (authData: AuthData) => {
+    const res = await jsonFetch('post', '/auth/refresh', {
       id: authData.id,
-    }),
-  logIn: (args: LoginArgs) => jsonFetch('post', '/auth/login', args),
-  signUp: (args: SignupArgs) => jsonFetch('post', '/auth/signup', args),
+    })
+    return res.body
+  },
+  logIn: async (args: LoginArgs) => {
+    const res = await jsonFetch('post', '/auth/login', args)
+    return res.body
+  },
+  signUp: async (args: SignupArgs) => {
+    const res = await jsonFetch('post', '/auth/signup', args)
+    return res.body
+  },
   logOut: async () => {
     try {
       const response = await fetch('/auth/logout', { method: 'post' })

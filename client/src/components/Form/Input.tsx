@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { FieldError } from 'react-hook-form'
 import theme from 'src/styles/theme'
 import {
   border,
@@ -23,18 +24,20 @@ import {
   TypographyProps,
 } from 'styled-system'
 
-type InputProps = {
+interface InputProps
+  extends SpaceProps,
+    PositionProps,
+    ColorProps,
+    BorderProps,
+    LayoutProps,
+    FlexboxProps,
+    GridProps,
+    FontSizeProps,
+    LineHeightProps,
+    TypographyProps {
   as?: string
-} & SpaceProps &
-  PositionProps &
-  ColorProps &
-  BorderProps &
-  LayoutProps &
-  FlexboxProps &
-  GridProps &
-  FontSizeProps &
-  LineHeightProps &
-  TypographyProps
+  error?: FieldError | boolean
+}
 
 const Input = styled<'input', InputProps>('input')(
   {
@@ -55,6 +58,12 @@ const Input = styled<'input', InputProps>('input')(
   fontSize,
   lineHeight,
   typography,
+  (props) =>
+    props.error
+      ? {
+          border: `2px solid ${theme.colors.invalidRed}`,
+        }
+      : undefined,
 )
 
 Input.defaultProps = {

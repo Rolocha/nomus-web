@@ -7,7 +7,8 @@ import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
 import { useAuth } from 'src/utils/auth'
-import illustration from './login-illustration.svg'
+import signInSwoosh from './sign-in-swoosh.svg'
+import registrationSwoosh from './registration-swoosh.svg'
 import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
 import logoFull from './logo-full.svg'
@@ -96,10 +97,10 @@ const LoginPage = () => {
         right="0"
         top="-5%"
         height="110vh"
-        width="60vw"
+        width={{ login: '60vw', register: '65vw' }[mode]}
       >
         <Image
-          src={illustration}
+          src={{ login: signInSwoosh, register: registrationSwoosh }[mode]}
           w="100%"
           h="100%"
           css={css({ objectFit: 'cover', objectPosition: 'left' })}
@@ -114,9 +115,9 @@ const LoginPage = () => {
       >
         {/* Left-hand side */}
         <Box gridColumn="2/3">
-          <Text.PageHeader>
+          <Text.BrandHeader>
             {{ login: 'Sign in', register: 'Get started' }[mode]}
-          </Text.PageHeader>
+          </Text.BrandHeader>
           <Box mb={3} minWidth="300px">
             {
               {
@@ -153,22 +154,27 @@ const LoginPage = () => {
           gridColumn="4/5"
         >
           <Image src={logoFull} mb="32px" />
-          {infoLines.map((line) => (
-            <Box placeSelf="start" mb={3} display="flex">
-              <Box px="8px">
+          <Box
+            display="grid"
+            gridTemplateColumns="60px 4fr"
+            gridRowGap="24px"
+            gridColumnGap="8px"
+          >
+            {infoLines.map((line) => [
+              <Box px="8px" key="check" placeSelf="start end">
                 <SVG.Check
                   color={colors.midnightGray}
                   css={css({ width: '32px', height: '32px' })}
                 />
-              </Box>
-              <Box px="16px">
+              </Box>,
+              <Box key="content">
                 <Text.SectionSubheader mb={2}>
                   {line.title}
                 </Text.SectionSubheader>
                 <Text.Body2>{line.subtitle}</Text.Body2>
-              </Box>
-            </Box>
-          ))}
+              </Box>,
+            ])}
+          </Box>
         </Box>
       </Box>
     </Box>
