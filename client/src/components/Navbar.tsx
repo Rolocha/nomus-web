@@ -3,12 +3,14 @@ import { rgba } from 'polished'
 import * as React from 'react'
 import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
+import Image from 'src/components/Image'
 import Link from 'src/components/Link'
+import PopoverButton from 'src/components/Popover'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import logo from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
-import PopoverButton from './Popover'
 
 interface Props {}
 
@@ -118,13 +120,7 @@ const Navbar = (props: Props) => {
             alignItems="center"
             justifyContent="flex-start"
           >
-            <SVG.LogoWithText
-              color={colors.nomusBlue}
-              css={css`
-                height: 100%;
-                width: auto;
-              `}
-            />
+            <Image src={logo} w="auto" h="100%" />
           </Box>
         </Link>
 
