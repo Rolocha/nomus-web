@@ -11,8 +11,9 @@ import authRouter, { authMiddleware } from 'src/auth'
 import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { appServerPort, graphqlPath } from 'src/config'
-import { getUserFromCardId, spliceRouteStr } from './util/linker'
-// import { graphqlUploadExpress } from 'graphql-upload'
+import { getCardDataForInteractionString } from './util/linker'
+import { CardInteraction, User } from './models'
+import { CardInteractionType } from './util/enums'
 
 db.init()
 
@@ -33,21 +34,47 @@ gqlServer.applyMiddleware({ app, path: graphqlPath })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
-app.get('/d/:routeStr', async (req, res) => {
-  const routeStr = req.params.routeStr
-  const routeStrResult = spliceRouteStr(routeStr)
-  if (!routeStrResult.isSuccess) {
-    res.redirect(404, '404')
-    return
+// interactionString should take one of the following formats based on InteractionType
+//   - InteractionType.Tap (NFC): sheet_x_card_y
+//   - InteractionType.QRCode   : cardv_z
+app.get(
+  '/d/:interactionString',
+  cookieMiddleware,
+  bodyParser.json(),
+  authMiddleware,
+  async (req, res) => {
+    const { interactionString } = req.params
+
+    const cardDataResult = await getCardDataForInteractionString(interactionString)
+    if (!cardDataResult.isSuccess) {
+      // Failed result indicates the URL parse failed
+      res.status(404).json({
+        message: 'Invalid /d URL',
+      })
+      return
+    }
+
+    const { cardVersion, card, interactionType } = cardDataResult.value
+
+    // Log an interaction with this card
+    await CardInteraction.mongo.create({
+      card: card?.id, // may or may not be present
+      cardVersion: cardVersion.id,
+      interactionType,
+    })
+
+    const cardUser = await User.mongo.findById(cardVersion.user)
+    if (cardUser) {
+      res.redirect(307, `/${cardUser.username}`)
+    } else if (interactionType === CardInteractionType.Tap) {
+      res.redirect(302, `/admin/linker/${interactionString}`)
+    } else {
+      res.status(400).json({
+        message: `Got a non-tap (${interactionType}) interaction for a card without an associated user`,
+      })
+    }
   }
-  const { cardId } = routeStrResult.getValue()
-  const user = await getUserFromCardId(cardId)
-  if (user) {
-    res.redirect(307, `/${user.username}`)
-  } else {
-    res.redirect(302, `/admin/linker/${routeStr}`)
-  }
-})
+)
 
 app.listen(Number(appServerPort), () => {
   console.log(`⚡️ Express server is running on localhost:${appServerPort}`)
