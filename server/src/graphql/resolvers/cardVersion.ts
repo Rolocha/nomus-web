@@ -5,6 +5,7 @@ import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
 import { Role } from 'src/util/enums'
+import { Card, CardInteraction } from 'src/models'
 
 @ObjectType()
 class CardVersionStats {
@@ -82,11 +83,18 @@ class CardVersionResolver {
         })
       ).map((cardVersion) => cardVersion.id as string)
 
-    return ids.map((id) => ({
+    const numCardsOrdered = await Promise.all(
+      ids.map((id) => Card.mongo.count({ cardVersion: id }))
+    )
+
+    const interactions = await Promise.all(
+      ids.map((id) => CardInteraction.mongo.count({ cardVersion: id }))
+    )
+
+    return ids.map((id, index) => ({
       id,
-      // TODO: Correctly source this data rather than mocking 0's
-      numCardsOrdered: 0,
-      numTaps: 0,
+      numCardsOrdered: numCardsOrdered[index],
+      numTaps: interactions[index],
     }))
   }
 }
