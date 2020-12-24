@@ -29,7 +29,7 @@ const getCardVersionFromShortId = async (shortId: string): Promise<DocumentType<
   return await CardVersion.mongo.findById(order.cardVersion)
 }
 
-export const spliceNFCString = (
+const spliceNFCString = (
   nfcString: string
 ): Result<{ sheetId: string; cardId: string }, 'invalid-format'> => {
   const sheetCardMatch = nfcString.match(SHEET_CARD_REGEX)
@@ -40,9 +40,7 @@ export const spliceNFCString = (
   return Result.fail('invalid-format')
 }
 
-export const spliceQRString = (
-  qrString: string
-): Result<{ cardVersionId: string }, 'invalid-format'> => {
+const spliceQRString = (qrString: string): Result<{ cardVersionId: string }, 'invalid-format'> => {
   const cardVersionMatch = qrString.match(CARDV_REGEX)
   if (cardVersionMatch && cardVersionMatch.length === 2) {
     return Result.ok({ cardVersionId: cardVersionMatch[1] })

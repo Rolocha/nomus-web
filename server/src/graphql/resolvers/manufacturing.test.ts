@@ -5,7 +5,7 @@ import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
 import AWS from 'aws-sdk'
 import * as AWSMock from 'aws-sdk-mock'
-import { ROUTE_REGEX } from 'src/util/linker'
+import { SHEET_CARD_REGEX } from 'src/util/linker'
 
 beforeAll(async () => {
   await initDB()
@@ -46,12 +46,12 @@ describe('EncodingResolver', () => {
       })
 
       const createdSheets = await Sheet.mongo.find({})
-      expect(createdSheets.length).toBe(5)
+      expect(createdSheets.length).toBe(numSheets)
       expect(createdSheets[0].cards.length).toBe(25)
 
       const createdCards = await Card.mongo.find({})
       expect(createdCards.length).toBe(125)
-      expect(createdCards[0].nfcId).toMatch(ROUTE_REGEX)
+      expect(createdCards[0].nfcId).toMatch(SHEET_CARD_REGEX)
 
       expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
       expect(putObjectMock.mock.calls[0][0].Key).toBe(response.data?.createMassSheetEncoding?.s3Url)

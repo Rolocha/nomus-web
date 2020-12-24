@@ -19,7 +19,7 @@ export class Card extends BaseModel({
   @Field(() => User, { nullable: true })
   user: Ref<User>
 
-  @prop({ _id: false, required: true, ref: () => CardVersion, type: String })
+  @prop({ _id: false, required: false, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
