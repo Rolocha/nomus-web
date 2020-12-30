@@ -144,7 +144,6 @@ const RegistrationForm = () => {
           size="big"
           inProgress={submittingForm}
           inProgressText="Creating your account"
-          disabled={!formState.isValid}
           type="submit"
           width="100%"
         >

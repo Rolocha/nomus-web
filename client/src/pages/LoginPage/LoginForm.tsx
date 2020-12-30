@@ -110,7 +110,6 @@ const LoginForm = () => {
           size="big"
           inProgress={loggingIn}
           inProgressText="Logging in"
-          disabled={!formState.isValid}
         >
           Continue
         </Button>
