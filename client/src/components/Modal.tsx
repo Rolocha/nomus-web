@@ -46,10 +46,11 @@ interface Props {
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
   children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
-  width?: ResponsiveValue<
+  maxWidth?: ResponsiveValue<
     CSS.MaxWidthProperty<TLengthStyledSystem>,
     RequiredTheme
   >
+  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
   height?: ResponsiveValue<
     CSS.MaxHeightProperty<TLengthStyledSystem>,
     RequiredTheme
@@ -65,6 +66,7 @@ const Modal = ({
   isOpen,
   children,
   onClose,
+  maxWidth,
   width,
   height,
   confirmClose,
@@ -196,6 +198,7 @@ const Modal = ({
                           ref={modalCardRef}
                           position="relative"
                           zIndex={20}
+                          maxWidth={maxWidth ?? '90vw'}
                           width={
                             {
                               center: width ?? { _: '100%', md: '80%' },
@@ -315,6 +318,7 @@ const Modal = ({
                       preventCloseWithOutsideClick={true}
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
+                      maxWidth="90%"
                       width="400px"
                       actions={{
                         primary: {
