@@ -37,3 +37,14 @@ registerEnumType(CardSpecBaseType, {
   name: 'CardSpecBaseType',
   description: 'The base type for a card being built',
 })
+
+export enum CardInteractionType {
+  Tap = 'tap',
+  QRCode = 'qr-code',
+  Unknown = 'unknown',
+}
+
+registerEnumType(CardInteractionType, {
+  name: 'CardInteractionType',
+  description: 'How a card was interacted with by the receiver',
+})
