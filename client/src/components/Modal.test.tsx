@@ -1,22 +1,30 @@
 import * as React from 'react'
-import renderer from 'react-test-renderer'
 import { render, cleanup } from '@testing-library/react'
-
+import ReactDOM from 'react-dom'
 import { PageHeader, Body } from 'src/components/Text'
 import Modal from 'src/components/Modal'
-
-afterEach(cleanup)
+import { setUpModalPortal } from 'src/test-utils/modal.test'
 
 describe('<Modal />', () => {
-  it('renders a modal with the specified content', () => {
-    const component = renderer.create(
+  beforeAll(() => {
+    jest.spyOn(ReactDOM, 'createPortal')
+    setUpModalPortal()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  it('renders a modal with the specified content in a portal', () => {
+    render(
       <Modal isOpen={true} onClose={() => {}}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,
     )
-    const tree = component.toJSON()
-    expect(tree).toMatchSnapshot()
+    const modalRoot = document.querySelector('div#modal-root')
+    expect(modalRoot).toMatchSnapshot()
+    expect(ReactDOM.createPortal).toHaveBeenCalled()
   })
 
   it('if confirmClose is true, show confirmation modal when trying to close', () => {
