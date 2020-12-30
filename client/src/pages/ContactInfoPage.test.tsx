@@ -10,9 +10,10 @@ import {
 import * as React from 'react'
 import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom'
 import { ContactInfoInput } from 'src/apollo/types/globalTypes'
+import { NotesFormData } from 'src/components/NotesEditingModal'
 import { createMockContact } from 'src/mocks/contact'
 import saveContactMutation from 'src/mutations/saveContactMutation'
-import ContactInfoPage, { NotesFormData } from 'src/pages/ContactInfoPage'
+import ContactInfoPage from 'src/pages/ContactInfoPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { validateUrl } from 'src/test-utils/url.test'
 import { Contact } from 'src/types/contact'
@@ -217,13 +218,17 @@ describe('Contact Info Page', () => {
     ).toBeInTheDocument()
   })
 
+  // it('if logged in and not yet connected to this user, creates a Connection', async () => {
+
+  // })
+
   describe('Save contact card button', () => {
     it('links to the VCF file download', async () => {
       const { renderResult } = renderComponent({ partialContact: mockContact })
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       const saveContactCardLink = renderResult
-        .getByText('Save contact card')
+        .getByText('Save contact')
         .closest('a')
 
       expect(
@@ -298,7 +303,7 @@ describe('Contact Info Page', () => {
       useAuthSpy.mockRestore()
     })
 
-    it('if logged in and contact already saved, the button is disabled and says "Saved" instead', async () => {
+    it('if logged in and contact already saved, the button says "View in dashboard" instead', async () => {
       const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
         logIn: jest.fn(),
         logOut: jest.fn(),
@@ -315,11 +320,13 @@ describe('Contact Info Page', () => {
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       expect(renderResult.queryByText('Save to Nomus')).toBe(null)
-      const savedButton = renderResult
-        .queryByText('Saved to Nomus')
-        ?.closest('button')
-      expect(savedButton).toBeInTheDocument()
-      expect(savedButton?.disabled).toBe(true)
+      const viewInDashboardButton = renderResult
+        .queryByText('View in dashboard')
+        ?.closest('a')
+      expect(viewInDashboardButton).toBeInTheDocument()
+      expect(viewInDashboardButton?.href).toEndWith(
+        `/dashboard/contacts/detail/${mockContact?.username}`,
+      )
 
       useAuthSpy.mockRestore()
     })

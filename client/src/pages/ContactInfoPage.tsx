@@ -413,36 +413,37 @@ const ContactInfoPage = () => {
             `}
             bg="white"
             boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 1fr' }}
+            gridTemplateColumns={{ _: '50px 1fr', [bp]: '3fr 3fr 1fr' }}
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
             <ExternalLink
               asButton
-              buttonStyle="primary"
+              buttonStyle="secondary"
               buttonSize="big"
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              Save contact card
+              <SVG.Download color={colors.nomusBlue} />{' '}
+              <Box as="span" display={{ _: 'none', [bp]: 'inline-block' }}>
+                Save contact
+              </Box>
             </ExternalLink>
 
-            {contact.connected ? (
-              <Button variant="secondary" size="big" disabled>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  width="100%"
-                  justifyContent="center"
-                >
-                  <SVG.Check /> <span>Saved to Nomus</span>
-                </Box>
-              </Button>
+            {loggedIn && contact.connected ? (
+              <ExternalLink
+                asButton
+                buttonStyle="primary"
+                buttonSize="big"
+                href={`/dashboard/contacts/detail/${username}`}
+              >
+                View in dashboard
+              </ExternalLink>
             ) : (
               <Link
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
                 asButton
-                buttonStyle="secondary"
+                buttonStyle="primary"
                 buttonSize="big"
               >
                 Save to Nomus
