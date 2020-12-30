@@ -182,22 +182,24 @@ const NotesEditingModal = ({
           gridColumnGap={3}
           gridRowGap={3}
           css={css({
-            placeItems: 'center stretch',
+            placeItems: 'start stretch',
           })}
         >
-          <Box gridArea="meetingDate">
+          <Form.Item alignItems="stretch" gridArea="meetingDate" width="100%">
             <Form.Label>Meeting Date</Form.Label>
             <Form.Input
               width="100%"
+              // Needed to fix this janky iOS Safari bug with input[type="date"]: https://stackoverflow.com/questions/26573346/ios-safari-messes-up-input-type-date/44457841
+              minWidth="95%"
               type="date"
               name="meetingDate"
               placeholder="YYYY-MM-DD"
               defaultValue={formFields.meetingDate ?? ''}
               ref={setRefAndRegister(fieldRefs?.meetingDate)}
             ></Form.Input>
-          </Box>
+          </Form.Item>
 
-          <Box gridArea="meetingPlace">
+          <Form.Item gridArea="meetingPlace">
             <Form.Label>Meeting Place</Form.Label>
             <Form.Input
               width="100%"
@@ -206,9 +208,9 @@ const NotesEditingModal = ({
               defaultValue={formFields.meetingPlace ?? ''}
               ref={setRefAndRegister(fieldRefs?.meetingPlace)}
             ></Form.Input>
-          </Box>
+          </Form.Item>
 
-          <Box gridArea="tags">
+          <Form.Item gridArea="tags">
             <Form.Label>
               Tags{' '}
               <Text.Body3
@@ -228,9 +230,9 @@ const NotesEditingModal = ({
               defaultValue={formFields.tags ?? ''}
               ref={setRefAndRegister(fieldRefs?.tags)}
             ></Form.Input>
-          </Box>
+          </Form.Item>
 
-          <Box gridArea="notes">
+          <Form.Item gridArea="notes">
             <Form.Label>Additional Notes</Form.Label>
             <Form.TextArea
               name="notes"
@@ -238,7 +240,7 @@ const NotesEditingModal = ({
               rows={4}
               ref={setRefAndRegister(fieldRefs?.notes)}
             />
-          </Box>
+          </Form.Item>
         </Box>
       </Form.Form>
     </Modal>
