@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as Text from 'src/components/Text'
 import { useForm } from 'react-hook-form'
 import { gql, useMutation } from 'src/apollo'
 import { LinkSheetToUserQuery } from 'src/apollo/types/LinkSheetToUserQuery'
@@ -89,7 +90,10 @@ const LinkerPage = () => {
           gridColumnGap={3}
           gridRowGap={3}
         ></Box>
+        <Text.PageHeader>Hi!</Text.PageHeader>
       </Box>
     </Box>
   )
 }
+
+export default LinkerPage

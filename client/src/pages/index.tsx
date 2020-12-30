@@ -17,6 +17,7 @@ import LoginPage from 'src/pages/LoginPage'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import ComingSoonPage from './ComingSoonPage'
+import LinkerPage from './LinkerPage'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -132,6 +133,11 @@ export const routes: Array<RouteType> = [
   //   Component: CardBuilder,
   //   requiredAuthLevel: Role.User,
   // },
+  {
+    path: '/admin/linker/:routeStr',
+    Component: LinkerPage,
+    requiredAuthLevel: Role.PrintTech,
+  },
   {
     path: '/admin',
     exact: false,
