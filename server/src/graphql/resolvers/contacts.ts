@@ -19,6 +19,7 @@ import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { DATE } from 'src/util/regex'
+import { getCurrentDateForDateInput } from 'src/util/date'
 
 @ObjectType()
 class Contact {
@@ -147,23 +148,6 @@ class ContactsResolver {
     return await Promise.all(connections.map(connectionToContact))
   }
 
-  // The contact query returns a specific user's contact information
-  // It checks that the user is actually connected before returning the information
-  @Authorized(Role.User)
-  @Query(() => Contact)
-  async contact(
-    @Arg('contactId', { nullable: false }) contactId: string,
-    @Ctx() context: IApolloContext
-  ): Promise<Contact> {
-    const connection = await Connection.mongo.findOne({ from: context.user._id, to: contactId })
-
-    if (!connection) {
-      throw new Error('No connection exists between current user and queried user')
-    }
-
-    return connectionToContact(connection)
-  }
-
   @Query(() => Contact, {
     description:
       'A public-facing set of information about a user which includes additional connection-specific notes if the requesting user has already connected with them',
@@ -186,6 +170,12 @@ class ContactsResolver {
       })
       if (existingConnection != null) {
         const contact = await connectionToContact(existingConnection)
+        return { ...contact, connected: true }
+      } else {
+        // Auto-connect the requesting user to the contact
+        const contact = await this.createNewContact(context.user.id, contactUser.id, {
+          meetingDate: getCurrentDateForDateInput(),
+        })
         return { ...contact, connected: true }
       }
     }
