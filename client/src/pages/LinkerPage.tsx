@@ -143,11 +143,6 @@ const LinkerPage = () => {
                   If you want to retry, click the "Retry" button on the bottom
                   to re-type the Short ID
                 </Text.Body>
-                <Text.Body>
-                  If there's another problem, we'll get it sorted. click the
-                  "Email Nomus" button below and it'll email help@nomus.me with
-                  the information we need.
-                </Text.Body>
               </Box>
             )}
             {!(isSuccessState || isFailureState) && (
@@ -163,6 +158,11 @@ const LinkerPage = () => {
           <Box gridArea="instructions">
             {isFailureState && (
               <Box>
+                <Text.Body mb={3}>
+                  If there's a problem, we'll get it sorted. click the "Email
+                  Nomus" button below and it'll email help@nomus.me with the
+                  information we need.
+                </Text.Body>
                 <Text.Body>
                   Please enter the 6 digit alphanumeric ID found on the long
                   edge of the printed sheet in the email.
@@ -187,6 +187,7 @@ const LinkerPage = () => {
                     name="shortId"
                     type="string"
                     fontSize="16px"
+                    width="100%"
                   />
                 </Form.Form>
               </Box>
@@ -198,10 +199,10 @@ const LinkerPage = () => {
                 display="grid"
                 gridTemplateAreas={{
                   _: `
-                  "retry" "email"
+                  "retry email"
                 `,
                   [bp]: `
-                  "retry" "email"
+                  "retry email"
                 `,
                 }}
                 gridColumnGap={3}
@@ -210,11 +211,11 @@ const LinkerPage = () => {
                 <Box gridArea="retry">
                   <Button
                     onClick={onRetry}
-                    variant="secondary"
+                    variant="primary"
                     width={{ _: '100%', [bp]: '100%' }}
                   >
                     <Box display="flex" flexDirection="row" alignItems="center">
-                      <Text.Body2 fontSize="14px" color="nomusBlue">
+                      <Text.Body2 fontSize="14px" color="white">
                         Retry
                       </Text.Body2>
                     </Box>
@@ -225,7 +226,6 @@ const LinkerPage = () => {
                   display="flex"
                   flexDirection="row"
                   justifyContent="stretch"
-                  mt={3}
                   mx={-1}
                   css={css`
                     & > * {
@@ -239,7 +239,7 @@ const LinkerPage = () => {
                   <Box px={1} display="flex" justifyContent="stretch">
                     <Link
                       asButton
-                      buttonStyle="primary"
+                      buttonStyle="secondary"
                       to={sendHelpEmail(window.location.pathname, extraInfo)}
                     >
                       Email Nomus
@@ -252,7 +252,7 @@ const LinkerPage = () => {
               <Button
                 onClick={linkerFormHandleSubmit(onSubmitLinker)}
                 variant="secondary"
-                width={{ _: '100%', [bp]: '50%' }}
+                width={{ _: '100%', [bp]: '100%' }}
               >
                 <Box display="flex" flexDirection="row" alignItems="center">
                   <Text.Body2 fontSize="14px" color="nomusBlue">
