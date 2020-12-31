@@ -1,10 +1,12 @@
 import * as React from 'react'
 import * as Text from 'src/components/Text'
+import * as Form from 'src/components/Form'
 import { useForm } from 'react-hook-form'
 import { gql, useMutation } from 'src/apollo'
 import { LinkSheetToUserQuery } from 'src/apollo/types/LinkSheetToUserQuery'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
+import Button from 'src/components/Button'
 
 const bp = 'md'
 
@@ -20,7 +22,6 @@ const LINKER_MUTATION = gql`
     }
   }
 `
-
 const LinkerPage = () => {
   const {
     register: linkerFormRegister,
@@ -77,20 +78,76 @@ const LinkerPage = () => {
               "explain"
               "instructions"
               "inputForm"
-              "send"
+              "buttonSection"
             `,
             [bp]: `
               "heading"
               "explain"
               "instructions"
               "inputForm"
-              "send"
+              "buttonSection"
             `,
           }}
           gridColumnGap={3}
           gridRowGap={3}
-        ></Box>
-        <Text.PageHeader>Hi!</Text.PageHeader>
+        >
+          <Box gridArea="heading" placeSelf="center">
+            {!(isSuccessState || isFailureState) && (
+              <Text.PageHeader>Sheet Linker</Text.PageHeader>
+            )}
+          </Box>
+
+          <Box gridArea="explain">
+            {!(isSuccessState || isFailureState) && (
+              <Box>
+                <Text.Body>This page is to link cards to a User.</Text.Body>
+                <Text.Body>
+                  For any questions, email help@nomus.me and we'll get it
+                  sorted!
+                </Text.Body>
+              </Box>
+            )}
+          </Box>
+          <Box gridArea="instructions">
+            {!(isSuccessState || isFailureState) && (
+              <Text.Body>
+                Please enter the 6 digit alphanumeric ID found on the long edge
+                of the printed sheet below
+              </Text.Body>
+            )}
+          </Box>
+          <Box gridArea="inputForm">
+            {!(isSuccessState || isFailureState) && (
+              <Box>
+                <Text.Label>Short ID:</Text.Label>
+                <Form.Form>
+                  <Form.Input
+                    onSubmit={linkerFormHandleSubmit(onSubmitLinker)}
+                    ref={linkerFormRegister()}
+                    name="shortId"
+                    type="string"
+                    fontSize="16px"
+                  />
+                </Form.Form>
+              </Box>
+            )}
+          </Box>
+          <Box gridArea="buttonSection">
+            {!(isSuccessState || isFailureState) && (
+              <Button
+                onClick={linkerFormHandleSubmit(onSubmitLinker)}
+                variant="secondary"
+                width={{ _: '100%', [bp]: '50%' }}
+              >
+                <Box display="flex" flexDirection="row" alignItems="center">
+                  <Text.Body2 fontSize="14px" color="nomusBlue">
+                    Link
+                  </Text.Body2>
+                </Box>
+              </Button>
+            )}
+          </Box>
+        </Box>
       </Box>
     </Box>
   )
