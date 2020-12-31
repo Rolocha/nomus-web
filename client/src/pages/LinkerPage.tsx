@@ -7,6 +7,8 @@ import { LinkSheetToUserQuery } from 'src/apollo/types/LinkSheetToUserQuery'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
+import { css } from '@emotion/core'
+import Link from 'src/components/Link'
 
 const bp = 'md'
 
@@ -22,6 +24,21 @@ const LINKER_MUTATION = gql`
     }
   }
 `
+
+const sendHelpEmail = (routeStr: string, errorStr: string): string => {
+  const params = new URLSearchParams()
+  params.set('subject', 'Sheet Linking Failed: ' + routeStr)
+  params.set(
+    'body',
+    'Sheet Linking Failed for sheet: ' +
+      routeStr +
+      '\nError String: `' +
+      errorStr +
+      '`\nShort Id on Sheet Edge:',
+  )
+  return `mailto:help@nomus.me?${params.toString()}`
+}
+
 const LinkerPage = () => {
   const {
     register: linkerFormRegister,
@@ -58,6 +75,11 @@ const LinkerPage = () => {
     }
   }
 
+  const onRetry = async () => {
+    setIsFailureState(false)
+    setIsSuccessState(false)
+  }
+
   return (
     <Box>
       <Navbar />
@@ -92,12 +114,42 @@ const LinkerPage = () => {
           gridRowGap={3}
         >
           <Box gridArea="heading" placeSelf="center">
+            {isSuccessState && (
+              <Text.PageHeader color="validGreen">
+                Success Linking Sheet!
+              </Text.PageHeader>
+            )}
+            {isFailureState && (
+              <Text.PageHeader color="invalidRed">
+                Error Linking Sheet!
+              </Text.PageHeader>
+            )}
             {!(isSuccessState || isFailureState) && (
               <Text.PageHeader>Sheet Linker</Text.PageHeader>
             )}
           </Box>
 
           <Box gridArea="explain">
+            {isSuccessState && (
+              <Box>
+                <Text.Body>That went well!</Text.Body>
+                <Text.Body>Thank you for all the work you do :)</Text.Body>
+              </Box>
+            )}
+            {isFailureState && (
+              <Box>
+                <Text.Body>Something went wrong linking this sheet!</Text.Body>
+                <Text.Body>
+                  If you want to retry, click the "Retry" button on the bottom
+                  to re-type the Short ID
+                </Text.Body>
+                <Text.Body>
+                  If there's another problem, we'll get it sorted. click the
+                  "Email Nomus" button below and it'll email help@nomus.me with
+                  the information we need.
+                </Text.Body>
+              </Box>
+            )}
             {!(isSuccessState || isFailureState) && (
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
@@ -109,6 +161,14 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="instructions">
+            {isFailureState && (
+              <Box>
+                <Text.Body>
+                  Please enter the 6 digit alphanumeric ID found on the long
+                  edge of the printed sheet in the email.
+                </Text.Body>
+              </Box>
+            )}
             {!(isSuccessState || isFailureState) && (
               <Text.Body>
                 Please enter the 6 digit alphanumeric ID found on the long edge
@@ -133,6 +193,61 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="buttonSection">
+            {isFailureState && (
+              <Box
+                display="grid"
+                gridTemplateAreas={{
+                  _: `
+                  "retry" "email"
+                `,
+                  [bp]: `
+                  "retry" "email"
+                `,
+                }}
+                gridColumnGap={3}
+                gridRowGap={3}
+              >
+                <Box gridArea="retry">
+                  <Button
+                    onClick={onRetry}
+                    variant="secondary"
+                    width={{ _: '100%', [bp]: '100%' }}
+                  >
+                    <Box display="flex" flexDirection="row" alignItems="center">
+                      <Text.Body2 fontSize="14px" color="nomusBlue">
+                        Retry
+                      </Text.Body2>
+                    </Box>
+                  </Button>
+                </Box>
+                <Box
+                  gridArea="email"
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="stretch"
+                  mt={3}
+                  mx={-1}
+                  css={css`
+                    & > * {
+                      flex-grow: 1;
+                      > * {
+                        width: 100%;
+                      }
+                    }
+                  `}
+                >
+                  <Box px={1} display="flex" justifyContent="stretch">
+                    <Link
+                      asButton
+                      buttonStyle="primary"
+                      to={sendHelpEmail(window.location.pathname, extraInfo)}
+                    >
+                      Email Nomus
+                    </Link>
+                  </Box>
+                </Box>
+              </Box>
+            )}
             {!(isSuccessState || isFailureState) && (
               <Button
                 onClick={linkerFormHandleSubmit(onSubmitLinker)}
