@@ -1,23 +1,25 @@
+import { css } from '@emotion/core'
 import * as React from 'react'
-import Box from 'src/components/Box'
-import { useQuery, gql, useMutation } from 'src/apollo'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
-import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
-import LoadingPage from 'src/pages/LoadingPage'
-import * as Text from 'src/components/Text'
-import * as Form from 'src/components/Form'
 import { useForm } from 'react-hook-form'
-import EditButton from 'src/components/EditButton'
-import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
-import CHANGE_PASSWORD_MUTATION from './changePasswordMutation'
-import Button from 'src/components/Button'
-import { useAuth } from 'src/utils/auth'
 import { useHistory } from 'react-router-dom'
+import { gql, useMutation, useQuery } from 'src/apollo'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
+import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
+import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
+import Box from 'src/components/Box'
+import Button from 'src/components/Button'
+import EditButton from 'src/components/EditButton'
+import * as Form from 'src/components/Form'
+import SaveButton from 'src/components/SaveButton'
+import * as SVG from 'src/components/SVG'
+import * as Text from 'src/components/Text'
+import LoadingPage from 'src/pages/LoadingPage'
+import { useAuth } from 'src/utils/auth'
+import zxcvbn from 'zxcvbn'
+import CHANGE_PASSWORD_MUTATION from './changePasswordMutation'
 // import ActivationEditor from './ActivationEditor'
 import ProgressBar from './ProgressBar'
-import zxcvbn from 'zxcvbn'
-import SaveButton from 'src/components/SaveButton'
+import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
 
 const bp = 'lg'
 
@@ -40,6 +42,7 @@ export default () => {
   const { logOut } = useAuth()
   const [isEditingEmail, setIsEditingEmail] = React.useState(false)
   const [isEditingUsername, setIsEditingUsername] = React.useState(false)
+
   const {
     register: emailFormRegister,
     handleSubmit: emailFormHandleSubmit,
@@ -78,6 +81,7 @@ export default () => {
             last
           }
           email
+          isEmailVerified
           activated
         }
       }
@@ -198,14 +202,19 @@ export default () => {
               name="email"
               type="email"
               autoComplete="email"
-              fontSize="16px"
-              width="85%"
-              padding="2px 4px"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
         ) : (
-          <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
+          <Box>
+            <Box display="flex" alignItems="center">
+              {!data.user.isEmailVerified && (
+                <SVG.ExclamationO css={css({ marginRight: '4px' })} />
+              )}
+
+              <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
+            </Box>
+          </Box>
         )}
       </Box>
 
@@ -244,9 +253,7 @@ export default () => {
                 name="username"
                 type="username"
                 autoComplete="username"
-                fontSize="16px"
-                width="100%"
-                padding="0px 6px"
+                py={0}
               />
               <Form.Input type="submit" display="none" />
             </Box>

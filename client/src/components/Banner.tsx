@@ -8,7 +8,8 @@ import Box from './Box'
 interface Props {
   type: 'success' | 'warning' | 'danger' | 'info'
   title: string
-  description: string | JSX.Element
+  description: React.ReactNode
+  className?: string
   closable?: boolean
   onClickClose?: () => void
 }
@@ -16,6 +17,7 @@ interface Props {
 const Banner = ({
   type,
   title,
+  className,
   description,
   closable,
   onClickClose,
@@ -36,6 +38,7 @@ const Banner = ({
 
   return (
     <Box
+      className={className}
       position="relative"
       borderRadius={2}
       display="flex"
@@ -54,6 +57,7 @@ const Banner = ({
         display="grid"
         gridTemplateColumns={closable ? 'auto auto' : 'auto'}
         gridColumnGap={2}
+        width="100%"
         justifyContent="space-between"
         alignItems="center"
         p={2}
