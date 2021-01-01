@@ -38,9 +38,7 @@ const renderSubmissionError = (type: SubmissionErrorType) => {
 }
 
 const RegistrationForm = () => {
-  const { register, handleSubmit, formState, errors } = useForm<
-    RegistrationFormData
-  >({
+  const { register, handleSubmit, errors } = useForm<RegistrationFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
