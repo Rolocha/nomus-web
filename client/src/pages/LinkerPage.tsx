@@ -24,7 +24,7 @@ const LINKER_MUTATION = gql`
   }
 `
 
-const sendHelpEmail = (routeStr: string, errorStr: string): string => {
+const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
   const params = new URLSearchParams()
   params.set('subject', 'Sheet Linking Failed: ' + routeStr)
   params.set(
@@ -35,12 +35,11 @@ const sendHelpEmail = (routeStr: string, errorStr: string): string => {
 }
 
 const LinkerPage = () => {
-  const { register, handleSubmit } = useForm<LinkerFormData>()
+  const { register, handleSubmit, formState, setError, errors } = useForm<
+    LinkerFormData
+  >()
   const [linkSheet] = useMutation<LinkSheetToUserQuery>(LINKER_MUTATION)
-  const [submissionState, setSubmissionState] = React.useState<null | boolean>(
-    null,
-  )
-  const [extraInfo, setExtraInfo] = React.useState('No Info')
+  const [infoToEmail, setInfoToEmail] = React.useState<string | null>(null)
 
   const onSubmitLinker = async (formData: LinkerFormData) => {
     if (formData.shortId) {
@@ -53,17 +52,22 @@ const LinkerPage = () => {
             shortId: formData.shortId.toUpperCase(),
           },
         })
-        console.log(response)
+        console.log('test' + response)
         if (response.errors) {
-          setExtraInfo(response.errors.toString())
-          setSubmissionState(false)
+          setInfoToEmail(response.errors.toString())
+          setError('shortId', {
+            type: 'manual',
+            message: 'Uh oh, something went wrong',
+          })
         } else {
-          setExtraInfo(response.data?.linkSheetToUser.userId || '')
-          setSubmissionState(true)
+          setInfoToEmail(response.data?.linkSheetToUser.userId || '')
         }
       } catch (e) {
-        setExtraInfo(e.message)
-        setSubmissionState(false)
+        setInfoToEmail(e.message)
+        setError('shortId', {
+          type: 'manual',
+          message: 'Uh oh, something went wrong',
+        })
       }
     }
   }
@@ -102,10 +106,10 @@ const LinkerPage = () => {
           gridRowGap={3}
         >
           <Box gridArea="heading" placeSelf="center">
-            {!submissionState && (
+            {!formState.isSubmitSuccessful && (
               <Text.PageHeader>Sheet Linker</Text.PageHeader>
             )}
-            {submissionState === true && (
+            {formState.isSubmitSuccessful && (
               <Text.PageHeader color="validGreen">
                 Success Linking Sheet!
               </Text.PageHeader>
@@ -113,7 +117,7 @@ const LinkerPage = () => {
           </Box>
 
           <Box gridArea="explain">
-            {!submissionState && (
+            {!formState.isSubmitSuccessful && (
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
                 <Text.Body>
@@ -122,7 +126,7 @@ const LinkerPage = () => {
                 </Text.Body>
               </Box>
             )}
-            {submissionState === true && (
+            {formState.isSubmitSuccessful && (
               <Box>
                 <Text.Body>That went well!</Text.Body>
                 <Text.Body>
@@ -135,7 +139,7 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="instructions">
-            {!submissionState && (
+            {!formState.isSubmitSuccessful && (
               <Text.Body>
                 Please enter the 6 digit alphanumeric ID found on the long edge
                 of the printed sheet below:
@@ -143,7 +147,7 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="inputForm">
-            {!submissionState && (
+            {!formState.isSubmitSuccessful && (
               <Box>
                 <Text.Label>Short ID:</Text.Label>
                 <Form.Form>
@@ -160,7 +164,7 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="buttonSection">
-            {!submissionState && (
+            {!formState.isSubmitSuccessful && (
               <Button
                 onClick={handleSubmit(onSubmitLinker)}
                 variant="secondary"
@@ -174,12 +178,14 @@ const LinkerPage = () => {
                 </Box>
               </Button>
             )}
-            {submissionState === false && (
+            {errors.shortId && (
               <Box>
                 <Text.Body color="invalidRed">
-                  Uh oh, that code doesn't seem to be right. Try typing it
+                  Uh oh, That code doesn't seem to be right. Try typing it
                   again, or email us at{' '}
-                  <Link to={sendHelpEmail(window.location.pathname, extraInfo)}>
+                  <Link
+                    to={sendHelpEmail(window.location.pathname, infoToEmail)}
+                  >
                     help@nomus.me
                   </Link>{' '}
                   and we'll help sort it out.
