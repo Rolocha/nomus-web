@@ -34,10 +34,20 @@ const formatDate = (date: Date) => {
 
 const sendReorderEmail = (cardId: string) => {
   const params = new URLSearchParams()
-  params.set('subject', "I'd like to Reorder a Card!")
+  params.set('subject', `I'd like to reorder a card!`)
   params.set(
     'body',
-    "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
+    `Hi! I'd like to reorder a card please\ncardID: ${cardId}\n\nNumber of cards to order:`,
+  )
+  return `mailto:hi@nomus.me?${params.toString()}`
+}
+
+const sendModifyEmail = (cardId: string) => {
+  const params = new URLSearchParams()
+  params.set('subject', `I'd like to modify a card!`)
+  params.set(
+    'body',
+    `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
   )
   return `mailto:hi@nomus.me?${params.toString()}`
 }
@@ -169,7 +179,7 @@ export default () => {
                     <Link
                       asButton
                       buttonStyle="secondary"
-                      to={sendReorderEmail(defaultCardVersion.id)}
+                      to={sendModifyEmail(defaultCardVersion.id)}
                     >
                       Modify card
                     </Link>
@@ -275,7 +285,7 @@ export default () => {
                       <Link
                         asButton
                         buttonStyle="secondary"
-                        to={sendReorderEmail(cv.id)}
+                        to={sendModifyEmail(cv.id)}
                         css={css`
                           padding: 9.5px 6px;
                         `}
