@@ -90,7 +90,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
 
     setCookies(res, accessToken, refreshToken)
     res
-      .status(200)
+      .status(201)
       .json({ data: getAuthDataForAccessToken(accessToken) })
       .end()
 

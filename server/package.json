@@ -83,7 +83,7 @@
     "eslint": "^7.7.0",
     "graphql-tag": "^2.10.3",
     "husky": "^4.2.5",
-    "jest": "^25.5.3",
+    "jest": "^26.6.3",
     "node-env-run": "^3.0.2",
     "nodemon": "^2.0.3",
     "prettier": "2.0.4",
@@ -136,6 +136,9 @@
     },
     "testRegex": "/src/.*\\.test\\.ts$",
     "testEnvironment": "node",
-    "preset": "@shelf/jest-mongodb"
+    "preset": "@shelf/jest-mongodb",
+    "setupFiles": [
+      "<rootDir>/src/test-utils/setup-env.js"
+    ]
   }
 }
