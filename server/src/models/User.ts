@@ -158,10 +158,10 @@ export class User extends BaseModel({
   @Field({ nullable: false })
   isEmailVerified: boolean
 
-  @prop({ required: true, default: () => crypto.randomBytes(20).toString('hex') })
+  @prop({ required: false, default: () => crypto.randomBytes(20).toString('hex') })
   emailVerificationToken: string | null
 
-  @prop({ required: true, default: () => Date.now() + emailVerificationTokenLifespan })
+  @prop({ required: false, default: () => Date.now() + emailVerificationTokenLifespan })
   emailVerificationTokenExpiresAtMs: number
 
   @prop({

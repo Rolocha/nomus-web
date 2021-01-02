@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 
 export const initDB = async () => {
   try {
+    // Disconnect from any existing connections (e.g. if you imported {app} from src/app in the test file calling this method)
+    await mongoose.disconnect()
     await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

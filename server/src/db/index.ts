@@ -14,13 +14,16 @@ export async function init(options: Partial<typeof mongoCredentials> = {}) {
   const dbUri = dbUriOverride ?? `mongodb://${username}:${password}@${hostname}:${port}/${dbName}`
   let connection
   try {
-    connection = await mongoose.connect(dbUri, {
-      // Required to silence various deprecation warnings: https://mongoosejs.com/docs/deprecations.html
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    })
+    connection = await mongoose.connect(
+      process.env.NODE_ENV === 'test' ? process.env.MONGO_URL : dbUri,
+      {
+        // Required to silence various deprecation warnings: https://mongoosejs.com/docs/deprecations.html
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+      }
+    )
   } catch (err) {
     console.log('Failed to connect to MongoDB')
     console.log(err)

@@ -3,7 +3,12 @@ import jwt from 'jsonwebtoken'
 
 import { RefreshToken, User } from 'src/models'
 import { getUserFromToken } from './util'
-import { accessTokenLifespan, refreshTokenLifespan } from 'src/config'
+import {
+  accessTokenLifespan,
+  ACCESS_TOKEN_COOKIE_NAME,
+  refreshTokenLifespan,
+  REFRESH_TOKEN_COOKIE_NAME,
+} from 'src/config'
 import { TokenBody } from './types'
 import { Role } from 'src/util/enums'
 
@@ -19,9 +24,6 @@ interface AuthResponse {
     message?: string
   }
 }
-
-const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
-const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
 
 const getAuthDataForAccessToken = (accessToken: string) => {
   const accessTokenBody = jwt.decode(accessToken) as TokenBody

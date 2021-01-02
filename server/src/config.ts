@@ -12,7 +12,10 @@ export const mongoCredentials = {
 }
 export const nodeEnv = process.env.NODE_ENV ?? 'development'
 export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
-export const sendgridToken = process.env.SENDGRID_TOKEN
+export const sendgridToken =
+  process.env.NODE_ENV === 'test'
+    ? 'SG.whatever-as-long-as-it-starts-with-SG'
+    : process.env.SENDGRID_TOKEN
 
 // Internal Config (not sourced from env vars)
 export const graphqlPath = '/graphql'
@@ -21,8 +24,12 @@ export const accessTokenLifespan = ms('15m')
 export const emailVerificationTokenLifespan = ms('24 hours')
 export const s3BucketName = 'nomus-assets'
 export const stripeToken = 'sk_test_5MLw6Iojb4Juypm2TLmTimJO00JFJQ4ldp'
-export const baseUrl = {
-  development: 'http://localhost:1234',
-  staging: 'https://stage.nomus.me',
-  production: 'https://nomus.me',
-}[process.env.ENV]
+export const baseUrl =
+  {
+    development: 'http://localhost:1234',
+    staging: 'https://stage.nomus.me',
+    production: 'https://nomus.me',
+  }[process.env.ENV] ?? 'https://testing.nomus.me'
+
+export const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
+export const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
