@@ -7,7 +7,6 @@ import { LinkSheetToUserQuery } from 'src/apollo/types/LinkSheetToUserQuery'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
-import { css } from '@emotion/core'
 import Link from 'src/components/Link'
 
 const bp = 'md'
@@ -36,13 +35,11 @@ const sendHelpEmail = (routeStr: string, errorStr: string): string => {
 }
 
 const LinkerPage = () => {
-  const {
-    register: linkerFormRegister,
-    handleSubmit: linkerFormHandleSubmit,
-  } = useForm<LinkerFormData>()
+  const { register, handleSubmit } = useForm<LinkerFormData>()
   const [linkSheet] = useMutation<LinkSheetToUserQuery>(LINKER_MUTATION)
-  const [isFailureState, setIsFailureState] = React.useState(false)
-  const [isSuccessState, setIsSuccessState] = React.useState(false)
+  const [submissionState, setSubmissionState] = React.useState<null | boolean>(
+    null,
+  )
   const [extraInfo, setExtraInfo] = React.useState('No Info')
 
   const onSubmitLinker = async (formData: LinkerFormData) => {
@@ -59,17 +56,14 @@ const LinkerPage = () => {
         console.log(response)
         if (response.errors) {
           setExtraInfo(response.errors.toString())
-          setIsFailureState(true)
-          setIsSuccessState(false)
+          setSubmissionState(false)
         } else {
           setExtraInfo(response.data?.linkSheetToUser.userId || '')
-          setIsSuccessState(true)
-          setIsFailureState(false)
+          setSubmissionState(true)
         }
       } catch (e) {
         setExtraInfo(e.message)
-        setIsFailureState(true)
-        setIsSuccessState(false)
+        setSubmissionState(false)
       }
     }
   }
@@ -108,23 +102,27 @@ const LinkerPage = () => {
           gridRowGap={3}
         >
           <Box gridArea="heading" placeSelf="center">
-            {isSuccessState && (
+            {!submissionState && (
+              <Text.PageHeader>Sheet Linker</Text.PageHeader>
+            )}
+            {submissionState === true && (
               <Text.PageHeader color="validGreen">
                 Success Linking Sheet!
               </Text.PageHeader>
             )}
-            {isFailureState && (
-              <Text.PageHeader color="invalidRed">
-                Error Linking Sheet!
-              </Text.PageHeader>
-            )}
-            {!(isSuccessState || isFailureState) && (
-              <Text.PageHeader>Sheet Linker</Text.PageHeader>
-            )}
           </Box>
 
           <Box gridArea="explain">
-            {isSuccessState && (
+            {!submissionState && (
+              <Box>
+                <Text.Body>This page is to link cards to a User.</Text.Body>
+                <Text.Body>
+                  For any questions, email help@nomus.me and we'll get it
+                  sorted!
+                </Text.Body>
+              </Box>
+            )}
+            {submissionState === true && (
               <Box>
                 <Text.Body>That went well!</Text.Body>
                 <Text.Body>
@@ -135,23 +133,9 @@ const LinkerPage = () => {
                 </Text.Body>
               </Box>
             )}
-            {isFailureState && (
-              <Box>
-                <Text.Body>Something went wrong linking this sheet!</Text.Body>
-              </Box>
-            )}
-            {!(isSuccessState || isFailureState) && (
-              <Box>
-                <Text.Body>This page is to link cards to a User.</Text.Body>
-                <Text.Body>
-                  For any questions, email help@nomus.me and we'll get it
-                  sorted!
-                </Text.Body>
-              </Box>
-            )}
           </Box>
           <Box gridArea="instructions">
-            {!isSuccessState && (
+            {!submissionState && (
               <Text.Body>
                 Please enter the 6 digit alphanumeric ID found on the long edge
                 of the printed sheet below:
@@ -159,13 +143,13 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="inputForm">
-            {!isSuccessState && (
+            {!submissionState && (
               <Box>
                 <Text.Label>Short ID:</Text.Label>
                 <Form.Form>
                   <Form.Input
-                    onSubmit={linkerFormHandleSubmit(onSubmitLinker)}
-                    ref={linkerFormRegister()}
+                    onSubmit={handleSubmit(onSubmitLinker)}
+                    ref={register()}
                     name="shortId"
                     type="string"
                     fontSize="16px"
@@ -176,9 +160,9 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="buttonSection">
-            {!isSuccessState && (
+            {!submissionState && (
               <Button
-                onClick={linkerFormHandleSubmit(onSubmitLinker)}
+                onClick={handleSubmit(onSubmitLinker)}
                 variant="secondary"
                 width={{ _: '100%', [bp]: '100%' }}
                 mb={3}
@@ -190,54 +174,16 @@ const LinkerPage = () => {
                 </Box>
               </Button>
             )}
-            {isFailureState && (
-              <Box
-                display="grid"
-                gridTemplateAreas={{
-                  _: `
-                  "desc" 
-                  "email"
-                `,
-                  [bp]: `
-                  "desc" 
-                  "email"
-                `,
-                }}
-                gridColumnGap={3}
-                gridRowGap={3}
-              >
-                <Box gridArea="desc">
-                  <Text.Body color="invalidRed">
-                    Uh oh, that code doesn't seem to be right. Try typing it
-                    again, or email us with the button below and we'll help sort
-                    it out.
-                  </Text.Body>
-                </Box>
-                <Box
-                  gridArea="email"
-                  display="flex"
-                  flexDirection="row"
-                  justifyContent="stretch"
-                  mx={-1}
-                  css={css`
-                    & > * {
-                      flex-grow: 1;
-                      > * {
-                        width: 100%;
-                      }
-                    }
-                  `}
-                >
-                  <Box px={1} display="flex" justifyContent="stretch">
-                    <Link
-                      asButton
-                      buttonStyle="secondary"
-                      to={sendHelpEmail(window.location.pathname, extraInfo)}
-                    >
-                      Email Nomus
-                    </Link>
-                  </Box>
-                </Box>
+            {submissionState === false && (
+              <Box>
+                <Text.Body color="invalidRed">
+                  Uh oh, that code doesn't seem to be right. Try typing it
+                  again, or email us at{' '}
+                  <Link to={sendHelpEmail(window.location.pathname, extraInfo)}>
+                    help@nomus.me
+                  </Link>{' '}
+                  and we'll help sort it out.
+                </Text.Body>
               </Box>
             )}
           </Box>
