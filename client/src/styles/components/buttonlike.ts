@@ -196,6 +196,14 @@ export const sizeVariants = {
     paddingTop: '13px',
     paddingBottom: '13px',
   },
+  knob: {
+    fontSize: '16px',
+    [mq.md]: {
+      fontSize: '20px',
+    },
+    borderRadius: '2em',
+    padding: '13px',
+  },
   normal: {
     paddingTop: '9.5px',
     paddingBottom: '9.5px',

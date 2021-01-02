@@ -22,7 +22,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -35,11 +35,11 @@ interface UrlParams {
   username?: string
 }
 
-const bp = 'md'
+const bp = 'lg'
 
 const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()
-
+  const isDesktopWidth = useBreakpoint(bp)
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
   const { loggedIn } = useAuth()
   const history = useHistory()
@@ -399,6 +399,7 @@ const ContactInfoPage = () => {
           <Box
             // Only upper margin in desktop mode
             gridArea="buttons"
+            placeSelf="end stretch"
             display="grid"
             css={css`
               position: fixed;
@@ -413,19 +414,23 @@ const ContactInfoPage = () => {
             `}
             bg="white"
             boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: '50px 1fr', [bp]: '3fr 3fr 1fr' }}
+            gridTemplateColumns={{ _: 'auto 1fr', [bp]: '3fr 3fr 1fr' }}
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
             <ExternalLink
               asButton
-              buttonStyle="secondary"
-              buttonSize="big"
+              buttonStyle="primary"
+              buttonSize={isDesktopWidth ? 'big' : 'knob'}
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              <SVG.Download color={colors.nomusBlue} />{' '}
-              <Box as="span" display={{ _: 'none', [bp]: 'inline-block' }}>
+              <SVG.Download color={colors.white} />{' '}
+              <Box
+                as="span"
+                ml={2}
+                display={{ _: 'none', [bp]: 'inline-block' }}
+              >
                 Save contact
               </Box>
             </ExternalLink>
@@ -433,7 +438,7 @@ const ContactInfoPage = () => {
             {loggedIn && contact.connected ? (
               <ExternalLink
                 asButton
-                buttonStyle="primary"
+                buttonStyle="secondary"
                 buttonSize="big"
                 href={`/dashboard/contacts/detail/${username}`}
               >
@@ -443,7 +448,7 @@ const ContactInfoPage = () => {
               <Link
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
                 asButton
-                buttonStyle="primary"
+                buttonStyle="secondary"
                 buttonSize="big"
               >
                 Save to Nomus
