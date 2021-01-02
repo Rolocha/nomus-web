@@ -30,11 +30,7 @@ const sendHelpEmail = (routeStr: string, errorStr: string): string => {
   params.set('subject', 'Sheet Linking Failed: ' + routeStr)
   params.set(
     'body',
-    'Sheet Linking Failed for sheet: ' +
-      routeStr +
-      '\nError String: `' +
-      errorStr +
-      '`\nShort Id on Sheet Edge:',
+    `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
   )
   return `mailto:help@nomus.me?${params.toString()}`
 }
@@ -57,27 +53,25 @@ const LinkerPage = () => {
         const response = await linkSheet({
           variables: {
             routeStr: routeStr,
-            shortId: formData.shortId,
+            shortId: formData.shortId.toUpperCase(),
           },
         })
         console.log(response)
         if (response.errors) {
           setExtraInfo(response.errors.toString())
           setIsFailureState(true)
+          setIsSuccessState(false)
         } else {
           setExtraInfo(response.data?.linkSheetToUser.userId || '')
           setIsSuccessState(true)
+          setIsFailureState(false)
         }
       } catch (e) {
         setExtraInfo(e.message)
         setIsFailureState(true)
+        setIsSuccessState(false)
       }
     }
-  }
-
-  const onRetry = async () => {
-    setIsFailureState(false)
-    setIsSuccessState(false)
   }
 
   return (
@@ -133,16 +127,17 @@ const LinkerPage = () => {
             {isSuccessState && (
               <Box>
                 <Text.Body>That went well!</Text.Body>
-                <Text.Body>Thank you for all the work you do :)</Text.Body>
+                <Text.Body>
+                  Thank you for all the work you do{' '}
+                  <span role="img" aria-label="smiley">
+                    😊
+                  </span>
+                </Text.Body>
               </Box>
             )}
             {isFailureState && (
               <Box>
                 <Text.Body>Something went wrong linking this sheet!</Text.Body>
-                <Text.Body>
-                  If you want to retry, click the "Retry" button on the bottom
-                  to re-type the Short ID
-                </Text.Body>
               </Box>
             )}
             {!(isSuccessState || isFailureState) && (
@@ -156,28 +151,15 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="instructions">
-            {isFailureState && (
-              <Box>
-                <Text.Body mb={3}>
-                  If there's a problem, we'll get it sorted. click the "Email
-                  Nomus" button below and it'll email help@nomus.me with the
-                  information we need.
-                </Text.Body>
-                <Text.Body>
-                  Please enter the 6 digit alphanumeric ID found on the long
-                  edge of the printed sheet in the email.
-                </Text.Body>
-              </Box>
-            )}
-            {!(isSuccessState || isFailureState) && (
+            {!isSuccessState && (
               <Text.Body>
                 Please enter the 6 digit alphanumeric ID found on the long edge
-                of the printed sheet below
+                of the printed sheet below:
               </Text.Body>
             )}
           </Box>
           <Box gridArea="inputForm">
-            {!(isSuccessState || isFailureState) && (
+            {!isSuccessState && (
               <Box>
                 <Text.Label>Short ID:</Text.Label>
                 <Form.Form>
@@ -194,32 +176,42 @@ const LinkerPage = () => {
             )}
           </Box>
           <Box gridArea="buttonSection">
+            {!isSuccessState && (
+              <Button
+                onClick={linkerFormHandleSubmit(onSubmitLinker)}
+                variant="secondary"
+                width={{ _: '100%', [bp]: '100%' }}
+                mb={3}
+              >
+                <Box display="flex" flexDirection="row" alignItems="center">
+                  <Text.Body2 fontSize="14px" color="nomusBlue">
+                    Link
+                  </Text.Body2>
+                </Box>
+              </Button>
+            )}
             {isFailureState && (
               <Box
                 display="grid"
                 gridTemplateAreas={{
                   _: `
-                  "retry email"
+                  "desc" 
+                  "email"
                 `,
                   [bp]: `
-                  "retry email"
+                  "desc" 
+                  "email"
                 `,
                 }}
                 gridColumnGap={3}
                 gridRowGap={3}
               >
-                <Box gridArea="retry">
-                  <Button
-                    onClick={onRetry}
-                    variant="primary"
-                    width={{ _: '100%', [bp]: '100%' }}
-                  >
-                    <Box display="flex" flexDirection="row" alignItems="center">
-                      <Text.Body2 fontSize="14px" color="white">
-                        Retry
-                      </Text.Body2>
-                    </Box>
-                  </Button>
+                <Box gridArea="desc">
+                  <Text.Body color="invalidRed">
+                    Uh oh, that code doesn't seem to be right. Try typing it
+                    again, or email us with the button below and we'll help sort
+                    it out.
+                  </Text.Body>
                 </Box>
                 <Box
                   gridArea="email"
@@ -247,19 +239,6 @@ const LinkerPage = () => {
                   </Box>
                 </Box>
               </Box>
-            )}
-            {!(isSuccessState || isFailureState) && (
-              <Button
-                onClick={linkerFormHandleSubmit(onSubmitLinker)}
-                variant="secondary"
-                width={{ _: '100%', [bp]: '100%' }}
-              >
-                <Box display="flex" flexDirection="row" alignItems="center">
-                  <Text.Body2 fontSize="14px" color="nomusBlue">
-                    Link
-                  </Text.Body2>
-                </Box>
-              </Button>
             )}
           </Box>
         </Box>
