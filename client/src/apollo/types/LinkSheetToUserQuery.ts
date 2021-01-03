@@ -9,8 +9,9 @@
 
 export interface LinkSheetToUserQuery_linkSheetToUser {
   __typename: 'LinkedInfo'
-  userId: string
-  sheetId: string
+  userId: string | null
+  sheetId: string | null
+  error: string | null
 }
 
 export interface LinkSheetToUserQuery {

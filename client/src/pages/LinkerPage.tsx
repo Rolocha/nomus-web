@@ -1,9 +1,11 @@
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import * as Form from 'src/components/Form'
+import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { gql, useMutation } from 'src/apollo'
 import { LinkSheetToUserQuery } from 'src/apollo/types/LinkSheetToUserQuery'
+import { yupResolver } from '@hookform/resolvers/yup'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
@@ -20,6 +22,7 @@ const LINKER_MUTATION = gql`
     linkSheetToUser(routeStr: $routeStr, shortId: $shortId) {
       userId
       sheetId
+      error
     }
   }
 `
@@ -37,7 +40,13 @@ const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
 const LinkerPage = () => {
   const { register, handleSubmit, formState, setError, errors } = useForm<
     LinkerFormData
-  >()
+  >({
+    resolver: yupResolver(
+      yup.object().shape({
+        shortId: yup.string().required('short-Id is required'),
+      }),
+    ),
+  })
   const [linkSheet] = useMutation<LinkSheetToUserQuery>(LINKER_MUTATION)
   const [infoToEmail, setInfoToEmail] = React.useState<string | null>(null)
 
@@ -52,12 +61,18 @@ const LinkerPage = () => {
             shortId: formData.shortId.toUpperCase(),
           },
         })
-        console.log('test' + response)
         if (response.errors) {
           setInfoToEmail(response.errors.toString())
           setError('shortId', {
             type: 'manual',
             message: 'Uh oh, something went wrong',
+          })
+        }
+        if (response.data?.linkSheetToUser.error) {
+          setInfoToEmail(response.data?.linkSheetToUser.error.toString())
+          setError('shortId', {
+            type: 'manual',
+            message: response.data?.linkSheetToUser.error.toString(),
           })
         } else {
           setInfoToEmail(response.data?.linkSheetToUser.userId || '')

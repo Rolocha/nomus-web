@@ -27,6 +27,7 @@ export interface UCPContactsSectionQuery_contacts {
   cardFrontImageUrl: string | null
   cardBackImageUrl: string | null
   notes: string | null
+  tags: string[] | null
   vcfUrl: string | null
   meetingPlace: string | null
   meetingDate: string | null
