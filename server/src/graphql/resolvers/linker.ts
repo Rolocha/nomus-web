@@ -4,13 +4,13 @@ import { linkSheetToUser } from 'src/util/linker'
 
 @ObjectType()
 class LinkedInfo {
-  @Field()
+  @Field({ nullable: true })
   userId: string
 
-  @Field()
+  @Field({ nullable: true })
   sheetId: string
 
-  @Field()
+  @Field({ nullable: true })
   error: string
 }
 

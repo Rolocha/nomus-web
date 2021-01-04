@@ -1,5 +1,6 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, CardVersion, Order, Sheet } from 'src/models'
+import { Ref } from 'src/models/scalars'
 import { CardInteractionType } from './enums'
 import { Result } from './error'
 
@@ -24,9 +25,14 @@ const linkSheetToCardVersion = async (
   }
 }
 
-const getCardVersionFromShortId = async (shortId: string): Promise<DocumentType<CardVersion>> => {
+const getCardVersionRefFromShortId = async (
+  shortId: string
+): Promise<Result<{ cardv: Ref<CardVersion> }, 'order-not-found'>> => {
   const order = await Order.mongo.findOne({ shortId: shortId })
-  return await CardVersion.mongo.findById(order.cardVersion)
+  if (order == null) {
+    return Result.fail('order-not-found')
+  }
+  return Result.ok({ cardv: order.cardVersion })
 }
 
 const spliceNFCString = (
@@ -95,10 +101,11 @@ export const linkSheetToUser = async (
 ): Promise<Result<{ userId: string; sheetId: string }, 'cv-not-found' | 'sheet-not-found'>> => {
   const { sheetId } = spliceNFCString(nfcString).getValue()
 
-  const cardVersion = await getCardVersionFromShortId(shortId)
-  if (!cardVersion) {
+  const cardVersionResult = await getCardVersionRefFromShortId(shortId)
+  if (!cardVersionResult.isSuccess) {
     return Result.fail('cv-not-found')
   }
+  const cardVersion = await CardVersion.mongo.findById(cardVersionResult.getValue().cardv)
 
   const sheet = await Sheet.mongo.findById(sheetId)
   if (!sheet) {
@@ -107,5 +114,8 @@ export const linkSheetToUser = async (
 
   await linkSheetToCardVersion(sheet, cardVersion)
 
-  return Result.ok({ userId: cardVersion.user.toString(), sheetId: sheet.id })
+  return Result.ok({
+    userId: cardVersion.user.toString(),
+    sheetId: sheet.id,
+  })
 }
