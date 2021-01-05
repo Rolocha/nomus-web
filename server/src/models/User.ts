@@ -22,7 +22,7 @@ import { CardVersion } from './CardVersion'
 import { Connection } from './Connection'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import RefreshToken from './Token'
+import RefreshToken from './RefreshToken'
 import { validateEmail } from './utils'
 
 export interface UserCreatePayload {
