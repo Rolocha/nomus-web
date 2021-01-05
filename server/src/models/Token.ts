@@ -10,10 +10,10 @@ import { BaseModel } from './BaseModel'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class Token extends BaseModel({
+class RefreshToken extends BaseModel({
   prefix: 'tok',
 }) {
-  static mongo: ReturnModelType<typeof Token>
+  static mongo: ReturnModelType<typeof RefreshToken>
 
   @prop({ required: true, ref: 'User', type: String })
   @Field(() => User, { nullable: false })
@@ -33,7 +33,10 @@ class Token extends BaseModel({
   @Field()
   forceInvalidated: boolean
 
-  public static async createNewTokenForUser(this: ReturnModelType<typeof Token>, user: string) {
+  public static async createNewTokenForUser(
+    this: ReturnModelType<typeof RefreshToken>,
+    user: string
+  ) {
     const preHashToken = crypto.randomBytes(40).toString('hex')
     const tokenObject = await this.create({
       client: user,
@@ -49,7 +52,7 @@ class Token extends BaseModel({
   }
 
   public static async verify(
-    this: ReturnModelType<typeof Token>,
+    this: ReturnModelType<typeof RefreshToken>,
     proposedToken: string,
     associatedUser: string
   ): Promise<boolean> {
@@ -72,7 +75,7 @@ class Token extends BaseModel({
   }
 
   public static async invalidate(
-    this: ReturnModelType<typeof Token>,
+    this: ReturnModelType<typeof RefreshToken>,
     tokenIdToInvalidate: string
   ): Promise<boolean> {
     const thisTokenToInvalidate = await this.findById(tokenIdToInvalidate)
@@ -82,6 +85,6 @@ class Token extends BaseModel({
 }
 
 // Attach the mongoose model onto the core model itself
-Token.mongo = getModelForClass(Token)
+RefreshToken.mongo = getModelForClass(RefreshToken)
 
-export default Token
+export default RefreshToken

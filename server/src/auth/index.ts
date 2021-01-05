@@ -1,7 +1,7 @@
 import * as express from 'express'
 import jwt from 'jsonwebtoken'
 
-import { User, Token } from 'src/models'
+import { RefreshToken, User } from 'src/models'
 import { getUserFromToken } from './util'
 import { accessTokenLifespan, refreshTokenLifespan } from 'src/config'
 import { TokenBody } from './types'
@@ -117,7 +117,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
 authRouter.post('/logout', async (req, res: express.Response<boolean>) => {
   res.clearCookie(ACCESS_TOKEN_COOKIE_NAME)
   res.clearCookie(REFRESH_TOKEN_COOKIE_NAME)
-  Token.mongo.invalidate(req.cookies[REFRESH_TOKEN_COOKIE_NAME])
+  RefreshToken.mongo.invalidate(req.cookies[REFRESH_TOKEN_COOKIE_NAME])
   res.end()
 })
 
@@ -135,7 +135,7 @@ const refreshToken = async (req: express.Request, res: express.Response<AuthResp
   }
 
   // Check if the specified refresh token exists and belongs to this user
-  const isTokenValid = await Token.mongo.verify(refreshToken, user._id)
+  const isTokenValid = await RefreshToken.mongo.verify(refreshToken, user._id)
   if (!isTokenValid) {
     return res.status(401).json({
       error: {
