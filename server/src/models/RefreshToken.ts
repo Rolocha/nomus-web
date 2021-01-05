@@ -79,8 +79,11 @@ class RefreshToken extends BaseModel({
     tokenIdToInvalidate: string
   ): Promise<boolean> {
     const thisTokenToInvalidate = await this.findById(tokenIdToInvalidate)
-    thisTokenToInvalidate.forceInvalidated = true
-    return true
+    if (thisTokenToInvalidate != null) {
+      thisTokenToInvalidate.forceInvalidated = true
+      return true
+    }
+    return false
   }
 }
 
