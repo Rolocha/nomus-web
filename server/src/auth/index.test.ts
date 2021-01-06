@@ -7,7 +7,7 @@ import * as authUtils from 'src/auth/util'
 import { Result } from 'src/util/error'
 import { sgMail } from 'src/util/sendgrid'
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from 'src/config'
-import { createMockToken } from 'src/__mocks__/models/Token'
+import { createMockRefreshToken } from 'src/__mocks__/models/RefreshToken'
 
 // NOTE: No need to initDB in this test bc the src/app import initializes it
 afterAll(async () => {
@@ -74,7 +74,7 @@ describe('POST /logout', () => {
 
   it("invalidates the user's refresh token", async () => {
     const user = await createMockUser({})
-    const { preHashToken } = await createMockToken(user.id)
+    const { preHashToken } = await createMockRefreshToken(user.id)
 
     const response = await request(app)
       .post('/auth/logout')

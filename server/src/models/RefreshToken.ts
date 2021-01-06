@@ -88,6 +88,7 @@ export class RefreshToken extends BaseModel({
 }
 
 // Attach the mongoose model onto the core model itself
-RefreshToken.mongo = getModelForClass(RefreshToken)
+export const RefreshTokenModel = getModelForClass(RefreshToken)
+RefreshToken.mongo = RefreshTokenModel
 
 export default RefreshToken
