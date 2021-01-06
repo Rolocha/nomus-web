@@ -22,7 +22,7 @@ import { CardVersion } from './CardVersion'
 import { Connection } from './Connection'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import Token from './Token'
+import RefreshToken from './RefreshToken'
 import { validateEmail } from './utils'
 
 export interface UserCreatePayload {
@@ -221,7 +221,7 @@ export class User extends BaseModel({
   public async generateRefreshToken(): Promise<string> {
     // Get the PRE-hashed refresh token since this is the generation step where we need
     // to send it to the client
-    const { preHashToken } = await Token.mongo.createNewTokenForUser(this.id)
+    const { preHashToken } = await RefreshToken.mongo.createNewTokenForUser(this.id)
     return preHashToken
   }
 
