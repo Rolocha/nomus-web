@@ -11,7 +11,7 @@ import { BaseModel } from './BaseModel'
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 class RefreshToken extends BaseModel({
-  prefix: 'tok',
+  prefix: 'reftok',
 }) {
   static mongo: ReturnModelType<typeof RefreshToken>
 
