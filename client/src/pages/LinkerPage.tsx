@@ -28,13 +28,19 @@ const LINKER_MUTATION = gql`
 `
 
 const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
-  const params = new URLSearchParams()
-  params.set('subject', 'Sheet Linking Failed: ' + routeStr)
-  params.set(
-    'body',
-    `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
+  let args = []
+  args.push(
+    'subject=' + encodeURIComponent(`Sheet Linking Failed: ${routeStr}`),
   )
-  return `mailto:help@nomus.me?${params.toString()}`
+  args.push(
+    'body=' +
+      encodeURIComponent(
+        `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
+      ),
+  )
+  var url = `mailto:${encodeURIComponent('help@nomus.me')}`
+  url += '?' + args.join('&')
+  return url
 }
 
 const LinkerPage = () => {
