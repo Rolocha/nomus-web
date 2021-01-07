@@ -33,13 +33,31 @@ const formatDate = (date: Date) => {
 }
 
 const sendReorderEmail = (cardId: string) => {
-  const params = new URLSearchParams()
-  params.set('subject', "I'd like to Reorder a Card!")
-  params.set(
-    'body',
-    "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
+  let args = []
+  args.push('subject=' + encodeURIComponent("I'd like to reorder a card!"))
+  args.push(
+    'body=' +
+      encodeURIComponent(
+        `Hi! I'd like to reorder a card please :) \ncardID: ${cardId}\n\nNumber of cards to order:`,
+      ),
   )
-  return `mailto:hi@nomus.me?${params.toString()}`
+  var url = `mailto:${encodeURIComponent('hi@nomus.me')}`
+  url += '?' + args.join('&')
+  return url
+}
+
+const sendModifyEmail = (cardId: string) => {
+  let args = []
+  args.push('subject=' + encodeURIComponent("I'd like to modify a card!"))
+  args.push(
+    'body=' +
+      encodeURIComponent(
+        `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
+      ),
+  )
+  var url = `mailto:${encodeURIComponent('hi@nomus.me')}`
+  url += '?' + args.join('&')
+  return url
 }
 
 export default () => {
@@ -169,7 +187,7 @@ export default () => {
                     <Link
                       asButton
                       buttonStyle="secondary"
-                      to={sendReorderEmail(defaultCardVersion.id)}
+                      to={sendModifyEmail(defaultCardVersion.id)}
                     >
                       Modify card
                     </Link>
@@ -275,7 +293,7 @@ export default () => {
                       <Link
                         asButton
                         buttonStyle="secondary"
-                        to={sendReorderEmail(cv.id)}
+                        to={sendModifyEmail(cv.id)}
                         css={css`
                           padding: 9.5px 6px;
                         `}
