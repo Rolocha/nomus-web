@@ -10,6 +10,7 @@ import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
 import Link from 'src/components/Link'
+import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -28,19 +29,11 @@ const LINKER_MUTATION = gql`
 `
 
 const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
-  let args = []
-  args.push(
-    'subject=' + encodeURIComponent(`Sheet Linking Failed: ${routeStr}`),
+  return createMailtoURL(
+    'help@nomus.me',
+    `Sheet Linking Failed: ${routeStr}`,
+    `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
   )
-  args.push(
-    'body=' +
-      encodeURIComponent(
-        `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
-      ),
-  )
-  var url = `mailto:${encodeURIComponent('help@nomus.me')}`
-  url += '?' + args.join('&')
-  return url
 }
 
 const LinkerPage = () => {

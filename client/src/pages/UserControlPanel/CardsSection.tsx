@@ -22,6 +22,7 @@ import Link from 'src/components/Link'
 import cardsEmptyStateSvg from './cards_empty_state.svg'
 import Image from 'src/components/Image'
 import { colors } from 'src/styles'
+import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -33,31 +34,19 @@ const formatDate = (date: Date) => {
 }
 
 const sendReorderEmail = (cardId: string) => {
-  let args = []
-  args.push('subject=' + encodeURIComponent("I'd like to reorder a card!"))
-  args.push(
-    'body=' +
-      encodeURIComponent(
-        `Hi! I'd like to reorder a card please :) \ncardID: ${cardId}\n\nNumber of cards to order:`,
-      ),
+  return createMailtoURL(
+    'hi@nomus.me',
+    "I'd like to reorder a card!",
+    `Hi! I'd like to reorder a card please :) \ncardID: ${cardId}\n\nNumber of cards to order:`,
   )
-  var url = `mailto:${encodeURIComponent('hi@nomus.me')}`
-  url += '?' + args.join('&')
-  return url
 }
 
 const sendModifyEmail = (cardId: string) => {
-  let args = []
-  args.push('subject=' + encodeURIComponent("I'd like to modify a card!"))
-  args.push(
-    'body=' +
-      encodeURIComponent(
-        `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
-      ),
+  return createMailtoURL(
+    'hi@nomus.me',
+    "I'd like to modify a card!",
+    `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
   )
-  var url = `mailto:${encodeURIComponent('hi@nomus.me')}`
-  url += '?' + args.join('&')
-  return url
 }
 
 export default () => {
