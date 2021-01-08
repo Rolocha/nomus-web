@@ -1,7 +1,9 @@
 // import { Order, CardVersion, User } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
+import { execQuery } from 'src/test-utils/graphql'
 // import { execQuery } from 'src/test-utils/graphql'
 import { createMockOrder } from 'src/__mocks__/models/Order'
+import { createMockUser } from 'src/__mocks__/models/User'
 // import { createMockUser } from 'src/__mocks__/models/User'
 //
 // import { OrderState } from 'src/util/enums'
@@ -21,51 +23,6 @@ describe('OrderResolver', () => {
 
   describe('order', () => {
     it("skipping tests for now since they don't pass", () => {})
-    //   it('fetches a single order for non-admin user', async () => {
-    //     const user = await createMockUser()
-    //     const order = await createMockOrder({ user: user })
-
-    //     const response = await execQuery({
-    //       source: `
-    //       query OrderTestQuery($orderId: String) {
-    //         order(orderId: $orderId) {
-    //           id
-    //         }
-    //       }
-    //       `,
-    //       variableValues: {
-    //         orderId: order.id,
-    //       },
-    //       contextUser: user,
-    //     })
-
-    //     expect(response.data?.order?.id).toBe(order.id)
-    //   })
-    //   it('fails to fetch a single order for non-admin user', async () => {
-    //     const user = await createMockUser()
-    //     const order = await createMockOrder({ user: user })
-    //     const user_hacker = await createMockUser({
-    //       name: { first: 'Jeff', middle: 'William', last: 'Winger' },
-    //       email: 'fake_lawyer@greendale.com',
-    //       password: 'save-greendale',
-    //     })
-
-    //     const response = await execQuery({
-    //       source: `
-    //       query OrderTestQuery($orderId: String) {
-    //         order(orderId: $orderId) {
-    //           id
-    //         }
-    //       }
-    //       `,
-    //       variableValues: {
-    //         orderId: order.id,
-    //       },
-    //       contextUser: user_hacker,
-    //     })
-
-    //     expect(response.errors[0]?.message).toBe('User is not authorized to access order')
-    //   })
     //   it('fetches a single order for admin user', async () => {
     //     const order = await createMockOrder()
 
@@ -281,6 +238,51 @@ describe('OrderModel', () => {
       const order2 = await createMockOrder({ shortId: 'SJC123' })
       expect(order1.shortId).toBe('SJC123')
       expect(order1.shortId).not.toEqual(order2.shortId)
+    })
+    it('fetches a single order for non-admin user', async () => {
+      const user = await createMockUser()
+      const order = await createMockOrder({ user: user })
+
+      const response = await execQuery({
+        source: `
+          query OrderTestQuery($orderId: String) {
+            order(orderId: $orderId) {
+              id
+            }
+          }
+          `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: user,
+      })
+
+      expect(response.data?.order?.id).toBe(order.id)
+    })
+    it('fails to fetch a single order for non-admin user', async () => {
+      const user = await createMockUser()
+      const order = await createMockOrder({ user: user })
+      const userHacker = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+
+      const response = await execQuery({
+        source: `
+          query OrderTestQuery($orderId: String) {
+            order(orderId: $orderId) {
+              id
+            }
+          }
+          `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: userHacker,
+      })
+
+      expect(response.errors[0]?.message).toBe('User is not authorized to access order')
     })
   })
 })

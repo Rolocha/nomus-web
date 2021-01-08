@@ -77,9 +77,20 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   paymentIntent: string
 
+  //shortId allows the print-tech to link a printed sheet to the user in this order
   @prop({ required: false, unique: true })
   @Field({ nullable: true })
   shortId: string
+
+  //shipping label from XPS to send to Hudson, stored in S3
+  @prop({ required: false, unique: true })
+  @Field({ nullable: true })
+  shippingLabelUrl: string
+
+  //25-Up Card Model Hudson will use to print stored in S3
+  @prop({ required: false, unique: true })
+  @Field({ nullable: true })
+  printSpecUrl: string
 }
 
 Order.mongo = getModelForClass(Order)
