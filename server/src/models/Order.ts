@@ -12,6 +12,7 @@ import { Field, ObjectType } from 'type-graphql'
 import { OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
+import { ShippingAddress } from './subschemas'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -83,14 +84,18 @@ class Order extends BaseModel({
   shortId: string
 
   //shipping label from XPS to send to Hudson, stored in S3
-  @prop({ required: false, unique: true })
+  @prop({ required: false })
   @Field({ nullable: true })
   shippingLabelUrl: string
 
   //25-Up Card Model Hudson will use to print stored in S3
-  @prop({ required: false, unique: true })
+  @prop({ required: false })
   @Field({ nullable: true })
   printSpecUrl: string
+
+  @prop({ _id: false, required: false })
+  @Field(() => ShippingAddress, { nullable: true })
+  shippingAddress: ShippingAddress
 }
 
 Order.mongo = getModelForClass(Order)
