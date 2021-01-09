@@ -199,6 +199,7 @@ describe('OrderResolver', () => {
       const newCardVersion = await CardVersion.mongo.findById(newOrder.cardVersion)
       expect(newOrder.quantity).toEqual(payload.quantity)
       expect(newOrder.state).toEqual(OrderState.Captured)
+      expect(newOrder.shippingAddress).toMatchObject(payload.shippingAddress)
       const orderUser = await User.mongo.findById(newOrder.user)
       const cardVersionUser = await User.mongo.findById(newCardVersion.user)
       expect(orderUser.id).toBe(user.id)
