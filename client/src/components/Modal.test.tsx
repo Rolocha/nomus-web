@@ -1,9 +1,10 @@
+import 'src/test-utils/mocks/matchMedia.mock'
+
+import { cleanup, render } from '@testing-library/react'
 import * as React from 'react'
 import renderer from 'react-test-renderer'
-import { render, cleanup } from '@testing-library/react'
-
-import { PageHeader, Body } from 'src/components/Text'
 import Modal from 'src/components/Modal'
+import { Body, PageHeader } from 'src/components/Text'
 
 afterEach(cleanup)
 

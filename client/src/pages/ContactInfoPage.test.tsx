@@ -1,3 +1,5 @@
+import 'src/test-utils/mocks/matchMedia.mock'
+
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import {
   cleanup,
