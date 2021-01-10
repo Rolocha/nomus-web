@@ -10,7 +10,7 @@ import { BaseModel } from './BaseModel'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
-class RefreshToken extends BaseModel({
+export class RefreshToken extends BaseModel({
   prefix: 'reftok',
 }) {
   static mongo: ReturnModelType<typeof RefreshToken>
@@ -88,6 +88,7 @@ class RefreshToken extends BaseModel({
 }
 
 // Attach the mongoose model onto the core model itself
-RefreshToken.mongo = getModelForClass(RefreshToken)
+export const RefreshTokenModel = getModelForClass(RefreshToken)
+RefreshToken.mongo = RefreshTokenModel
 
 export default RefreshToken

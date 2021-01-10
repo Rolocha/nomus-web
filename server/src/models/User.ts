@@ -1,3 +1,5 @@
+import ms from 'ms'
+import { sgMail } from 'src/util/sendgrid'
 import {
   DocumentType,
   getModelForClass,
@@ -8,10 +10,16 @@ import {
 } from '@typegoose/typegoose'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import * as fs from 'fs'
 import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
-import { accessTokenLifespan, authTokenPrivateKey } from 'src/config'
+import {
+  accessTokenLifespan,
+  authTokenPrivateKey,
+  baseUrl,
+  emailVerificationTokenLifespan,
+} from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { EventualResult, Result } from 'src/util/error'
@@ -24,6 +32,7 @@ import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
 import RefreshToken from './RefreshToken'
 import { validateEmail } from './utils'
+import { URLSearchParams } from 'url'
 
 export interface UserCreatePayload {
   id?: string
@@ -143,6 +152,19 @@ export class User extends BaseModel({
   email: string
 
   @prop({
+    required: true,
+    default: false,
+  })
+  @Field({ nullable: false })
+  isEmailVerified: boolean
+
+  @prop({ required: false, default: () => crypto.randomBytes(20).toString('hex') })
+  emailVerificationToken: string | null
+
+  @prop({ required: false, default: () => Date.now() + emailVerificationTokenLifespan })
+  emailVerificationTokenExpiresAtMs: number
+
+  @prop({
     unique: true,
   })
   @Field({ nullable: true })
@@ -241,6 +263,53 @@ export class User extends BaseModel({
       return result.isSuccess ? result.value : null
     }
     return null
+  }
+
+  public async verifyEmail(
+    this: DocumentType<User>,
+    token: string
+  ): Promise<'already-verified' | 'success' | 'invalid' | 'expired'> {
+    let result: 'already-verified' | 'success' | 'invalid' | 'expired' = 'success'
+    if (this.isEmailVerified) result = 'already-verified'
+    if (this.emailVerificationToken !== token) result = 'invalid'
+    if (Date.now() > this.emailVerificationTokenExpiresAtMs) result = 'expired'
+
+    if (result === 'success' || result === 'already-verified') {
+      this.isEmailVerified = true
+      await this.save()
+    }
+    return result
+  }
+
+  public async sendVerificationEmail(this: DocumentType<User>): Promise<void> {
+    if (this.isEmailVerified) {
+      throw new Error('User email is already verified, no need to send a verification email')
+    }
+    if (
+      !this.emailVerificationToken ||
+      // Check if the verification token expires in the next 10 minutes
+      !this.emailVerificationTokenExpiresAtMs ||
+      Date.now() + ms('10 minutes') >= this.emailVerificationTokenExpiresAtMs
+    ) {
+      // Create a new token and expiration time
+      this.emailVerificationToken = crypto.randomBytes(20).toString('hex')
+      this.emailVerificationTokenExpiresAtMs = Date.now() + emailVerificationTokenLifespan
+      await this.save()
+    }
+
+    const verificationURLQueryParams = new URLSearchParams()
+    verificationURLQueryParams.set('token', this.emailVerificationToken)
+    verificationURLQueryParams.set('email', this.email)
+    const verificationURL = `${baseUrl}/auth/verify?${verificationURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: this.email,
+      from: 'hi@nomus.me',
+      templateId: 'd-02455eda777b41f980776fa13d043b81',
+      dynamicTemplateData: {
+        verificationURL,
+      },
+    })
   }
 
   public async updateProfilePic(

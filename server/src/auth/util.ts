@@ -4,6 +4,7 @@ import { User } from 'src/models/User'
 import { authTokenPrivateKey } from 'src/config'
 import { Result } from 'src/util/error'
 import { TokenBody } from './types'
+import { DocumentType } from '@typegoose/typegoose'
 
 interface Options {
   ignoreExpiration: boolean
@@ -14,7 +15,7 @@ const defaultOptions = {
 }
 
 type AuthorizationResult = Result<
-  User,
+  DocumentType<User>,
   'token-expired' | 'missing-token' | 'no-matching-user' | 'jwt-error' | 'unknown-error'
 >
 export const getUserFromToken = async (

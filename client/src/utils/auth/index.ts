@@ -103,3 +103,7 @@ const authManager = new AuthManager<
 export const useAuth = authManager.useAuth
 export const ensureActiveToken = authManager.ensureActiveToken
 export const logOutAndClearData = authManager.logOutAndClearData
+export const resendVerificationEmail = async () => {
+  const result = await fetch('/auth/resend-verification-email')
+  return result.ok
+}

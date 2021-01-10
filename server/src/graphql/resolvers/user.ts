@@ -122,7 +122,13 @@ class UserResolver {
     userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last
     userBeingUpdated.headline = userUpdatePayload.headline ?? userBeingUpdated.headline
 
-    userBeingUpdated.email = userUpdatePayload.email ?? userBeingUpdated.email
+    // If user is changing their email, mark it as no longer verified and send a new verification email
+    if (userBeingUpdated.email !== userUpdatePayload.email) {
+      userBeingUpdated.email = userUpdatePayload.email
+      userBeingUpdated.isEmailVerified = false
+      userBeingUpdated.sendVerificationEmail() // No need to await
+    }
+
     userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber ?? userBeingUpdated.phoneNumber
     userBeingUpdated.bio = userUpdatePayload.bio ?? userBeingUpdated.bio
     userBeingUpdated.activated = userUpdatePayload.activated ?? userBeingUpdated.activated

@@ -3,7 +3,12 @@ import jwt from 'jsonwebtoken'
 
 import { RefreshToken, User } from 'src/models'
 import { getUserFromToken } from './util'
-import { accessTokenLifespan, refreshTokenLifespan } from 'src/config'
+import {
+  accessTokenLifespan,
+  ACCESS_TOKEN_COOKIE_NAME,
+  refreshTokenLifespan,
+  REFRESH_TOKEN_COOKIE_NAME,
+} from 'src/config'
 import { TokenBody } from './types'
 import { Role } from 'src/util/enums'
 
@@ -19,9 +24,6 @@ interface AuthResponse {
     message?: string
   }
 }
-
-const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
-const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
 
 const getAuthDataForAccessToken = (accessToken: string) => {
   const accessTokenBody = jwt.decode(accessToken) as TokenBody
@@ -87,7 +89,13 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
     const refreshToken = await user.generateRefreshToken()
 
     setCookies(res, accessToken, refreshToken)
-    res.json({ data: getAuthDataForAccessToken(accessToken) })
+    res
+      .status(201)
+      .json({ data: getAuthDataForAccessToken(accessToken) })
+      .end()
+
+    // Send the verification email, but don't await as it's not the end of the world if it fails, user can request again
+    user.sendVerificationEmail()
   } catch (err) {
     // Check for trying to create an account that already exists
     if (err.code === 11000) {
@@ -180,5 +188,54 @@ export const authMiddleware = async (
   req.user = user
   next()
 }
+
+authRouter.get('/verify', async (req, res) => {
+  const { token, email } = req.query
+
+  if (email == null || token == null || typeof email !== 'string' || typeof token !== 'string') {
+    return res.status(400).json({
+      message: 'Invalid verification link',
+    })
+  }
+
+  const user = await User.mongo.findOne({ email })
+  if (user == null) {
+    return res.status(400).json({
+      message: 'No user with that email',
+    })
+  }
+
+  const verificationResult = await user.verifyEmail(token)
+
+  switch (verificationResult) {
+    case 'already-verified': {
+      return res.redirect('/dashboard/settings')
+    }
+    case 'success': {
+      return res.redirect('/dashboard/settings?justVerifiedEmail')
+    }
+    case 'invalid': {
+      return res.status(400).json({
+        message: 'Invalid verification link',
+      })
+    }
+    case 'expired': {
+      return res.status(400).json({
+        message: 'Expired verification token',
+      })
+    }
+  }
+})
+
+// Include the auth middleware here since we need the user object to send an email
+authRouter.get('/resend-verification-email', authMiddleware, async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      message: 'Not logged in as any user',
+    })
+  }
+  await req.user.sendVerificationEmail()
+  res.status(200).end()
+})
 
 export default authRouter

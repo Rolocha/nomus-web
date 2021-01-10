@@ -14,6 +14,7 @@ export default gql`
       headline
       phoneNumber
       email
+      isEmailVerified
       bio
       activated
     }
