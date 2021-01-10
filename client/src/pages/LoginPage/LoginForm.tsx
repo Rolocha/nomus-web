@@ -1,9 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
+import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import { Link } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -31,7 +33,7 @@ const renderSubmissionError = (type: SubmissionErrorType) => {
 }
 
 const LoginForm = () => {
-  const { register, handleSubmit, formState, errors } = useForm<LoginFormData>({
+  const { register, handleSubmit, errors } = useForm<LoginFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -43,7 +45,15 @@ const LoginForm = () => {
       }),
     ),
   })
-  const { logIn } = useAuth()
+  const { logIn, loggedIn } = useAuth()
+
+  const history = useHistory()
+  const location = useLocation<{ from: Location }>()
+  const searchParams = React.useMemo(
+    () => new URLSearchParams(location.search),
+    [location],
+  )
+
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [loggingIn, setLoggingIn] = React.useState(false)
   const [
@@ -64,8 +74,23 @@ const LoginForm = () => {
     }
   }
 
+  // Redirect to the redirect_uri once the user is logged in
+  if (loggedIn) {
+    const redirectUrl = searchParams.get('redirect_url')
+    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
+    if (nextUrl.startsWith('/')) {
+      history.replace(nextUrl)
+    } else {
+      // If the URL doesn't start with /, it's probably a different domain
+      // in which case we have to use window.location's .replace() instead of history's
+      window.location.replace(nextUrl)
+    }
+    return null
+  }
+
   return (
     <Box display="flex" flexDirection="column" mt={4}>
+      <Text.BrandHeader>Sign In</Text.BrandHeader>
       <Form.Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Item mb="20px">
           <Form.Label htmlFor="email">EMAIL</Form.Label>
@@ -110,7 +135,6 @@ const LoginForm = () => {
           size="big"
           inProgress={loggingIn}
           inProgressText="Logging in"
-          disabled={!formState.isValid}
         >
           Continue
         </Button>
@@ -118,6 +142,10 @@ const LoginForm = () => {
           <Box my={2}>{renderSubmissionError(submissionError)}</Box>
         )}
       </Form.Form>
+      <Text.Body2 mt={3}>
+        Don't have an account yet?{' '}
+        <Link to={`/register?${searchParams.toString()}`}>Get started.</Link>
+      </Text.Body2>
     </Box>
   )
 }

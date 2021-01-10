@@ -17,6 +17,7 @@ import { createMockContact } from 'src/mocks/contact'
 import saveContactMutation from 'src/mutations/saveContactMutation'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import publicContactQuery from 'src/queries/publicContact'
+import { setUpModalPortal } from 'src/test-utils/modal.test'
 import { validateUrl } from 'src/test-utils/url.test'
 import { Contact } from 'src/types/contact'
 import * as Auth from 'src/utils/auth'
@@ -27,6 +28,9 @@ import {
 import { formatName } from 'src/utils/name'
 import LoginPage from './LoginPage'
 
+beforeAll(() => {
+  setUpModalPortal()
+})
 afterEach(cleanup)
 
 const createSaveContactMutationMock = (

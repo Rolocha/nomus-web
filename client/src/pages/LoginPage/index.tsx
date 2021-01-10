@@ -1,46 +1,24 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import Link from 'src/components/Link'
-import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
-import { useAuth } from 'src/utils/auth'
-import signInSwoosh from './sign-in-swoosh.svg'
-import registrationSwoosh from './registration-swoosh.svg'
-import LoginForm from './LoginForm'
-import RegistrationForm from './RegistrationForm'
+import * as Text from 'src/components/Text'
 import logoFull from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
+import LoginForm from './LoginForm'
+import registrationSwoosh from './registration-swoosh.svg'
+import RegistrationForm from './RegistrationForm'
+import signInSwoosh from './sign-in-swoosh.svg'
 
 const bp = 'lg'
 
 const LoginPage = () => {
-  const { loggedIn } = useAuth()
-  const history = useHistory()
   const location = useLocation<{ from: Location }>()
-
-  const searchParams = React.useMemo(
-    () => new URLSearchParams(location.search),
-    [location],
-  )
 
   // Guaranteed to be either register or login since those are the only routes this page should be rendered for
   const mode = location.pathname.substr(1) as 'register' | 'login'
-
-  if (loggedIn) {
-    const redirectUrl = searchParams.get('redirect_url')
-    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
-    if (nextUrl.startsWith('/')) {
-      history.replace(nextUrl)
-    } else {
-      // If the URL doesn't start with /, it's probably a different domain
-      // in which case we have to use window.location's .replace() instead of history's
-      window.location.replace(nextUrl)
-    }
-    return null
-  }
 
   const infoLines =
     {
@@ -114,34 +92,11 @@ const LoginPage = () => {
         pt="110px"
       >
         {/* Left-hand side */}
-        <Box gridColumn="2/3">
-          <Text.BrandHeader>
-            {{ login: 'Sign in', register: 'Get started' }[mode]}
-          </Text.BrandHeader>
-          <Box mb={3} minWidth="300px">
-            {
-              {
-                login: <LoginForm />,
-                register: <RegistrationForm />,
-              }[mode]
-            }
-          </Box>
+        <Box gridColumn="2/3" minWidth="300px">
           {
             {
-              login: (
-                <Text.Body2>
-                  Don't have an account yet?{' '}
-                  <Link to={`/register?${searchParams.toString()}`}>
-                    Get started.
-                  </Link>
-                </Text.Body2>
-              ),
-              register: (
-                <Text.Body2>
-                  Have an account?{' '}
-                  <Link to={`/login?${searchParams.toString()}`}>Sign in.</Link>
-                </Text.Body2>
-              ),
+              login: <LoginForm />,
+              register: <RegistrationForm />,
             }[mode]
           }
         </Box>

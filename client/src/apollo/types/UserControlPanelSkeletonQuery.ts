@@ -16,7 +16,10 @@ export interface UserControlPanelSkeletonQuery_user_name {
 
 export interface UserControlPanelSkeletonQuery_user {
   __typename: 'User'
+  id: string
   name: UserControlPanelSkeletonQuery_user_name | null
+  email: string | null
+  isEmailVerified: boolean
 }
 
 export interface UserControlPanelSkeletonQuery {

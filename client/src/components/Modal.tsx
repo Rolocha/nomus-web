@@ -1,19 +1,20 @@
-import { useTransition, animated } from 'react-spring'
 import { css, Global } from '@emotion/core'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
+import ReactDOM from 'react-dom'
+import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
+import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import * as SVG from 'src/components/SVG'
+import { use100vh } from 'src/utils/ui'
 import {
   RequiredTheme,
   ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
-import { use100vh } from 'src/utils/ui'
 
 export enum ActionType {
   Cancel = 'cancel',
@@ -45,10 +46,11 @@ interface Props {
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
   children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
-  width?: ResponsiveValue<
+  maxWidth?: ResponsiveValue<
     CSS.MaxWidthProperty<TLengthStyledSystem>,
     RequiredTheme
   >
+  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
   height?: ResponsiveValue<
     CSS.MaxHeightProperty<TLengthStyledSystem>,
     RequiredTheme
@@ -64,6 +66,7 @@ const Modal = ({
   isOpen,
   children,
   onClose,
+  maxWidth,
   width,
   height,
   confirmClose,
@@ -74,7 +77,9 @@ const Modal = ({
   const modalCardRef = React.useRef<HTMLDivElement>(null)
   const [confirmingClose, setConfirmingClose] = React.useState(false)
   const backgroundTransitions = useTransition(isOpen, null, {
-    from: { opacity: 0 },
+    // Need position and zIndex to give it a stacking context to guarantee
+    // it renders over modal underneath (if there is one)
+    from: { opacity: 0, position: 'relative', zIndex: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
   })
@@ -140,7 +145,7 @@ const Modal = ({
 
   const fullHeight = use100vh()
 
-  return (
+  return ReactDOM.createPortal(
     <Box>
       {/* Apply some global styles when the modal is open to prevent body scrolling and ensure Navbar has lower z-index */}
       {/* This is sliiightly hacky but it's just for Navbar, I don't anticipate needing to do this elsewhere */}
@@ -193,6 +198,7 @@ const Modal = ({
                           ref={modalCardRef}
                           position="relative"
                           zIndex={20}
+                          maxWidth={maxWidth ?? '90vw'}
                           width={
                             {
                               center: width ?? { _: '100%', md: '80%' },
@@ -312,6 +318,8 @@ const Modal = ({
                       preventCloseWithOutsideClick={true}
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
+                      maxWidth="90%"
+                      width="400px"
                       actions={{
                         primary: {
                           text: 'No thanks',
@@ -325,11 +333,11 @@ const Modal = ({
                     >
                       <Box>
                         <Box>
-                          <Text.PageHeader mb={3}>Discard?</Text.PageHeader>
+                          <Text.CardHeader mb={3}>Discard?</Text.CardHeader>
 
-                          <Text.Body>
+                          <Text.Body2>
                             Changes you have made won't be saved.
-                          </Text.Body>
+                          </Text.Body2>
                         </Box>
                       </Box>
                     </Modal>
@@ -339,7 +347,11 @@ const Modal = ({
             </animated.div>
           ),
       )}
-    </Box>
+    </Box>,
+    // Render Modals via a portal to a div#modal-root that's a sibling of
+    // the main app's div#root (check client/public/index.html)
+    // See https://reactjs.org/docs/portals.html for more details
+    document.getElementById('modal-root')!,
   )
 }
 

@@ -13,6 +13,7 @@ import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import ContactCardsList from './ContactCardsList'
 import ContactsEmptyState from './ContactsEmptyState'
+import { Link } from 'src/components/Link'
 import { ContactsSortOption } from './utils'
 
 interface Props {
@@ -128,13 +129,21 @@ const ContactsDetailView = ({
             {selectedContact.phoneNumber && (
               <Box px={3}>
                 <Text.Label>Phone</Text.Label>
-                <Text.Body2>{selectedContact.phoneNumber}</Text.Body2>
+                <Text.Body2>
+                  <Link to={`tel:${selectedContact.phoneNumber}`}>
+                    {selectedContact.phoneNumber}
+                  </Link>
+                </Text.Body2>
               </Box>
             )}
             {selectedContact.email && (
               <Box px={3}>
                 <Text.Label>Email</Text.Label>
-                <Text.Body2>{selectedContact.email}</Text.Body2>
+                <Text.Body2>
+                  <Link to={`tel:${selectedContact.email}`}>
+                    {selectedContact.email}
+                  </Link>
+                </Text.Body2>
               </Box>
             )}
           </Box>

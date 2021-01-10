@@ -28,6 +28,7 @@ export interface UpdateProfileQuery_updateProfile {
   headline: string | null
   phoneNumber: string | null
   email: string | null
+  isEmailVerified: boolean
   bio: string | null
   activated: boolean
 }

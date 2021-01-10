@@ -1,84 +1,68 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Modal /> renders a modal with the specified content 1`] = `
+exports[`<Modal /> renders a modal with the specified content in a portal 1`] = `
 <div
-  className="css-1x3sxzl-Box e1gi27mm0"
+  id="modal-root"
 >
   <div
-    style={
-      Object {
-        "opacity": 0,
-      }
-    }
+    class="css-1x3sxzl-Box e1gi27mm0"
   >
-    <aside
-      aria-modal={true}
-      className="css-1m0a4o1-Box e1gi27mm0"
-      data-testid="modal"
-      display="flex"
-      height={null}
-      onClick={[Function]}
-      width="100vw"
+    <div
+      style="opacity: 0; position: relative; z-index: 0;"
     >
-      <div
-        style={
-          Object {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "transform": "scale(0)",
-            "width": "100%",
-          }
-        }
+      <aside
+        aria-modal="true"
+        class="css-7ipd20-Box e1gi27mm0"
+        data-testid="modal"
+        display="flex"
+        height="768"
+        width="100vw"
       >
         <div
-          className="css-1dxwlu-Box e1gi27mm0"
-          display="flex"
-          height="unset"
-          width={
-            Object {
-              "_": "100%",
-              "md": "80%",
-            }
-          }
+          style="display: flex; flex-direction: column; justify-content: center; align-items: center; transform: scale(0); width: 100%;"
         >
           <div
-            className="css-q4rbdj-Box e1gi27mm0"
+            class="css-1rsa3wr-Box e1gi27mm0"
+            display="flex"
+            height="unset"
+            width="[object Object]"
           >
-            <h2
-              className="css-aaj9al-Text e1pb1ozb0"
-            >
-              Test Modal
-            </h2>
-            <p
-              className="css-182fmg5-Text e1pb1ozb0"
-            >
-              Some content
-            </p>
             <div
-              aria-label="Close Modal"
-              className="css-1qehuvj-Box-Modal e1gi27mm0"
-              onClick={[Function]}
-              role="button"
+              class="css-q4rbdj-Box e1gi27mm0"
             >
-              <svg
-                fill="none"
-                height="24"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+              <h2
+                class="css-aaj9al-Text e1pb1ozb0"
               >
-                <path
-                  d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
-                  fill="#444444"
-                />
-              </svg>
+                Test Modal
+              </h2>
+              <p
+                class="css-182fmg5-Text e1pb1ozb0"
+              >
+                Some content
+              </p>
+              <div
+                aria-label="Close Modal"
+                class="css-1qehuvj-Box-Modal e1gi27mm0"
+                role="button"
+              >
+                <svg
+                  fill="none"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                    fill="#444444"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </div>
   </div>
 </div>
 `;

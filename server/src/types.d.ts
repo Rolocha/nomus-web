@@ -1,6 +1,6 @@
 declare namespace Express {
   interface Request {
-    user?: import('src/models/User').User
+    user?: import('@typegoose/typegoose').DocumentType<import('src/models/User').User>
   }
 }
 

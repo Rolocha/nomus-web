@@ -3,8 +3,10 @@ import { UserModel, validateUsername } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
-
+import { sgMail } from 'src/util/sendgrid'
 import { Result } from 'src/util/error'
+
+jest.mock('src/util/sendgrid')
 
 beforeAll(async () => {
   await initDB()
@@ -243,6 +245,49 @@ describe('UserResolver', () => {
         expect(userObject.phoneNumber).toBe(updatePayload.phoneNumber)
         expect(userObject.bio).toBe(updatePayload.bio)
       }
+    })
+
+    it('de-verifies email and sends a verification email if email was changed', async () => {
+      const user = await createMockUser({
+        name: {
+          first: 'L',
+          last: 'A',
+        },
+        email: 'abc@gmail.com',
+        phoneNumber: '5555555555',
+        isEmailVerified: true,
+      })
+      const updatePayload = {
+        email: 'newone@gmail.com',
+      }
+      const response = await execQuery({
+        source: `
+        mutation UpdateProfileTestQuery($userId: String, $updatedUser: ProfileUpdateInput!) {
+          updateProfile(userId: $userId, updatedUser: $updatedUser) {
+            id
+            email
+            isEmailVerified
+          }
+        }
+        `,
+        variableValues: {
+          updatedUser: updatePayload,
+        },
+        contextUser: user,
+      })
+
+      // We should assert on the DB user as well as the one on the GraphQL response
+      const updatedUser = await UserModel.findById(response.data.updateProfile.id)
+      for (const userObject of [updatedUser, response.data.updateProfile]) {
+        expect(userObject.email).toBe(updatePayload.email)
+        expect(userObject.isEmailVerified).toBe(false)
+      }
+
+      expect(sgMail.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: updatedUser.email,
+        })
+      )
     })
   })
 

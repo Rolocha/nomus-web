@@ -1,6 +1,9 @@
+import { css } from '@emotion/core'
 import * as React from 'react'
+import { useLocation } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
+import Toast from 'src/components/Toast'
 import Box from 'src/components/Box'
 import MultiWorkspace from 'src/components/MultiWorkspace'
 import Navbar from 'src/components/Navbar'
@@ -15,6 +18,9 @@ import ContactsSection from './ContactsSection'
 // import OrdersSection from './OrdersSection'
 import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
+import Banner from 'src/components/Banner'
+import { ExternalLink } from 'src/components/Link'
+import { resendVerificationEmail } from 'src/utils/auth'
 
 const bp = 'md'
 
@@ -23,15 +29,34 @@ const ProfilePage = () => {
     gql`
       query UserControlPanelSkeletonQuery {
         user {
+          id
           name {
             first
             middle
             last
           }
+          email
+          isEmailVerified
         }
       }
     `,
   )
+
+  const location = useLocation()
+  const [showJustVerifiedEmail, setShowJustVerifiedEmail] = React.useState<
+    boolean | null
+  >(null)
+  const [
+    resentVerificationEmailSuccessfully,
+    setResentVerificationEmailSuccessfully,
+  ] = React.useState<null | boolean>(null)
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    // If we haven't set it yet, set showJustVerifiedEmail to whether it's in the URL query params
+    if (showJustVerifiedEmail == null) {
+      setShowJustVerifiedEmail(params.get('justVerifiedEmail') != null)
+    }
+  }, [showJustVerifiedEmail, location])
 
   if (loading || !data) {
     return <LoadingPage fullscreen />
@@ -73,6 +98,63 @@ const ProfilePage = () => {
                   data.user.name,
                 )}`}</Text.PageHeader>
               </Box>
+            )}
+
+            {data.user.isEmailVerified !== true && (
+              <Banner
+                css={css({
+                  marginBottom: '16px',
+                })}
+                type="warning"
+                title="Email not verified"
+                description={
+                  <span>
+                    {resentVerificationEmailSuccessfully == null && (
+                      <>
+                        Please confirm your email address by clicking the magic
+                        link we sent to your inbox. Didn't get an email?{' '}
+                        <ExternalLink
+                          css={css({ cursor: 'pointer' })}
+                          onClick={() => {
+                            resendVerificationEmail().then((result) => {
+                              setResentVerificationEmailSuccessfully(result)
+                            })
+                          }}
+                        >
+                          Resend.
+                        </ExternalLink>
+                      </>
+                    )}
+                    {resentVerificationEmailSuccessfully && (
+                      <span>
+                        We sent another verification email. Please check your
+                        inbox.
+                      </span>
+                    )}
+                    {/* This should only happen if something went awry on our end... */}
+                    {resentVerificationEmailSuccessfully === false && (
+                      <span>
+                        Uh oh... something went wrong. Please try again later.
+                      </span>
+                    )}
+                  </span>
+                }
+              />
+            )}
+
+            {data.user.isEmailVerified && showJustVerifiedEmail && (
+              <Toast
+                css={css({
+                  marginBottom: '16px',
+                })}
+                type="success"
+                title="Email verified"
+                description="Successfully verified your email address."
+                autoCloseIn={8000}
+                onClickClose={() => {
+                  setShowJustVerifiedEmail(false)
+                }}
+              />
             )}
 
             <MultiWorkspace

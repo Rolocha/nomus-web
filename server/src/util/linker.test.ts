@@ -5,8 +5,9 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
+import { CardInteractionType } from './enums'
 import { NamedError } from './error'
-import { getUserFromCardId, linkSheetToUser, spliceRouteStr } from './linker'
+import { getCardDataForInteractionString, linkSheetToUser } from './linker'
 
 beforeAll(async () => {
   await initDB()
@@ -21,50 +22,55 @@ describe('linker', () => {
     await dropAllCollections()
   })
 
-  describe('linking sheet to user', () => {
+  describe('getCardDataForInteractionString', () => {
     it('fails incorrectly formatted routeStr, miss-spelled', async () => {
       const badRoute = 'sheet_jsdldnfskl-card_fsfljs'
-      expect(spliceRouteStr(badRoute).isSuccess).toBeFalsy()
-      expect(spliceRouteStr(badRoute).error).toEqual(
-        new NamedError(`Incorrectly formatted routeStr: ${badRoute}`)
-      )
+      const result = await getCardDataForInteractionString(badRoute)
+      expect(result.isSuccess).toBeFalsy()
+      expect(result.error).toEqual(new NamedError(`Incorrectly formatted routeStr: ${badRoute}`))
     })
 
     it('fails incorrectly formatted routeStr, repeated', async () => {
       const repeatedRoute =
         'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345-sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
-      expect(spliceRouteStr(repeatedRoute).isSuccess).toBeFalsy()
-      expect(spliceRouteStr(repeatedRoute).error).toEqual(
+      const result = await getCardDataForInteractionString(repeatedRoute)
+      expect(result.isSuccess).toBeFalsy()
+      expect(result.error).toEqual(
         new NamedError(`Incorrectly formatted routeStr: ${repeatedRoute}`)
       )
     })
 
-    it('returns the split of a routeStr', async () => {
-      const routeStr = 'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
-      const [esheet, ecard] = routeStr.split('-')
-      expect(spliceRouteStr(routeStr).value).toStrictEqual({ sheetId: esheet, cardId: ecard })
+    it('properly parses a tap (NFC) URL', async () => {
+      const cardVersion = await createMockCardVersion()
+      const card = await createMockCard({ cardVersion: cardVersion.id })
+      const sheet = await createMockSheet({ cards: [card] })
+
+      const routeStr = [sheet.id, card.id].join('-')
+      const result = await getCardDataForInteractionString(routeStr)
+
+      expect(result.value.card.id).toStrictEqual(card.id)
+      expect(result.value.cardVersion.id).toStrictEqual(cardVersion.id)
+      expect(result.value.interactionType).toStrictEqual(CardInteractionType.Tap)
     })
 
-    it("returns a non-registered card's user as null", async () => {
-      const card = await createMockCard({ user: null })
-      const res = await getUserFromCardId(card.id)
-      expect(res).toBe(null)
-    })
+    it('properly parses a QR scan URL', async () => {
+      const cardVersion = await createMockCardVersion()
 
-    it("returns a registered card's user", async () => {
-      const user = await createMockUser()
-      const card = await createMockCard({ user })
-      const res = await getUserFromCardId(card.id)
-      expect(res.id).toBe(user.id)
-      expect(res.name.first).toBe(user.name.first)
-    })
+      const routeStr = cardVersion.id
+      const result = await getCardDataForInteractionString(routeStr)
 
+      expect(result.value.cardVersion.id).toStrictEqual(cardVersion.id)
+      expect(result.value.interactionType).toStrictEqual(CardInteractionType.QRCode)
+    })
+  })
+
+  describe('linkSheetToUser', () => {
     it('links a sheet from a routeStr to a user with a shortId', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
         user: user.id,
       })
-      const card = await createMockCard({ user: null })
+      const card = await createMockCard({ user: null, cardVersion: cardVersion.id })
       const sheet = await createMockSheet({
         cardVersion: null,
         cards: [card.id],
@@ -87,12 +93,12 @@ describe('linker', () => {
       expect(resCard.user).toBe(user.id)
     })
 
-    it.only('tries to link a sheet but fails because there is no sheet', async () => {
+    it('tries to link a sheet but fails because there is no sheet', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
         user: user.id,
       })
-      const card = await createMockCard({ user: null })
+      const card = await createMockCard({ user: null, cardVersion: cardVersion.id })
 
       const order = await createMockOrder({
         user: user.id,

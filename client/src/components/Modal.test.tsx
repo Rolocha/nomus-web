@@ -2,22 +2,33 @@ import 'src/test-utils/mocks/matchMedia.mock'
 
 import { cleanup, render } from '@testing-library/react'
 import * as React from 'react'
-import renderer from 'react-test-renderer'
+import ReactDOM from 'react-dom'
+import { PageHeader, Body } from 'src/components/Text'
 import Modal from 'src/components/Modal'
-import { Body, PageHeader } from 'src/components/Text'
+import { setUpModalPortal } from 'src/test-utils/modal.test'
 
 afterEach(cleanup)
 
 describe('<Modal />', () => {
-  it('renders a modal with the specified content', () => {
-    const component = renderer.create(
+  beforeAll(() => {
+    jest.spyOn(ReactDOM, 'createPortal')
+    setUpModalPortal()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  it('renders a modal with the specified content in a portal', () => {
+    render(
       <Modal isOpen={true} onClose={() => {}}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,
     )
-    const tree = component.toJSON()
-    expect(tree).toMatchSnapshot()
+    const modalRoot = document.querySelector('div#modal-root')
+    expect(modalRoot).toMatchSnapshot()
+    expect(ReactDOM.createPortal).toHaveBeenCalled()
   })
 
   it('if confirmClose is true, show confirmation modal when trying to close', () => {
