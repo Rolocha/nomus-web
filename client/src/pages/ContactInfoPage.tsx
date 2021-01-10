@@ -236,12 +236,19 @@ const ContactInfoPage = () => {
             <Box gridArea="profileInfo">
               <Box mb={3}>
                 <Text.Label mb={1}>PHONE</Text.Label>
-                <Text.Body2>{contact.phoneNumber}</Text.Body2>
+                <Text.Body2>
+                  <Link to={`tel:${contact.phoneNumber}`}>
+                    {contact.phoneNumber}
+                  </Link>
+                </Text.Body2>
               </Box>
 
               <Box mb={3}>
                 <Text.Label>EMAIL</Text.Label>
-                <Text.Body2>{contact.email}</Text.Body2>
+
+                <Text.Body2>
+                  <Link to={`mailto:${contact.email}`}>{contact.email}</Link>
+                </Text.Body2>
               </Box>
 
               <Box>

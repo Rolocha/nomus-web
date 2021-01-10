@@ -80,7 +80,8 @@ const isExternalLink = (
   to: React.ComponentProps<typeof ReactRouterLink>['to'],
 ): to is string => {
   return (
-    typeof to === 'string' && (to.startsWith('http') || to.startsWith('mailto'))
+    typeof to === 'string' &&
+    (to.startsWith('http') || to.startsWith('mailto:') || to.startsWith('tel:'))
   )
 }
 
