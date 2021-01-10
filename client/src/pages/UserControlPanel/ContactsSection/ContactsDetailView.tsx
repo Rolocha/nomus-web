@@ -13,7 +13,6 @@ import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import ContactCardsList from './ContactCardsList'
 import ContactsEmptyState from './ContactsEmptyState'
-import ProfilePicture from 'src/components/ProfilePicture'
 import { Link } from 'src/components/Link'
 import { ContactsSortOption } from './utils'
 
