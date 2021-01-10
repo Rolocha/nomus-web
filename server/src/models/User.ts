@@ -308,6 +308,7 @@ export class User extends BaseModel({
       templateId: 'd-02455eda777b41f980776fa13d043b81',
       dynamicTemplateData: {
         verificationURL,
+        firstName: this.name.first,
       },
     })
   }
