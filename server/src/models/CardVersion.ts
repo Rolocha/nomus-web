@@ -3,7 +3,7 @@ import { CardSpecBaseType } from 'src/util/enums'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
-import { PrintAddress, PersonName } from './subschemas'
+import { Address, PersonName } from './subschemas'
 import { User } from './User'
 import { validateEmail } from './utils'
 
@@ -62,8 +62,8 @@ export class CardVersion extends BaseModel({
   vcfNotes: string
 
   @prop({ _id: false })
-  @Field(() => PrintAddress, { nullable: false })
-  address: PrintAddress
+  @Field(() => Address, { nullable: false })
+  address: Address
 
   @prop({ required: false })
   @Field({ nullable: true })

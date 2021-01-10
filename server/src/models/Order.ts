@@ -12,7 +12,7 @@ import { Field, ObjectType } from 'type-graphql'
 import { OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
-import { ShippingAddress } from './subschemas'
+import { Address } from './subschemas'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -94,8 +94,8 @@ class Order extends BaseModel({
   printSpecUrl: string
 
   @prop({ _id: false, required: false })
-  @Field(() => ShippingAddress, { nullable: true })
-  shippingAddress: ShippingAddress
+  @Field(() => Address, { nullable: true })
+  shippingAddress: Address
 }
 
 Order.mongo = getModelForClass(Order)

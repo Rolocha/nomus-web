@@ -1,4 +1,4 @@
-import { ObjectType, Field } from 'type-graphql'
+import { ObjectType, Field, InputType } from 'type-graphql'
 import { prop } from '@typegoose/typegoose'
 
 @ObjectType()
@@ -36,25 +36,9 @@ export const isValidUserCheckpointKey = (s: string): s is UserCheckpointKey => {
   return (USER_CHECKPOINT_KEYS as string[]).includes(s)
 }
 
-@ObjectType()
-//Custom address printed and displayed on the business card
-export class PrintAddress {
-  @prop()
-  @Field({ nullable: true })
-  line1: string
-
-  @prop()
-  @Field({ nullable: true })
-  line2: string
-
-  @prop()
-  @Field({ nullable: true })
-  line3: string
-}
-
-@ObjectType()
-//Shipping Address on the Order to set shipping labels
-export class ShippingAddress {
+@InputType('AddressInput')
+@ObjectType('AddressObject')
+export class Address {
   @prop()
   @Field({ nullable: false })
   line1: string
