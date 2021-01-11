@@ -29,11 +29,11 @@ const LINKER_MUTATION = gql`
 `
 
 const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
-  return createMailtoURL(
-    'help@nomus.me',
-    `Sheet Linking Failed: ${routeStr}`,
-    `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
-  )
+  return createMailtoURL({
+    to: 'help@nomus.me',
+    subject: `Sheet Linking Failed: ${routeStr}`,
+    body: `Sheet Linking Failed for sheet: ${routeStr}\nError String: ${errorStr}\n\nShortId on Sheet Edge: `,
+  })
 }
 
 const LinkerPage = () => {

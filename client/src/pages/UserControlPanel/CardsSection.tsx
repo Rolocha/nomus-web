@@ -34,19 +34,19 @@ const formatDate = (date: Date) => {
 }
 
 const sendReorderEmail = (cardId: string) => {
-  return createMailtoURL(
-    'hi@nomus.me',
-    "I'd like to reorder a card!",
-    `Hi! I'd like to reorder a card please :) \ncardID: ${cardId}\n\nNumber of cards to order:`,
-  )
+  return createMailtoURL({
+    to: 'hi@nomus.me',
+    subject: "I'd like to reorder a card!",
+    body: `Hi! I'd like to reorder a card please :)\ncardID: ${cardId}\n\nNumber of cards to order:`,
+  })
 }
 
 const sendModifyEmail = (cardId: string) => {
-  return createMailtoURL(
-    'hi@nomus.me',
-    "I'd like to modify a card!",
-    `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
-  )
+  return createMailtoURL({
+    to: 'hi@nomus.me',
+    subject: "I'd like to modify a card!",
+    body: `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
+  })
 }
 
 export default () => {
