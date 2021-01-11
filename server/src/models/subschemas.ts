@@ -37,7 +37,7 @@ export const isValidUserCheckpointKey = (s: string): s is UserCheckpointKey => {
 }
 
 @InputType('AddressInput')
-@ObjectType('AddressObject')
+@ObjectType()
 export class Address {
   @prop()
   @Field({ nullable: false })

@@ -86,7 +86,7 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   shortId: string
 
-  @prop({ required: false, descrption: 'URL pointing to shipping label document' })
+  @prop({ required: false, description: 'URL pointing to shipping label document' })
   shippingLabelUrl: string
 
   @prop({ required: false, description: 'URL pointing to the document to be printed' })
