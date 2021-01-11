@@ -1,6 +1,7 @@
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
+import { Address } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderState, Role } from 'src/util/enums'
 import { calculateCost } from 'src/util/pricing'
@@ -69,24 +70,6 @@ class CustomCardSpecInput extends BaseCardSpecInput {
 //   addressLine3?: string
 // }
 
-@InputType({ description: 'A shipping address input' })
-class ShippingAddressInput {
-  @Field({ nullable: false })
-  line1: string
-
-  @Field({ nullable: true })
-  line2?: string
-
-  @Field({ nullable: false })
-  city: string
-
-  @Field({ nullable: false })
-  state: string
-
-  @Field({ nullable: false })
-  postalCode: string
-}
-
 @InputType({
   description: 'Input to generate new Order object, regardless of what type of card base was used',
 })
@@ -101,8 +84,8 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
   @Field({ nullable: true })
   stripeToken: string
 
-  @Field((type) => ShippingAddressInput, { nullable: true })
-  shippingAddress: ShippingAddressInput
+  @Field((type) => Address, { nullable: true })
+  shippingAddress: Address
 }
 
 @InputType({ description: 'Input to generate new or update existing custom card Order' })
