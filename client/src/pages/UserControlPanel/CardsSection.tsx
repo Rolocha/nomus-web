@@ -37,7 +37,12 @@ const sendReorderEmail = (cardId: string) => {
   return createMailtoURL({
     to: 'hi@nomus.me',
     subject: "I'd like to reorder a card!",
-    body: `Hi! I'd like to reorder a card please :)\ncardID: ${cardId}\n\nNumber of cards to order:`,
+    body: `
+Hi! I'd like to reorder a card please :)
+cardID: ${cardId}
+
+Number of cards to order:
+`.trim(),
   })
 }
 
@@ -45,7 +50,12 @@ const sendModifyEmail = (cardId: string) => {
   return createMailtoURL({
     to: 'hi@nomus.me',
     subject: "I'd like to modify a card!",
-    body: `Hi! I'd like to modify a card please\ncardID: ${cardId}\n\nI'd like to change:`,
+    body: `
+Hi! I'd like to modify a card please
+cardID: ${cardId}
+
+I'd like to change:
+`.trim(),
   })
 }
 

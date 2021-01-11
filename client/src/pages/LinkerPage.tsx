@@ -32,7 +32,12 @@ const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
   return createMailtoURL({
     to: 'help@nomus.me',
     subject: `Sheet Linking Failed: ${routeStr}`,
-    body: `Sheet Linking Failed for sheet: ${routeStr}\nError String: ${errorStr}\n\nShortId on Sheet Edge: `,
+    body: `
+Sheet Linking Failed for sheet: ${routeStr}
+Error String: ${errorStr}
+
+ShortId on Sheet Edge: 
+`.trim(),
   })
 }
 
