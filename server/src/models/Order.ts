@@ -78,22 +78,21 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   paymentIntent: string
 
-  //shortId allows the print-tech to link a printed sheet to the user in this order
-  @prop({ required: false, unique: true })
+  @prop({
+    required: false,
+    unique: true,
+    description: 'ID printed onto a sheet for the print tech to link a user',
+  })
   @Field({ nullable: true })
   shortId: string
 
-  //shipping label from XPS to send to Hudson, stored in S3
-  @prop({ required: false })
-  @Field({ nullable: true })
+  @prop({ required: false, descrption: 'URL pointing to shipping label document' })
   shippingLabelUrl: string
 
-  //25-Up Card Model Hudson will use to print stored in S3
-  @prop({ required: false })
-  @Field({ nullable: true })
+  @prop({ required: false, description: 'URL pointing to the document to be printed' })
   printSpecUrl: string
 
-  @prop({ _id: false, required: false })
+  @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 }
