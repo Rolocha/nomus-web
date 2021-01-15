@@ -126,6 +126,9 @@ const LoginForm = () => {
             autoComplete="current-password"
             error={errors.password}
           />
+          <Text.Body3>
+            <Link to="/forgot-password">Forgot your password?</Link>
+          </Text.Body3>
           <Form.FieldError fieldError={errors.password} />
         </Form.Item>
         <Button

@@ -1,5 +1,5 @@
 import ms from 'ms'
-import { sgMail } from 'src/util/sendgrid'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import {
   DocumentType,
   getModelForClass,
@@ -19,6 +19,7 @@ import {
   authTokenPrivateKey,
   baseUrl,
   emailVerificationTokenLifespan,
+  passwordResetTokenLifespan,
 } from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
@@ -305,7 +306,7 @@ export class User extends BaseModel({
     await sgMail.send({
       to: this.email,
       from: 'hi@nomus.me',
-      templateId: 'd-02455eda777b41f980776fa13d043b81',
+      templateId: SendgridTemplate.VerifyEmail,
       dynamicTemplateData: {
         verificationURL,
       },
