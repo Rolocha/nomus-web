@@ -96,7 +96,7 @@ const ContactInfoPage = () => {
   }, [publicContact])
 
   const downloadLink = React.useMemo(
-    () => `/api/contact-card/${username}?${contactInfoParams.toString()}`,
+    () => `/api/contact/vcf/${username}?${contactInfoParams.toString()}`,
     [contactInfoParams, username],
   )
 

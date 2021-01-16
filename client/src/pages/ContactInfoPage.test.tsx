@@ -234,7 +234,7 @@ describe('Contact Info Page', () => {
       expect(
         saveContactCardLink
           ?.getAttribute('href')
-          ?.startsWith(`/api/contact-card/${mockContact?.username}`),
+          ?.startsWith(`/api/contact/vcf/${mockContact?.username}`),
       ).toBe(true)
       expect(saveContactCardLink?.getAttribute('download')).toBe(
         `${mockContact?.username}.vcf`,
