@@ -224,10 +224,6 @@ describe('Contact Info Page', () => {
     ).toBeInTheDocument()
   })
 
-  // it('if logged in and not yet connected to this user, creates a Connection', async () => {
-
-  // })
-
   describe('Save contact card button', () => {
     it('links to the VCF file download', async () => {
       const { renderResult } = renderComponent({ partialContact: mockContact })
