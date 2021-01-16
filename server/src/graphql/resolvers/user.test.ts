@@ -339,8 +339,15 @@ describe('UserResolver', () => {
   })
 
   describe('sendPasswordResetEmail', () => {
+    let sgMailSendSpy = null
+    beforeEach(() => {
+      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+    })
     it('sends the password reset email if a user with the provided email exists', async () => {
-      jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
       const user = await createMockUser({
         email: 'blah@nomus.me',
         password: 'abc123',
@@ -370,7 +377,6 @@ describe('UserResolver', () => {
 
     // Quiet success is key to not leaking data about which emails are valid ones in our DB
     it("quietly succeeds without sending an email if the email doesn't belong to any use", async () => {
-      jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
       const response = await execQuery({
         source: `
           mutation SendPasswordResetEmailQuery($email: String!) {
