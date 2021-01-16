@@ -22,14 +22,9 @@ interface ResetPasswordFormData {
 }
 
 const ResetPassword = () => {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    formState,
-    setError,
-    clearErrors,
-  } = useForm<ResetPasswordFormData>({
+  const { register, handleSubmit, errors, formState } = useForm<
+    ResetPasswordFormData
+  >({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -59,7 +54,7 @@ const ResetPassword = () => {
   )
 
   const onSubmit = async (formData: ResetPasswordFormData) => {
-    const result = await resetPassword({
+    await resetPassword({
       variables: {
         token: queryParams.get('token'),
         userId: queryParams.get('userId'),

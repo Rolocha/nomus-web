@@ -1,5 +1,3 @@
-import ms from 'ms'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import {
   DocumentType,
   getModelForClass,
@@ -14,26 +12,27 @@ import crypto from 'crypto'
 import * as fs from 'fs'
 import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
+import ms from 'ms'
 import {
   accessTokenLifespan,
   authTokenPrivateKey,
   baseUrl,
   emailVerificationTokenLifespan,
-  passwordResetTokenLifespan,
 } from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Field, ObjectType } from 'type-graphql'
+import { URLSearchParams } from 'url'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import { Connection } from './Connection'
+import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import RefreshToken from './RefreshToken'
 import { validateEmail } from './utils'
-import { URLSearchParams } from 'url'
 
 export interface UserCreatePayload {
   id?: string
