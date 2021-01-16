@@ -209,7 +209,7 @@ class UserResolver {
   async sendPasswordResetEmail(@Arg('email', { nullable: false }) email: string): Promise<void> {
     const user = await User.mongo.findOne({ email })
     if (user == null) {
-      throw new Error('no-user-with-that-email')
+      return null
     }
 
     // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
@@ -240,6 +240,11 @@ class UserResolver {
     @Arg('newPassword', { nullable: false }) newPassword: string,
     @Arg('userId', { nullable: false }) userId: string
   ): Promise<void> {
+    const user = await User.mongo.findById(userId)
+    if (user == null) {
+      throw new Error('invalid-user')
+    }
+
     // Verify token belongs to the user and is valid
     const isTokenValid = await PasswordResetToken.mongo.verify(token, userId)
     if (!isTokenValid) {
@@ -247,10 +252,6 @@ class UserResolver {
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
-    const user = await User.mongo.findById(userId)
-    if (user == null) {
-      throw new Error('invalid-user')
-    }
     user.password = newPassword
     await user.save()
 
