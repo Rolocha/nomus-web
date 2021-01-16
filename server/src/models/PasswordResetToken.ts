@@ -1,4 +1,10 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import {
+  getModelForClass,
+  modelOptions,
+  prop,
+  ReturnModelType,
+  DocumentType,
+} from '@typegoose/typegoose'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { passwordResetTokenLifespan } from 'src/config'
@@ -21,6 +27,9 @@ export class PasswordResetToken extends BaseModel({
   @prop({ required: false, default: () => Date.now() + passwordResetTokenLifespan })
   expiresAtMs: number // ms since epoch
 
+  @prop({ default: false })
+  forceInvalidated: boolean
+
   public static async createNewTokenForUser(
     this: ReturnModelType<typeof PasswordResetToken>,
     user: string
@@ -36,7 +45,7 @@ export class PasswordResetToken extends BaseModel({
   }
 
   public isValid(): boolean {
-    return this.expiresAtMs > Date.now()
+    return this.expiresAtMs > Date.now() && !this.forceInvalidated
   }
 
   public static async verify(
@@ -45,7 +54,7 @@ export class PasswordResetToken extends BaseModel({
     associatedUser: string
   ): Promise<boolean> {
     try {
-      const tokensForThisUser = await this.find({ client: associatedUser })
+      const tokensForThisUser = await this.find({ user: associatedUser })
       for (const token of tokensForThisUser) {
         const tokenMatches = await bcrypt.compare(proposedToken, token.value)
         if (tokenMatches) {
@@ -59,6 +68,19 @@ export class PasswordResetToken extends BaseModel({
     } catch (err) {
       return false
     }
+  }
+
+  public static async invalidateAllForUser(
+    this: ReturnModelType<typeof PasswordResetToken>,
+    userId: string
+  ): Promise<void> {
+    const tokensToInvalidate = await this.find({ user: userId })
+    await Promise.all(tokensToInvalidate.map((token) => token.invalidate()))
+  }
+
+  public async invalidate(this: DocumentType<PasswordResetToken>) {
+    this.forceInvalidated = true
+    return this.save()
   }
 }
 

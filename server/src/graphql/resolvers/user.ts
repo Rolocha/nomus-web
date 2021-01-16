@@ -212,11 +212,13 @@ class UserResolver {
       throw new Error('no-user-with-that-email')
     }
 
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
     const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
 
     const passwordResetURLQueryParams = new URLSearchParams()
     passwordResetURLQueryParams.set('token', preHashToken)
-    passwordResetURLQueryParams.set('id', user.id)
+    passwordResetURLQueryParams.set('userId', user.id)
     const passwordResetLink = `${baseUrl}/reset-password?${passwordResetURLQueryParams.toString()}`
 
     await sgMail.send({
@@ -235,9 +237,24 @@ class UserResolver {
   @Mutation(() => Void, { nullable: true })
   async resetPassword(
     @Arg('token', { nullable: false }) token: string,
-    @Arg('password', { nullable: false }) password: string
+    @Arg('newPassword', { nullable: false }) newPassword: string,
+    @Arg('userId', { nullable: false }) userId: string
   ): Promise<void> {
-    // TODO
+    // Verify token belongs to the user and is valid
+    const isTokenValid = await PasswordResetToken.mongo.verify(token, userId)
+    if (!isTokenValid) {
+      throw new Error('invalid-token')
+    }
+
+    // Update the user's password, let User's pre-save hook handle hashing it
+    const user = await User.mongo.findById(userId)
+    if (user == null) {
+      throw new Error('invalid-user')
+    }
+    user.password = newPassword
+    await user.save()
+
+    return null
   }
 }
 export default UserResolver
