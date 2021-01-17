@@ -59,3 +59,23 @@ export class Address {
   @Field({ nullable: false })
   postalCode: string
 }
+
+@ObjectType()
+export class OrderPrice {
+  //Price of cards in the order
+  @prop({ required: true })
+  @Field({ nullable: false })
+  subtotal: number
+
+  @prop({ required: true, default: 0 })
+  @Field({ nullable: false })
+  tax: number
+
+  @prop({ required: true, default: 0 })
+  @Field({ nullable: false })
+  shipping: number
+
+  @prop({ required: true })
+  @Field({ nullable: false })
+  total: number
+}

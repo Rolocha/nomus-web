@@ -10,6 +10,7 @@ import * as Text from 'src/components/Text'
 import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
+import { getUserFacingOrderState } from 'src/utils/order'
 
 interface Props {
   orders: Array<Order>
@@ -91,7 +92,7 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Status</Text.Label>
               </Box>
-              <Text.Body2>{order.state}</Text.Body2>
+              <Text.Body2>{getUserFacingOrderState(order)}</Text.Body2>
             </Box>
             <Box gridArea="orderNumber" placeSelf="center start">
               <Box display={{ _: 'block', [bp]: 'none' }}>
@@ -117,7 +118,7 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Price</Text.Label>
               </Box>
-              <Text.Body2>{formatDollarAmount(order.price)}</Text.Body2>
+              <Text.Body2>{formatDollarAmount(order.price.total)}</Text.Body2>
             </Box>
 
             <Box

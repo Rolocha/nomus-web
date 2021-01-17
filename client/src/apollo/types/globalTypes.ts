@@ -8,6 +8,14 @@
 //==============================================================
 
 /**
+ * The cancelation state of an Order
+ */
+export enum OrderCancelationState {
+  Canceled = 'Canceled',
+  NotCanceled = 'NotCanceled',
+}
+
+/**
  * foo
  */
 export enum OrderState {

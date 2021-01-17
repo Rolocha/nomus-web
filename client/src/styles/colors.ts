@@ -17,6 +17,7 @@ const colors = {
 
   // Some grays
   superlightGray: '#E5E5E5',
+  lightGray: '#aaa',
   white: '#FFFFFF',
 
   // States
@@ -37,8 +38,8 @@ const colors = {
   activeBlue: '#E5F1FF',
   outlineBlue: '#B2D6FF',
 
-  hoverRed: '#FFF0F7',
-  activeRed: '#FFE5F1',
+  hoverRed: '#B01500',
+  activeRed: '#9E1300',
   outlineRed: '#FFB2D6',
 
   hoverGreen: '#F0FFF7',

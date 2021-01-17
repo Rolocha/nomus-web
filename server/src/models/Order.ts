@@ -13,7 +13,7 @@ import { Field, ObjectType } from 'type-graphql'
 import { OrderState, OrderCancelationState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
-import { Address } from './subschemas'
+import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 
 @pre<Order>('save', async function (next) {
@@ -62,10 +62,9 @@ class Order extends BaseModel({
   @Field({ nullable: false })
   quantity: number
 
-  //Price of cards in the order
-  @prop({ required: true })
-  @Field({ nullable: false })
-  price: number
+  @prop({ _id: false, required: true })
+  @Field(() => OrderPrice, { nullable: false })
+  price: OrderPrice
 
   //This correlates with OrderState at server/src/util/enums.ts
   @prop({ enum: OrderState, type: String, required: true })

@@ -138,6 +138,30 @@ export const styleVariants = {
   danger: {
     borderWidth: '1px',
     borderStyle: 'solid',
+    backgroundColor: colors.invalidRed,
+    borderColor: colors.invalidRed,
+    color: colors.white,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverRed,
+    },
+    '&:active': {
+      backgroundColor: colors.activeRed,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineRed}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: '#DFE5EC',
+      color: colors.disabledBlue,
+      borderColor: '#DFE5EC',
+    },
+  },
+
+  dangerSecondary: {
+    borderWidth: '1px',
+    borderStyle: 'solid',
     backgroundColor: 'white',
     borderColor: colors.invalidRed,
     color: colors.invalidRed,
