@@ -4,6 +4,7 @@ import colors from 'src/styles/colors'
 import * as Text from 'src/components/Text'
 
 type Props = {
+  className?: string
   value: number
   max?: number
   showPercent?: boolean
@@ -12,13 +13,19 @@ type Props = {
 }
 
 const ProgressBar = ({
+  className,
   value,
   max = 100,
   showPercent = false,
   bgColor = colors.lightGray,
   sliderColor = colors.nomusBlue,
 }: Props) => (
-  <Box display="flex" flexDirection="row" alignItems="center">
+  <Box
+    className={className}
+    display="flex"
+    flexDirection="row"
+    alignItems="center"
+  >
     <Box height={15} width="100%" bg={bgColor} borderRadius={50}>
       <Box
         height="100%"

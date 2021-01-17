@@ -11,6 +11,7 @@ import {
 } from 'src/config'
 import { TokenBody } from './types'
 import { Role } from 'src/util/enums'
+import zxcvbn from 'zxcvbn'
 
 const authRouter = express.Router()
 
@@ -78,6 +79,16 @@ authRouter.post('/login', async (req, res: express.Response<AuthResponse>) => {
 
 authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
   const { firstName, middleName, lastName, email, password } = req.body
+
+  // Verify password strength
+  if (zxcvbn(password).score < 3) {
+    return res.status(400).json({
+      error: {
+        code: 'password-too-weak',
+      },
+    })
+  }
+
   try {
     const user = await User.mongo.createNewUser({
       name: {

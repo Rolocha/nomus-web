@@ -2,7 +2,7 @@ import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -12,6 +12,8 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
+import { getPasswordScore } from 'src/utils/password'
+import ProgressBar from 'src/components/ProgressBar'
 
 interface RegistrationFormData {
   email: string
@@ -44,7 +46,7 @@ const RegistrationForm = () => {
     null | boolean
   >(null)
 
-  const { register, handleSubmit, formState, errors } = useForm<
+  const { register, handleSubmit, formState, errors, watch } = useForm<
     RegistrationFormData
   >({
     mode: 'onBlur',
@@ -57,12 +59,24 @@ const RegistrationForm = () => {
           .string()
           .email('Please enter a valid email address.')
           .required('Email is required.'),
-        password: yup.string().required('Password is required.'),
+        password: yup
+          .string()
+          .required('Password is required.')
+          .test(
+            'is-secure',
+            'Your password is too weak. Please use a stronger password.',
+            (value) =>
+              value ? getPasswordScore(value).sufficientlySecure : false,
+          ),
       }),
     ),
+    defaultValues: {
+      password: '',
+    },
   })
-  const { signUp } = useAuth()
+  const { loggedIn, signUp } = useAuth()
 
+  const history = useHistory()
   const location = useLocation<{ from: Location }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
@@ -93,6 +107,23 @@ const RegistrationForm = () => {
     const result = await fetch('/auth/resend-verification-email')
     setResentEmailSuccessfully(result.ok)
   }
+
+  // Redirect to the redirect_uri once the user is logged in
+  if (loggedIn) {
+    const redirectUrl = searchParams.get('redirect_url')
+    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
+    if (nextUrl.startsWith('/')) {
+      history.replace(nextUrl)
+    } else {
+      // If the URL doesn't start with /, it's probably a different domain
+      // in which case we have to use window.location's .replace() instead of history's
+      window.location.replace(nextUrl)
+    }
+    return null
+  }
+
+  const currPassword = watch('password')
+  const currPasswordScore = getPasswordScore(currPassword)
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
@@ -205,11 +236,27 @@ const RegistrationForm = () => {
               </Box>
               <Form.Input
                 name="password"
-                ref={register({ required: true })}
+                ref={register({
+                  required: true,
+                })}
                 type={passwordVisible ? 'text' : 'password'}
                 autoComplete="current-password"
                 error={errors.password}
               />
+              <ProgressBar
+                css={css({
+                  marginTop: '4px',
+                  width: '100%',
+                })}
+                value={currPasswordScore.score}
+                sliderColor={currPasswordScore.color}
+                max={4}
+              />
+              {formState.dirtyFields.password && (
+                <Text.Body3 textAlign="right">
+                  {currPasswordScore.label}
+                </Text.Body3>
+              )}
               <Form.FieldError fieldError={errors.password} />
             </Form.Item>
             <Button
