@@ -122,7 +122,13 @@ const ResetPassword = () => {
                 />
                 <Form.FieldError fieldError={errors.confirmPassword} />
               </Form.Item>
-              <Button type="submit" width="100%" variant="primary" size="big">
+              <Button
+                type="submit"
+                width="100%"
+                variant="primary"
+                size="big"
+                inProgress={formState.isSubmitting}
+              >
                 Update password
               </Button>
             </Form.Form>

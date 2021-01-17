@@ -83,7 +83,13 @@ const ForgotPassword = () => {
                 />
                 <Form.FieldError fieldError={errors.email} />
               </Form.Item>
-              <Button type="submit" width="100%" variant="primary" size="big">
+              <Button
+                type="submit"
+                width="100%"
+                variant="primary"
+                size="big"
+                inProgress={formState.isSubmitting}
+              >
                 Email me a recovery link
               </Button>
             </Form.Form>
