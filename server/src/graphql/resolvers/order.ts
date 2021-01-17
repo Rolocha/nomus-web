@@ -189,15 +189,17 @@ class OrderResolver {
     }
     const createdCardVersion = await CardVersionModel.create(createCardVersion)
 
-    // TODO: Factor in tax and shipping into calculateCost()
-    const price = calculateCost(quantity)
-    if (price == null) {
+    const subtotal = calculateCost(quantity)
+    if (subtotal == null) {
       throw new Error('Invalid quantity specified, failed to calculate pricing')
     }
 
+    // TODO: Factor in tax and shipping into calculateCost()
+    const total = subtotal
+
     // TODO: create if orderId is null, otherwise update existing one using Order.find({ id: orderId }).paymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: price,
+      amount: total,
       currency: 'usd', // We'll know we made it when we can change this line :')
     })
 
@@ -206,7 +208,12 @@ class OrderResolver {
       cardVersion: createdCardVersion._id,
       state: OrderState.Captured,
       paymentIntent: paymentIntent.id,
-      price,
+      price: {
+        subtotal,
+        shipping: 0,
+        tax: 0,
+        total,
+      },
       ...payload,
     }
     const createdOrder = await Order.mongo.create(createOrder)
