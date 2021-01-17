@@ -1,7 +1,7 @@
 import { CardVersion, Order, User } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderState } from 'src/util/enums'
+import { OrderCancelationState, OrderState } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 
@@ -85,6 +85,58 @@ describe('OrderResolver', () => {
     })
   })
 
+  describe('cancelOrder', () => {
+    it('cancels the specified order belonging to the context user', async () => {
+      const user = await createMockUser()
+      const order = await createMockOrder({ user: user.id })
+
+      const response = await execQuery({
+        source: `
+        mutation CancelOrderMutation($orderId: String) {
+          cancelOrder(orderId: $orderId) {
+            id
+            cancelationState
+          }
+        }
+        `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: user,
+      })
+
+      expect(response.data?.cancelOrder?.id).toBe(order.id)
+      const updatedOrder = await Order.mongo.findById(order.id)
+      expect(updatedOrder.cancelationState).toBe(OrderCancelationState.Canceled)
+    })
+
+    it("reports no order if the order exists but doesn't belong to the context user", async () => {
+      const user = await createMockUser()
+      const contextUser = await createMockUser()
+      const order = await createMockOrder({ user: user.id })
+
+      const response = await execQuery({
+        source: `
+        mutation CancelOrderMutation($orderId: String) {
+          cancelOrder(orderId: $orderId) {
+            id
+            cancelationState
+          }
+        }
+        `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: contextUser,
+      })
+
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'no-matching-order',
+        })
+      )
+    })
+  })
   describe('orders', () => {
     it('fetches all orders for a user', async () => {
       const user = await createMockUser()

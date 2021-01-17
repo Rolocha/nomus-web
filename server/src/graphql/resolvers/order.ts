@@ -1,3 +1,4 @@
+import { DocumentType } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
@@ -122,6 +123,27 @@ class OrderResolver {
         return Error('User is not authorized to access order')
       }
     }
+  }
+
+  @Authorized(Role.User)
+  @Mutation((type) => Order)
+  async cancelOrder(
+    @Arg('orderId', { nullable: true }) orderId: string | null,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>> {
+    if (!context.user) {
+      throw new Error('no-user-specified')
+    }
+    const order = await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+    if (!order) {
+      throw new Error('no-matching-order')
+    }
+
+    const cancelationResult = await order.cancel()
+    if (!cancelationResult.isSuccess) {
+      throw cancelationResult.error
+    }
+    return cancelationResult.value
   }
 
   //Get all orders for a User

@@ -5,14 +5,16 @@ import {
   pre,
   prop,
   ReturnModelType,
+  DocumentType,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderState } from '../util/enums'
+import { OrderState, OrderCancelationState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address } from './subschemas'
+import { EventualResult, Result } from 'src/util/error'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -39,6 +41,8 @@ class Order extends BaseModel({
   prefix: 'ord',
 }) {
   static mongo: ReturnModelType<typeof Order>
+
+  static CANCELABLE_STATES = [OrderState.Captured, OrderState.Paid]
 
   @Field()
   createdAt: Date
@@ -68,6 +72,15 @@ class Order extends BaseModel({
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 
+  @prop({
+    enum: OrderCancelationState,
+    type: String,
+    required: true,
+    default: OrderCancelationState.NotCanceled,
+  })
+  @Field((type) => OrderCancelationState, { nullable: false })
+  cancelationState: OrderCancelationState
+
   //Tracking Number for USPS
   @prop({ required: false })
   @Field({ nullable: true })
@@ -95,6 +108,25 @@ class Order extends BaseModel({
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
+
+  private canBeCanceled() {
+    return (
+      Order.CANCELABLE_STATES.includes(this.state) &&
+      this.cancelationState !== OrderCancelationState.Canceled
+    )
+  }
+
+  public async cancel(
+    this: DocumentType<Order>
+  ): EventualResult<DocumentType<Order>, 'cannot-be-canceled'> {
+    if (!this.canBeCanceled()) {
+      return Result.fail('cannot-be-canceled')
+    }
+
+    this.cancelationState = OrderCancelationState.Canceled
+    await this.save()
+    return Result.ok(this)
+  }
 }
 
 Order.mongo = getModelForClass(Order)

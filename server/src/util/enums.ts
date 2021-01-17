@@ -16,6 +16,16 @@ registerEnumType(OrderState, {
   description: 'foo',
 })
 
+export enum OrderCancelationState {
+  Canceled = 'canceled',
+  NotCanceled = 'not-canceled',
+}
+
+registerEnumType(OrderCancelationState, {
+  name: 'OrderCancelationState',
+  description: 'The cancelation state of an Order',
+})
+
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
   User = 'user',
