@@ -18,6 +18,7 @@ import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import ComingSoonPage from './ComingSoonPage'
 import LinkerPage from './LinkerPage'
+import AccordionDemo from './AccordionDemo'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -53,6 +54,12 @@ export const routes: Array<RouteType> = [
     exact: true,
     path: '/login',
     Component: LoginPage,
+  },
+  // TODO: Delete this before merging
+  {
+    exact: true,
+    path: '/accordion-demo',
+    Component: AccordionDemo,
   },
   {
     exact: true,
