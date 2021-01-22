@@ -140,8 +140,8 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
                 <Text.Body>
-                  For any questions, email help@nomus.me and we'll get it
-                  sorted!
+                  For any questions, email help@nomus.me or call 1-714-495-8665
+                  and we'll get it sorted!
                 </Text.Body>
               </Box>
             )}
@@ -201,13 +201,13 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body color="invalidRed">
                   Uh oh, That code doesn't seem to be right. Try typing it
-                  again, or email us at{' '}
+                  again, email us at{' '}
                   <Link
                     to={sendHelpEmail(window.location.pathname, infoToEmail)}
                   >
                     help@nomus.me
                   </Link>{' '}
-                  and we'll help sort it out.
+                  , or call us at 1-714-495-8665 and we'll help sort it out.
                 </Text.Body>
               </Box>
             )}
