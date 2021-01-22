@@ -22,6 +22,7 @@ export const graphqlPath = '/graphql'
 export const refreshTokenLifespan = ms('30 days')
 export const accessTokenLifespan = ms('15m')
 export const emailVerificationTokenLifespan = ms('24 hours')
+export const passwordResetTokenLifespan = ms('24 hours')
 export const s3BucketName = 'nomus-assets'
 export const stripeToken = 'sk_test_5MLw6Iojb4Juypm2TLmTimJO00JFJQ4ldp'
 export const baseUrl =

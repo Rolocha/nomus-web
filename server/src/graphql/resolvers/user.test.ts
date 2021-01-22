@@ -3,8 +3,9 @@ import { UserModel, validateUsername } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { sgMail } from 'src/util/sendgrid'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Result } from 'src/util/error'
+import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPasswordToken'
 
 jest.mock('src/util/sendgrid')
 
@@ -334,6 +335,144 @@ describe('UserResolver', () => {
   describe('reserved routes', () => {
     it('tries to be a reserved route', async () => {
       expect(await validateUsername('dashboard')).toStrictEqual(Result.fail('reserved-route'))
+    })
+  })
+
+  describe('sendPasswordResetEmail', () => {
+    let sgMailSendSpy = null
+    beforeEach(() => {
+      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+    })
+    it('sends the password reset email if a user with the provided email exists', async () => {
+      const user = await createMockUser({
+        email: 'blah@nomus.me',
+        password: 'abc123',
+      })
+      await execQuery({
+        source: `
+          mutation SendPasswordResetEmailQuery($email: String!) {
+            sendPasswordResetEmail(email: $email)
+          }
+        `,
+        variableValues: {
+          email: user.email,
+        },
+      })
+
+      expect(sgMail.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: user.email,
+          templateId: SendgridTemplate.ResetPassword,
+          dynamicTemplateData: {
+            passwordResetLink: expect.stringMatching(/reset-password\?/),
+            firstName: user.name.first,
+          },
+        })
+      )
+    })
+
+    // Quiet success is key to not leaking data about which emails are valid ones in our DB
+    it("quietly succeeds without sending an email if the email doesn't belong to any use", async () => {
+      const response = await execQuery({
+        source: `
+          mutation SendPasswordResetEmailQuery($email: String!) {
+            sendPasswordResetEmail(email: $email)
+          }
+        `,
+        variableValues: {
+          email: 'foo@nomus.me',
+        },
+      })
+
+      expect(response.errors).toBe(undefined)
+      expect(response.data.sendPasswordResetEmail).toBe(null)
+      expect(sgMail.send).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('resetPassword', () => {
+    it('resets the password based on the provided token, newPassword, userId', async () => {
+      const newPassword = 'horsebatterystaplecorrect'
+      const user = await createMockUser({
+        password: 'abc123',
+      })
+      const { preHashToken } = await createMockPasswordResetToken(user.id)
+      await execQuery({
+        source: `
+          mutation ResetPasswordTestQuery($token: String!, $newPassword: String!, $userId: String!) {
+            resetPassword(token: $token, newPassword: $newPassword, userId: $userId)
+          }
+        `,
+        variableValues: {
+          token: preHashToken,
+          newPassword,
+          userId: user.id,
+        },
+      })
+
+      // Can't just check the responde.data.user bc it doesn't include the password field
+      const updatedUser = await UserModel.findById(user.id)
+      expect(await bcrypt.compare(newPassword, updatedUser.password)).toBe(true)
+    })
+
+    it('errors if the token is present but invalid', async () => {
+      const newPassword = 'horsebatterystaplecorrect'
+      const user = await createMockUser({
+        password: 'abc123',
+      })
+
+      // Intentionally ignoring the result
+      await createMockPasswordResetToken(user.id)
+      const response = await execQuery({
+        source: `
+          mutation ResetPasswordTestQuery($token: String!, $newPassword: String!, $userId: String!) {
+            resetPassword(token: $token, newPassword: $newPassword, userId: $userId)
+          }
+        `,
+        variableValues: {
+          token: "uh oh, what's this?",
+          newPassword,
+          userId: user.id,
+        },
+      })
+
+      // Can't just check the responde.data.user bc it doesn't include the password field
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'invalid-token',
+        })
+      )
+    })
+
+    it('errors if the userId is invalid', async () => {
+      const newPassword = 'horsebatterystaplecorrect'
+      const user = await createMockUser({
+        password: 'abc123',
+      })
+      const { preHashToken } = await createMockPasswordResetToken(user.id)
+      const response = await execQuery({
+        source: `
+          mutation ResetPasswordTestQuery($token: String!, $newPassword: String!, $userId: String!) {
+            resetPassword(token: $token, newPassword: $newPassword, userId: $userId)
+          }
+        `,
+        variableValues: {
+          token: preHashToken,
+          newPassword,
+          userId: 'not a real user id',
+        },
+      })
+
+      // Can't just check the responde.data.user bc it doesn't include the password field
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'invalid-user',
+        })
+      )
     })
   })
 })

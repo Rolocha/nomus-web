@@ -6,11 +6,15 @@ import { IApolloContext } from 'src/graphql/types'
 import { User, validateUsername } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
+import { Void } from 'src/models/scalars'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 import { isValidUserCheckpointKey } from 'src/models/subschemas'
+import PasswordResetToken from 'src/models/PasswordResetToken'
+import { baseUrl } from 'src/config'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -199,6 +203,59 @@ class UserResolver {
     }
     await context.user.save()
     return await this.userFromMongoDocument(context.user)
+  }
+
+  @Mutation(() => Void, { nullable: true })
+  async sendPasswordResetEmail(@Arg('email', { nullable: false }) email: string): Promise<void> {
+    const user = await User.mongo.findOne({ email })
+    if (user == null) {
+      return null
+    }
+
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
+    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
+
+    const passwordResetURLQueryParams = new URLSearchParams()
+    passwordResetURLQueryParams.set('token', preHashToken)
+    passwordResetURLQueryParams.set('userId', user.id)
+    const passwordResetLink = `${baseUrl}/reset-password?${passwordResetURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: user.email,
+      from: 'hi@nomus.me',
+      templateId: SendgridTemplate.ResetPassword,
+      dynamicTemplateData: {
+        passwordResetLink,
+        firstName: user.name.first,
+      },
+    })
+
+    return null
+  }
+
+  @Mutation(() => Void, { nullable: true })
+  async resetPassword(
+    @Arg('token', { nullable: false }) token: string,
+    @Arg('newPassword', { nullable: false }) newPassword: string,
+    @Arg('userId', { nullable: false }) userId: string
+  ): Promise<void> {
+    const user = await User.mongo.findById(userId)
+    if (user == null) {
+      throw new Error('invalid-user')
+    }
+
+    // Verify token belongs to the user and is valid
+    const isTokenValid = await PasswordResetToken.mongo.verify(token, userId)
+    if (!isTokenValid) {
+      throw new Error('invalid-token')
+    }
+
+    // Update the user's password, let User's pre-save hook handle hashing it
+    user.password = newPassword
+    await user.save()
+
+    return null
   }
 }
 export default UserResolver
