@@ -90,6 +90,9 @@ const Box = styled<'div', BoxProps>('div')(
     textAlign: {
       property: 'textAlign',
     },
+    transition: {
+      property: 'transition',
+    },
   }),
   space,
   position,
