@@ -1,3 +1,5 @@
+import 'src/test-utils/mocks/matchMedia.mock'
+
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import {
   cleanup,
@@ -228,7 +230,7 @@ describe('Contact Info Page', () => {
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       const saveContactCardLink = renderResult
-        .getByText('Save contact card')
+        .getByText('Save contact')
         .closest('a')
 
       expect(
@@ -303,7 +305,7 @@ describe('Contact Info Page', () => {
       useAuthSpy.mockRestore()
     })
 
-    it('if logged in and contact already saved, the button is disabled and says "Saved" instead', async () => {
+    it('if logged in and contact already saved, the button says "View in dashboard" instead', async () => {
       const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
         logIn: jest.fn(),
         logOut: jest.fn(),
@@ -320,11 +322,13 @@ describe('Contact Info Page', () => {
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       expect(renderResult.queryByText('Save to Nomus')).toBe(null)
-      const savedButton = renderResult
-        .queryByText('Saved to Nomus')
-        ?.closest('button')
-      expect(savedButton).toBeInTheDocument()
-      expect(savedButton?.disabled).toBe(true)
+      const viewInDashboardButton = renderResult
+        .queryByText('View in dashboard')
+        ?.closest('a')
+      expect(viewInDashboardButton).toBeInTheDocument()
+      expect(viewInDashboardButton?.href).toEndWith(
+        `/dashboard/contacts/detail/${mockContact?.username}`,
+      )
 
       useAuthSpy.mockRestore()
     })

@@ -22,7 +22,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -35,11 +35,11 @@ interface UrlParams {
   username?: string
 }
 
-const bp = 'md'
+const bp = 'lg'
 
 const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()
-
+  const isDesktopWidth = useBreakpoint(bp)
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
   const { loggedIn } = useAuth()
   const history = useHistory()
@@ -406,6 +406,7 @@ const ContactInfoPage = () => {
           <Box
             // Only upper margin in desktop mode
             gridArea="buttons"
+            placeSelf="end stretch"
             display="grid"
             css={css`
               position: fixed;
@@ -420,31 +421,36 @@ const ContactInfoPage = () => {
             `}
             bg="white"
             boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: '1fr 1fr', [bp]: '3fr 3fr 1fr' }}
+            gridTemplateColumns={{ _: 'auto 1fr', [bp]: '3fr 3fr 1fr' }}
             gridColumnGap={{ _: 2, [bp]: 3 }}
             gridRowGap={2}
           >
             <ExternalLink
               asButton
               buttonStyle="primary"
-              buttonSize="big"
+              buttonSize={isDesktopWidth ? 'big' : 'knob'}
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              Save contact card
+              <SVG.Download color={colors.white} />{' '}
+              <Box
+                as="span"
+                ml={2}
+                display={{ _: 'none', [bp]: 'inline-block' }}
+              >
+                Save contact
+              </Box>
             </ExternalLink>
 
-            {contact.connected ? (
-              <Button variant="secondary" size="big" disabled>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  width="100%"
-                  justifyContent="center"
-                >
-                  <SVG.Check /> <span>Saved to Nomus</span>
-                </Box>
-              </Button>
+            {loggedIn && contact.connected ? (
+              <ExternalLink
+                asButton
+                buttonStyle="secondary"
+                buttonSize="big"
+                href={`/dashboard/contacts/detail/${username}`}
+              >
+                View in dashboard
+              </ExternalLink>
             ) : (
               <Link
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}

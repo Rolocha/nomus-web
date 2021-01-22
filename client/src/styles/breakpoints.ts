@@ -16,7 +16,7 @@ export const useBreakpoint = (bp: 'sm' | 'md' | 'lg') => {
   const matcher = window.matchMedia(mq[bp].replace('@media ', ''))
   const [matches, setMatches] = React.useState(matcher.matches)
   React.useEffect(() => {
-    matcher.addListener((e) => {
+    matcher.addEventListener('change', (e) => {
       if (e.matches) {
         setMatches(true)
       } else {
