@@ -20,7 +20,7 @@ const linkSheetToOrder = async (
 
   const res = sheet.cards.map(async (cardId) => {
     const currCard = await Card.mongo.findById(cardId)
-    currCard.user = cardVersion.user
+    currCard.user = order.user
     currCard.cardVersion = cardVersion
     return await currCard.save()
   })
@@ -116,8 +116,15 @@ export const linkSheetToUser = async (
   await linkSheetToOrder(sheet, order)
 
   //Check if order has been completed before modifying state
-  order.state = OrderState.Created
-  await order.save()
+  const completedSheets = await Sheet.mongo.find({ order: order.id })
+  let numCardsPrinted = 0
+  for (let sheet of completedSheets) {
+    numCardsPrinted += sheet.cards.length
+  }
+  if (numCardsPrinted === order.quantity) {
+    order.state = OrderState.Created
+    await order.save()
+  }
 
   return Result.ok({
     userId: order.user.toString(),

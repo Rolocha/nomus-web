@@ -65,12 +65,12 @@ describe('linker', () => {
   })
 
   describe('linkSheetToUser', () => {
-    it('links a sheet from a routeStr to a user with a shortId', async () => {
+    it('links a sheet from a routeStr to a user with a shortId, one sheet', async () => {
       const user = await createMockUser()
       const cardVersion = await createMockCardVersion({
         user: user.id,
       })
-      const card = await createMockCard({ user: null, cardVersion: cardVersion.id })
+      const card = await createMockCard({ user: null, cardVersion: null })
       const sheet = await createMockSheet({
         cardVersion: null,
         cards: [card.id],
@@ -79,6 +79,7 @@ describe('linker', () => {
         user: user.id,
         cardVersion: cardVersion.id,
         state: OrderState.Creating,
+        quantity: 1,
       })
 
       const routeStr = sheet.id + '-' + card.id
@@ -96,6 +97,65 @@ describe('linker', () => {
       expect(resCard.user).toBe(user.id)
       expect(resCard.cardVersion).toBe(cardVersion.id)
       expect(resOrder.state).toBe(OrderState.Created)
+    })
+
+    it('links multiple sheets in one order', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion({
+        user: user.id,
+      })
+      const card1 = await createMockCard({ user: null, cardVersion: null })
+      const sheet1 = await createMockSheet({
+        cardVersion: null,
+        cards: [card1.id],
+      })
+      const card2 = await createMockCard({ user: null, cardVersion: null })
+      const card3 = await createMockCard({ user: null, cardVersion: null })
+      const sheet2 = await createMockSheet({
+        cardVersion: null,
+        cards: [card2.id, card3.id],
+      })
+      const order = await createMockOrder({
+        user: user.id,
+        cardVersion: cardVersion.id,
+        state: OrderState.Creating,
+        quantity: 3,
+      })
+
+      const routeStr = sheet1.id + '-' + card1.id
+
+      const ret = (await linkSheetToUser(routeStr, order.shortId)).value
+
+      expect(ret).toMatchObject({ userId: user.id, sheetId: sheet1.id })
+
+      const resSheet = await Sheet.mongo.findById(sheet1.id)
+      const resCard = await Card.mongo.findById(card1.id)
+      const resOrder = await Order.mongo.findById(order.id)
+
+      expect(resSheet.cardVersion).toBe(cardVersion.id)
+      expect(resSheet.order).toBe(order.id)
+      expect(resCard.user).toBe(user.id)
+      expect(resCard.cardVersion).toBe(cardVersion.id)
+      expect(resOrder.state).toBe(OrderState.Creating)
+
+      const routeStr2 = sheet2.id + '-' + card2.id
+
+      const ret2 = (await linkSheetToUser(routeStr2, order.shortId)).value
+
+      expect(ret2).toMatchObject({ userId: user.id, sheetId: sheet2.id })
+
+      const resSheet2 = await Sheet.mongo.findById(sheet2.id)
+      const resCard2 = await Card.mongo.findById(card2.id)
+      const resCard3 = await Card.mongo.findById(card3.id)
+      const resOrder2 = await Order.mongo.findById(order.id)
+
+      expect(resSheet2.cardVersion).toBe(cardVersion.id)
+      expect(resSheet2.order).toBe(order.id)
+      expect(resCard2.user).toBe(user.id)
+      expect(resCard2.cardVersion).toBe(cardVersion.id)
+      expect(resCard3.user).toBe(user.id)
+      expect(resCard3.cardVersion).toBe(cardVersion.id)
+      expect(resOrder2.state).toBe(OrderState.Created)
     })
 
     it('tries to link a sheet but fails because there is no sheet', async () => {
