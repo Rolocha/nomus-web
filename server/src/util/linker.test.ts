@@ -92,6 +92,7 @@ describe('linker', () => {
       const resOrder = await Order.mongo.findById(order.id)
 
       expect(resSheet.cardVersion).toBe(cardVersion.id)
+      expect(resSheet.order).toBe(order.id)
       expect(resCard.user).toBe(user.id)
       expect(resCard.cardVersion).toBe(cardVersion.id)
       expect(resOrder.state).toBe(OrderState.Created)

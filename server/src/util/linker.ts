@@ -6,11 +6,18 @@ import { Result } from './error'
 export const SHEET_CARD_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
 export const CARDV_REGEX = /(cardv_[a-f0-9]{24})/i
 
-const linkSheetToCardVersion = async (
+const linkSheetToOrder = async (
   sheet: DocumentType<Sheet>,
-  cardVersion: DocumentType<CardVersion>
-): Promise<Result<undefined, 'save-error'>> => {
-  sheet.cardVersion = cardVersion
+  order: DocumentType<Order>
+): Promise<Result<undefined, 'cv-not-found' | 'save-error'>> => {
+  const cardVersion = await CardVersion.mongo.findById(order.cardVersion)
+  if (cardVersion == null) {
+    return Result.fail('cv-not-found')
+  }
+
+  sheet.cardVersion = cardVersion.id
+  sheet.order = order.id
+
   const res = sheet.cards.map(async (cardId) => {
     const currCard = await Card.mongo.findById(cardId)
     currCard.user = cardVersion.user
@@ -101,22 +108,19 @@ export const linkSheetToUser = async (
     return Result.fail('order-not-found')
   }
 
-  const cardVersion = await CardVersion.mongo.findById(order.cardVersion)
-  if (cardVersion == null) {
-    return Result.fail('cv-not-found')
-  }
   const sheet = await Sheet.mongo.findById(sheetId)
   if (!sheet) {
     return Result.fail('sheet-not-found')
   }
 
-  await linkSheetToCardVersion(sheet, cardVersion)
+  await linkSheetToOrder(sheet, order)
 
+  //Check if order has been completed before modifying state
   order.state = OrderState.Created
   await order.save()
 
   return Result.ok({
-    userId: cardVersion.user.toString(),
+    userId: order.user.toString(),
     sheetId: sheet.id,
   })
 }
