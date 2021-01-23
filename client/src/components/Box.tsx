@@ -40,6 +40,7 @@ type BoxProps = {
   transform?: ResponsiveValue<ThemeValue<'transform', any>>
   cursor?: ResponsiveValue<ThemeValue<'cursor', any>>
   textAlign?: ResponsiveValue<ThemeValue<'textAlign', any>>
+  transition?: ResponsiveValue<ThemeValue<'transition', any>>
 } & SpaceProps &
   PositionProps &
   ColorProps &
@@ -89,6 +90,9 @@ const Box = styled<'div', BoxProps>('div')(
     },
     textAlign: {
       property: 'textAlign',
+    },
+    transition: {
+      property: 'transition',
     },
   }),
   space,

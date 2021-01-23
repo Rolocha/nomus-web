@@ -16,6 +16,7 @@ const colors = {
   africanElephant: '#A9A591',
 
   // Some grays
+  lightGray: '#E0E0DE',
   superlightGray: '#E5E5E5',
   white: '#FFFFFF',
 
