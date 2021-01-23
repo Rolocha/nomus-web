@@ -1,11 +1,11 @@
-import { Card, Sheet } from 'src/models'
+import { Card, Order, Sheet } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { createMockCard } from 'src/__mocks__/models/Card'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { CardInteractionType } from './enums'
+import { CardInteractionType, OrderState } from './enums'
 import { NamedError } from './error'
 import { getCardDataForInteractionString, linkSheetToUser } from './linker'
 
@@ -78,6 +78,7 @@ describe('linker', () => {
       const order = await createMockOrder({
         user: user.id,
         cardVersion: cardVersion.id,
+        state: OrderState.Creating,
       })
 
       const routeStr = sheet.id + '-' + card.id
@@ -88,9 +89,12 @@ describe('linker', () => {
 
       const resSheet = await Sheet.mongo.findById(sheet.id)
       const resCard = await Card.mongo.findById(card.id)
+      const resOrder = await Order.mongo.findById(order.id)
 
       expect(resSheet.cardVersion).toBe(cardVersion.id)
       expect(resCard.user).toBe(user.id)
+      expect(resCard.cardVersion).toBe(cardVersion.id)
+      expect(resOrder.state).toBe(OrderState.Created)
     })
 
     it('tries to link a sheet but fails because there is no sheet', async () => {
