@@ -42,3 +42,6 @@ export const getPasswordScore = (
     sufficientlySecure: score >= 3,
   }
 }
+
+export const validatePassword = (value: string | null | undefined) =>
+  value ? getPasswordScore(value).sufficientlySecure : false

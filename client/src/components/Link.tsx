@@ -9,6 +9,7 @@ import theme from 'src/styles/theme'
 const linkBaseStyles = (props: LinkStyleProps) => ({
   textDecoration: props.underline ? 'underline' : 'none',
   color: props.color ?? theme.colors.linkBlue,
+  cursor: 'pointer',
 })
 
 interface LinkStyleProps extends SpaceProps, LayoutProps {
@@ -70,8 +71,10 @@ const defaultProps = {
 ExternalLink.defaultProps = defaultProps
 InternalLink.defaultProps = defaultProps
 
-interface UnifiedLinkProps extends InternalLinkProps, LinkStyleProps {
-  to: React.ComponentProps<typeof ReactRouterLink>['to']
+interface UnifiedLinkProps
+  extends Omit<InternalLinkProps, 'to'>,
+    LinkStyleProps {
+  to: React.ComponentProps<typeof ReactRouterLink>['to'] | null
   type?: 'internal' | 'external'
   ref?: any
 }
@@ -95,18 +98,19 @@ const UnifiedLink = ({
   referrerPolicy,
   ...props
 }: UnifiedLinkProps) => {
-  // TODO: Figure out how to properly pass ref through, hasn't been necessary yet so punting on this
-  return to != null && isExternalLink(to) ? (
-    // @ts-expect-error slight mismatch on style types, hopefully not a big deal
-    <ExternalLink ref={ref} {...props} href={to} />
-  ) : (
-    <InternalLink
-      {...props}
-      to={to}
-      defaultValue={defaultValue}
-      referrerPolicy={referrerPolicy}
-    />
-  )
+  if (to == null || isExternalLink(to)) {
+    // @ts-ignore
+    return <ExternalLink ref={ref} {...props} href={to} />
+  } else {
+    return (
+      <InternalLink
+        {...props}
+        to={to}
+        defaultValue={defaultValue}
+        referrerPolicy={referrerPolicy}
+      />
+    )
+  }
 }
 
 export { ExternalLink, InternalLink, UnifiedLink as Link }

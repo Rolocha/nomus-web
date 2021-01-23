@@ -80,18 +80,13 @@ class UserResolver {
   @Authorized(Role.User)
   @Mutation((type) => User)
   async changePassword(
-    @Arg('oldPassword', { nullable: false }) oldPassword: string,
+    @Arg('currentPassword', { nullable: false }) currentPassword: string,
     @Arg('newPassword', { nullable: false }) newPassword: string,
-    @Arg('confirmNewPassword', { nullable: false }) confirmNewPassword: string,
     @Ctx() context: IApolloContext
   ) {
-    const oldPasswordMatches = await bcrypt.compare(oldPassword, context.user.password)
-    if (!oldPasswordMatches) {
-      throw new Error('incorrect-old-password')
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      throw new Error('password-confirmation-no-match')
+    const currentPasswordMatches = await bcrypt.compare(currentPassword, context.user.password)
+    if (!currentPasswordMatches) {
+      throw new Error('incorrect-current-password')
     }
 
     if (zxcvbn(newPassword).score < 2) {

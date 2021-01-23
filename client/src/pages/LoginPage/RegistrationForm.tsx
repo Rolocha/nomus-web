@@ -7,13 +7,12 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Link, { ExternalLink } from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
-import * as Text from 'src/components/Text'
-import { colors } from 'src/styles'
-import { useAuth } from 'src/utils/auth'
-import * as yup from 'yup'
-import { getPasswordScore } from 'src/utils/password'
 import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
+import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
+import * as Text from 'src/components/Text'
+import { useAuth } from 'src/utils/auth'
+import { validatePassword } from 'src/utils/password'
+import * as yup from 'yup'
 
 interface RegistrationFormData {
   email: string
@@ -65,8 +64,7 @@ const RegistrationForm = () => {
           .test(
             'is-secure',
             'Your password is too weak. Please use a stronger password.',
-            (value) =>
-              value ? getPasswordScore(value).sufficientlySecure : false,
+            validatePassword,
           ),
       }),
     ),
@@ -121,8 +119,6 @@ const RegistrationForm = () => {
     }
     return null
   }
-
-  const currPassword = watch('password')
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
@@ -220,18 +216,10 @@ const RegistrationForm = () => {
             <Form.Item mb="20px">
               <Box display="flex" justifyContent="space-between">
                 <Form.Label htmlFor="password">PASSWORD</Form.Label>
-                <Box
-                  role="button"
-                  cursor="pointer"
-                  display="flex"
-                  alignItems="center"
-                  onClick={() => setPasswordVisible(!passwordVisible)}
-                >
-                  <SVG.Eye color={colors.nomusBlue} />{' '}
-                  <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
-                    {passwordVisible ? 'Hide' : 'Show'} password
-                  </Text.Body3>
-                </Box>
+                <PasswordVisibilityToggle
+                  visible={passwordVisible}
+                  setVisible={setPasswordVisible}
+                />
               </Box>
               <Form.Input
                 name="password"
@@ -242,7 +230,7 @@ const RegistrationForm = () => {
                 autoComplete="current-password"
                 error={errors.password}
               />
-              <PasswordStrengthIndicator password={currPassword} />
+              <PasswordStrengthIndicator password={watch('password')} />
               <Form.FieldError fieldError={errors.password} />
             </Form.Item>
             <Button

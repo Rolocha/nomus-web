@@ -22,7 +22,8 @@ import {
   UPDATE_PROFILE_MUTATION,
   UPDATE_USERNAME_MUTATION,
   CHANGE_PASSWORD_MUTATION,
-} from './mutations'
+} from '../mutations'
+import ChangePasswordForm from './ChangePasswordForm'
 
 const bp = 'lg'
 
@@ -32,12 +33,6 @@ interface EmailFormData {
 
 interface UsernameFormData {
   username: string
-}
-
-interface PasswordFormData {
-  oldPassword: string
-  newPassword: string
-  confirmNewPassword: string
 }
 
 export default () => {
@@ -56,23 +51,13 @@ export default () => {
     handleSubmit: usernameFormHandleSubmit,
     reset: usernameFormReset,
   } = useForm<UsernameFormData>()
-  const {
-    register: passwordFormRegister,
-    handleSubmit: passwordFormHandleSubmit,
-    reset: passwordFormReset,
-    watch: passwordFormWatch,
-  } = useForm<PasswordFormData>({
-    defaultValues: { oldPassword: '', newPassword: '', confirmNewPassword: '' },
-  })
+
   const haveSetDefaultRef = React.useRef(false)
   const [updateProfile] = useMutation<UpdateProfileQuery>(
     UPDATE_PROFILE_MUTATION,
   )
   const [updateUsername] = useMutation<UpdateUsernameMutation>(
     UPDATE_USERNAME_MUTATION,
-  )
-  const [changePassword] = useMutation<ChangePasswordQuery>(
-    CHANGE_PASSWORD_MUTATION,
   )
 
   const { loading, data } = useQuery<UCPSettingsSectionQuery>(
@@ -122,21 +107,6 @@ export default () => {
     setIsEditingUsername(false)
   }
 
-  const onPasswordChange = (formData: PasswordFormData) => {
-    changePassword({
-      variables: {
-        oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword,
-        confirmNewPassword: formData.confirmNewPassword,
-      },
-    })
-    passwordFormReset({
-      oldPassword: '',
-      newPassword: '',
-      confirmNewPassword: '',
-    })
-  }
-
   if (loading || !data) {
     return <LoadingPage />
   }
@@ -167,25 +137,16 @@ export default () => {
         "email editEmail"
         "username editUsername"
         "signOut signOut"
-        "changePassword ."
         "passwordForm passwordForm"
-        "passwordForm passwordForm"
-        "passwordForm passwordForm"
-        "changePasswordButton changePasswordButton"
         "deactivateProfileHeader ."
         "deactivateProfileQuestion deactivateProfileQuestion"
-        "deactivateProfileButton deactivateProfileButton"
       `,
         [bp]: `
         "account . ."
         "email editEmail emailCopy"
         "username editUsername usernameCopy"
         "signOut . ."
-        "changePassword . ."
-        "passwordForm . passwordCopy1"
-        "passwordForm . passwordCopy1"
-        "passwordForm . passwordCopy1"
-        "changePasswordButton . ."
+        "passwordForm . ."
         "deactivateProfileHeader . ."
         "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
@@ -312,74 +273,11 @@ export default () => {
         </Button>
       </Box>
 
-      <Box gridArea="changePassword" alignSelf={{ _: 'start', md: 'center' }}>
-        <Text.SectionHeader mb={1} mt={0}>
+      <Box gridArea="passwordForm">
+        <Text.SectionHeader mb={3} mt={0}>
           Change password
         </Text.SectionHeader>
-      </Box>
-
-      <Box gridArea="passwordForm">
-        <Form.Form onSubmit={passwordFormHandleSubmit(onPasswordChange)}>
-          <Text.Label mb={1}>CURRENT PASSWORD</Text.Label>
-          <Form.Input
-            ref={passwordFormRegister({ required: true })}
-            name="oldPassword"
-            type="password"
-            autoComplete="old-password"
-            width="100%"
-          />
-          <Form.Input type="submit" display="none" />
-          <Text.Label mb={1} mt={3}>
-            NEW PASSWORD
-          </Text.Label>
-          <Form.Input
-            ref={passwordFormRegister({ required: true })}
-            name="newPassword"
-            type="password"
-            autoComplete="new-password"
-            width="100%"
-          />
-          <Form.Input type="submit" display="none" />
-          <Text.Label mb={1} mt={3}>
-            CONFIRM NEW PASSWORD
-          </Text.Label>
-          <Form.Input
-            ref={passwordFormRegister({ required: true })}
-            name="confirmNewPassword"
-            type="password"
-            autoComplete="new-password"
-            width="100%"
-          />
-          <Form.Input type="submit" display="none" />
-        </Form.Form>
-      </Box>
-
-      {passwordFormWatch('newPassword').length > 0 && (
-        <Box gridArea="passwordCopy1" display={{ _: 'none', [bp]: 'block' }}>
-          <Text.Body3>New password strength:</Text.Body3>
-          <Text.Body3>
-            {renderPasswordCopy(zxcvbn(passwordFormWatch('newPassword')).score)}
-          </Text.Body3>
-          <ProgressBar
-            value={zxcvbn(passwordFormWatch('newPassword')).score}
-            max={4}
-            showPercent={true}
-          />
-        </Box>
-      )}
-
-      <Box gridArea="changePasswordButton">
-        <Button
-          width={{ _: '100%', [bp]: '75%' }}
-          variant="secondary"
-          onClick={passwordFormHandleSubmit(onPasswordChange)}
-        >
-          <Box alignItems="center" justifySelf="center">
-            <Text.Plain fontSize="14px" color="nomusBlue">
-              Change password
-            </Text.Plain>
-          </Box>
-        </Button>
+        <ChangePasswordForm />
       </Box>
 
       {/* <Box

@@ -1,20 +1,20 @@
+import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers/yup'
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
 import { ResetPasswordMutation } from 'src/apollo/types/ResetPasswordMutation'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
-import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
-import * as yup from 'yup'
-import { colors } from 'src/styles'
-import Logo from 'src/components/Logo'
-import { css } from '@emotion/core'
 import Link from 'src/components/Link'
+import Logo from 'src/components/Logo'
+import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
+import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
+import * as Text from 'src/components/Text'
+import * as yup from 'yup'
 
 interface ResetPasswordFormData {
   password: string
@@ -22,7 +22,7 @@ interface ResetPasswordFormData {
 }
 
 const ResetPassword = () => {
-  const { register, handleSubmit, errors, formState } = useForm<
+  const { register, handleSubmit, errors, formState, watch } = useForm<
     ResetPasswordFormData
   >({
     mode: 'onBlur',
@@ -34,10 +34,21 @@ const ResetPassword = () => {
           .oneOf([yup.ref('password')], "Passwords don't match."),
       }),
     ),
+    defaultValues: {
+      password: '',
+    },
   })
 
   const location = useLocation()
+  const history = useHistory()
   const queryParams = new URLSearchParams(location.search)
+  const { token, userId } = React.useMemo(
+    () => ({
+      token: queryParams.get('token'),
+      userId: queryParams.get('userId'),
+    }),
+    [queryParams],
+  )
 
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [resetPassword] = useMutation<ResetPasswordMutation>(
@@ -63,6 +74,13 @@ const ResetPassword = () => {
     })
   }
 
+  React.useEffect(() => {
+    if (token == null || userId == null) {
+      // Malformed URL, this page won't work for them, redirect
+      history.push('/forgot-password')
+    }
+  }, [token, userId, history])
+
   return (
     <Box
       container
@@ -72,7 +90,9 @@ const ResetPassword = () => {
       position="relative"
     >
       <Box display="flex" flexDirection="column" mt={4}>
-        <Logo css={css({ marginBottom: '32px' })} />
+        <Link to="/">
+          <Logo css={css({ marginBottom: '32px' })} />
+        </Link>
         <Text.PageHeader>Reset your password</Text.PageHeader>
 
         {formState.isSubmitSuccessful ? (
@@ -91,18 +111,10 @@ const ResetPassword = () => {
               <Form.Item mb="20px">
                 <Box display="flex" justifyContent="space-between">
                   <Form.Label htmlFor="password">New password</Form.Label>
-                  <Box
-                    role="button"
-                    cursor="pointer"
-                    display="flex"
-                    alignItems="center"
-                    onClick={() => setPasswordVisible(!passwordVisible)}
-                  >
-                    <SVG.Eye color={colors.nomusBlue} />{' '}
-                    <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
-                      {passwordVisible ? 'Hide' : 'Show'} password
-                    </Text.Body3>
-                  </Box>
+                  <PasswordVisibilityToggle
+                    visible={passwordVisible}
+                    setVisible={setPasswordVisible}
+                  />
                 </Box>
                 <Form.Input
                   name="password"
@@ -110,6 +122,7 @@ const ResetPassword = () => {
                   type={passwordVisible ? 'text' : 'password'}
                   error={errors.password}
                 />
+                <PasswordStrengthIndicator password={watch('password')} />
                 <Form.FieldError fieldError={errors.password} />
               </Form.Item>
               <Form.Item mb="20px">
