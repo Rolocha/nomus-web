@@ -13,7 +13,7 @@ import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
 import { getPasswordScore } from 'src/utils/password'
-import ProgressBar from 'src/components/ProgressBar'
+import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
 
 interface RegistrationFormData {
   email: string
@@ -123,7 +123,6 @@ const RegistrationForm = () => {
   }
 
   const currPassword = watch('password')
-  const currPasswordScore = getPasswordScore(currPassword)
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
@@ -243,20 +242,7 @@ const RegistrationForm = () => {
                 autoComplete="current-password"
                 error={errors.password}
               />
-              <ProgressBar
-                css={css({
-                  marginTop: '4px',
-                  width: '100%',
-                })}
-                value={currPasswordScore.score}
-                sliderColor={currPasswordScore.color}
-                max={4}
-              />
-              {formState.dirtyFields.password && (
-                <Text.Body3 textAlign="right">
-                  {currPasswordScore.label}
-                </Text.Body3>
-              )}
+              <PasswordStrengthIndicator password={currPassword} />
               <Form.FieldError fieldError={errors.password} />
             </Form.Item>
             <Button
