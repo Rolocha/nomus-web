@@ -11,6 +11,7 @@
  * foo
  */
 export enum OrderState {
+  Canceled = 'Canceled',
   Captured = 'Captured',
   Created = 'Created',
   Creating = 'Creating',

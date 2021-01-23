@@ -15,11 +15,19 @@ export interface UCPOrdersSectionQuery_orders_cardVersion {
   backImageUrl: string | null
 }
 
+export interface UCPOrdersSectionQuery_orders_price {
+  __typename: 'OrderPrice'
+  subtotal: number
+  tax: number
+  shipping: number
+  total: number
+}
+
 export interface UCPOrdersSectionQuery_orders {
   __typename: 'Order'
   id: string
   cardVersion: UCPOrdersSectionQuery_orders_cardVersion
-  price: number
+  price: UCPOrdersSectionQuery_orders_price
   quantity: number
   state: OrderState
   createdAt: any

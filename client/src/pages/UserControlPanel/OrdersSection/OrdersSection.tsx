@@ -29,7 +29,12 @@ export default () => {
             frontImageUrl
             backImageUrl
           }
-          price
+          price {
+            subtotal
+            tax
+            shipping
+            total
+          }
           quantity
           state
           createdAt

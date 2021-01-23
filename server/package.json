@@ -140,7 +140,7 @@
     "testEnvironment": "node",
     "preset": "@shelf/jest-mongodb",
     "setupFiles": [
-      "<rootDir>/src/test-utils/setup-env.js"
+      "<rootDir>/src/test-utils/setup-env.ts"
     ]
   }
 }

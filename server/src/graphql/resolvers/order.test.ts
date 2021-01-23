@@ -85,6 +85,58 @@ describe('OrderResolver', () => {
     })
   })
 
+  describe('cancelOrder', () => {
+    it('cancels the specified order belonging to the context user', async () => {
+      const user = await createMockUser()
+      const order = await createMockOrder({ user: user.id })
+
+      const response = await execQuery({
+        source: `
+        mutation CancelOrderMutation($orderId: String) {
+          cancelOrder(orderId: $orderId) {
+            id
+            state
+          }
+        }
+        `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: user,
+      })
+
+      expect(response.data?.cancelOrder?.id).toBe(order.id)
+      const updatedOrder = await Order.mongo.findById(order.id)
+      expect(updatedOrder.state).toBe(OrderState.Canceled)
+    })
+
+    it("reports no order if the order exists but doesn't belong to the context user", async () => {
+      const user = await createMockUser()
+      const contextUser = await createMockUser()
+      const order = await createMockOrder({ user: user.id })
+
+      const response = await execQuery({
+        source: `
+        mutation CancelOrderMutation($orderId: String) {
+          cancelOrder(orderId: $orderId) {
+            id
+            state
+          }
+        }
+        `,
+        variableValues: {
+          orderId: order.id,
+        },
+        contextUser: contextUser,
+      })
+
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'no-matching-order',
+        })
+      )
+    })
+  })
   describe('orders', () => {
     it('fetches all orders for a user', async () => {
       const user = await createMockUser()

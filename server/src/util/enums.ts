@@ -9,6 +9,7 @@ export enum OrderState {
   Created = 'created',
   Enroute = 'enroute',
   Fulfilled = 'fulfilled',
+  Canceled = 'canceled',
 }
 
 registerEnumType(OrderState, {
