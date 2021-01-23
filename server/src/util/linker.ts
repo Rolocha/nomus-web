@@ -1,6 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { Card, CardVersion, Order, Sheet, User } from 'src/models'
-import { Ref } from 'src/models/scalars'
+import { Card, CardVersion, Order, Sheet } from 'src/models'
 import { CardInteractionType, OrderState } from './enums'
 import { Result } from './error'
 
