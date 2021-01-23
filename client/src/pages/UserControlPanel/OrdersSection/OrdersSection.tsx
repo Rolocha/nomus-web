@@ -39,7 +39,6 @@ export default () => {
           state
           createdAt
           trackingNumber
-          cancelationState
         }
       }
     `,

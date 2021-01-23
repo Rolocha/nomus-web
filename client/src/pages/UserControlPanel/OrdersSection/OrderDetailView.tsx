@@ -1,7 +1,7 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
 import { gql, useMutation } from 'src/apollo'
-import { OrderCancelationState } from 'src/apollo/types/globalTypes'
+import { OrderState } from 'src/apollo/types/globalTypes'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import CopyableText from 'src/components/CopyableText'
@@ -25,7 +25,7 @@ export default ({ order }: Props) => {
     mutation CancelOrderMutation($orderId: String) {
       cancelOrder(orderId: $orderId) {
         id
-        cancelationState
+        state
       }
     }
   `)
@@ -99,7 +99,7 @@ export default ({ order }: Props) => {
         >
           <Box gridArea="status">
             <Text.Label>Status</Text.Label>
-            <Text.Body2>{getUserFacingOrderState(order)}</Text.Body2>
+            <Text.Body2>{getUserFacingOrderState(order.state)}</Text.Body2>
           </Box>
           <Box gridArea="orderDate">
             <Text.Label>Date Ordered</Text.Label>
@@ -151,7 +151,7 @@ export default ({ order }: Props) => {
       </Box>
 
       <Box mt={4} display="flex" mx={-3}>
-        {order.cancelationState === OrderCancelationState.NotCanceled && (
+        {[OrderState.Captured, OrderState.Paid].includes(order.state) && (
           <Box px={3}>
             <Button
               variant="danger"

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { OrderCancelationState } from './globalTypes'
+import { OrderState } from './globalTypes'
 
 // ====================================================
 // GraphQL mutation operation: CancelOrderMutation
@@ -12,7 +12,7 @@ import { OrderCancelationState } from './globalTypes'
 export interface CancelOrderMutation_cancelOrder {
   __typename: 'Order'
   id: string
-  cancelationState: OrderCancelationState
+  state: OrderState
 }
 
 export interface CancelOrderMutation {

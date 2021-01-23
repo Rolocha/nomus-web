@@ -92,7 +92,7 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ _: 'block', [bp]: 'none' }}>
                 <Text.Label>Status</Text.Label>
               </Box>
-              <Text.Body2>{getUserFacingOrderState(order)}</Text.Body2>
+              <Text.Body2>{getUserFacingOrderState(order.state)}</Text.Body2>
             </Box>
             <Box gridArea="orderNumber" placeSelf="center start">
               <Box display={{ _: 'block', [bp]: 'none' }}>

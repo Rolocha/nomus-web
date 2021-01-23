@@ -1,4 +1,4 @@
-import { OrderCancelationState, OrderState } from 'src/apollo/types/globalTypes'
+import { OrderState } from 'src/apollo/types/globalTypes'
 import { CardVersion } from './cardVersion'
 
 export interface OrderPrice {
@@ -14,7 +14,6 @@ export interface Order {
   price: OrderPrice
   quantity: number
   state: OrderState
-  cancelationState: OrderCancelationState
   createdAt: Date
   trackingNumber: string | null
 }

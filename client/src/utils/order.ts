@@ -1,11 +1,10 @@
-import { OrderCancelationState, OrderState } from 'src/apollo/types/globalTypes'
-import { Order, UserFacingOrderState } from 'src/types/order'
+import { OrderState } from 'src/apollo/types/globalTypes'
+import { UserFacingOrderState } from 'src/types/order'
 
-export const getUserFacingOrderState = (order: Order): UserFacingOrderState => {
-  if (order.cancelationState === OrderCancelationState.Canceled)
-    return UserFacingOrderState.Canceled
-
-  switch (order.state) {
+export const getUserFacingOrderState = (
+  state: OrderState,
+): UserFacingOrderState => {
+  switch (state) {
     case OrderState.Captured:
     case OrderState.Paid:
     case OrderState.Creating:
@@ -15,5 +14,7 @@ export const getUserFacingOrderState = (order: Order): UserFacingOrderState => {
       return UserFacingOrderState.OnItsWay
     case OrderState.Fulfilled:
       return UserFacingOrderState.Complete
+    case OrderState.Canceled:
+      return UserFacingOrderState.Canceled
   }
 }

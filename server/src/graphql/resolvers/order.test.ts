@@ -1,7 +1,7 @@
 import { CardVersion, Order, User } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderCancelationState, OrderState } from 'src/util/enums'
+import { OrderState } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 
@@ -95,7 +95,7 @@ describe('OrderResolver', () => {
         mutation CancelOrderMutation($orderId: String) {
           cancelOrder(orderId: $orderId) {
             id
-            cancelationState
+            state
           }
         }
         `,
@@ -107,7 +107,7 @@ describe('OrderResolver', () => {
 
       expect(response.data?.cancelOrder?.id).toBe(order.id)
       const updatedOrder = await Order.mongo.findById(order.id)
-      expect(updatedOrder.cancelationState).toBe(OrderCancelationState.Canceled)
+      expect(updatedOrder.state).toBe(OrderState.Canceled)
     })
 
     it("reports no order if the order exists but doesn't belong to the context user", async () => {
@@ -120,7 +120,7 @@ describe('OrderResolver', () => {
         mutation CancelOrderMutation($orderId: String) {
           cancelOrder(orderId: $orderId) {
             id
-            cancelationState
+            state
           }
         }
         `,

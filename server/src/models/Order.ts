@@ -10,7 +10,7 @@ import {
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderState, OrderCancelationState } from '../util/enums'
+import { OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
@@ -71,15 +71,6 @@ class Order extends BaseModel({
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 
-  @prop({
-    enum: OrderCancelationState,
-    type: String,
-    required: true,
-    default: OrderCancelationState.NotCanceled,
-  })
-  @Field((type) => OrderCancelationState, { nullable: false })
-  cancelationState: OrderCancelationState
-
   //Tracking Number for USPS
   @prop({ required: false })
   @Field({ nullable: true })
@@ -109,10 +100,7 @@ class Order extends BaseModel({
   shippingAddress: Address
 
   private canBeCanceled() {
-    return (
-      Order.CANCELABLE_STATES.includes(this.state) &&
-      this.cancelationState !== OrderCancelationState.Canceled
-    )
+    return Order.CANCELABLE_STATES.includes(this.state)
   }
 
   public async cancel(
@@ -122,7 +110,7 @@ class Order extends BaseModel({
       return Result.fail('cannot-be-canceled')
     }
 
-    this.cancelationState = OrderCancelationState.Canceled
+    this.state = OrderState.Canceled
     await this.save()
     return Result.ok(this)
   }

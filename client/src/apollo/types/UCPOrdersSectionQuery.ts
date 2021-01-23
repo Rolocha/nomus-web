@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { OrderState, OrderCancelationState } from './globalTypes'
+import { OrderState } from './globalTypes'
 
 // ====================================================
 // GraphQL query operation: UCPOrdersSectionQuery
@@ -32,7 +32,6 @@ export interface UCPOrdersSectionQuery_orders {
   state: OrderState
   createdAt: any
   trackingNumber: string | null
-  cancelationState: OrderCancelationState
 }
 
 export interface UCPOrdersSectionQuery {

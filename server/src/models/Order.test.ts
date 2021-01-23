@@ -1,5 +1,5 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
-import { OrderCancelationState, OrderState } from 'src/util/enums'
+import { OrderState } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 
 beforeAll(async () => {
@@ -20,9 +20,9 @@ describe('Order model', () => {
       `successfully cancels the order if it's in the %s state`,
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
-        expect(order.cancelationState).toBe(OrderCancelationState.NotCanceled)
+        expect(order.state).toBe(initialState)
         await order.cancel()
-        expect(order.cancelationState).toBe(OrderCancelationState.Canceled)
+        expect(order.state).toBe(OrderState.Canceled)
       }
     )
 
@@ -30,10 +30,10 @@ describe('Order model', () => {
       `fails to cancel the order if it's in the %s state`,
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
-        expect(order.cancelationState).toBe(OrderCancelationState.NotCanceled)
+        expect(order.state).toBe(initialState)
         const result = await order.cancel()
         expect(result.error.name).toBe('cannot-be-canceled')
-        expect(order.cancelationState).toBe(OrderCancelationState.NotCanceled)
+        expect(order.state).toBe(initialState)
       }
     )
   })

@@ -8,17 +8,10 @@
 //==============================================================
 
 /**
- * The cancelation state of an Order
- */
-export enum OrderCancelationState {
-  Canceled = 'Canceled',
-  NotCanceled = 'NotCanceled',
-}
-
-/**
  * foo
  */
 export enum OrderState {
+  Canceled = 'Canceled',
   Captured = 'Captured',
   Created = 'Created',
   Creating = 'Creating',

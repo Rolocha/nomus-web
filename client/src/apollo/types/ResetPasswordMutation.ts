@@ -14,4 +14,5 @@ export interface ResetPasswordMutation {
 export interface ResetPasswordMutationVariables {
   token: string
   newPassword: string
+  userId: string
 }
