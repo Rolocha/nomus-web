@@ -101,9 +101,11 @@ describe('POST /signup', () => {
     password: 'an-actually-secure-password',
   }
 
-  it('creates a new user with the provided registration info', async () => {
+  beforeEach(() => {
     jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+  })
 
+  it('creates a new user with the provided registration info', async () => {
     const response = await request(app)
       .post('/auth/signup')
       .set('Cookie', [`${ACCESS_TOKEN_COOKIE_NAME}=blahWhatever`])
@@ -122,8 +124,6 @@ describe('POST /signup', () => {
   })
 
   it('sets the access token and refresh token cookies', async () => {
-    jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
-
     const response = await request(app)
       .post('/auth/signup')
       .set('Cookie', [`${ACCESS_TOKEN_COOKIE_NAME}=blahWhatever`])
@@ -139,8 +139,6 @@ describe('POST /signup', () => {
   })
 
   it('sends a verification email', async () => {
-    jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
-
     const response = await request(app)
       .post('/auth/signup')
       .set('Cookie', [`${ACCESS_TOKEN_COOKIE_NAME}=blahWhatever`])
@@ -150,6 +148,22 @@ describe('POST /signup', () => {
     expect(sgMail.send).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'someone@personman.com',
+      })
+    )
+  })
+
+  it('fails if the password is too weak', async () => {
+    const response = await request(app)
+      .post('/auth/signup')
+      .set('Cookie', [`${ACCESS_TOKEN_COOKIE_NAME}=blahWhatever`])
+      .send({ ...signupPayload, password: 'nomus' })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        error: {
+          code: 'password-too-weak',
+        },
       })
     )
   })
