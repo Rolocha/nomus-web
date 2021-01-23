@@ -165,7 +165,7 @@ const ChangePasswordForm = () => {
       </Form.Item>
 
       <Box>
-        {formState.isSubmitSuccessful || true ? (
+        {formState.isSubmitSuccessful ? (
           <>
             <Box display="flex" alignItems="center">
               <Text.Body2 color={colors.validGreen}>
