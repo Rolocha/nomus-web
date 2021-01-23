@@ -436,6 +436,32 @@ describe('UserResolver', () => {
       expect(await bcrypt.compare(newPassword, updatedUser.password)).toBe(true)
     })
 
+    it('errors if the password is too weak', async () => {
+      const newPassword = 'weak'
+      const user = await createMockUser({
+        password: 'abc123',
+      })
+      const { preHashToken } = await createMockPasswordResetToken(user.id)
+      const response = await execQuery({
+        source: `
+          mutation ResetPasswordTestQuery($token: String!, $newPassword: String!, $userId: String!) {
+            resetPassword(token: $token, newPassword: $newPassword, userId: $userId)
+          }
+        `,
+        variableValues: {
+          token: preHashToken,
+          newPassword,
+          userId: user.id,
+        },
+      })
+
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'password-too-weak',
+        })
+      )
+    })
+
     it('errors if the token is present but invalid', async () => {
       const newPassword = 'horsebatterystaplecorrect'
       const user = await createMockUser({
