@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 import { gql, useMutation, useQuery } from 'src/apollo'
-import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
@@ -11,18 +10,12 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
-import ProgressBar from 'src/components/ProgressBar'
 import SaveButton from 'src/components/SaveButton'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
-import zxcvbn from 'zxcvbn'
-import {
-  UPDATE_PROFILE_MUTATION,
-  UPDATE_USERNAME_MUTATION,
-  CHANGE_PASSWORD_MUTATION,
-} from '../mutations'
+import { UPDATE_PROFILE_MUTATION, UPDATE_USERNAME_MUTATION } from '../mutations'
 import ChangePasswordForm from './ChangePasswordForm'
 
 const bp = 'lg'
@@ -109,16 +102,6 @@ export default () => {
 
   if (loading || !data) {
     return <LoadingPage />
-  }
-
-  const renderPasswordCopy = (passwordStrength: number): string => {
-    return [
-      'Way too weak',
-      'Pretty weak',
-      "It's ok, but you can do better",
-      'Awesome',
-      'Amazing!',
-    ][passwordStrength]
   }
 
   return (

@@ -98,7 +98,7 @@ describe('POST /signup', () => {
     firstName: 'Someone',
     lastName: 'Personman',
     email: 'someone@personman.com',
-    password: 'nomus',
+    password: 'an-actually-secure-password',
   }
 
   it('creates a new user with the provided registration info', async () => {
