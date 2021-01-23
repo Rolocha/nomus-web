@@ -89,7 +89,7 @@ class UserResolver {
       throw new Error('incorrect-current-password')
     }
 
-    if (zxcvbn(newPassword).score < 2) {
+    if (zxcvbn(newPassword).score < 3) {
       throw new Error('password-too-weak')
     }
 
@@ -264,6 +264,10 @@ class UserResolver {
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
+    if (zxcvbn(newPassword).score < 3) {
+      throw new Error('password-too-weak')
+    }
+
     user.password = newPassword
     await user.save()
 
