@@ -140,7 +140,7 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
                 <Text.Body>
-                  For any questions, email help@nomus.me or call 1-714-495-8665
+                  For any questions, email help@nomus.me or call 714-495-8665
                   and we'll get it sorted!
                 </Text.Body>
               </Box>
@@ -207,7 +207,7 @@ const LinkerPage = () => {
                   >
                     help@nomus.me
                   </Link>{' '}
-                  , or call us at 1-714-495-8665 and we'll help sort it out.
+                  , or call us at 714-495-8665 and we'll help sort it out.
                 </Text.Body>
               </Box>
             )}

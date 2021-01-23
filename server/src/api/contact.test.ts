@@ -5,7 +5,6 @@ import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
 import vcf from 'vcf'
 import { User } from 'src/models'
 import { createMockConnection } from 'src/__mocks__/models/Connection'
-// import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from 'src/config'
 
 // NOTE: No need to initDB in this test bc the src/app import initializes it
 afterAll(async () => {
