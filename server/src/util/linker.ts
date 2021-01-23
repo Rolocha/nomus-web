@@ -107,7 +107,7 @@ export const linkSheetToUser = async (
   shortId: string
 ): Promise<
   Result<
-    { userId: Ref<User>; sheetId: string },
+    { userId: string; sheetId: string },
     'order-not-found' | 'cv-not-found' | 'sheet-not-found'
   >
 > => {
@@ -134,7 +134,7 @@ export const linkSheetToUser = async (
   }
 
   return Result.ok({
-    userId: order.user,
+    userId: order.user.toString(),
     sheetId: sheet.id,
   })
 }
