@@ -18,7 +18,6 @@ const colors = {
   // Some grays
   lightGray: '#E0E0DE',
   superlightGray: '#E5E5E5',
-  lightGray: '#aaa',
   white: '#FFFFFF',
 
   // States
