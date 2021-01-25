@@ -5,7 +5,7 @@ import { ObjectType, Field } from 'type-graphql'
 
 import { User } from './User'
 import { Ref } from './scalars'
-import { refreshTokenLifespan } from 'src/config'
+import { REFRESH_TOKEN_LIFESPAN } from 'src/config'
 import { BaseModel } from './BaseModel'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
@@ -24,7 +24,7 @@ export class RefreshToken extends BaseModel({
   value: string
   // Hashed form of the token value
 
-  @prop({ default: () => Date.now() + refreshTokenLifespan })
+  @prop({ default: () => Date.now() + REFRESH_TOKEN_LIFESPAN })
   @Field()
   expiresAt: number
   // Token expiration UNIX timestamp

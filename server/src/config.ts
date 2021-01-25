@@ -1,7 +1,7 @@
 import ms from 'ms'
 
-export const authTokenPrivateKey = process.env.AUTH_TOKEN_PRIVATE_KEY
-export const mongoCredentials = {
+export const AUTH_TOKEN_PRIVATE_KEY = process.env.AUTH_TOKEN_PRIVATE_KEY
+export const MONGO_CREDENTIALS = {
   username: process.env.MONGO_USERNAME,
   password: process.env.MONGO_PASSWORD,
   hostname: process.env.MONGO_HOSTNAME,
@@ -10,22 +10,21 @@ export const mongoCredentials = {
   // Manually defined URI string, if omitted, builds a basic one based on the details above
   dbUri: process.env.MONGO_DB_URI,
 }
-export const nodeEnv = process.env.NODE_ENV ?? 'development'
-export const appServerPort = process.env.APP_SERVER_PORT ?? '3000'
-export const sendgridToken =
+export const NODE_ENV = process.env.NODE_ENV ?? 'development'
+export const APP_SERVER_PORT = process.env.APP_SERVER_PORT ?? '3000'
+export const SENDGRID_TOKEN =
   process.env.NODE_ENV === 'test'
     ? 'SG.whatever-as-long-as-it-starts-with-SG'
     : process.env.SENDGRID_TOKEN
 
 // Internal Config (not sourced from env vars)
-export const graphqlPath = '/graphql'
-export const refreshTokenLifespan = ms('30 days')
-export const accessTokenLifespan = ms('15m')
-export const emailVerificationTokenLifespan = ms('24 hours')
-export const passwordResetTokenLifespan = ms('24 hours')
-export const s3BucketName = 'nomus-assets'
-export const stripeToken = 'sk_test_5MLw6Iojb4Juypm2TLmTimJO00JFJQ4ldp'
-export const baseUrl =
+export const REFRESH_TOKEN_LIFESPAN = ms('30 days')
+export const ACCESS_TOKEN_LIFESPAN = ms('15m')
+export const EMAIL_VERIFICATION_TOKEN_LIFESPAN = ms('24 hours')
+export const PASSWORD_RESET_TOKEN_LIFESPAN = ms('24 hours')
+export const S3_BUCKET_NAME = 'nomus-assets'
+export const STRIPE_TOKEN = process.env.STRIPE_TOKEN
+export const BASE_URL =
   {
     development: 'http://localhost:1234',
     staging: 'https://stage.nomus.me',

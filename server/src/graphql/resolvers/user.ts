@@ -13,7 +13,7 @@ import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
-import { baseUrl } from 'src/config'
+import { BASE_URL } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
@@ -219,7 +219,7 @@ class UserResolver {
     const passwordResetURLQueryParams = new URLSearchParams()
     passwordResetURLQueryParams.set('token', preHashToken)
     passwordResetURLQueryParams.set('userId', user.id)
-    const passwordResetLink = `${baseUrl}/reset-password?${passwordResetURLQueryParams.toString()}`
+    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
 
     await sgMail.send({
       to: user.email,

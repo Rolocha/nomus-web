@@ -1,8 +1,8 @@
 import sendgrid from '@sendgrid/client'
 import express from 'express'
-import { sendgridToken } from 'src/config'
+import { SENDGRID_TOKEN } from 'src/config'
 
-sendgrid.setApiKey(sendgridToken)
+sendgrid.setApiKey(SENDGRID_TOKEN)
 
 export const sendgridRouter = express.Router()
 

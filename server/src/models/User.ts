@@ -14,10 +14,10 @@ import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
 import {
-  accessTokenLifespan,
-  authTokenPrivateKey,
-  baseUrl,
-  emailVerificationTokenLifespan,
+  ACCESS_TOKEN_LIFESPAN,
+  AUTH_TOKEN_PRIVATE_KEY,
+  BASE_URL,
+  EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
@@ -161,7 +161,7 @@ export class User extends BaseModel({
   @prop({ required: false, default: () => crypto.randomBytes(20).toString('hex') })
   emailVerificationToken: string | null
 
-  @prop({ required: false, default: () => Date.now() + emailVerificationTokenLifespan })
+  @prop({ required: false, default: () => Date.now() + EMAIL_VERIFICATION_TOKEN_LIFESPAN })
   emailVerificationTokenExpiresAtMs: number
 
   @prop({
@@ -235,8 +235,8 @@ export class User extends BaseModel({
 
   public generateAccessToken(): string {
     const body = { _id: this.id, roles: this.roles ?? [] }
-    return jwt.sign(body, authTokenPrivateKey, {
-      expiresIn: accessTokenLifespan,
+    return jwt.sign(body, AUTH_TOKEN_PRIVATE_KEY, {
+      expiresIn: ACCESS_TOKEN_LIFESPAN,
     })
   }
 
@@ -293,14 +293,14 @@ export class User extends BaseModel({
     ) {
       // Create a new token and expiration time
       this.emailVerificationToken = crypto.randomBytes(20).toString('hex')
-      this.emailVerificationTokenExpiresAtMs = Date.now() + emailVerificationTokenLifespan
+      this.emailVerificationTokenExpiresAtMs = Date.now() + EMAIL_VERIFICATION_TOKEN_LIFESPAN
       await this.save()
     }
 
     const verificationURLQueryParams = new URLSearchParams()
     verificationURLQueryParams.set('token', this.emailVerificationToken)
     verificationURLQueryParams.set('email', this.email)
-    const verificationURL = `${baseUrl}/auth/verify?${verificationURLQueryParams.toString()}`
+    const verificationURL = `${BASE_URL}/auth/verify?${verificationURLQueryParams.toString()}`
 
     await sgMail.send({
       to: this.email,
