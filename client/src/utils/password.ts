@@ -1,6 +1,8 @@
 import { colors } from 'src/styles'
 import zxcvbn, { ZXCVBNScore } from 'zxcvbn'
 
+const MINIMUM_PASSWORD_STRENGTH = 2
+
 interface PasswordScore {
   score: ZXCVBNScore
   label: string
@@ -39,7 +41,7 @@ export const getPasswordScore = (
   return {
     score,
     ...getScoreMetadata(score),
-    sufficientlySecure: score >= 3,
+    sufficientlySecure: !(score < MINIMUM_PASSWORD_STRENGTH),
   }
 }
 

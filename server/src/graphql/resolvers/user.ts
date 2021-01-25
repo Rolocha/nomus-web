@@ -23,7 +23,7 @@ import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
-import { BASE_URL } from 'src/config'
+import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
@@ -89,7 +89,7 @@ class UserResolver {
       throw new Error('incorrect-current-password')
     }
 
-    if (zxcvbn(newPassword).score < 3) {
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
       throw new Error('password-too-weak')
     }
 
@@ -264,7 +264,7 @@ class UserResolver {
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
-    if (zxcvbn(newPassword).score < 3) {
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
       throw new Error('password-too-weak')
     }
 

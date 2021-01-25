@@ -7,6 +7,7 @@ import {
   ACCESS_TOKEN_LIFESPAN,
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_LIFESPAN,
+  MINIMUM_PASSWORD_STRENGTH,
   REFRESH_TOKEN_COOKIE_NAME,
 } from 'src/config'
 import { TokenBody } from './types'
@@ -81,7 +82,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
   const { firstName, middleName, lastName, email, password } = req.body
 
   // Verify password strength
-  if (zxcvbn(password).score < 3) {
+  if (zxcvbn(password).score < MINIMUM_PASSWORD_STRENGTH) {
     return res.status(400).json({
       error: {
         code: 'password-too-weak',
