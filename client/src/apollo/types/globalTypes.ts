@@ -52,7 +52,6 @@ export interface CustomCardSpecInput {
  * Input for udpating user profile
  */
 export interface ProfileUpdateInput {
-  username?: string | null
   firstName?: string | null
   middleName?: string | null
   lastName?: string | null

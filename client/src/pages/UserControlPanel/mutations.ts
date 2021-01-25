@@ -24,3 +24,48 @@ export const UPDATE_USER_CHECKPOINTS = gql`
     }
   }
 `
+
+export const CHANGE_PASSWORD_MUTATION = gql`
+  mutation ChangePasswordQuery(
+    $oldPassword: String!
+    $newPassword: String!
+    $confirmNewPassword: String!
+  ) {
+    changePassword(
+      oldPassword: $oldPassword
+      newPassword: $newPassword
+      confirmNewPassword: $confirmNewPassword
+    ) {
+      id
+    }
+  }
+`
+
+export const UPDATE_PROFILE_MUTATION = gql`
+  mutation UpdateProfileQuery($updatedUser: ProfileUpdateInput!) {
+    updateProfile(updatedUser: $updatedUser) {
+      id
+      name {
+        first
+        middle
+        last
+      }
+      profilePicUrl
+      headline
+      phoneNumber
+      email
+      isEmailVerified
+      bio
+      activated
+    }
+  }
+`
+
+export const UPDATE_USERNAME_MUTATION = gql`
+  mutation UpdateUsernameMutation($username: String!) {
+    updateProfile(username: $username) {
+      id
+      username
+    }
+  }
+`
