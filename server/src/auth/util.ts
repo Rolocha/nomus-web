@@ -1,7 +1,7 @@
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 
 import { User } from 'src/models/User'
-import { authTokenPrivateKey } from 'src/config'
+import { AUTH_TOKEN_PRIVATE_KEY } from 'src/config'
 import { Result } from 'src/util/error'
 import { TokenBody } from './types'
 import { DocumentType } from '@typegoose/typegoose'
@@ -27,7 +27,7 @@ export const getUserFromToken = async (
     if (token == null || token.trim() === '') {
       return Result.fail('missing-token')
     }
-    const data = jwt.verify(token, authTokenPrivateKey, {
+    const data = jwt.verify(token, AUTH_TOKEN_PRIVATE_KEY, {
       ignoreExpiration: _options.ignoreExpiration,
     }) as TokenBody
     const user = await User.mongo.findOne({ _id: data._id })

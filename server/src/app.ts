@@ -10,7 +10,6 @@ import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
 import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
-import { graphqlPath } from 'src/config'
 import { getCardDataForInteractionString } from './util/linker'
 import { CardInteraction, User } from './models'
 import { CardInteractionType } from './util/enums'
@@ -29,8 +28,8 @@ app.get('/ping', async (req: Request, res: Response) => {
 app.use('/auth', cookieMiddleware, bodyParser.json(), authRouter)
 
 // Set up GraphQL
-app.use(graphqlPath, cookieMiddleware, authMiddleware)
-gqlServer.applyMiddleware({ app, path: graphqlPath })
+app.use('/graphql', cookieMiddleware, authMiddleware)
+gqlServer.applyMiddleware({ app, path: '/graphql' })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 

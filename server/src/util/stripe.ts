@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
-import { stripeToken } from 'src/config'
+import { STRIPE_TOKEN } from 'src/config'
 
-export const stripe = new Stripe(stripeToken, {
+export const stripe = new Stripe(STRIPE_TOKEN, {
   apiVersion: '2020-03-02',
 })
 

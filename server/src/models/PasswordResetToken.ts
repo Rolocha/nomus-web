@@ -7,7 +7,7 @@ import {
 } from '@typegoose/typegoose'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
-import { passwordResetTokenLifespan } from 'src/config'
+import { PASSWORD_RESET_TOKEN_LIFESPAN } from 'src/config'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 import { User } from './User'
@@ -24,7 +24,7 @@ export class PasswordResetToken extends BaseModel({
   @prop({ required: true, default: () => crypto.randomBytes(20).toString('hex') })
   value: string | null
 
-  @prop({ required: false, default: () => Date.now() + passwordResetTokenLifespan })
+  @prop({ required: false, default: () => Date.now() + PASSWORD_RESET_TOKEN_LIFESPAN })
   expiresAtMs: number // ms since epoch
 
   @prop({ default: false })

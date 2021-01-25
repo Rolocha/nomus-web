@@ -4,9 +4,9 @@ import jwt from 'jsonwebtoken'
 import { RefreshToken, User } from 'src/models'
 import { getUserFromToken } from './util'
 import {
-  accessTokenLifespan,
+  ACCESS_TOKEN_LIFESPAN,
   ACCESS_TOKEN_COOKIE_NAME,
-  refreshTokenLifespan,
+  REFRESH_TOKEN_LIFESPAN,
   REFRESH_TOKEN_COOKIE_NAME,
 } from 'src/config'
 import { TokenBody } from './types'
@@ -36,12 +36,15 @@ const getAuthDataForAccessToken = (accessToken: string) => {
 
 const setCookies = (res: express.Response, accessToken: string, refreshToken?: string) => {
   // TODO: Add secure: true once we have HTTPS set up
-  res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, { httpOnly: true, maxAge: accessTokenLifespan })
+  res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+    httpOnly: true,
+    maxAge: ACCESS_TOKEN_LIFESPAN,
+  })
   if (refreshToken) {
     res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       path: '/auth/refresh',
-      maxAge: refreshTokenLifespan,
+      maxAge: REFRESH_TOKEN_LIFESPAN,
     })
   }
 }
