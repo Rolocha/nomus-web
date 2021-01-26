@@ -14,7 +14,21 @@ export enum OrderState {
 
 registerEnumType(OrderState, {
   name: 'OrderState',
-  description: 'foo',
+  description: 'Current State in Order Tracking State Machine',
+})
+
+// Triggers for OrderState changes, stored in OrderEvent collection
+export enum OrderEventTrigger {
+  Nomus = 'nomus', // nomus code performs a state transition
+  Transport = 'transport', // our shipping partners notify us on change
+  Payment = 'payment', // payment partner notifies us of payment received
+  Printer = 'printer', // printing partner has received or printed materials
+  Internal = 'internal', // used our Admin Panel for some manual triage
+}
+
+registerEnumType(OrderEventTrigger, {
+  name: 'OrderEventTrigger',
+  description: 'Triggers for OrderState stored in OrderEvent collection',
 })
 
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
