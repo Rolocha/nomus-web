@@ -47,17 +47,17 @@ class Order extends BaseModel({
   @Field()
   createdAt: Date
 
-  //User who ordered the cards
+  // User who ordered the cards
   @prop({ required: true, ref: () => User, type: String })
   @Field(() => User, { nullable: false })
   user: Ref<User>
 
-  //Card Version that was ordered
+  // Card Version that was ordered
   @prop({ required: true, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
-  //Quantity of cards in the order
+  // Quantity of cards in the order
   @prop({ required: false })
   @Field({ nullable: false })
   quantity: number
@@ -66,17 +66,17 @@ class Order extends BaseModel({
   @Field(() => OrderPrice, { nullable: false })
   price: OrderPrice
 
-  //This correlates with OrderState at server/src/util/enums.ts
+  // This correlates with OrderState at server/src/util/enums.ts
   @prop({ enum: OrderState, type: String, required: true })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 
-  //Tracking Number for USPS
+  // Tracking Number for USPS
   @prop({ required: false })
   @Field({ nullable: true })
   trackingNumber: string
 
-  //Stripe PaymentIntent id. For now, this is null but future work will replace this
+  // Stripe PaymentIntent id. For now, this is null but future work will replace this
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
