@@ -354,7 +354,28 @@ describe('UserResolver', () => {
   })
 
   describe('updateUsername', () => {
-    it('calls ')
+    it('updates the username', async () => {
+      const user = await createMockUser({})
+      const response = await execQuery({
+        source: `
+        mutation UpdateUsernameTestQuery($username: String!) {
+          updateUsername(username: $username) {
+            id
+            username
+          }
+        }
+        `,
+        variableValues: {
+          username: 'new-one',
+        },
+        contextUser: user,
+      })
+
+      // We should assert on the DB user as well as the one on the GraphQL response
+      const updatedUser = await UserModel.findById(response.data.updateUsername.id)
+      expect(updatedUser.username).toBe('new-one')
+      expect(response.data.updateUsername.username).toBe('new-one')
+    })
   })
 
   describe('sendPasswordResetEmail', () => {
