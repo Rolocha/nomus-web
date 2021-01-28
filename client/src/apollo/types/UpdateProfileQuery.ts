@@ -19,7 +19,6 @@ export interface UpdateProfileQuery_updateProfile_name {
 export interface UpdateProfileQuery_updateProfile {
   __typename: 'User'
   id: string
-  username: string | null
   name: UpdateProfileQuery_updateProfile_name | null
   /**
    * A URL pointing to the user's profile picture
