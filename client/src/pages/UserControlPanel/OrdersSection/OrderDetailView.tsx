@@ -1,13 +1,18 @@
 import { css } from '@emotion/core'
 import * as React from 'react'
+import { gql, useMutation } from 'src/apollo'
+import { OrderState } from 'src/apollo/types/globalTypes'
 import Box from 'src/components/Box'
-import Image from 'src/components/Image'
+import Button from 'src/components/Button'
 import CopyableText from 'src/components/CopyableText'
-import * as Text from 'src/components/Text'
+import Image from 'src/components/Image'
 import { ExternalLink } from 'src/components/Link'
+import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
+import { getUserFacingOrderState } from 'src/utils/order'
 
 interface Props {
   order: Order
@@ -16,11 +21,35 @@ interface Props {
 const bp = 'md'
 
 export default ({ order }: Props) => {
+  const [cancelOrder, { loading: orderCancelLoading }] = useMutation(gql`
+    mutation CancelOrderMutation($orderId: String) {
+      cancelOrder(orderId: $orderId) {
+        id
+        state
+      }
+    }
+  `)
+
+  const handleClickOrderCancel = async () => {
+    if (
+      window.confirm(
+        'Are you sure you want to cancel this order? If you change your mind, you can click the link below to e-mail us.',
+      )
+    ) {
+      await cancelOrder({
+        variables: {
+          orderId: order.id,
+        },
+      })
+    }
+  }
+
   return (
     <Box>
-      <Text.H4>
-        Order <CopyableText copyText={order.id}>{order.id}</CopyableText>
-      </Text.H4>
+      <Text.H4>Your {getFormattedFullDate(order.createdAt)} order</Text.H4>
+      <Text.Body3 color={colors.lightGray}>
+        <CopyableText copyText={order.id}>{order.id}</CopyableText>
+      </Text.Body3>
       <Box
         pt={2}
         display="flex"
@@ -70,7 +99,7 @@ export default ({ order }: Props) => {
         >
           <Box gridArea="status">
             <Text.Label>Status</Text.Label>
-            <Text.Body2>{order.state}</Text.Body2>
+            <Text.Body2>{getUserFacingOrderState(order.state)}</Text.Body2>
           </Box>
           <Box gridArea="orderDate">
             <Text.Label>Date Ordered</Text.Label>
@@ -97,26 +126,44 @@ export default ({ order }: Props) => {
           >
             <Box>
               <Text.Body2>Subtotal</Text.Body2>
-              <Text.Body2>TODO</Text.Body2>
+              <Text.Body2>
+                {formatDollarAmount(order.price.subtotal)}
+              </Text.Body2>
             </Box>
             <Box>
               <Text.Body2>Tax</Text.Body2>
-              <Text.Body2>TODO</Text.Body2>
+              <Text.Body2>{formatDollarAmount(order.price.tax)}</Text.Body2>
             </Box>
             <Box>
               <Text.Body2>Shipping</Text.Body2>
-              <Text.Body2>{formatDollarAmount(500)}</Text.Body2>
+              <Text.Body2>
+                {formatDollarAmount(order.price.shipping)}
+              </Text.Body2>
             </Box>
             <Box>
               <Text.Body2 fontWeight="500">Total</Text.Body2>
               <Text.Body2 fontWeight="500">
-                {formatDollarAmount(order.price)}
+                {formatDollarAmount(order.price.total)}
               </Text.Body2>
             </Box>
           </Box>
         </Box>
       </Box>
 
+      <Box mt={4} display="flex" mx={-3}>
+        {[OrderState.Captured, OrderState.Paid].includes(order.state) && (
+          <Box px={3}>
+            <Button
+              variant="danger"
+              inProgress={orderCancelLoading}
+              inProgressText="Canceling your order"
+              onClick={handleClickOrderCancel}
+            >
+              Cancel order
+            </Button>
+          </Box>
+        )}
+      </Box>
       <Box mt={4}>
         <Text.Body3 textAlign="center">
           Need help with your order? Shoot us an email at{' '}

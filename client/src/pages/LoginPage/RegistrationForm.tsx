@@ -99,7 +99,7 @@ const RegistrationForm = () => {
       <Text.BrandHeader>
         {formState.isSubmitted ? 'Thank you!' : 'Get started'}
       </Text.BrandHeader>
-      {formState.isSubmitted ? (
+      {formState.isSubmitSuccessful ? (
         <>
           <Box mt={3}>
             <Text.Body2 mb={3}>

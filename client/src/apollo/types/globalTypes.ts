@@ -11,12 +11,21 @@
  * foo
  */
 export enum OrderState {
+  Canceled = 'Canceled',
   Captured = 'Captured',
   Created = 'Created',
   Creating = 'Creating',
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
   Paid = 'Paid',
+}
+
+export interface AddressInput {
+  line1: string
+  line2?: string | null
+  city: string
+  state: string
+  postalCode: string
 }
 
 /**
@@ -55,24 +64,13 @@ export interface ProfileUpdateInput {
 }
 
 /**
- * A shipping address input
- */
-export interface ShippingAddressInput {
-  line1: string
-  line2?: string | null
-  city: string
-  state: string
-  postalCode: string
-}
-
-/**
  * Input to generate new or update existing custom card Order
  */
 export interface UpsertCustomOrderInput {
   orderId?: string | null
   quantity?: number | null
   stripeToken?: string | null
-  shippingAddress?: ShippingAddressInput | null
+  shippingAddress?: AddressInput | null
   cardSpec: CustomCardSpecInput
 }
 

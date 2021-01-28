@@ -10,6 +10,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
+import ProgressBar from 'src/components/ProgressBar'
 import SaveButton from 'src/components/SaveButton'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
@@ -18,7 +19,6 @@ import { useAuth } from 'src/utils/auth'
 import zxcvbn from 'zxcvbn'
 import CHANGE_PASSWORD_MUTATION from './changePasswordMutation'
 // import ActivationEditor from './ActivationEditor'
-import ProgressBar from './ProgressBar'
 import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
 
 const bp = 'lg'
@@ -357,6 +357,7 @@ export default () => {
           <ProgressBar
             value={zxcvbn(passwordFormWatch('newPassword')).score}
             max={4}
+            showPercent={true}
           />
         </Box>
       )}

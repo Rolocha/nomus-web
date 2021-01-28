@@ -1,9 +1,13 @@
+import 'src/test-utils/mocks/matchMedia.mock'
+
+import { cleanup, render } from '@testing-library/react'
 import * as React from 'react'
-import { render, cleanup } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import { PageHeader, Body } from 'src/components/Text'
 import Modal from 'src/components/Modal'
 import { setUpModalPortal } from 'src/test-utils/modal.test'
+
+afterEach(cleanup)
 
 describe('<Modal />', () => {
   beforeAll(() => {

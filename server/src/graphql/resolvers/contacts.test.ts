@@ -6,6 +6,7 @@ import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { Role } from 'src/util/enums'
 import { Connection } from 'src/models'
+import { getCurrentDateForDateInput } from 'src/util/date'
 
 beforeAll(async () => {
   await initDB()
@@ -21,7 +22,7 @@ describe('ContactsResolver', () => {
   })
 
   describe('contacts query', () => {
-    it("get's user's connections", async () => {
+    it("gets user's connections", async () => {
       const userFrom = await createMockUser()
       const userTo1 = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
@@ -210,7 +211,7 @@ describe('ContactsResolver', () => {
       expect(response.data?.contacts).toMatchObject(expectedData)
     })
   })
-  describe('contact query', () => {
+  describe('publicContact query', () => {
     it('gets a user contact where connection exists', async () => {
       const userFrom = await createMockUser()
       const userTo = await createMockUser({
@@ -229,8 +230,8 @@ describe('ContactsResolver', () => {
 
       const response = await execQuery({
         source: `
-        query ContactTestQuery($contactId: String!) {
-          contact(contactId: $contactId) {
+        query PublicContactTestQuery($username: String!) {
+          publicContact(username: $username) {
             id
             name {
               first
@@ -247,11 +248,12 @@ describe('ContactsResolver', () => {
             meetingDate
             meetingPlace
             notes
+            connected
           }
         }
         `,
         variableValues: {
-          contactId: userTo.id,
+          username: userTo.username,
         },
         contextUser: userFrom,
       })
@@ -267,11 +269,13 @@ describe('ContactsResolver', () => {
         notes: connection.notes ?? null,
         meetingDate,
         meetingPlace: connection.meetingPlace,
+        connected: true,
       }
 
-      expect(response.data?.contact).toMatchObject(expectedData)
+      expect(response.data?.publicContact).toMatchObject(expectedData)
     })
-    it('fails if no connection exists', async () => {
+
+    it('creates a new connection if none exists', async () => {
       const userFrom = await createMockUser()
       const userTo = await createMockUser({
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
@@ -279,10 +283,12 @@ describe('ContactsResolver', () => {
         password: 'save-greendale',
       })
 
+      expect(await Connection.mongo.findOne({ from: userFrom.id, to: userTo.id })).toBeNull()
+
       const response = await execQuery({
         source: `
-        query ContactTestQuery($contactId: String!) {
-          contact(contactId: $contactId) {
+        query PublicContactTestQuery($username: String!) {
+          publicContact(username: $username) {
             id
             name {
               first
@@ -299,16 +305,28 @@ describe('ContactsResolver', () => {
             meetingDate
             meetingPlace
             notes
+            connected
           }
         }
         `,
         variableValues: {
-          contactId: userTo.id,
+          username: userTo.username,
         },
         contextUser: userFrom,
       })
 
-      expect(response.errors).toBeDefined()
+      expect(response.data?.publicContact).toMatchObject({
+        id: userTo.id,
+        name: (userTo.name as DocumentType<PersonName>).toObject(),
+        phoneNumber: userTo.phoneNumber ?? null,
+        email: userTo.email,
+        cardFrontImageUrl: null,
+        cardBackImageUrl: null,
+        vcfUrl: userTo.vcfUrl ?? null,
+        meetingDate: getCurrentDateForDateInput(),
+        connected: true,
+      })
+      expect(await Connection.mongo.findOne({ from: userFrom.id, to: userTo.id })).not.toBeNull()
     })
   })
 

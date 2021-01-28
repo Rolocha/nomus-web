@@ -1,5 +1,3 @@
-import ms from 'ms'
-import { sgMail } from 'src/util/sendgrid'
 import {
   DocumentType,
   getModelForClass,
@@ -14,25 +12,27 @@ import crypto from 'crypto'
 import * as fs from 'fs'
 import { FileUpload } from 'graphql-upload'
 import jwt from 'jsonwebtoken'
+import ms from 'ms'
 import {
-  accessTokenLifespan,
-  authTokenPrivateKey,
-  baseUrl,
-  emailVerificationTokenLifespan,
+  ACCESS_TOKEN_LIFESPAN,
+  AUTH_TOKEN_PRIVATE_KEY,
+  BASE_URL,
+  EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Field, ObjectType } from 'type-graphql'
+import { URLSearchParams } from 'url'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import { Connection } from './Connection'
+import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import RefreshToken from './RefreshToken'
 import { validateEmail } from './utils'
-import { URLSearchParams } from 'url'
 
 export interface UserCreatePayload {
   id?: string
@@ -161,7 +161,7 @@ export class User extends BaseModel({
   @prop({ required: false, default: () => crypto.randomBytes(20).toString('hex') })
   emailVerificationToken: string | null
 
-  @prop({ required: false, default: () => Date.now() + emailVerificationTokenLifespan })
+  @prop({ required: false, default: () => Date.now() + EMAIL_VERIFICATION_TOKEN_LIFESPAN })
   emailVerificationTokenExpiresAtMs: number
 
   @prop({
@@ -235,8 +235,8 @@ export class User extends BaseModel({
 
   public generateAccessToken(): string {
     const body = { _id: this.id, roles: this.roles ?? [] }
-    return jwt.sign(body, authTokenPrivateKey, {
-      expiresIn: accessTokenLifespan,
+    return jwt.sign(body, AUTH_TOKEN_PRIVATE_KEY, {
+      expiresIn: ACCESS_TOKEN_LIFESPAN,
     })
   }
 
@@ -293,21 +293,22 @@ export class User extends BaseModel({
     ) {
       // Create a new token and expiration time
       this.emailVerificationToken = crypto.randomBytes(20).toString('hex')
-      this.emailVerificationTokenExpiresAtMs = Date.now() + emailVerificationTokenLifespan
+      this.emailVerificationTokenExpiresAtMs = Date.now() + EMAIL_VERIFICATION_TOKEN_LIFESPAN
       await this.save()
     }
 
     const verificationURLQueryParams = new URLSearchParams()
     verificationURLQueryParams.set('token', this.emailVerificationToken)
     verificationURLQueryParams.set('email', this.email)
-    const verificationURL = `${baseUrl}/auth/verify?${verificationURLQueryParams.toString()}`
+    const verificationURL = `${BASE_URL}/auth/verify?${verificationURLQueryParams.toString()}`
 
     await sgMail.send({
       to: this.email,
       from: 'hi@nomus.me',
-      templateId: 'd-02455eda777b41f980776fa13d043b81',
+      templateId: SendgridTemplate.VerifyEmail,
       dynamicTemplateData: {
         verificationURL,
+        firstName: this.name.first,
       },
     })
   }

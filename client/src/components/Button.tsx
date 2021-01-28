@@ -76,7 +76,7 @@ const Button = React.forwardRef(
         {inProgress ? (
           <Box display="flex" alignItems="center">
             <Spinner size="1em" />
-            {inProgressText && <Text.Plain ml={1}>{inProgressText}</Text.Plain>}
+            <Text.Plain ml={1}>{inProgressText || children}</Text.Plain>
           </Box>
         ) : (
           children

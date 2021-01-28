@@ -1,3 +1,4 @@
+import { DocumentType } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
@@ -124,6 +125,27 @@ class OrderResolver {
     }
   }
 
+  @Authorized(Role.User)
+  @Mutation((type) => Order)
+  async cancelOrder(
+    @Arg('orderId', { nullable: true }) orderId: string | null,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>> {
+    if (!context.user) {
+      throw new Error('no-user-specified')
+    }
+    const order = await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+    if (!order) {
+      throw new Error('no-matching-order')
+    }
+
+    const cancelationResult = await order.cancel()
+    if (!cancelationResult.isSuccess) {
+      throw cancelationResult.error
+    }
+    return cancelationResult.value
+  }
+
   //Get all orders for a User
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
@@ -167,15 +189,17 @@ class OrderResolver {
     }
     const createdCardVersion = await CardVersionModel.create(createCardVersion)
 
-    // TODO: Factor in tax and shipping into calculateCost()
-    const price = calculateCost(quantity)
-    if (price == null) {
+    const subtotal = calculateCost(quantity)
+    if (subtotal == null) {
       throw new Error('Invalid quantity specified, failed to calculate pricing')
     }
 
+    // TODO: Factor in tax and shipping into calculateCost()
+    const total = subtotal
+
     // TODO: create if orderId is null, otherwise update existing one using Order.find({ id: orderId }).paymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: price,
+      amount: total,
       currency: 'usd', // We'll know we made it when we can change this line :')
     })
 
@@ -184,7 +208,12 @@ class OrderResolver {
       cardVersion: createdCardVersion._id,
       state: OrderState.Captured,
       paymentIntent: paymentIntent.id,
-      price,
+      price: {
+        subtotal,
+        shipping: 0,
+        tax: 0,
+        total,
+      },
       ...payload,
     }
     const createdOrder = await Order.mongo.create(createOrder)

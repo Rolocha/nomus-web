@@ -138,6 +138,30 @@ export const styleVariants = {
   danger: {
     borderWidth: '1px',
     borderStyle: 'solid',
+    backgroundColor: colors.invalidRed,
+    borderColor: colors.invalidRed,
+    color: colors.white,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverRed,
+    },
+    '&:active': {
+      backgroundColor: colors.activeRed,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineRed}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: '#DFE5EC',
+      color: colors.disabledBlue,
+      borderColor: '#DFE5EC',
+    },
+  },
+
+  dangerSecondary: {
+    borderWidth: '1px',
+    borderStyle: 'solid',
     backgroundColor: 'white',
     borderColor: colors.invalidRed,
     color: colors.invalidRed,
@@ -195,6 +219,14 @@ export const sizeVariants = {
     borderRadius: '2em',
     paddingTop: '13px',
     paddingBottom: '13px',
+  },
+  knob: {
+    fontSize: '16px',
+    [mq.md]: {
+      fontSize: '20px',
+    },
+    borderRadius: '2em',
+    padding: '13px',
   },
   normal: {
     paddingTop: '9.5px',

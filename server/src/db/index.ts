@@ -1,14 +1,14 @@
 import mongoose from 'mongoose'
-import { mongoCredentials } from 'src/config'
+import { MONGO_CREDENTIALS } from 'src/config'
 
-export async function init(options: Partial<typeof mongoCredentials> = {}) {
+export async function init(options: Partial<typeof MONGO_CREDENTIALS> = {}) {
   const {
-    dbName = mongoCredentials.dbName,
-    username = mongoCredentials.username,
-    password = mongoCredentials.password,
-    hostname = mongoCredentials.hostname,
-    port = mongoCredentials.port,
-    dbUri: dbUriOverride = mongoCredentials.dbUri,
+    dbName = MONGO_CREDENTIALS.dbName,
+    username = MONGO_CREDENTIALS.username,
+    password = MONGO_CREDENTIALS.password,
+    hostname = MONGO_CREDENTIALS.hostname,
+    port = MONGO_CREDENTIALS.port,
+    dbUri: dbUriOverride = MONGO_CREDENTIALS.dbUri,
   } = options
 
   const dbUri = dbUriOverride ?? `mongodb://${username}:${password}@${hostname}:${port}/${dbName}`

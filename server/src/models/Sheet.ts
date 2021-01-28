@@ -5,6 +5,7 @@ import { Card } from './Card'
 import { CardVersion } from './CardVersion'
 import { Ref } from './scalars'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
+import Order from './Order'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType({
@@ -22,6 +23,10 @@ export class Sheet extends BaseModel({
   @prop({ _id: false, required: false, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: true })
   cardVersion: Ref<CardVersion>
+
+  @prop({ _id: false, required: false, ref: () => Order, type: String })
+  @Field(() => Order, { nullable: true })
+  order: Ref<Order>
 }
 
 // Attach the mongoose model onto the core model itself

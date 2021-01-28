@@ -10,6 +10,7 @@ import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
 import Link from 'src/components/Link'
+import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -28,13 +29,16 @@ const LINKER_MUTATION = gql`
 `
 
 const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
-  const params = new URLSearchParams()
-  params.set('subject', 'Sheet Linking Failed: ' + routeStr)
-  params.set(
-    'body',
-    `Sheet Linking Failed for sheet: ${routeStr} \nError String: ${errorStr} \nShortId on Sheet Edge: `,
-  )
-  return `mailto:help@nomus.me?${params.toString()}`
+  return createMailtoURL({
+    to: 'help@nomus.me',
+    subject: `Sheet Linking Failed: ${routeStr}`,
+    body: `
+Sheet Linking Failed for sheet: ${routeStr}
+Error String: ${errorStr}
+
+ShortId on Sheet Edge: 
+`.trim(),
+  })
 }
 
 const LinkerPage = () => {
@@ -136,8 +140,8 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
                 <Text.Body>
-                  For any questions, email help@nomus.me and we'll get it
-                  sorted!
+                  For any questions, email help@nomus.me or call 714-495-8665
+                  and we'll get it sorted!
                 </Text.Body>
               </Box>
             )}
@@ -197,13 +201,13 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body color="invalidRed">
                   Uh oh, That code doesn't seem to be right. Try typing it
-                  again, or email us at{' '}
+                  again, email us at{' '}
                   <Link
                     to={sendHelpEmail(window.location.pathname, infoToEmail)}
                   >
                     help@nomus.me
                   </Link>{' '}
-                  and we'll help sort it out.
+                  , or call us at 714-495-8665 and we'll help sort it out.
                 </Text.Body>
               </Box>
             )}

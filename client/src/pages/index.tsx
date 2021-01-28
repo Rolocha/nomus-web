@@ -8,16 +8,18 @@ import {
 import ProtectedRoute from 'src/components/ProtectedRoute'
 import { AuthLevel } from 'src/config'
 import AdminPanel from 'src/pages/AdminPanel'
+import ComingSoonPage from 'src/pages/ComingSoonPage'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import ContactSaver from 'src/pages/ContactSaver'
+import ForgotPassword from 'src/pages/ForgotPassword'
 import FourOhFourPage from 'src/pages/FourOhFourPage'
 import LandingPage from 'src/pages/LandingPage'
+import LinkerPage from 'src/pages/LinkerPage'
 import LoadingPage from 'src/pages/LoadingPage'
 import LoginPage from 'src/pages/LoginPage'
+import ResetPassword from 'src/pages/ResetPassword'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
-import ComingSoonPage from './ComingSoonPage'
-import LinkerPage from './LinkerPage'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -58,6 +60,16 @@ export const routes: Array<RouteType> = [
     exact: true,
     path: '/register',
     Component: LoginPage,
+  },
+  {
+    exact: true,
+    path: '/forgot-password',
+    Component: ForgotPassword,
+  },
+  {
+    exact: true,
+    path: '/reset-password',
+    Component: ResetPassword,
   },
   {
     path: '/faq',

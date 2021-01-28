@@ -15,7 +15,7 @@ import theme from 'src/styles/theme'
 import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
-// import OrdersSection from './OrdersSection'
+import OrdersSection from './OrdersSection'
 import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
 import Banner from 'src/components/Banner'
@@ -179,14 +179,14 @@ const ProfilePage = () => {
                   Icon: SVG.Contacts,
                   content: <ContactsSection />,
                 },
-                // {
-                //   key: 'orders',
-                //   linkPath: 'orders',
-                //   matchPath: 'orders/:orderId?',
-                //   label: 'Orders',
-                //   Icon: SVG.Orders,
-                //   content: <OrdersSection />,
-                // },
+                {
+                  key: 'orders',
+                  linkPath: 'orders',
+                  matchPath: 'orders/:orderId?',
+                  label: 'Orders',
+                  Icon: SVG.Orders,
+                  content: <OrdersSection />,
+                },
                 {
                   key: 'settings',
                   label: 'Settings',

@@ -1167,6 +1167,13 @@
   resolved "https://registry.yarnpkg.com/@types/vcards-js/-/vcards-js-2.10.0.tgz#26dfa952278f877b63373f2e73f07988832b905b"
   integrity sha512-3LcC+AS65zKCZlAlpm6Ysf/jOJaJ1HBWbbvJglT0uoheGBwGnjN25kg6WG8c3ZafgAAainVEWpxGTUIxl0ETow==
 
+"@types/vcf@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/vcf/-/vcf-2.0.3.tgz#621c4f2236258d20692c7216c0b660b803a66eaa"
+  integrity sha512-T7FW77SvkTPAI5qEGpFHL9EAFgVaceDwLxAp+xgBxcZrhz6fTwf44LhYEUnJJeZ+EuKSJ8owQYKwlabYyVwJ8Q==
+  dependencies:
+    "@types/node" "*"
+
 "@types/webpack-sources@*":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-0.1.7.tgz#0a330a9456113410c74a5d64180af0cbca007141"
@@ -3849,6 +3856,11 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+foldline@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/foldline/-/foldline-1.1.0.tgz#95017b3fc2cff156c167373897e76ceb32ae0964"
+  integrity sha512-9SheyADS50hjvFYjFJ3OB/GlDz2mD1T2CHd7auIk4Uto5YYWPBcw8iYo3F+gENJ+/SOeH9tT0loHZSqlUlumTA==
 
 follow-redirects@1.5.10:
   version "1.5.10"
@@ -8845,6 +8857,14 @@ vcards-js@^2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/vcards-js/-/vcards-js-2.10.0.tgz#70871c3c6f1f154ae0b4925d761bfe7ac2c8502a"
   integrity sha512-nah+xbVInVJaO6+C5PEUqaougmv8BN8aa7ZCtmVQcX6eWIZGRukckFtseXSI7KD7/nXtwkJe624y42T0r+L+AQ==
+
+vcf@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/vcf/-/vcf-2.1.0.tgz#c1844bcc4c1098b4f1e1457801c16cdc51537faa"
+  integrity sha512-mTS5UnGuY6YHHkU/uD6eLla1tlAqmg38m1Fx6e/uaovVEuhuEU7YQ7O46G99A3OdmgEFHt5KW5g2P8q4v4O1bQ==
+  dependencies:
+    camelcase "^5.0.0"
+    foldline "^1.1.0"
 
 verror@1.10.0:
   version "1.10.0"

@@ -16,6 +16,7 @@ const colors = {
   africanElephant: '#A9A591',
 
   // Some grays
+  lightGray: '#E0E0DE',
   superlightGray: '#E5E5E5',
   white: '#FFFFFF',
 
@@ -37,8 +38,8 @@ const colors = {
   activeBlue: '#E5F1FF',
   outlineBlue: '#B2D6FF',
 
-  hoverRed: '#FFF0F7',
-  activeRed: '#FFE5F1',
+  hoverRed: '#B01500',
+  activeRed: '#9E1300',
   outlineRed: '#FFB2D6',
 
   hoverGreen: '#F0FFF7',

@@ -22,6 +22,7 @@ import Link from 'src/components/Link'
 import cardsEmptyStateSvg from './cards_empty_state.svg'
 import Image from 'src/components/Image'
 import { colors } from 'src/styles'
+import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -33,13 +34,29 @@ const formatDate = (date: Date) => {
 }
 
 const sendReorderEmail = (cardId: string) => {
-  const params = new URLSearchParams()
-  params.set('subject', "I'd like to Reorder a Card!")
-  params.set(
-    'body',
-    "Hi! I'd like to reorder a card please :) \ncardID: " + cardId,
-  )
-  return `mailto:hi@nomus.me?${params.toString()}`
+  return createMailtoURL({
+    to: 'hi@nomus.me',
+    subject: "I'd like to reorder a card!",
+    body: `
+Hi! I'd like to reorder a card please :)
+cardID: ${cardId}
+
+Number of cards to order:
+`.trim(),
+  })
+}
+
+const sendModifyEmail = (cardId: string) => {
+  return createMailtoURL({
+    to: 'hi@nomus.me',
+    subject: "I'd like to modify a card!",
+    body: `
+Hi! I'd like to modify a card please
+cardID: ${cardId}
+
+I'd like to change:
+`.trim(),
+  })
 }
 
 export default () => {
@@ -169,7 +186,7 @@ export default () => {
                     <Link
                       asButton
                       buttonStyle="secondary"
-                      to={sendReorderEmail(defaultCardVersion.id)}
+                      to={sendModifyEmail(defaultCardVersion.id)}
                     >
                       Modify card
                     </Link>
@@ -275,7 +292,7 @@ export default () => {
                       <Link
                         asButton
                         buttonStyle="secondary"
-                        to={sendReorderEmail(cv.id)}
+                        to={sendModifyEmail(cv.id)}
                         css={css`
                           padding: 9.5px 6px;
                         `}
