@@ -3,7 +3,7 @@ import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-expres
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
-import { User, validateUsername } from 'src/models/User'
+import { User } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Void } from 'src/models/scalars'
@@ -118,12 +118,13 @@ class UserResolver {
     if (!usernameUpdateResult.isSuccess) {
       switch (usernameUpdateResult.error.name) {
         case 'empty-username':
-        case 'username-too-short':
+          throw new UserInputError('Invalid request', {
+            username: 'Please enter a non-empty username.',
+          })
+        case 'reserved-route':
           throw new UserInputError('Invalid request', {
             username: 'That username is not allowed.',
           })
-
-        case 'reserved-route':
         case 'non-unique-username':
           throw new UserInputError('Invalid request', {
             username: 'That username is already taken.',

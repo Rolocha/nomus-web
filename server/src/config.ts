@@ -33,3 +33,25 @@ export const BASE_URL =
 
 export const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
 export const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
+export const RESERVED_ROUTES = [
+  'about',
+  'api',
+  'auth',
+  'card-builder',
+  'careers',
+  'd',
+  'dashboard',
+  'dashboard',
+  'design',
+  'faq',
+  'faq',
+  'get-started',
+  'hello',
+  'jobs',
+  'login',
+  'profile',
+  'profile',
+  'register',
+  'registration',
+  'signup',
+]

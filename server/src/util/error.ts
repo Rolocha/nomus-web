@@ -1,4 +1,9 @@
 // Inspired by https://khalilstemmler.com/articles/enterprise-typescript-nodejs/handling-errors-result-class/
+
+type extractError<Type> = Type extends Result<infer T, infer E> ? E : never
+
+export type ErrorsOf<T> = extractError<T>
+
 export class Result<T, E extends string> {
   public isSuccess: boolean
   public error: NamedError<E> | undefined
@@ -15,7 +20,7 @@ export class Result<T, E extends string> {
     }
 
     this.isSuccess = isSuccess
-    this.error = new NamedError(error)
+    this.error = error ? new NamedError(error) : undefined
     this._value = value
 
     Object.freeze(this)

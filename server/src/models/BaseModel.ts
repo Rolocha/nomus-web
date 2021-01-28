@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
 import { modelOptions, prop } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
+import mongoose from 'mongoose'
+import { Field, ObjectType } from 'type-graphql'
 
 const defaultId = (prefix: string) => () => {
   const id = mongoose.Types.ObjectId()
