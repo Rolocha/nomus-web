@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { GraphQLUpload } from 'apollo-server-express'
+import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
@@ -7,7 +7,17 @@ import { User, validateUsername } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Void } from 'src/models/scalars'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  Query,
+  Resolver,
+  UnauthorizedError,
+} from 'type-graphql'
 
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
@@ -18,9 +28,6 @@ import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
-  @Field({ nullable: true })
-  username?: string
-
   @Field({ nullable: true })
   firstName?: string
   @Field({ nullable: true })
@@ -98,47 +105,57 @@ class UserResolver {
   }
 
   @Authorized(Role.User)
-  @AdminOnlyArgs('userId')
   @Mutation((type) => User)
-  async updateProfile(
-    @Arg('userId', { nullable: true }) userId: string | null,
-    @Arg('updatedUser', { nullable: false }) userUpdatePayload: ProfileUpdateInput,
+  async updateUsername(
+    @Arg('username', { nullable: true }) username: string,
     @Ctx() context: IApolloContext
-  ) {
-    const requestingUserId = context.user._id
-    const requestedUserId = userId ?? requestingUserId
+  ): Promise<User> {
+    if (!context.user) {
+      throw new UnauthorizedError()
+    }
 
-    const userBeingUpdated =
-      requestedUserId === context.user._id
-        ? context.user
-        : await User.mongo.findOne({ _id: requestedUserId })
+    const usernameUpdateResult = await context.user.updateUsername(username)
+    if (!usernameUpdateResult.isSuccess) {
+      switch (usernameUpdateResult.error.name) {
+        case 'empty-username':
+        case 'username-too-short':
+          throw new UserInputError('Invalid request', {
+            username: 'That username is not allowed.',
+          })
 
-    if (userUpdatePayload.username) {
-      if (await validateUsername(userUpdatePayload.username)) {
-        userBeingUpdated.username = userUpdatePayload.username ?? userBeingUpdated.username
-      } else {
-        throw new Error('non-unique-username')
+        case 'reserved-route':
+        case 'non-unique-username':
+          throw new UserInputError('Invalid request', {
+            username: 'That username is already taken.',
+          })
+        case 'unknown-error':
+          throw new ApolloError('Unknown error')
       }
     }
 
-    userBeingUpdated.name.first = userUpdatePayload.firstName ?? userBeingUpdated.name.first
-    userBeingUpdated.name.middle = userUpdatePayload.middleName ?? userBeingUpdated.name.middle
-    userBeingUpdated.name.last = userUpdatePayload.lastName ?? userBeingUpdated.name.last
-    userBeingUpdated.headline = userUpdatePayload.headline ?? userBeingUpdated.headline
+    return context.user
+  }
 
-    // If user is changing their email, mark it as no longer verified and send a new verification email
-    if (userBeingUpdated.email !== userUpdatePayload.email) {
-      userBeingUpdated.email = userUpdatePayload.email
-      userBeingUpdated.isEmailVerified = false
-      userBeingUpdated.sendVerificationEmail() // No need to await
+  @Authorized(Role.User)
+  @Mutation((type) => User)
+  async updateProfile(
+    @Arg('updatedUser', { nullable: false }) userUpdatePayload: ProfileUpdateInput,
+    @Ctx() context: IApolloContext
+  ) {
+    if (!context.user) {
+      throw new UnauthorizedError()
     }
 
-    userBeingUpdated.phoneNumber = userUpdatePayload.phoneNumber ?? userBeingUpdated.phoneNumber
-    userBeingUpdated.bio = userUpdatePayload.bio ?? userBeingUpdated.bio
-    userBeingUpdated.activated = userUpdatePayload.activated ?? userBeingUpdated.activated
+    context.user.name.first = userUpdatePayload.firstName ?? context.user.name.first
+    context.user.name.middle = userUpdatePayload.middleName ?? context.user.name.middle
+    context.user.name.last = userUpdatePayload.lastName ?? context.user.name.last
+    context.user.headline = userUpdatePayload.headline ?? context.user.headline
+    context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
+    context.user.bio = userUpdatePayload.bio ?? context.user.bio
+    context.user.activated = userUpdatePayload.activated ?? context.user.activated
 
-    await userBeingUpdated.save()
-    return await this.userFromMongoDocument(userBeingUpdated)
+    await context.user.save()
+    return await this.userFromMongoDocument(context.user)
   }
 
   @Authorized(Role.User)

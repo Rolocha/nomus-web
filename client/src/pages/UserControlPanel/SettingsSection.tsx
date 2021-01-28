@@ -6,6 +6,7 @@ import { gql, useMutation, useQuery } from 'src/apollo'
 import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
+import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
@@ -17,9 +18,11 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
 import zxcvbn from 'zxcvbn'
-import CHANGE_PASSWORD_MUTATION from './changePasswordMutation'
-// import ActivationEditor from './ActivationEditor'
-import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
+import {
+  UPDATE_PROFILE_MUTATION,
+  UPDATE_USERNAME_MUTATION,
+  CHANGE_PASSWORD_MUTATION,
+} from './mutations'
 
 const bp = 'lg'
 
@@ -65,6 +68,9 @@ export default () => {
   const [updateProfile] = useMutation<UpdateProfileQuery>(
     UPDATE_PROFILE_MUTATION,
   )
+  const [updateUsername] = useMutation<UpdateUsernameMutation>(
+    UPDATE_USERNAME_MUTATION,
+  )
   const [changePassword] = useMutation<ChangePasswordQuery>(
     CHANGE_PASSWORD_MUTATION,
   )
@@ -107,9 +113,9 @@ export default () => {
 
   const onSubmitUsername = (formData: UsernameFormData) => {
     if (formData.username) {
-      updateProfile({
+      updateUsername({
         variables: {
-          updatedUser: { username: formData.username },
+          username: formData.username,
         },
       })
     }

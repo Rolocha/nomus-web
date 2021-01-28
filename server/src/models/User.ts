@@ -233,6 +233,16 @@ export class User extends BaseModel({
     return Result.ok(user)
   }
 
+  public async updateUsername(newUsername: string): ReturnType<typeof validateUsername> {
+    const usernameValidation = await validateUsername(newUsername)
+    if (usernameValidation.isSuccess) {
+      this.username = newUsername
+      return Result.ok()
+    } else {
+      return Result.fail(usernameValidation.error.name)
+    }
+  }
+
   public generateAccessToken(): string {
     const body = { _id: this.id, roles: this.roles ?? [] }
     return jwt.sign(body, AUTH_TOKEN_PRIVATE_KEY, {

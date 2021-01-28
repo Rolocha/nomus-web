@@ -213,8 +213,8 @@ describe('UserResolver', () => {
       }
       const response = await execQuery({
         source: `
-        mutation UpdateProfileTestQuery($userId: String, $updatedUser: ProfileUpdateInput!) {
-          updateProfile(userId: $userId, updatedUser: $updatedUser) {
+        mutation UpdateProfileTestQuery($updatedUser: ProfileUpdateInput!) {
+          updateProfile(updatedUser: $updatedUser) {
             id
             name {
               first
@@ -248,6 +248,50 @@ describe('UserResolver', () => {
       }
     })
 
+    it.only('can perform a partial update', async () => {
+      const user = await createMockUser({})
+      const updatePayload = {
+        bio: user.bio + '; added some more stuff',
+      }
+      const response = await execQuery({
+        source: `
+        mutation UpdateProfileTestQuery($updatedUser: ProfileUpdateInput!) {
+          updateProfile(updatedUser: $updatedUser) {
+            id
+            name {
+              first
+              middle
+              last
+            }
+            headline
+            email
+            phoneNumber
+            bio
+          }
+        }
+        `,
+        variableValues: {
+          updatedUser: updatePayload,
+        },
+        contextUser: user,
+      })
+
+      // We should assert on the DB user as well as the one on the GraphQL response
+      const updatedUser = await UserModel.findById(response.data.updateProfile.id)
+      for (const userObject of [updatedUser, response.data.updateProfile]) {
+        // Expect the old data
+        expect(userObject.name.first).toBe(user.name.first)
+        expect(userObject.name.middle).toBe(user.name.middle)
+        expect(userObject.name.last).toBe(user.name.last)
+        expect(userObject.headline).toBe(user.headline)
+        expect(userObject.email).toBe(user.email)
+        expect(userObject.phoneNumber).toBe(user.phoneNumber)
+
+        // Expect the updated data
+        expect(userObject.bio).toBe(updatePayload.bio)
+      }
+    })
+
     it('de-verifies email and sends a verification email if email was changed', async () => {
       const user = await createMockUser({
         name: {
@@ -263,8 +307,8 @@ describe('UserResolver', () => {
       }
       const response = await execQuery({
         source: `
-        mutation UpdateProfileTestQuery($userId: String, $updatedUser: ProfileUpdateInput!) {
-          updateProfile(userId: $userId, updatedUser: $updatedUser) {
+        mutation UpdateProfileTestQuery($updatedUser: ProfileUpdateInput!) {
+          updateProfile(updatedUser: $updatedUser) {
             id
             email
             isEmailVerified
