@@ -3,7 +3,7 @@ import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-expres
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
-import { User, validateUsername } from 'src/models/User'
+import { User } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Void } from 'src/models/scalars'
