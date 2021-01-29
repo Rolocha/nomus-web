@@ -7,6 +7,7 @@ import OrderResolver from './order'
 import SheetResolver from './sheet'
 import ManufacturingResolver from './manufacturing'
 import LinkerResolver from './linker'
+import OrderEventResolver from './orderEvent'
 
 export default [
   ContactsResolver,
@@ -16,4 +17,5 @@ export default [
   SheetResolver,
   ManufacturingResolver,
   LinkerResolver,
+  OrderEventResolver,
 ] as NonEmptyArray<Function>

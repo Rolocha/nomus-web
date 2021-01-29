@@ -8,7 +8,7 @@
 //==============================================================
 
 /**
- * foo
+ * Current State in Order Tracking State Machine
  */
 export enum OrderState {
   Canceled = 'Canceled',
