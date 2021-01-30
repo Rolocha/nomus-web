@@ -113,12 +113,13 @@ class UserResolver {
     if (!usernameUpdateResult.isSuccess) {
       switch (usernameUpdateResult.error.name) {
         case 'empty-username':
-        case 'username-too-short':
+          throw new UserInputError('Invalid request', {
+            username: 'Please enter a non-empty username.',
+          })
+        case 'reserved-route':
           throw new UserInputError('Invalid request', {
             username: 'That username is not allowed.',
           })
-
-        case 'reserved-route':
         case 'non-unique-username':
           throw new UserInputError('Invalid request', {
             username: 'That username is already taken.',
@@ -144,6 +145,11 @@ class UserResolver {
     context.user.name.first = userUpdatePayload.firstName ?? context.user.name.first
     context.user.name.middle = userUpdatePayload.middleName ?? context.user.name.middle
     context.user.name.last = userUpdatePayload.lastName ?? context.user.name.last
+    if (userUpdatePayload.email && userUpdatePayload.email !== context.user.email) {
+      context.user.email = userUpdatePayload.email
+      context.user.isEmailVerified = false
+      await context.user.sendVerificationEmail()
+    }
     context.user.headline = userUpdatePayload.headline ?? context.user.headline
     context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
     context.user.bio = userUpdatePayload.bio ?? context.user.bio

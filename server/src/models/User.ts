@@ -21,7 +21,7 @@ import {
 } from 'src/config'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
-import { EventualResult, Result } from 'src/util/error'
+import { ErrorsOf, EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Field, ObjectType } from 'type-graphql'
@@ -32,65 +32,17 @@ import { Connection } from './Connection'
 import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import { validateEmail } from './utils'
+import { validateEmail, validateUsername, ValidateUsernameResult } from './validation'
 
 export interface UserCreatePayload {
   id?: string
   name: PersonName
   email: string
   password: string
-}
-
-export const ReservedRoutes = [
-  'dashboard',
-  'profile',
-  'faq',
-  'careers',
-  'jobs',
-  'login',
-  'auth',
-  'api',
-  'signup',
-  'register',
-  'registration',
-  'faq',
-  'dashboard',
-  'card-builder',
-  'get-started',
-  'about',
-  'profile',
-  'design',
-  'hello',
-]
-
-type ValidateUsernameResult = Result<
-  null,
-  | 'username-too-short'
-  | 'empty-username'
-  | 'reserved-route'
-  | 'non-unique-username'
-  | 'unknown-error'
->
-export const validateUsername = async (usernameVal: string): Promise<ValidateUsernameResult> => {
-  const exists = await User.mongo.find({ username: usernameVal }).limit(1)
-
-  if (exists.length > 0) {
-    return Result.fail('non-unique-username')
-  }
-
-  if (ReservedRoutes.includes(usernameVal)) {
-    return Result.fail('reserved-route')
-  }
-
-  if (usernameVal == null) {
-    return Result.fail('empty-username')
-  }
-
-  if (usernameVal.length <= 5) {
-    return Result.fail('username-too-short')
-  }
-
-  return Result.ok()
+  username?: string
+  headline?: string
+  bio?: string
+  phoneNumber?: string
 }
 
 @pre<User>('save', async function (next) {
@@ -196,14 +148,26 @@ export class User extends BaseModel({
   public static async createNewUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
-  ): Promise<DocumentType<User>> {
-    const user = await this.create(userInfo)
+  ): EventualResult<DocumentType<User>, ErrorsOf<ValidateUsernameResult>> {
+    if (userInfo.username) {
+      const usernameValidationResult = await validateUsername(userInfo.username)
+      if (usernameValidationResult.error) {
+        return Result.fail(usernameValidationResult.error.name)
+      }
+    }
+
+    const user = await this.create({
+      username: this.defaultUsername(userInfo.name),
+      ...userInfo,
+    })
+
+    // Auto-create a Connection to self
     await Connection.mongo.create({
       from: user.id,
       to: user.id,
       meetingDate: getCurrentDateForDateInput(),
     })
-    return user
+    return Result.ok(user)
   }
 
   public static async getDefaultCardVersionForUsername(
@@ -233,10 +197,14 @@ export class User extends BaseModel({
     return Result.ok(user)
   }
 
-  public async updateUsername(newUsername: string): ReturnType<typeof validateUsername> {
+  public async updateUsername(
+    this: DocumentType<User>,
+    newUsername: string
+  ): ReturnType<typeof validateUsername> {
     const usernameValidation = await validateUsername(newUsername)
     if (usernameValidation.isSuccess) {
       this.username = newUsername
+      await this.save()
       return Result.ok()
     } else {
       return Result.fail(usernameValidation.error.name)
@@ -361,6 +329,13 @@ export class User extends BaseModel({
       // Delete the file now that we're done
       fs.unlink(filepath, () => {})
     }
+  }
+
+  // Private methods
+  private static defaultUsername(name: PersonName) {
+    return [name.first, name.last, Math.random().toString(36).substring(2, 8)]
+      .join('-')
+      .toLowerCase()
   }
 }
 

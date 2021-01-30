@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
-import { UserModel, validateUsername } from 'src/models/User'
+import { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
-import { Result } from 'src/util/error'
 import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPasswordToken'
 
 jest.mock('src/util/sendgrid')
@@ -221,7 +220,7 @@ describe('UserResolver', () => {
       }
     })
 
-    it.only('can perform a partial update', async () => {
+    it('can perform a partial update', async () => {
       const user = await createMockUser({})
       const updatePayload = {
         bio: user.bio + '; added some more stuff',
@@ -327,31 +326,28 @@ describe('UserResolver', () => {
     })
   })
 
-  describe('username testing', () => {
-    it('has a username collision', async () => {
-      await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxmysox')).toStrictEqual(Result.fail('non-unique-username'))
-    })
-
-    it('does not have a collision', async () => {
-      await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxyoursox')).toStrictEqual(Result.ok())
-    })
-
-    it('creates a new username for a new user', async () => {
-      const user = await createMockUser({
-        name: {
-          first: 'A',
-          last: 'A',
+  describe('updateUsername', () => {
+    it('updates the username', async () => {
+      const user = await createMockUser({})
+      const response = await execQuery({
+        source: `
+        mutation UpdateUsernameTestQuery($username: String!) {
+          updateUsername(username: $username) {
+            id
+            username
+          }
+        }
+        `,
+        variableValues: {
+          username: 'new-one',
         },
+        contextUser: user,
       })
-      expect(user.username.substring(0, 4)).toBe('a-a-')
-      expect(user.username.length).toBe(10)
-    })
-  })
-  describe('reserved routes', () => {
-    it('tries to be a reserved route', async () => {
-      expect(await validateUsername('dashboard')).toStrictEqual(Result.fail('reserved-route'))
+
+      // We should assert on the DB user as well as the one on the GraphQL response
+      const updatedUser = await UserModel.findById(response.data.updateUsername.id)
+      expect(updatedUser.username).toBe('new-one')
+      expect(response.data.updateUsername.username).toBe('new-one')
     })
   })
 

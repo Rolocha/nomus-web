@@ -91,7 +91,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
   }
 
   try {
-    const user = await User.mongo.createNewUser({
+    const createUserResult = await User.mongo.createNewUser({
       name: {
         first: firstName,
         middle: middleName,
@@ -100,6 +100,18 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
       email,
       password,
     })
+
+    if (!createUserResult.isSuccess) {
+      switch (createUserResult.error.name) {
+        case 'empty-username':
+        case 'non-unique-username':
+        case 'reserved-route':
+          return res.status(400).json({ error: { code: createUserResult.error.name } })
+        case 'unknown-error':
+          return res.status(500).json({ error: { code: createUserResult.error.name } })
+      }
+    }
+    const user = createUserResult.value
     const accessToken = user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
 
