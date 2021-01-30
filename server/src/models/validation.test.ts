@@ -1,9 +1,7 @@
+import { RESERVED_ROUTES } from 'src/config'
+import validateUsername from 'src/models/validation/validateUsername'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { RESERVED_ROUTES } from 'src/config'
-import { User } from 'src/Models/User'
-import { validateUsername } from 'src/models/validators'
-import { Result } from 'src/util/error'
 
 beforeAll(async () => {
   await initDB()

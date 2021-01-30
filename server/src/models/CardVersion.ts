@@ -5,7 +5,7 @@ import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 import { Address, PersonName } from './subschemas'
 import { User } from './User'
-import { validateEmail } from './validators'
+import validateEmail from './validation/validateEmail'
 
 // @ts-ignore
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })

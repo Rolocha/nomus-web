@@ -32,7 +32,7 @@ import { Connection } from './Connection'
 import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
-import { validateEmail, validateUsername, ValidateUsernameResult } from './validators'
+import { validateEmail, validateUsername, ValidateUsernameResult } from './validation'
 
 export interface UserCreatePayload {
   id?: string
