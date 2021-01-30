@@ -56,13 +56,15 @@ app.get(
     const { cardVersion, card, interactionType } = cardDataResult.value
 
     // Log an interaction with this card
-    await CardInteraction.mongo.create({
-      card: card?.id, // may or may not be present
-      cardVersion: cardVersion.id,
-      interactionType,
-    })
+    if (cardVersion) {
+      await CardInteraction.mongo.create({
+        card: card?.id, // may or may not be present
+        cardVersion: cardVersion.id,
+        interactionType,
+      })
+    }
 
-    const cardUser = await User.mongo.findById(cardVersion.user)
+    const cardUser = await User.mongo.findById(card.user)
     if (cardUser) {
       res.redirect(307, `/${cardUser.username}`)
     } else if (interactionType === CardInteractionType.Tap) {

@@ -140,20 +140,21 @@ const LinkerPage = () => {
               <Box>
                 <Text.Body>This page is to link cards to a User.</Text.Body>
                 <Text.Body>
-                  For any questions, email help@nomus.me or call 714-495-8665
-                  and we'll get it sorted!
+                  For any questions, email{' '}
+                  <Link
+                    to={sendHelpEmail(window.location.pathname, infoToEmail)}
+                  >
+                    help@nomus.me
+                  </Link>{' '}
+                  or call <Link to={'tel:+17144958665'}>714-495-8665</Link> and
+                  we'll get it sorted!
                 </Text.Body>
               </Box>
             )}
             {formState.isSubmitSuccessful && (
               <Box>
                 <Text.Body>That went well!</Text.Body>
-                <Text.Body>
-                  Thank you for all the work you do{' '}
-                  <span role="img" aria-label="smiley">
-                    😊
-                  </span>
-                </Text.Body>
+                <Text.Body>Thank you for all the work you do :)</Text.Body>
               </Box>
             )}
           </Box>
@@ -207,7 +208,9 @@ const LinkerPage = () => {
                   >
                     help@nomus.me
                   </Link>{' '}
-                  , or call us at 714-495-8665 and we'll help sort it out.
+                  , or call us at{' '}
+                  <Link to={'tel:+17144958665'}>714-495-8665</Link> and we'll
+                  help sort it out.
                 </Text.Body>
               </Box>
             )}
