@@ -55,3 +55,4 @@ export const RESERVED_ROUTES = [
   'registration',
   'signup',
 ]
+export const MINIMUM_PASSWORD_STRENGTH = 2 // on zxcvbn's 0-4 scale
