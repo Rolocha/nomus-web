@@ -148,7 +148,7 @@ export class User extends BaseModel({
   public static async createNewUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
-  ): EventualResult<User, ErrorsOf<ValidateUsernameResult>> {
+  ): EventualResult<DocumentType<User>, ErrorsOf<ValidateUsernameResult>> {
     if (userInfo.username) {
       const usernameValidationResult = await validateUsername(userInfo.username)
       if (usernameValidationResult.error) {
