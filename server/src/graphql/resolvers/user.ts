@@ -1,5 +1,10 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express'
+import {
+  ApolloError,
+  AuthenticationError,
+  GraphQLUpload,
+  UserInputError,
+} from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
@@ -252,6 +257,30 @@ class UserResolver {
     return null
   }
 
+  @Query(() => Boolean, {
+    nullable: true,
+    description: 'Validates whether the reset password token is valid and non-expired',
+  })
+  async validateResetPasswordLink(
+    @Arg('token', { nullable: false }) token: string,
+    @Arg('userId', { nullable: false }) userId: string
+  ): Promise<boolean> {
+    const user = await User.mongo.findById(userId)
+    if (user == null) {
+      throw new UserInputError('Invalid password reset link.')
+    }
+
+    // Verify token belongs to the user and is valid
+    const tokenValidity = await PasswordResetToken.mongo.verify(token, userId)
+    switch (tokenValidity) {
+      case 'invalid':
+        throw new UserInputError('Invalid password reset link.')
+      case 'expired':
+        throw new AuthenticationError('Password reset link expired.')
+    }
+    return true
+  }
+
   @Mutation(() => Void, { nullable: true })
   async resetPassword(
     @Arg('token', { nullable: false }) token: string,
@@ -260,13 +289,16 @@ class UserResolver {
   ): Promise<void> {
     const user = await User.mongo.findById(userId)
     if (user == null) {
-      throw new Error('invalid-user')
+      throw new UserInputError('Invalid password reset link.')
     }
 
     // Verify token belongs to the user and is valid
-    const isTokenValid = await PasswordResetToken.mongo.verify(token, userId)
-    if (!isTokenValid) {
-      throw new Error('invalid-token')
+    const tokenValidity = await PasswordResetToken.mongo.verify(token, userId)
+    switch (tokenValidity) {
+      case 'invalid':
+        throw new UserInputError('Invalid password reset link.')
+      case 'expired':
+        throw new AuthenticationError('Password reset link expired.')
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
