@@ -27,14 +27,12 @@ export const UPDATE_USER_CHECKPOINTS = gql`
 
 export const CHANGE_PASSWORD_MUTATION = gql`
   mutation ChangePasswordQuery(
-    $oldPassword: String!
+    $currentPassword: String!
     $newPassword: String!
-    $confirmNewPassword: String!
   ) {
     changePassword(
-      oldPassword: $oldPassword
+      currentPassword: $currentPassword
       newPassword: $newPassword
-      confirmNewPassword: $confirmNewPassword
     ) {
       id
     }

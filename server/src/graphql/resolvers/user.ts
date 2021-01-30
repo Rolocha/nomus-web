@@ -23,7 +23,7 @@ import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
-import { BASE_URL } from 'src/config'
+import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
@@ -80,21 +80,16 @@ class UserResolver {
   @Authorized(Role.User)
   @Mutation((type) => User)
   async changePassword(
-    @Arg('oldPassword', { nullable: false }) oldPassword: string,
+    @Arg('currentPassword', { nullable: false }) currentPassword: string,
     @Arg('newPassword', { nullable: false }) newPassword: string,
-    @Arg('confirmNewPassword', { nullable: false }) confirmNewPassword: string,
     @Ctx() context: IApolloContext
   ) {
-    const oldPasswordMatches = await bcrypt.compare(oldPassword, context.user.password)
-    if (!oldPasswordMatches) {
-      throw new Error('incorrect-old-password')
+    const currentPasswordMatches = await bcrypt.compare(currentPassword, context.user.password)
+    if (!currentPasswordMatches) {
+      throw new Error('incorrect-current-password')
     }
 
-    if (newPassword !== confirmNewPassword) {
-      throw new Error('password-confirmation-no-match')
-    }
-
-    if (zxcvbn(newPassword).score < 2) {
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
       throw new Error('password-too-weak')
     }
 
@@ -269,6 +264,10 @@ class UserResolver {
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
+      throw new Error('password-too-weak')
+    }
+
     user.password = newPassword
     await user.save()
 

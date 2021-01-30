@@ -17,7 +17,6 @@ export interface ChangePasswordQuery {
 }
 
 export interface ChangePasswordQueryVariables {
-  oldPassword: string
+  currentPassword: string
   newPassword: string
-  confirmNewPassword: string
 }

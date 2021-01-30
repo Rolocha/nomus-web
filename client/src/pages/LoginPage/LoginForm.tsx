@@ -6,9 +6,8 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import { Link } from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
+import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import * as Text from 'src/components/Text'
-import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
 import * as yup from 'yup'
 
@@ -106,18 +105,10 @@ const LoginForm = () => {
         <Form.Item mb="20px">
           <Box display="flex" justifyContent="space-between">
             <Form.Label htmlFor="password">PASSWORD</Form.Label>
-            <Box
-              role="button"
-              cursor="pointer"
-              display="flex"
-              alignItems="center"
-              onClick={() => setPasswordVisible(!passwordVisible)}
-            >
-              <SVG.Eye color={colors.nomusBlue} />{' '}
-              <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
-                {passwordVisible ? 'Hide' : 'Show'} password
-              </Text.Body3>
-            </Box>
+            <PasswordVisibilityToggle
+              visible={passwordVisible}
+              setVisible={setPasswordVisible}
+            />
           </Box>
           <Form.Input
             name="password"

@@ -33,3 +33,4 @@ export const BASE_URL =
 
 export const ACCESS_TOKEN_COOKIE_NAME = 'X-Access-Token'
 export const REFRESH_TOKEN_COOKIE_NAME = 'X-Refresh-Token'
+export const MINIMUM_PASSWORD_STRENGTH = 2 // on zxcvbn's 0-4 scale
