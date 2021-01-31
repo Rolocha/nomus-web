@@ -153,15 +153,14 @@ const NotesEditingModal = ({
         },
       }}
       width="min(700px, 95%)"
-    >
-      <Text.CardHeader mb={3}>
-        {modalTitle ?? `Edit notes about ${formatName(contact.name)}`}
-      </Text.CardHeader>
-      <Text.Body2 mb={4}>
-        {modalDescription ??
+      header={{
+        title: modalTitle ?? `Edit notes about ${formatName(contact.name)}`,
+        subtitle:
+          modalDescription ??
           `Jotting down a couple of quick details about your connection will help
-        you better remember them and why they matter to you.`}
-      </Text.Body2>
+      you better remember them and why they matter to you.`,
+      }}
+    >
       <Form.Form onSubmit={handleSubmit(saveNotes)} id="notes-form">
         <Box
           display="grid"
