@@ -1,5 +1,6 @@
 import { AuthManager, BaseAuthData } from './auth-manager'
 import { AUTH_DATA_KEY } from 'src/config'
+import { client } from 'src/apollo'
 
 // Needs to stay in sync with the enum at server/src/util/enums.ts
 export enum Role {
@@ -85,6 +86,7 @@ const authManager = new AuthManager<
       if (!response.ok || response.status !== 200) {
         throw new Error('Logout failed')
       }
+      await client.clearStore()
       return true
     } catch (err) {
       console.error(err)
