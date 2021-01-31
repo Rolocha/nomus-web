@@ -92,55 +92,58 @@ const ProfilePage = () => {
           pb={{ [bp]: 4 }}
         >
           <Box width="100%">
-            {data.user.name && (
-              <Box pt={4} pb="24px" display={{ _: 'none', [bp]: 'block' }}>
-                <Text.PageHeader>{`Welcome back, ${formatName(
-                  data.user.name,
-                )}`}</Text.PageHeader>
-              </Box>
-            )}
+            <Box width="100%" mb={{ _: 0, [bp]: 3 }}>
+              {data.user.name && (
+                <Box pt={4} pb="24px" display={{ _: 'none', [bp]: 'block' }}>
+                  <Text.PageHeader>{`Welcome back, ${formatName(
+                    data.user.name,
+                  )}`}</Text.PageHeader>
+                </Box>
+              )}
 
-            {data.user.isEmailVerified !== true && (
-              <Banner
-                css={css({
-                  marginBottom: '16px',
-                })}
-                type="warning"
-                title="Email not verified"
-                description={
-                  <span>
-                    {resentVerificationEmailSuccessfully == null && (
-                      <>
-                        Please confirm your email address by clicking the magic
-                        link we sent to your inbox. Didn't get an email?{' '}
-                        <ExternalLink
-                          css={css({ cursor: 'pointer' })}
-                          onClick={() => {
-                            resendVerificationEmail().then((result) => {
-                              setResentVerificationEmailSuccessfully(result)
-                            })
-                          }}
-                        >
-                          Resend.
-                        </ExternalLink>
-                      </>
-                    )}
-                    {resentVerificationEmailSuccessfully && (
-                      <span>
-                        We sent another verification email. Please check your
-                        inbox.
-                      </span>
-                    )}
-                    {/* This should only happen if something went awry on our end... */}
-                    {resentVerificationEmailSuccessfully === false && (
-                      <span>
-                        Uh oh... something went wrong. Please try again later.
-                      </span>
-                    )}
-                  </span>
-                }
-              />
-            )}
+              {data.user.isEmailVerified !== true && (
+                <Banner
+                  type="warning"
+                  title="Email not verified"
+                  borderRadius={{
+                    _: 'NONE',
+                    [bp]: 'DEFAULT',
+                  }}
+                  description={
+                    <span>
+                      {resentVerificationEmailSuccessfully == null && (
+                        <>
+                          Please confirm your email address by clicking the
+                          magic link we sent to your inbox. Didn't get an email?{' '}
+                          <ExternalLink
+                            css={css({ cursor: 'pointer' })}
+                            onClick={() => {
+                              resendVerificationEmail().then((result) => {
+                                setResentVerificationEmailSuccessfully(result)
+                              })
+                            }}
+                          >
+                            Resend.
+                          </ExternalLink>
+                        </>
+                      )}
+                      {resentVerificationEmailSuccessfully && (
+                        <span>
+                          We sent another verification email. Please check your
+                          inbox.
+                        </span>
+                      )}
+                      {/* This should only happen if something went awry on our end... */}
+                      {resentVerificationEmailSuccessfully === false && (
+                        <span>
+                          Uh oh... something went wrong. Please try again later.
+                        </span>
+                      )}
+                    </span>
+                  }
+                />
+              )}
+            </Box>
 
             {data.user.isEmailVerified && showJustVerifiedEmail && (
               <Toast
