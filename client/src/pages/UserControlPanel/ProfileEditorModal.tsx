@@ -8,11 +8,9 @@ import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import Modal from 'src/components/Modal'
-import * as Text from 'src/components/Text'
 import { UPDATE_PROFILE_MUTATION } from './mutations'
 import * as yup from 'yup'
 import { useRegisterWithRef } from 'src/utils/form'
-import { colors } from 'src/styles'
 
 interface FormData {
   firstName: string

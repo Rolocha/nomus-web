@@ -5,7 +5,6 @@ import Button from 'src/components/Button'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
 
 type EditButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
