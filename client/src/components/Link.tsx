@@ -56,18 +56,15 @@ interface InternalLinkProps
     LinkStyleProps {}
 
 // @ts-ignore
-const ExternalLink = styled<'a', LinkStyleProps>('a', {
+const ExternalLink = styled('a', {
   shouldForwardProp: (prop: string | number | symbol) =>
     isPropValid(prop) && prop !== 'underline',
 })(...args)
 // @ts-ignore
-const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
-  ReactRouterLink,
-  {
-    shouldForwardProp: (prop: string | number | symbol) =>
-      isPropValid(prop) && prop !== 'underline',
-  },
-)(...args)
+const InternalLink = styled(ReactRouterLink, {
+  shouldForwardProp: (prop: string | number | symbol) =>
+    isPropValid(prop) && prop !== 'underline',
+})(...args)
 
 const defaultProps = {
   asButton: false,
