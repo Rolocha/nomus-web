@@ -2,6 +2,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const PATHS = {
   src: path.resolve(__dirname, '../src'),
@@ -56,8 +57,21 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+    // Load the index.html template file
     new HtmlWebpackPlugin({
-      template: path.resolve(PATHS.public, 'index.html'),
+      template: path.resolve(PATHS.src, 'index.html'),
+    }),
+    // Copy everything in the public folder to be publicly accessible
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: PATHS.public,
+          globOptions: {
+            // Ignoring index.html since HtmlWebpackPlugin handles it
+            ignore: ['index.html'],
+          },
+        },
+      ],
     }),
   ],
 }
