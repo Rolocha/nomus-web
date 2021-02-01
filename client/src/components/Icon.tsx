@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import * as React from 'react'
 import {
@@ -29,7 +29,7 @@ type IconProps = SpaceProps &
   GridProps &
   ShadowProps
 
-const Icon = styled<'i', IconProps>('i')(
+const Icon = styled.i<IconProps>(
   space,
   position,
   color,

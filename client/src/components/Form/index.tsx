@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 
 interface FormProps {}
 
-export const Form = styled<'form', FormProps>('form')()
+export const Form = styled.form<FormProps>()
 
 export default Form
 export { default as FieldError } from './FieldError'

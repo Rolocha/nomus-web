@@ -51,7 +51,7 @@ type BoxProps = {
   ShadowProps &
   BackgroundProps
 
-const Box = styled<'div', BoxProps>('div')(
+const Box = styled.div<BoxProps>(
   {
     boxSizing: 'border-box',
     minWidth: 0,

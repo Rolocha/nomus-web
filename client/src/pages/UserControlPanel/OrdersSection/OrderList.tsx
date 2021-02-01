@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import 'css.gg/icons/css/chevron-right.css'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'

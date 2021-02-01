@@ -36,7 +36,7 @@ type TextAreaProps = {
   LineHeightProps &
   TypographyProps
 
-const TextArea = styled<'textarea', TextAreaProps>('textarea')(
+const TextArea = styled.textarea<TextAreaProps>(
   {
     border: `1px solid ${theme.colors.africanElephant}`,
     borderRadius: '6px',

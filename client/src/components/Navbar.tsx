@@ -1,4 +1,4 @@
-import { css, Global } from '@emotion/core'
+import { css, Global } from '@emotion/react'
 import { rgba } from 'polished'
 import * as React from 'react'
 import { animated, useTransition } from 'react-spring'

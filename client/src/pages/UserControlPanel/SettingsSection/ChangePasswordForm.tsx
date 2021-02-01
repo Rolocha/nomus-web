@@ -14,7 +14,7 @@ import { CHANGE_PASSWORD_MUTATION } from '../mutations'
 import { validatePassword } from 'src/utils/password'
 import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import { colors } from 'src/styles'
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import Link from 'src/components/Link'
 
 interface PasswordFormData {

@@ -9,7 +9,7 @@ export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
 }
 
 // @ts-ignore
-const Label = styled<'label', LabelProps>('label')(
+const Label = styled.label<LabelProps>(
   {
     textTransform: 'uppercase',
     display: 'block',

@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import deepEqual from 'deep-equal'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
