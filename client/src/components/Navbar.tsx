@@ -112,10 +112,9 @@ const Navbar = (props: Props) => {
         zIndex={2}
         boxShadow="navbar"
       >
-        <Link to="/" height="60%">
+        <Link to="/" height="60%" display="inline">
           <Box
-            display="flex"
-            width="100%"
+            display="inline-flex"
             height="100%"
             alignItems="center"
             justifyContent="flex-start"

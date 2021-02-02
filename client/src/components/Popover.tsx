@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import { makeComplexResponsiveStyles } from 'src/styles/helpers'
+import { useCustomResponsiveStyles } from 'src/styles/helpers'
 import { ResponsiveValue } from 'styled-system'
 
 export enum PopoverAnchorPoint {
@@ -21,13 +21,13 @@ const PopoverButton = ({
   omitIconBg,
   icon,
   popoverContents,
-  anchorPoint,
+  anchorPoint = PopoverAnchorPoint.Top,
 }: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const popoverCard = React.useRef<HTMLDivElement | null>(null)
   const openerButton = React.useRef<HTMLDivElement | null>(null)
 
-  const popoverStyles: { [k in PopoverAnchorPoint]: any } = {
+  const anchorPointStyles = useCustomResponsiveStyles(anchorPoint, {
     [PopoverAnchorPoint.Top]: {
       top: '100%',
       left: '50%',
@@ -49,14 +49,7 @@ const PopoverButton = ({
       mt: 3,
       transform: 'unset',
     },
-  }
-
-  const anchorPointStyles =
-    anchorPoint != null
-      ? // @ts-ignore
-        // @ts-ignore above one doesn't work bc it's not at front of line but prettier forces ? at front
-        makeComplexResponsiveStyles(popoverStyles, anchorPoint)
-      : null
+  })
 
   React.useEffect(() => {
     const listener = (event: MouseEvent) => {

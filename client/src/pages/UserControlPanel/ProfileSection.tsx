@@ -135,38 +135,15 @@ export default () => {
         (data.user.defaultCardVersion.frontImageUrl ||
           data.user.defaultCardVersion.backImageUrl) ? (
           <Box
-            display="flex"
-            flexDirection={{ _: 'row', [bp]: 'column' }}
-            alignItems={{ _: 'center', [bp]: 'flex-end' }}
-            flexShrink={0}
+            width={{ _: '50%', [bp]: '100%' }}
+            mb={{ _: 0, [bp]: 2 }}
+            mr={{ _: 2, [bp]: 0 }}
           >
-            {/* Front of business card */}
-            {data.user.defaultCardVersion.frontImageUrl && (
-              <Box
-                width={{ _: '50%', [bp]: '100%' }}
-                mb={{ _: 0, [bp]: 2 }}
-                mr={{ _: 2, [bp]: 0 }}
-              >
-                <BusinessCardImage
-                  width="100%"
-                  frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
-                />
-              </Box>
-            )}
-            {/* Back of business card */}
-            {data.user.defaultCardVersion.backImageUrl && (
-              <Box
-                width={{ _: '50%', [bp]: '100%' }}
-                display="flex"
-                flexDirection="column"
-                alignItems="stretch"
-              >
-                <BusinessCardImage
-                  width="100%"
-                  backImageUrl={data.user.defaultCardVersion.backImageUrl}
-                />
-              </Box>
-            )}
+            <BusinessCardImage
+              width="100%"
+              frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
+              backImageUrl={data.user.defaultCardVersion.backImageUrl}
+            />
           </Box>
         ) : (
           // User has no defaultCardVersion, show the placeholder and a button to get Nomus card

@@ -179,13 +179,13 @@ const ContactInfoPage = () => {
             gridTemplateAreas={{
               _: `
               "profilePic nameplate"
-              "cards cards"
+              "businessCard businessCard"
               "profileInfo profileInfo"
             `,
               [bp]: `
               "banner banner"
               "profilePic nameplate"
-              "cards profileInfo"
+              "businessCard profileInfo"
           `,
             }}
             gridColumnGap={3}
@@ -207,29 +207,19 @@ const ContactInfoPage = () => {
               <Text.Body2>{contact.headline}</Text.Body2>
             </Box>
 
-            {contact.cardFrontImageUrl && contact.cardBackImageUrl && (
+            {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
               <Box
-                gridArea="cards"
-                display="flex"
-                flexDirection={{ _: 'row', [bp]: 'column' }}
-                alignItems={{ _: 'center', [bp]: 'flex-end' }}
-                flexShrink={0}
+                gridArea="businessCard"
+                width={{ _: '50%', [bp]: '100%' }}
+                mb={{ _: 0, [bp]: 2 }}
+                mr={{ _: 2, [bp]: 0 }}
               >
-                {/* Front of business card */}
-                {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
-                  <Box
-                    width={{ _: '50%', [bp]: '100%' }}
-                    mb={{ _: 0, [bp]: 2 }}
-                    mr={{ _: 2, [bp]: 0 }}
-                  >
-                    <BusinessCardImage
-                      width="100%"
-                      frontImageUrl={contact.cardFrontImageUrl}
-                      backImageUrl={contact.cardBackImageUrl}
-                      nameForImageAlt={formatName(contact.name)}
-                    />
-                  </Box>
-                )}
+                <BusinessCardImage
+                  width="100%"
+                  frontImageUrl={contact.cardFrontImageUrl}
+                  backImageUrl={contact.cardBackImageUrl}
+                  nameForImageAlt={formatName(contact.name)}
+                />
               </Box>
             )}
 
