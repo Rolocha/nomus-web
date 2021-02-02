@@ -13,7 +13,7 @@ class OrderEventResolver {
   async orderEvent(
     @Arg('orderEventId', { nullable: true }) orderEventId: string | null,
     @Ctx() context: IApolloContext
-  ): Promise<OrderEvent | Error> {
+  ): Promise<OrderEvent> {
     if (context.user.roles.includes(Role.Admin)) {
       return await OrderEvent.mongo.findById(orderEventId)
     } else {
@@ -32,7 +32,7 @@ class OrderEventResolver {
   async orderEventsForOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
     @Ctx() context: IApolloContext
-  ): Promise<OrderEvent[] | Error> {
+  ): Promise<OrderEvent[]> {
     const order = await Order.mongo.findById(orderId)
     if (context.user.roles.includes(Role.Admin) || order.user === context.user.id) {
       return await OrderEvent.mongo.find({ order: orderId }).sort({ createdAt: 1 })
