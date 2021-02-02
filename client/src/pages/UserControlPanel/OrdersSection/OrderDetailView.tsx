@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import { gql, useMutation } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'

@@ -42,7 +42,7 @@ exports[`<Modal /> renders a modal with the specified content in a portal 1`] = 
               </p>
               <div
                 aria-label="Close Modal"
-                class="css-1qehuvj-Box-Modal e1gi27mm0"
+                class="css-1g06mgi-Box-Modal e1gi27mm0"
                 role="button"
               >
                 <svg

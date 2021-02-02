@@ -39,7 +39,7 @@ interface InputProps
   error?: FieldError | boolean
 }
 
-const Input = styled<'input', InputProps>('input')(
+const Input = styled.input<InputProps>(
   {
     borderRadius: '6px',
     padding: '10px 8px',

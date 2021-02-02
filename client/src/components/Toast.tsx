@@ -1,5 +1,5 @@
 import { useTransition, animated } from 'react-spring'
-import { css, keyframes } from '@emotion/core'
+import { css, keyframes } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
@@ -104,7 +104,6 @@ const Toast = ({
                   <Text.Body3 fontWeight={500}>{title}</Text.Body3>
                   {closable && (
                     <Box
-                      position
                       cursor="pointer"
                       role="button"
                       aria-label="close banner"

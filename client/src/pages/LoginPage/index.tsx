@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'

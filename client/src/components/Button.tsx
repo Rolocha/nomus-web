@@ -23,15 +23,15 @@ import Box from './Box'
 type InternalButtonProps = {
   variant?: keyof typeof styleVariants
   size?: keyof typeof sizeVariants
-  as?: string
+  as?: any
 } & SpaceProps &
   LayoutProps &
   GridProps &
   React.ButtonHTMLAttributes<HTMLButtonElement>
 
-export const InternalButton = styled<'button', InternalButtonProps>('button', {
+export const InternalButton = styled('button', {
   shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
-})(
+})<InternalButtonProps>(
   baseButtonStyles,
   space,
   grid,
@@ -42,7 +42,7 @@ export const InternalButton = styled<'button', InternalButtonProps>('button', {
   }),
   // The 'layout' set of styles already has a "size" property that sets both width and height
   // but we have our own custom "size" prop for Button so we want to exclude that
-  ({ size, ...props }) => layout(props),
+  ({ size, ...props }: InternalButtonProps) => layout(props),
 )
 
 InternalButton.defaultProps = {

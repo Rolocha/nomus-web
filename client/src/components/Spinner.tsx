@@ -6,7 +6,7 @@ interface Props {
   size?: string
 }
 
-const SpinnerStyledComponent = styled<'div', Props>('div')`
+const SpinnerStyledComponent = styled.div<Props>`
   width: ${(props: Props) => props.size || '50px'};
   height: ${(props: Props) => props.size || '50px'};
   border-radius: 50%;

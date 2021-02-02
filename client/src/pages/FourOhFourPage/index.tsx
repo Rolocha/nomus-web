@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
@@ -21,7 +21,7 @@ const FourOhFourPage = () => {
           lg: `"cards buttons"`,
         }}
         placeContent="center"
-        flexGrow="1"
+        flexGrow={1}
       >
         <Box
           position="relative"
