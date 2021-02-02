@@ -26,11 +26,6 @@ class OrderEvent extends BaseModel({
   @prop({ enum: OrderState, type: String, required: true })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
-
-  // Extra information about the transition, optional
-  @prop({ required: false })
-  @Field({ nullable: true })
-  extraMetadata: string
 }
 
 OrderEvent.mongo = getModelForClass(OrderEvent)

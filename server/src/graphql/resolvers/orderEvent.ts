@@ -3,10 +3,11 @@ import { Role } from 'src/util/enums'
 import { IApolloContext } from 'src/graphql/types'
 import { Arg, Authorized, Ctx, Query, Resolver } from 'type-graphql'
 import { Order } from 'src/models'
+import { UserInputError } from 'apollo-server-express'
 
 @Resolver()
 class OrderEventResolver {
-  //Get a single OrderEvent
+  // Get a single OrderEvent
   @Authorized(Role.User)
   @Query(() => OrderEvent, { nullable: true })
   async orderEvent(
@@ -20,12 +21,12 @@ class OrderEventResolver {
       if ((orderEvent.order as Order).user === context.user.id) {
         return orderEvent as OrderEvent
       } else {
-        return Error('not-authorized')
+        throw new UserInputError('not-authorized')
       }
     }
   }
 
-  //Get all OrderEvents of an Order
+  // Get all OrderEvents of an Order
   @Authorized(Role.User)
   @Query(() => [OrderEvent], { nullable: true })
   async orderEventsForOrder(
@@ -36,7 +37,7 @@ class OrderEventResolver {
     if (context.user.roles.includes(Role.Admin) || order.user === context.user.id) {
       return await OrderEvent.mongo.find({ order: orderId }).sort({ createdAt: 1 })
     } else {
-      return Error('not-authorized')
+      throw new UserInputError('not-authorized')
     }
   }
 }
