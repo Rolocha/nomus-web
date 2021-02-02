@@ -1,4 +1,4 @@
-import { ClassNames } from '@emotion/core'
+import { ClassNames } from '@emotion/react'
 
 import * as React from 'react'
 import * as stripeJs from '@stripe/stripe-js'

@@ -76,6 +76,9 @@ contactRouter.get(
     const fileName = `${contact.name.first}-${contact.name.last}.vcf`
     const filePath = saveVCFToFile(vCard, fileName)
 
+    // Not setting this header may cause issues on some browsers, e.g. iOS Chrome drops the vcf extension
+    // and makes the Contacts app not an option in the "Open with..." dialog
+    res.setHeader('Content-Disposition', `attachment; filename=${contact.username}.vcf`)
     res.sendFile(filePath, (err) => {
       if (err) {
         console.log('Failure')

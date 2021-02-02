@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import gql from 'graphql-tag'
 import * as React from 'react'

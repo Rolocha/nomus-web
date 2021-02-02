@@ -55,13 +55,16 @@ interface InternalLinkProps
   extends React.ComponentProps<typeof ReactRouterLink>,
     LinkStyleProps {}
 
-const ExternalLink = styled<'a', LinkStyleProps>('a', {
-  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline',
+// @ts-ignore
+const ExternalLink = styled('a', {
+  shouldForwardProp: (prop: string | number | symbol) =>
+    isPropValid(prop) && prop !== 'underline',
 })(...args)
-const InternalLink = styled<typeof ReactRouterLink, InternalLinkProps>(
-  ReactRouterLink,
-  { shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'underline' },
-)(...args)
+// @ts-ignore
+const InternalLink = styled(ReactRouterLink, {
+  shouldForwardProp: (prop: string | number | symbol) =>
+    isPropValid(prop) && prop !== 'underline',
+})(...args)
 
 const defaultProps = {
   asButton: false,
@@ -105,6 +108,7 @@ const UnifiedLink = ({
     return (
       <InternalLink
         {...props}
+        // @ts-ignore
         to={to}
         defaultValue={defaultValue}
         referrerPolicy={referrerPolicy}

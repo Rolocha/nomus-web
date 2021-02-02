@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'

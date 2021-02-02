@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'

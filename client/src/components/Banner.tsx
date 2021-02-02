@@ -1,10 +1,13 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
 import { colors } from 'src/styles'
 import Box from './Box'
+import { ResponsiveValue } from 'styled-system'
+import { useCustomResponsiveStyles } from 'src/styles/helpers'
 
+export type BannerBorderRadius = 'NONE' | 'DEFAULT'
 interface Props {
   type: 'success' | 'warning' | 'danger' | 'info'
   title: string
@@ -12,6 +15,7 @@ interface Props {
   className?: string
   closable?: boolean
   onClickClose?: () => void
+  borderRadius?: ResponsiveValue<BannerBorderRadius>
 }
 
 const Banner = ({
@@ -20,6 +24,7 @@ const Banner = ({
   className,
   description,
   closable,
+  borderRadius = 'DEFAULT',
   onClickClose,
 }: Props) => {
   const color = {
@@ -36,11 +41,37 @@ const Banner = ({
     info: SVG.InfoO,
   }[type]
 
+  const outerBorderRadiusStyles = useCustomResponsiveStyles<BannerBorderRadius>(
+    borderRadius,
+    {
+      NONE: {
+        borderRadius: 0,
+      },
+      DEFAULT: {
+        borderRadius: 2,
+      },
+    },
+  )
+
+  const innerBorderRadiusStyles = useCustomResponsiveStyles<BannerBorderRadius>(
+    borderRadius,
+    {
+      NONE: {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+      },
+      DEFAULT: {
+        borderTopLeftRadius: 2,
+        borderBottomLeftRadius: 2,
+      },
+    },
+  )
+
   return (
     <Box
       className={className}
       position="relative"
-      borderRadius={2}
+      {...outerBorderRadiusStyles}
       display="flex"
       alignItems="center"
       boxShadow="banner"
@@ -50,8 +81,7 @@ const Banner = ({
         bg={color}
         width="8px"
         alignSelf="stretch"
-        borderTopLeftRadius={2}
-        borderBottomLeftRadius={2}
+        {...innerBorderRadiusStyles}
       />
       <Box
         display="grid"
@@ -63,7 +93,10 @@ const Banner = ({
         p={2}
       >
         <Box display="flex">
-          <Icon color={color} css={css({ marginRight: '8px' })} />
+          <Icon
+            color={color}
+            css={css({ marginRight: '8px', flexShrink: 0 })}
+          />
           <Text.Body2>
             <span css={css({ fontWeight: 500, marginRight: '8px' })}>
               {title}

@@ -3,7 +3,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import { colors } from 'src/styles'
 
 type SaveButtonProps = {

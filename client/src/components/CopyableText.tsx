@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
