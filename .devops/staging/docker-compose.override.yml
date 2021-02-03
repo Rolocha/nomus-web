@@ -12,16 +12,7 @@ services:
     restart: always
     command: yarn serve
 
-  db:
-    container_name: db
-    image: mongo
-    env_file: .env
-    ports:
-      - 27017:27017
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - app-network
+  # db hosted in MDB Atlas
 
 volumes:
   dbdata:
