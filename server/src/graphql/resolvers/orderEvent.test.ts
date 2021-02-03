@@ -1,6 +1,6 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderState } from 'src/util/enums'
+import { OrderState, Role } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockOrderEvent } from 'src/__mocks__/models/OrderEvent'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -20,7 +20,7 @@ describe('OrderEventResolver', () => {
 
   describe('orderEvent', () => {
     it('Gets an OrderEvent specified by an OrderEventID', async () => {
-      const user = await createMockUser()
+      const user = await createMockUser({ roles: [Role.Admin] })
       const order = await createMockOrder({ user: user })
       const orderEvent = await createMockOrderEvent({ order: order })
 
@@ -29,6 +29,7 @@ describe('OrderEventResolver', () => {
         query OrderEventTestQuery($orderEventId: String) {
           orderEvent(orderEventId: $orderEventId) {
             id
+            state
             order {
               id
             }
@@ -42,13 +43,13 @@ describe('OrderEventResolver', () => {
       })
 
       expect(response.data?.orderEvent?.id).toBe(orderEvent.id)
-      expect(response.data?.orderEvent?.order.id).toBe(order.id)
+      expect(response.data?.orderEvent?.order?.id).toBe(order.id)
     })
   })
 
   describe('orderEventsForOrder', () => {
     it('Gets OrderEvents from an OrderID', async () => {
-      const user = await createMockUser()
+      const user = await createMockUser({ roles: [Role.Admin] })
       const order = await createMockOrder({ user: user })
       const orderEvent1 = await createMockOrderEvent({ order: order })
       const orderEvent2 = await createMockOrderEvent({ order: order, state: OrderState.Paid })
