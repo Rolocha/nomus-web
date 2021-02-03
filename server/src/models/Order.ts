@@ -10,11 +10,12 @@ import {
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderState } from '../util/enums'
+import { OrderEventTrigger, OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
+import OrderEvent from './OrderEvent'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -114,6 +115,52 @@ class Order extends BaseModel({
     await this.save()
     return Result.ok(this)
   }
+
+  public stateTransitionMap() {
+    type EnumDictionary<T extends string | symbol | number> = {
+      [K in T]: T[]
+    }
+    const res: EnumDictionary<OrderState> = {
+      [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
+      [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+      [OrderState.Creating]: [OrderState.Created],
+      [OrderState.Created]: [OrderState.Enroute],
+      [OrderState.Enroute]: [OrderState.Fulfilled],
+      [OrderState.Fulfilled]: [],
+      [OrderState.Canceled]: [],
+    }
+
+    return res
+  }
+
+  public isEligibleTransition(futureState: OrderState): boolean {
+    if (this.stateTransitionMap()[this.state].includes(futureState)) {
+      return true
+    }
+    return false
+  }
+
+  // public async transition(
+  //   this: DocumentType<Order>,
+  //   futureState: OrderState,
+  //   trigger: OrderEventTrigger
+  // ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
+  //   if (this.isEligibleTransition(futureState)) {
+  //     try {
+  //       await OrderEvent.mongo.create({
+  //         order: this.id,
+  //         trigger,
+  //         state: futureState,
+  //       })
+  //       this.state = futureState
+  //       await this.save()
+  //       return Result.ok(this)
+  //     } catch (e) {
+  //       return Result.fail('save-error')
+  //     }
+  //   }
+  //   return Result.fail('invalid-transition')
+  // }
 }
 
 Order.mongo = getModelForClass(Order)

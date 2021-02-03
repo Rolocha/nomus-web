@@ -46,4 +46,12 @@ describe('Order model', () => {
       }
     )
   })
+
+  describe('transitionState', () => {
+    it.only('knows good transisitions (delete this test)', async () => {
+      const order = await createMockOrder({ state: OrderState.Creating })
+      expect(order.isEligibleTransition(OrderState.Paid)).toBeFalsy()
+      expect(order.isEligibleTransition(OrderState.Created)).toBeTruthy()
+    })
+  })
 })
