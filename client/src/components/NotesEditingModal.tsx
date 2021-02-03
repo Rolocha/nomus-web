@@ -12,6 +12,7 @@ import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
 import { useAuth } from 'src/utils/auth'
 import { getCurrentDateForDateInput } from 'src/utils/date'
+import { useRegisterWithRef } from 'src/utils/form'
 import { formatName } from 'src/utils/name'
 
 interface FieldRefs {
@@ -87,15 +88,7 @@ const NotesEditingModal = ({
     }
   }, [isModalOpen, formState.isDirty])
 
-  const setRefAndRegister = React.useCallback(
-    (refObject?: React.MutableRefObject<any>) => (element: any) => {
-      if (refObject) {
-        refObject.current = element
-      }
-      register(element)
-    },
-    [register],
-  )
+  const registerWithRef = useRegisterWithRef(register)
 
   const saveNotes = async (data: NotesFormData) => {
     if (loggedIn) {
@@ -153,15 +146,14 @@ const NotesEditingModal = ({
         },
       }}
       width="min(700px, 95%)"
-    >
-      <Text.CardHeader mb={3}>
-        {modalTitle ?? `Edit notes about ${formatName(contact.name)}`}
-      </Text.CardHeader>
-      <Text.Body2 mb={4}>
-        {modalDescription ??
+      header={{
+        title: modalTitle ?? `Edit notes about ${formatName(contact.name)}`,
+        subtitle:
+          modalDescription ??
           `Jotting down a couple of quick details about your connection will help
-        you better remember them and why they matter to you.`}
-      </Text.Body2>
+      you better remember them and why they matter to you.`,
+      }}
+    >
       <Form.Form onSubmit={handleSubmit(saveNotes)} id="notes-form">
         <Box
           display="grid"
@@ -195,7 +187,7 @@ const NotesEditingModal = ({
               name="meetingDate"
               placeholder="YYYY-MM-DD"
               defaultValue={formFields.meetingDate ?? ''}
-              ref={setRefAndRegister(fieldRefs?.meetingDate)}
+              ref={registerWithRef(fieldRefs?.meetingDate)}
             ></Form.Input>
           </Form.Item>
 
@@ -206,7 +198,7 @@ const NotesEditingModal = ({
               type="text"
               name="meetingPlace"
               defaultValue={formFields.meetingPlace ?? ''}
-              ref={setRefAndRegister(fieldRefs?.meetingPlace)}
+              ref={registerWithRef(fieldRefs?.meetingPlace)}
             ></Form.Input>
           </Form.Item>
 
@@ -228,7 +220,7 @@ const NotesEditingModal = ({
               type="text"
               name="tags"
               defaultValue={formFields.tags ?? ''}
-              ref={setRefAndRegister(fieldRefs?.tags)}
+              ref={registerWithRef(fieldRefs?.tags)}
             ></Form.Input>
           </Form.Item>
 
@@ -238,7 +230,7 @@ const NotesEditingModal = ({
               name="notes"
               width="100%"
               rows={4}
-              ref={setRefAndRegister(fieldRefs?.notes)}
+              ref={registerWithRef(fieldRefs?.notes)}
             />
           </Form.Item>
         </Box>

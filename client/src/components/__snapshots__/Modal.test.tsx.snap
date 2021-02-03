@@ -22,13 +22,13 @@ exports[`<Modal /> renders a modal with the specified content in a portal 1`] = 
           style="display: flex; flex-direction: column; justify-content: center; align-items: center; transform: scale(0); width: 100%;"
         >
           <div
-            class="css-1rsa3wr-Box e1gi27mm0"
+            class="css-11y0e11-Box e1gi27mm0"
             display="flex"
-            height="unset"
+            height="80vh"
             width="[object Object]"
           >
             <div
-              class="css-q4rbdj-Box e1gi27mm0"
+              class="css-1i6u5k9-Box e1gi27mm0"
             >
               <h2
                 class="css-aaj9al-Text e1pb1ozb0"

@@ -4,37 +4,43 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import { mq } from 'src/styles/breakpoints'
+import { colors } from 'src/styles'
 
 type EditButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
+  variant?: 'primary' | 'tertiary'
   iconOnlyBp?: string | null
+  text?: string
 }
-const EditButton = ({ iconOnlyBp, onClick }: EditButtonProps) => (
-  <Button onClick={onClick} variant="tertiary">
-    <Box display="flex" flexDirection="row" alignItems="center">
-      <SVG.Pen
-        css={css`
-          width: 20px;
-          ${iconOnlyBp &&
-          `${mq[iconOnlyBp]} {
-              margin-right: 8px;
-          }`}
-        `}
-      />
-      <Box
-        display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
-      >
-        <Text.Body2 fontSize="14px" color="nomusBlue">
-          Edit
-        </Text.Body2>
+const EditButton = ({
+  iconOnlyBp = null,
+  variant = 'tertiary',
+  onClick,
+  text = 'Edit',
+}: EditButtonProps) => {
+  const textColor = { primary: colors.white, tertiary: colors.nomusBlue }[
+    variant
+  ]
+  return (
+    <Button onClick={onClick} variant={variant} px="24px">
+      <Box display="flex" flexDirection="row" alignItems="center">
+        <SVG.Pen
+          color={textColor}
+          css={css`
+            width: 20px;
+          `}
+        />
+        <Box
+          display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
+          ml="8px"
+        >
+          <Text.Body2 fontSize="14px" color={textColor}>
+            {text}
+          </Text.Body2>
+        </Box>
       </Box>
-    </Box>
-  </Button>
-)
-
-EditButton.defaultProps = {
-  iconOnlyBp: null,
+    </Button>
+  )
 }
 
 export default EditButton
