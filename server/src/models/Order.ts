@@ -7,7 +7,6 @@ import {
   ReturnModelType,
   DocumentType,
   mongoose,
-  post,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
@@ -121,7 +120,7 @@ class Order extends BaseModel({
     return Result.ok(this)
   }
 
-  public stateTransitionMap() {
+  private stateTransitionMap() {
     type EnumDictionary<T extends string | symbol | number> = {
       [K in T]: T[]
     }

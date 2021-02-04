@@ -32,7 +32,7 @@ describe('Order model', () => {
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
         expect(order.state).toBe(initialState)
-        await order.cancel()
+        await order.transition(OrderState.Canceled)
         expect(order.state).toBe(OrderState.Canceled)
       }
     )
@@ -42,8 +42,8 @@ describe('Order model', () => {
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
         expect(order.state).toBe(initialState)
-        const result = await order.cancel()
-        expect(result.error.name).toBe('cannot-be-canceled')
+        const result = await order.transition(OrderState.Canceled)
+        expect(result.error.name).toBe('invalid-transition')
         expect(order.state).toBe(initialState)
       }
     )
@@ -103,7 +103,7 @@ describe('Order model', () => {
       const res = await order.transition(OrderState.Fulfilled)
       expect(order.state).toBe(OrderState.Captured)
       expect(res.isSuccess).toBe(false)
-      expect(res.error).toEqual(new NamedError('invalid-transition'))
+      expect(res.error.name).toBe('invalid-transition')
 
       const orderEvents = await OrderEvent.mongo.find({ order: order.id }).sort({ createdAt: 1 })
       expect(orderEvents).toEqual([
