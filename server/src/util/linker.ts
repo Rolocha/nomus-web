@@ -1,6 +1,6 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, CardVersion, Order, Sheet } from 'src/models'
-import { CardInteractionType, OrderState } from './enums'
+import { CardInteractionType, OrderEventTrigger, OrderState } from './enums'
 import { Result } from './error'
 
 export const SHEET_CARD_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
@@ -128,8 +128,7 @@ export const linkSheetToUser = async (
   const sheetsPrintedSoFar = await Sheet.mongo.find({ order: order.id })
   const numCardsPrinted = sheetsPrintedSoFar.reduce((total, sheet) => total + sheet.cards.length, 0)
   if (numCardsPrinted === order.quantity) {
-    order.state = OrderState.Created
-    await order.save()
+    order.transition(OrderState.Created, OrderEventTrigger.Printer)
   }
 
   return Result.ok({
