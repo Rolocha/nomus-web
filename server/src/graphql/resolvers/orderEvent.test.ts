@@ -1,4 +1,3 @@
-import OrderEvent from 'src/models/OrderEvent'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState, Role } from 'src/util/enums'
