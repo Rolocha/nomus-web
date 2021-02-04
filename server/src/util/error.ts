@@ -1,7 +1,6 @@
 // Inspired by https://khalilstemmler.com/articles/enterprise-typescript-nodejs/handling-errors-result-class/
 
-// tslint:disable-next-line
-type extractError<Type> = Type extends Result<infer T, infer E> ? E : never
+type extractError<Type> = Type extends Result<infer T, infer E> ? E : never // eslint-disable-line
 
 export type ErrorsOf<T> = extractError<T>
 
