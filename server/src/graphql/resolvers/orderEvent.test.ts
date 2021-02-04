@@ -49,6 +49,8 @@ describe('OrderEventResolver', () => {
 
   describe('orderEventsForOrder', () => {
     it('Gets OrderEvents from an OrderID', async () => {
+      // For some reason, the return from GQL has a capitalized first character and idk why
+      // e.g. "paid" -> "Paid"
       function capitalize(toCap: string) {
         return toCap.charAt(0).toUpperCase() + toCap.slice(1)
       }

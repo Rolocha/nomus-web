@@ -30,6 +30,7 @@ import { EventualResult, Result } from 'src/util/error'
       }
       shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
     }
+    // Creates a new OrderEvent at creation time
     await mongoose.model('OrderEvent').create({
       order: this.id,
       state: OrderState.Captured,
@@ -104,6 +105,8 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
+  // Mapping of current possible state transitions according to our Order Flow State Machine
+  // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
   private stateTransitionMap() {
     type EnumDictionary<T extends string | symbol | number> = {
       [K in T]: T[]
@@ -121,6 +124,7 @@ class Order extends BaseModel({
     return res
   }
 
+  // Checks if a proposed transition can be accomplished in our state machine
   private isEligibleTransition(futureState: OrderState): boolean {
     if (this.stateTransitionMap()[this.state].includes(futureState)) {
       return true
@@ -128,6 +132,7 @@ class Order extends BaseModel({
     return false
   }
 
+  // Public instance method to transition OrderState
   public async transition(
     this: DocumentType<Order>,
     futureState: OrderState,
@@ -135,6 +140,8 @@ class Order extends BaseModel({
   ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
     if (this.isEligibleTransition(futureState)) {
       try {
+        // Trying to render the OrderEvent Model creates a circular dependency at compile time.
+        // This circumvents compile time issues, to have it occur during execution time.
         await mongoose.model('OrderEvent').create({
           order: this.id,
           trigger,
