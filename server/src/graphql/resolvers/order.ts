@@ -139,7 +139,7 @@ class OrderResolver {
       throw new Error('no-matching-order')
     }
 
-    const cancelationResult = await order.cancel()
+    const cancelationResult = await order.transition(OrderState.Canceled)
     if (!cancelationResult.isSuccess) {
       throw cancelationResult.error
     }

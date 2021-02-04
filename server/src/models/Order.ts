@@ -104,22 +104,6 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
-  private canBeCanceled() {
-    return Order.CANCELABLE_STATES.includes(this.state)
-  }
-
-  public async cancel(
-    this: DocumentType<Order>
-  ): EventualResult<DocumentType<Order>, 'cannot-be-canceled'> {
-    if (!this.canBeCanceled()) {
-      return Result.fail('cannot-be-canceled')
-    }
-
-    this.state = OrderState.Canceled
-    await this.save()
-    return Result.ok(this)
-  }
-
   private stateTransitionMap() {
     type EnumDictionary<T extends string | symbol | number> = {
       [K in T]: T[]

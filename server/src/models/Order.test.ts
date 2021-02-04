@@ -1,6 +1,5 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
-import { NamedError } from 'src/util/error'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import OrderEvent from './OrderEvent'
 

@@ -1,6 +1,7 @@
+import OrderEvent from 'src/models/OrderEvent'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderState, Role } from 'src/util/enums'
+import { OrderEventTrigger, OrderState, Role } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockOrderEvent } from 'src/__mocks__/models/OrderEvent'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -49,17 +50,22 @@ describe('OrderEventResolver', () => {
 
   describe('orderEventsForOrder', () => {
     it('Gets OrderEvents from an OrderID', async () => {
+      function capitalize(toCap: string) {
+        return toCap.charAt(0).toUpperCase() + toCap.slice(1)
+      }
+
       const user = await createMockUser({ roles: [Role.Admin] })
-      const order = await createMockOrder({ user: user })
-      const orderEvent1 = await createMockOrderEvent({ order: order })
-      const orderEvent2 = await createMockOrderEvent({ order: order, state: OrderState.Paid })
-      const orderEvent3 = await createMockOrderEvent({ order: order, state: OrderState.Creating })
+      const order = await createMockOrder()
+      await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
+      await order.transition(OrderState.Creating)
 
       const response = await execQuery({
         source: `
         query OrderEventsTestQuery($orderId: String) {
           orderEventsForOrder(orderId: $orderId) {
             id
+            state
+            trigger
           }
         }
         `,
@@ -70,9 +76,18 @@ describe('OrderEventResolver', () => {
       })
 
       expect(response.data?.orderEventsForOrder).toEqual([
-        { id: orderEvent1.id },
-        { id: orderEvent2.id },
-        { id: orderEvent3.id },
+        expect.objectContaining({
+          state: capitalize(OrderState.Captured),
+          trigger: capitalize(OrderEventTrigger.Nomus),
+        }),
+        expect.objectContaining({
+          state: capitalize(OrderState.Paid),
+          trigger: capitalize(OrderEventTrigger.Payment),
+        }),
+        expect.objectContaining({
+          state: capitalize(OrderState.Creating),
+          trigger: capitalize(OrderEventTrigger.Nomus),
+        }),
       ])
     })
   })
