@@ -6,6 +6,8 @@ import {
   prop,
   ReturnModelType,
   DocumentType,
+  mongoose,
+  post,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
@@ -15,7 +17,6 @@ import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
-import OrderEvent from './OrderEvent'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -30,7 +31,11 @@ import OrderEvent from './OrderEvent'
       }
       shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
     }
-
+    await mongoose.model('OrderEvent').create({
+      order: this.id,
+      state: OrderState.Captured,
+      trigger: OrderEventTrigger.Nomus,
+    })
     next()
   }
   next()
@@ -133,34 +138,34 @@ class Order extends BaseModel({
     return res
   }
 
-  public isEligibleTransition(futureState: OrderState): boolean {
+  private isEligibleTransition(futureState: OrderState): boolean {
     if (this.stateTransitionMap()[this.state].includes(futureState)) {
       return true
     }
     return false
   }
 
-  // public async transition(
-  //   this: DocumentType<Order>,
-  //   futureState: OrderState,
-  //   trigger: OrderEventTrigger
-  // ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
-  //   if (this.isEligibleTransition(futureState)) {
-  //     try {
-  //       await OrderEvent.mongo.create({
-  //         order: this.id,
-  //         trigger,
-  //         state: futureState,
-  //       })
-  //       this.state = futureState
-  //       await this.save()
-  //       return Result.ok(this)
-  //     } catch (e) {
-  //       return Result.fail('save-error')
-  //     }
-  //   }
-  //   return Result.fail('invalid-transition')
-  // }
+  public async transition(
+    this: DocumentType<Order>,
+    futureState: OrderState,
+    trigger = OrderEventTrigger.Nomus
+  ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
+    if (this.isEligibleTransition(futureState)) {
+      try {
+        await mongoose.model('OrderEvent').create({
+          order: this.id,
+          trigger,
+          state: futureState,
+        })
+        this.state = futureState
+        await this.save()
+        return Result.ok(this)
+      } catch (e) {
+        return Result.fail('save-error')
+      }
+    }
+    return Result.fail('invalid-transition')
+  }
 }
 
 Order.mongo = getModelForClass(Order)

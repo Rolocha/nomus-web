@@ -1,6 +1,8 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
-import { OrderState } from 'src/util/enums'
+import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { NamedError } from 'src/util/error'
 import { createMockOrder } from 'src/__mocks__/models/Order'
+import OrderEvent from './OrderEvent'
 
 beforeAll(async () => {
   await initDB()
@@ -48,10 +50,68 @@ describe('Order model', () => {
   })
 
   describe('transitionState', () => {
-    it.only('knows good transisitions (delete this test)', async () => {
-      const order = await createMockOrder({ state: OrderState.Creating })
-      expect(order.isEligibleTransition(OrderState.Paid)).toBeFalsy()
-      expect(order.isEligibleTransition(OrderState.Created)).toBeTruthy()
+    it('Goes through full Order State Machine', async () => {
+      const order = await createMockOrder()
+      expect(order.state).toBe(OrderState.Captured)
+
+      await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
+      expect(order.state).toBe(OrderState.Paid)
+
+      await order.transition(OrderState.Creating)
+      expect(order.state).toBe(OrderState.Creating)
+
+      await order.transition(OrderState.Created, OrderEventTrigger.Printer)
+      expect(order.state).toBe(OrderState.Created)
+
+      await order.transition(OrderState.Enroute)
+      expect(order.state).toBe(OrderState.Enroute)
+
+      await order.transition(OrderState.Fulfilled, OrderEventTrigger.Transport)
+      expect(order.state).toBe(OrderState.Fulfilled)
+
+      // Check that all OrderEvents are in the right order, with the right history
+      const orderEvents = await OrderEvent.mongo.find({ order: order.id }).sort({ createdAt: 1 })
+      expect(orderEvents).toEqual([
+        expect.objectContaining({
+          state: OrderState.Captured,
+          trigger: OrderEventTrigger.Nomus,
+        }),
+        expect.objectContaining({
+          state: OrderState.Paid,
+          trigger: OrderEventTrigger.Payment,
+        }),
+        expect.objectContaining({
+          state: OrderState.Creating,
+          trigger: OrderEventTrigger.Nomus,
+        }),
+        expect.objectContaining({
+          state: OrderState.Created,
+          trigger: OrderEventTrigger.Printer,
+        }),
+        expect.objectContaining({
+          state: OrderState.Enroute,
+          trigger: OrderEventTrigger.Nomus,
+        }),
+        expect.objectContaining({
+          state: OrderState.Fulfilled,
+          trigger: OrderEventTrigger.Transport,
+        }),
+      ])
+    })
+    it('Tries to do an improper state transition and fails', async () => {
+      const order = await createMockOrder()
+      const res = await order.transition(OrderState.Fulfilled)
+      expect(order.state).toBe(OrderState.Captured)
+      expect(res.isSuccess).toBe(false)
+      expect(res.error).toEqual(new NamedError('invalid-transition'))
+
+      const orderEvents = await OrderEvent.mongo.find({ order: order.id }).sort({ createdAt: 1 })
+      expect(orderEvents).toEqual([
+        expect.objectContaining({
+          state: OrderState.Captured,
+          trigger: OrderEventTrigger.Nomus,
+        }),
+      ])
     })
   })
 })
