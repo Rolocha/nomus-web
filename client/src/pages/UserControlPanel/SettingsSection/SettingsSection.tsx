@@ -80,18 +80,20 @@ export default () => {
     }
   }, [haveSetDefaultRef, data, emailFormReset, usernameFormReset])
 
-  const onSubmitEmail = (formData: EmailFormData) => {
-    updateProfile({
-      variables: {
-        updatedUser: { email: formData.email },
-      },
-    })
+  const onSubmitEmail = async (formData: EmailFormData) => {
+    if (formData.email && formData.email !== data?.user.email) {
+      updateProfile({
+        variables: {
+          updatedUser: { email: formData.email },
+        },
+      })
+    }
     setIsEditingEmail(false)
   }
 
-  const onSubmitUsername = (formData: UsernameFormData) => {
-    if (formData.username) {
-      updateUsername({
+  const onSubmitUsername = async (formData: UsernameFormData) => {
+    if (formData.username && formData.username !== data?.user.username) {
+      await updateUsername({
         variables: {
           username: formData.username,
         },
@@ -152,6 +154,7 @@ export default () => {
               name="email"
               type="email"
               autoComplete="email"
+              width="100%"
             />
             <Form.Input type="submit" display="none" />
           </Form.Form>
@@ -196,13 +199,14 @@ export default () => {
         <Text.Label>USERNAME/URL</Text.Label>
         {isEditingUsername ? (
           <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
-            <Box display="flex">
+            <Box display="inline-flex">
               <Text.Body2 mt={1}>{'nomus.me/'}</Text.Body2>
               <Form.Input
                 ref={usernameFormRegister()}
                 name="username"
                 type="username"
                 autoComplete="username"
+                width="100%"
                 py={0}
               />
               <Form.Input type="submit" display="none" />
