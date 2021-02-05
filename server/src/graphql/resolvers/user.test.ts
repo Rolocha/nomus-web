@@ -482,7 +482,7 @@ describe('UserResolver', () => {
       // Can't just check the responde.data.user bc it doesn't include the password field
       expect(response.errors).toContainEqual(
         expect.objectContaining({
-          message: 'invalid-token',
+          message: 'Invalid password reset link.',
         })
       )
     })
@@ -509,7 +509,7 @@ describe('UserResolver', () => {
       // Can't just check the responde.data.user bc it doesn't include the password field
       expect(response.errors).toContainEqual(
         expect.objectContaining({
-          message: 'invalid-user',
+          message: 'Invalid password reset link.',
         })
       )
     })
