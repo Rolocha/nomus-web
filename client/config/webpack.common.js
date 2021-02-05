@@ -54,6 +54,7 @@ module.exports = {
   output: {
     filename: 'bundle.[fullhash].js',
     path: PATHS.build,
+    publicPath: '/',
   },
   plugins: [
     new CleanWebpackPlugin(),
