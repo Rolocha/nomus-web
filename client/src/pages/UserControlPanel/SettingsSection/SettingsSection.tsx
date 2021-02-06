@@ -40,7 +40,22 @@ export default () => {
     register: emailFormRegister,
     handleSubmit: emailFormHandleSubmit,
     reset: emailFormReset,
-  } = useForm<EmailFormData>()
+    errors: emailErrors,
+    clearErrors: clearEmailErrors,
+    setError: setEmailError,
+  } = useForm<EmailFormData>({
+    mode: 'onBlur',
+    resolver: yupResolver(
+      yup.object().shape({
+        email: yup
+          .string()
+          .oneOf(
+            [yup.ref('email')],
+            'Oops, something went wrong. Try again in a bit!',
+          ),
+      }),
+    ),
+  })
   const {
     register: usernameFormRegister,
     handleSubmit: usernameFormHandleSubmit,
@@ -65,6 +80,7 @@ export default () => {
   const haveSetDefaultRef = React.useRef(false)
   const [updateProfile] = useMutation<UpdateProfileQuery>(
     UPDATE_PROFILE_MUTATION,
+    { errorPolicy: 'all' },
   )
   const [updateUsername] = useMutation<UpdateUsernameMutation>(
     UPDATE_USERNAME_MUTATION,
@@ -100,13 +116,25 @@ export default () => {
 
   const onSubmitEmail = async (formData: EmailFormData) => {
     if (formData.email && formData.email !== data?.user.email) {
-      updateProfile({
+      const response = await updateProfile({
         variables: {
           updatedUser: { email: formData.email },
         },
       })
+      console.log(response)
+      if (response.errors == null) {
+        clearEmailErrors()
+        setIsEditingEmail(false)
+      }
+      if (response.errors) {
+        setEmailError('email', {
+          type: 'server',
+          message: "That email doesn't seem right, try a different one",
+        })
+      }
+    } else {
+      setIsEditingEmail(false)
     }
-    setIsEditingEmail(false)
   }
 
   const onSubmitUsername = async (formData: UsernameFormData) => {
@@ -121,7 +149,6 @@ export default () => {
         setIsEditingUsername(false)
       }
       if (response.errors) {
-        console.log(response.errors)
         setUsernameError('username', {
           type: 'server',
           message: "That username isn't available, sorry. Try another one!",
@@ -187,6 +214,9 @@ export default () => {
               width="100%"
             />
             <Form.Input type="submit" display="none" />
+            <Box>
+              <Form.FieldError fieldError={emailErrors.email} />
+            </Box>
           </Form.Form>
         ) : (
           <Box>
