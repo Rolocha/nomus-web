@@ -13,6 +13,8 @@ import * as Form from 'src/components/Form'
 import SaveButton from 'src/components/SaveButton'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
 import { UPDATE_PROFILE_MUTATION, UPDATE_USERNAME_MUTATION } from '../mutations'
@@ -43,7 +45,22 @@ export default () => {
     register: usernameFormRegister,
     handleSubmit: usernameFormHandleSubmit,
     reset: usernameFormReset,
-  } = useForm<UsernameFormData>()
+    errors: usernameErrors,
+    clearErrors: clearUsernameErrors,
+    setError: setUsernameError,
+  } = useForm<UsernameFormData>({
+    mode: 'onBlur',
+    resolver: yupResolver(
+      yup.object().shape({
+        username: yup
+          .string()
+          .oneOf(
+            [yup.ref('username')],
+            'Oops, something went wrong. Try again in a bit!',
+          ),
+      }),
+    ),
+  })
 
   const haveSetDefaultRef = React.useRef(false)
   const [updateProfile] = useMutation<UpdateProfileQuery>(
@@ -51,6 +68,7 @@ export default () => {
   )
   const [updateUsername] = useMutation<UpdateUsernameMutation>(
     UPDATE_USERNAME_MUTATION,
+    { errorPolicy: 'all' },
   )
 
   const { loading, data } = useQuery<UCPSettingsSectionQuery>(
@@ -92,14 +110,26 @@ export default () => {
   }
 
   const onSubmitUsername = async (formData: UsernameFormData) => {
-    if (formData.username && formData.username !== data?.user.username) {
-      await updateUsername({
+    if (formData.username && formData.username !== data?.user?.username) {
+      const response = await updateUsername({
         variables: {
           username: formData.username,
         },
       })
+      if (response.errors == null) {
+        clearUsernameErrors()
+        setIsEditingUsername(false)
+      }
+      if (response.errors) {
+        console.log(response.errors)
+        setUsernameError('username', {
+          type: 'server',
+          message: "That username isn't available, sorry. Try another one!",
+        })
+      }
+    } else {
+      setIsEditingUsername(false)
     }
-    setIsEditingUsername(false)
   }
 
   if (loading || !data) {
@@ -210,6 +240,9 @@ export default () => {
                 py={0}
               />
               <Form.Input type="submit" display="none" />
+            </Box>
+            <Box>
+              <Form.FieldError fieldError={usernameErrors.username} />
             </Box>
           </Form.Form>
         ) : (
