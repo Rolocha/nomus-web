@@ -206,6 +206,12 @@ const Modal = ({
                           position="relative"
                           zIndex={20}
                           maxWidth={maxWidth ?? '90vw'}
+                          maxHeight={
+                            {
+                              center: '80vh',
+                              right: '100vh',
+                            }[anchorStyle]
+                          }
                           width={
                             {
                               center: width ?? { _: '100%', md: '80%' },
@@ -214,7 +220,7 @@ const Modal = ({
                           }
                           height={
                             {
-                              center: '80vh',
+                              center: undefined,
                               right: '100vh',
                             }[anchorStyle]
                           }
