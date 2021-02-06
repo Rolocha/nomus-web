@@ -121,7 +121,6 @@ export default () => {
           updatedUser: { email: formData.email },
         },
       })
-      console.log(response)
       if (response.errors == null) {
         clearEmailErrors()
         setIsEditingEmail(false)
