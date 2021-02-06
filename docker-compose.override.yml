@@ -30,6 +30,8 @@ services:
       - /client/node_modules/
       - ./client:/client
 
+  # db hosted in MDB Atlas
+
 networks:
   app-network:
     driver: bridge
