@@ -29,20 +29,7 @@ services:
       # Mirror local code but not node_modules
       - /client/node_modules/
       - ./client:/client
-  db:
-    container_name: db
-    image: mongo
-    env_file: .env
-    ports:
-      - 27017:27017
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - app-network
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  dbdata:
