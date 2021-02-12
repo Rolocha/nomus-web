@@ -353,11 +353,11 @@ const Modal = ({
                       width="400px"
                       actions={{
                         primary: {
-                          text: 'No, Cancel',
+                          text: 'No, cancel',
                           handler: cancelCloseConfirm,
                         },
                         secondary: {
-                          text: 'Yes, Discard',
+                          text: 'Yes, discard',
                           handler: tryToClose,
                         },
                       }}

@@ -47,7 +47,7 @@ describe('<Modal />', () => {
     // Click discard button
     getByText((content, element) => {
       return (
-        content === 'Yes, Discard' && element.tagName.toLowerCase() === 'button'
+        content === 'Yes, discard' && element.tagName.toLowerCase() === 'button'
       )
     }).click()
 
