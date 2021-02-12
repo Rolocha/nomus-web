@@ -59,7 +59,9 @@ const EditableImage = ({
         window.confirm(TOO_LARGE_MESSAGE)
       } else {
         setUpdating(true)
-        await onImageUpdate(image)
+        try {
+          await onImageUpdate(image)
+        } catch (e) {}
         setUpdating(false)
       }
     }
