@@ -73,10 +73,8 @@ const ChangeUsernameForm = ({ username }: Props) => {
 
   return (
     <Box
-      p={{ _: '24px', md: '48px' }}
       overflowY="scroll"
       height="100%"
-      width="100%"
       display="grid"
       gridTemplateColumns={{
         _: '8fr 4fr',
