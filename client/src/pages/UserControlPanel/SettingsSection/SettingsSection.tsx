@@ -49,10 +49,7 @@ export default () => {
       yup.object().shape({
         email: yup
           .string()
-          .oneOf(
-            [yup.ref('email')],
-            'Oops, something went wrong. Try again in a bit!',
-          ),
+          .email("That email doesn't seem right, try a different one"),
       }),
     ),
   })
@@ -67,12 +64,7 @@ export default () => {
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
-        username: yup
-          .string()
-          .oneOf(
-            [yup.ref('username')],
-            'Oops, something went wrong. Try again in a bit!',
-          ),
+        username: yup.string(),
       }),
     ),
   })
@@ -123,12 +115,12 @@ export default () => {
       })
       if (response.errors == null) {
         clearEmailErrors()
+        emailFormReset({ email: formData.email ?? '' })
         setIsEditingEmail(false)
-      }
-      if (response.errors) {
+      } else {
         setEmailError('email', {
           type: 'server',
-          message: "That email doesn't seem right, try a different one",
+          message: 'Oops, something went wrong. Try again in a bit!',
         })
       }
     } else {
@@ -145,9 +137,9 @@ export default () => {
       })
       if (response.errors == null) {
         clearUsernameErrors()
+        usernameFormReset({ username: formData.username ?? '' })
         setIsEditingUsername(false)
-      }
-      if (response.errors) {
+      } else {
         setUsernameError('username', {
           type: 'server',
           message: "That username isn't available, sorry. Try another one!",
@@ -218,14 +210,12 @@ export default () => {
             </Box>
           </Form.Form>
         ) : (
-          <Box>
-            <Box display="flex" alignItems="center">
-              {!data.user.isEmailVerified && (
-                <SVG.ExclamationO css={css({ marginRight: '4px' })} />
-              )}
+          <Box display="flex" alignItems="center">
+            {!data.user.isEmailVerified && (
+              <SVG.ExclamationO css={css({ marginRight: '4px' })} />
+            )}
 
-              <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
-            </Box>
+            <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
           </Box>
         )}
       </Box>
@@ -270,9 +260,7 @@ export default () => {
               />
               <Form.Input type="submit" display="none" />
             </Box>
-            <Box>
-              <Form.FieldError fieldError={usernameErrors.username} />
-            </Box>
+            <Form.FieldError fieldError={usernameErrors.username} />
           </Form.Form>
         ) : (
           <Text.Body2 mt={2}>{'nomus.me/' + data.user.username}</Text.Body2>
