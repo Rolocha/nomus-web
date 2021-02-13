@@ -1,71 +1,21 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
-import { gql, useMutation, useQuery } from 'src/apollo'
+import { gql, useQuery } from 'src/apollo'
 import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import EditButton from 'src/components/EditButton'
-import * as Form from 'src/components/Form'
-import SaveButton from 'src/components/SaveButton'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
-import { UPDATE_PROFILE_MUTATION } from '../mutations'
 import ChangePasswordForm from './ChangePasswordForm'
 import ChangeUsernameForm from './ChangeUsernameForm'
+import ChangeEmailForm from './ChangeEmailForm'
 
 const bp = 'lg'
-
-interface EmailFormData {
-  email: string
-}
-
-interface UsernameFormData {
-  username: string
-}
 
 export default () => {
   const history = useHistory()
   const { logOut } = useAuth()
-  const [isEditingEmail, setIsEditingEmail] = React.useState(false)
-
-  const {
-    register: emailFormRegister,
-    handleSubmit: emailFormHandleSubmit,
-    reset: emailFormReset,
-    errors: emailErrors,
-    clearErrors: clearEmailErrors,
-    setError: setEmailError,
-  } = useForm<EmailFormData>({
-    mode: 'onBlur',
-    resolver: yupResolver(
-      yup.object().shape({
-        email: yup
-          .string()
-          .email("That email doesn't seem right, try a different one"),
-      }),
-    ),
-  })
-  const { reset: usernameFormReset } = useForm<UsernameFormData>({
-    mode: 'onBlur',
-    resolver: yupResolver(
-      yup.object().shape({
-        username: yup.string(),
-      }),
-    ),
-  })
-
-  const haveSetDefaultRef = React.useRef(false)
-  const [updateProfile] = useMutation<UpdateProfileQuery>(
-    UPDATE_PROFILE_MUTATION,
-    { errorPolicy: 'all' },
-  )
 
   const { loading, data } = useQuery<UCPSettingsSectionQuery>(
     gql`
@@ -86,36 +36,6 @@ export default () => {
     `,
   )
 
-  React.useEffect(() => {
-    if (!haveSetDefaultRef.current && data) {
-      emailFormReset({ email: data.user.email ?? '' })
-      usernameFormReset({ username: data.user.username ?? '' })
-      haveSetDefaultRef.current = true
-    }
-  }, [haveSetDefaultRef, data, emailFormReset, usernameFormReset])
-
-  const onSubmitEmail = async (formData: EmailFormData) => {
-    if (formData.email && formData.email !== data?.user.email) {
-      const response = await updateProfile({
-        variables: {
-          updatedUser: { email: formData.email },
-        },
-      })
-      if (response.errors == null) {
-        clearEmailErrors()
-        emailFormReset({ email: formData.email ?? '' })
-        setIsEditingEmail(false)
-      } else {
-        setEmailError('email', {
-          type: 'server',
-          message: 'Oops, something went wrong. Try again in a bit!',
-        })
-      }
-    } else {
-      setIsEditingEmail(false)
-    }
-  }
-
   if (loading || !data) {
     return <LoadingPage />
   }
@@ -134,7 +54,7 @@ export default () => {
       gridTemplateAreas={{
         _: `
         "account ."
-        "email editEmail"
+        "email email"
         "username username"
         "signOut signOut"
         "passwordForm passwordForm"
@@ -143,7 +63,7 @@ export default () => {
       `,
         [bp]: `
         "account . ."
-        "email editEmail emailCopy"
+        "email email email"
         "username username username"
         "signOut . ."
         "passwordForm . ."
@@ -161,53 +81,10 @@ export default () => {
       </Box>
 
       <Box gridArea="email">
-        <Text.Label>EMAIL</Text.Label>
-        {isEditingEmail ? (
-          <Form.Form onSubmit={emailFormHandleSubmit(onSubmitEmail)}>
-            <Form.Input
-              ref={emailFormRegister({ required: true })}
-              name="email"
-              type="email"
-              autoComplete="email"
-              width="100%"
-            />
-            <Form.Input type="submit" display="none" />
-            <Box>
-              <Form.FieldError fieldError={emailErrors.email} />
-            </Box>
-          </Form.Form>
-        ) : (
-          <Box display="flex" alignItems="center">
-            {!data.user.isEmailVerified && (
-              <SVG.ExclamationO css={css({ marginRight: '4px' })} />
-            )}
-
-            <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
-          </Box>
-        )}
-      </Box>
-
-      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
-        {isEditingEmail ? (
-          <SaveButton
-            onClick={emailFormHandleSubmit(onSubmitEmail)}
-            iconOnlyBp={bp}
-          />
-        ) : (
-          <EditButton
-            onClick={() => {
-              setIsEditingEmail(true)
-            }}
-            iconOnlyBp={bp}
-          />
-        )}
-      </Box>
-
-      <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3>
-          This is the email associated with your account. If you would like to
-          change the email on your profile, go to the Profile tab.
-        </Text.Body3>
+        <ChangeEmailForm
+          email={data?.user.email ?? ''}
+          isEmailVerified={data?.user.isEmailVerified}
+        />
       </Box>
 
       <Box gridArea="username">
