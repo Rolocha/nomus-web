@@ -26,11 +26,11 @@ interface PasswordFormData {
 const bp = 'lg'
 
 const ERROR_MESSAGES = {
-  INCORRECT_CURRENT_PASSWORD: 'The current password you entered is incorrect.',
+  INCORRECT_CURRENT_PASSWORD: 'The password you entered is incorrect.',
   CURRENT_PASSWORD_REQUIRED: 'Your current password is required.',
   NEW_PASSWORD_REQUIRED: 'Please choose a new password.',
   PASSWORD_TOO_WEAK:
-    'Your password is too weak. Please use a stronger password.',
+    "Your password isn't secure enough. Avoid common words and repetition or try a longer password.",
   PASSWORDS_DO_NOT_MATCH: "Passwords don't match",
 }
 
