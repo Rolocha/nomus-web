@@ -12,7 +12,7 @@ type SaveButtonProps = {
 }
 
 const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
-  <Button onClick={onClick} variant="success">
+  <Button onClick={onClick} variant="success" px="24px">
     <Box display="flex" flexDirection="row" alignItems="center">
       <SVG.Check
         css={css`
