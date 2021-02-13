@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form'
 import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import { useMutation } from 'src/apollo'
 import { UPDATE_USERNAME_MUTATION } from '../mutations'
+import DangerButton from 'src/components/DangerButton'
 
 interface Props {
   username: string
@@ -71,6 +72,10 @@ const ChangeUsernameForm = ({ username }: Props) => {
     }
   }
 
+  const closeForm = async () => {
+    setActive(false)
+  }
+
   return (
     <Box
       overflowY="scroll"
@@ -114,15 +119,28 @@ const ChangeUsernameForm = ({ username }: Props) => {
         )}
       </Box>
 
-      <Box
-        gridArea="editUsername"
-        placeSelf={{ _: 'end', [bp]: 'start center' }}
-      >
+      <Box gridArea="editUsername" placeSelf={{ _: 'end', [bp]: 'center' }}>
         {active ? (
-          <SaveButton
-            onClick={handleSubmit(onSubmitUsername)}
-            iconOnlyBp={bp}
-          />
+          <Box
+            height="100%"
+            display="grid"
+            gridTemplateAreas={`
+              "save"
+              "cancel"
+            `}
+            gridColumnGap={1}
+            gridRowGap={1}
+          >
+            <Box gridArea="save">
+              <SaveButton
+                onClick={handleSubmit(onSubmitUsername)}
+                iconOnlyBp={bp}
+              />
+            </Box>
+            <Box gridArea="cancel">
+              <DangerButton onClick={closeForm} iconOnlyBp={bp} />
+            </Box>
+          </Box>
         ) : (
           <EditButton
             onClick={() => {

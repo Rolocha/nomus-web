@@ -12,6 +12,7 @@ import { useMutation } from 'src/apollo'
 import { UPDATE_PROFILE_MUTATION } from '../mutations'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import { css } from '@emotion/react'
+import DangerButton from 'src/components/DangerButton'
 
 const bp = 'lg'
 
@@ -76,6 +77,10 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
     }
   }
 
+  const closeForm = async () => {
+    setActive(false)
+  }
+
   return (
     <Box
       overflowY="scroll"
@@ -125,7 +130,26 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
 
       <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
         {active ? (
-          <SaveButton onClick={handleSubmit(onSubmitEmail)} iconOnlyBp={bp} />
+          <Box
+            height="100%"
+            display="grid"
+            gridTemplateAreas={`
+            "save"
+            "cancel"
+          `}
+            gridColumnGap={1}
+            gridRowGap={1}
+          >
+            <Box gridArea="save">
+              <SaveButton
+                onClick={handleSubmit(onSubmitEmail)}
+                iconOnlyBp={bp}
+              />
+            </Box>
+            <Box gridArea="cancel">
+              <DangerButton onClick={closeForm} iconOnlyBp={bp} />
+            </Box>
+          </Box>
         ) : (
           <EditButton
             onClick={() => {

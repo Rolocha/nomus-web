@@ -173,7 +173,7 @@ export const styleVariants = {
       backgroundColor: colors.activeRed,
     },
     '&:focus': {
-      boxShadow: `0 0 4px 0 ${colors.outlineRed}`,
+      boxShadow: `0 0 4px 0 ${colors.invalidRed}`,
       outline: 'none',
     },
     '&:disabled': {
