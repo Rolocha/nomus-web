@@ -32,7 +32,6 @@ import OrderEvent from './OrderEvent'
     }
     // Creates a new OrderEvent at creation time
     await OrderEvent.mongo.create({
-      // await mongoose.model('OrderEvent').create({
       order: this.id,
       state: OrderState.Captured,
       trigger: OrderEventTrigger.Nomus,
@@ -141,10 +140,7 @@ class Order extends BaseModel({
   ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
     if (this.isEligibleTransition(futureState)) {
       try {
-        // Trying to render the OrderEvent Model creates a circular dependency at compile time.
-        // This circumvents compile time issues, to have it occur during execution time.
         await OrderEvent.mongo.create({
-          // await mongoose.model('OrderEvent').create({
           order: this.id,
           trigger,
           state: futureState,
