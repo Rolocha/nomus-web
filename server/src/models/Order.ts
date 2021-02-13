@@ -6,6 +6,7 @@ import {
   prop,
   ReturnModelType,
   DocumentType,
+  mongoose,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
