@@ -6,11 +6,12 @@ import {
   prop,
   ReturnModelType,
   DocumentType,
+  mongoose,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderState } from '../util/enums'
+import { OrderEventTrigger, OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
@@ -29,7 +30,12 @@ import { EventualResult, Result } from 'src/util/error'
       }
       shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
     }
-
+    // Creates a new OrderEvent at creation time
+    await mongoose.model('OrderEvent').create({
+      order: this.id,
+      state: OrderState.Captured,
+      trigger: OrderEventTrigger.Nomus,
+    })
     next()
   }
   next()
@@ -99,20 +105,56 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
-  private canBeCanceled() {
-    return Order.CANCELABLE_STATES.includes(this.state)
-  }
-
-  public async cancel(
-    this: DocumentType<Order>
-  ): EventualResult<DocumentType<Order>, 'cannot-be-canceled'> {
-    if (!this.canBeCanceled()) {
-      return Result.fail('cannot-be-canceled')
+  // Mapping of current possible state transitions according to our Order Flow State Machine
+  // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
+  private stateTransitionMap() {
+    type EnumDictionary<T extends string | symbol | number> = {
+      [K in T]: T[]
+    }
+    const res: EnumDictionary<OrderState> = {
+      [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
+      [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+      [OrderState.Creating]: [OrderState.Created],
+      [OrderState.Created]: [OrderState.Enroute],
+      [OrderState.Enroute]: [OrderState.Fulfilled],
+      [OrderState.Fulfilled]: [],
+      [OrderState.Canceled]: [],
     }
 
-    this.state = OrderState.Canceled
-    await this.save()
-    return Result.ok(this)
+    return res
+  }
+
+  // Checks if a proposed transition can be accomplished in our state machine
+  private isEligibleTransition(futureState: OrderState): boolean {
+    if (this.stateTransitionMap()[this.state].includes(futureState)) {
+      return true
+    }
+    return false
+  }
+
+  // Public instance method to transition OrderState
+  public async transition(
+    this: DocumentType<Order>,
+    futureState: OrderState,
+    trigger = OrderEventTrigger.Nomus
+  ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
+    if (this.isEligibleTransition(futureState)) {
+      try {
+        // Trying to render the OrderEvent Model creates a circular dependency at compile time.
+        // This circumvents compile time issues, to have it occur during execution time.
+        await mongoose.model('OrderEvent').create({
+          order: this.id,
+          trigger,
+          state: futureState,
+        })
+        this.state = futureState
+        await this.save()
+        return Result.ok(this)
+      } catch (e) {
+        return Result.fail('save-error')
+      }
+    }
+    return Result.fail('invalid-transition')
   }
 }
 
