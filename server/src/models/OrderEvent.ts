@@ -13,7 +13,7 @@ class OrderEvent extends BaseModel({
   static mongo: ReturnModelType<typeof OrderEvent>
 
   // Order which had an event happen
-  @prop({ required: true, ref: () => Order, type: String })
+  @prop({ required: true, ref: 'Order', type: String })
   @Field(() => Order, { nullable: false })
   order: Ref<Order>
 

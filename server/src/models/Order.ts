@@ -6,7 +6,6 @@ import {
   prop,
   ReturnModelType,
   DocumentType,
-  mongoose,
 } from '@typegoose/typegoose'
 import { CardVersion } from './CardVersion'
 import { User } from './User'
@@ -16,6 +15,7 @@ import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
+import OrderEvent from './OrderEvent'
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -31,7 +31,8 @@ import { EventualResult, Result } from 'src/util/error'
       shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
     }
     // Creates a new OrderEvent at creation time
-    await mongoose.model('OrderEvent').create({
+    await OrderEvent.mongo.create({
+      // await mongoose.model('OrderEvent').create({
       order: this.id,
       state: OrderState.Captured,
       trigger: OrderEventTrigger.Nomus,
@@ -142,7 +143,8 @@ class Order extends BaseModel({
       try {
         // Trying to render the OrderEvent Model creates a circular dependency at compile time.
         // This circumvents compile time issues, to have it occur during execution time.
-        await mongoose.model('OrderEvent').create({
+        await OrderEvent.mongo.create({
+          // await mongoose.model('OrderEvent').create({
           order: this.id,
           trigger,
           state: futureState,

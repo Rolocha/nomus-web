@@ -128,7 +128,7 @@ export const linkSheetToUser = async (
   const sheetsPrintedSoFar = await Sheet.mongo.find({ order: order.id })
   const numCardsPrinted = sheetsPrintedSoFar.reduce((total, sheet) => total + sheet.cards.length, 0)
   if (numCardsPrinted === order.quantity) {
-    order.transition(OrderState.Created, OrderEventTrigger.Printer)
+    await order.transition(OrderState.Created, OrderEventTrigger.Printer)
   }
 
   return Result.ok({
