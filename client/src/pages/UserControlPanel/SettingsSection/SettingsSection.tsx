@@ -34,7 +34,6 @@ export default () => {
   const history = useHistory()
   const { logOut } = useAuth()
   const [isEditingEmail, setIsEditingEmail] = React.useState(false)
-  const [setIsEditingUsername] = React.useState(false)
 
   const {
     register: emailFormRegister,
@@ -197,7 +196,6 @@ export default () => {
           <EditButton
             onClick={() => {
               setIsEditingEmail(true)
-              setIsEditingUsername(false)
             }}
             iconOnlyBp={bp}
           />
