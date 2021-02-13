@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom'
 import { gql, useMutation, useQuery } from 'src/apollo'
 import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
-import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
@@ -17,8 +16,9 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
-import { UPDATE_PROFILE_MUTATION, UPDATE_USERNAME_MUTATION } from '../mutations'
+import { UPDATE_PROFILE_MUTATION } from '../mutations'
 import ChangePasswordForm from './ChangePasswordForm'
+import ChangeUsernameForm from './ChangeUsernameForm'
 
 const bp = 'lg'
 
@@ -34,7 +34,7 @@ export default () => {
   const history = useHistory()
   const { logOut } = useAuth()
   const [isEditingEmail, setIsEditingEmail] = React.useState(false)
-  const [isEditingUsername, setIsEditingUsername] = React.useState(false)
+  const [setIsEditingUsername] = React.useState(false)
 
   const {
     register: emailFormRegister,
@@ -53,14 +53,7 @@ export default () => {
       }),
     ),
   })
-  const {
-    register: usernameFormRegister,
-    handleSubmit: usernameFormHandleSubmit,
-    reset: usernameFormReset,
-    errors: usernameErrors,
-    clearErrors: clearUsernameErrors,
-    setError: setUsernameError,
-  } = useForm<UsernameFormData>({
+  const { reset: usernameFormReset } = useForm<UsernameFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -72,10 +65,6 @@ export default () => {
   const haveSetDefaultRef = React.useRef(false)
   const [updateProfile] = useMutation<UpdateProfileQuery>(
     UPDATE_PROFILE_MUTATION,
-    { errorPolicy: 'all' },
-  )
-  const [updateUsername] = useMutation<UpdateUsernameMutation>(
-    UPDATE_USERNAME_MUTATION,
     { errorPolicy: 'all' },
   )
 
@@ -128,28 +117,6 @@ export default () => {
     }
   }
 
-  const onSubmitUsername = async (formData: UsernameFormData) => {
-    if (formData.username && formData.username !== data?.user?.username) {
-      const response = await updateUsername({
-        variables: {
-          username: formData.username,
-        },
-      })
-      if (response.errors == null) {
-        clearUsernameErrors()
-        usernameFormReset({ username: formData.username ?? '' })
-        setIsEditingUsername(false)
-      } else {
-        setUsernameError('username', {
-          type: 'server',
-          message: "That username isn't available, sorry. Try another one!",
-        })
-      }
-    } else {
-      setIsEditingUsername(false)
-    }
-  }
-
   if (loading || !data) {
     return <LoadingPage />
   }
@@ -168,7 +135,7 @@ export default () => {
         _: `
         "account ."
         "email editEmail"
-        "username editUsername"
+        "username username"
         "signOut signOut"
         "passwordForm passwordForm"
         "deactivateProfileHeader ."
@@ -177,7 +144,7 @@ export default () => {
         [bp]: `
         "account . ."
         "email editEmail emailCopy"
-        "username editUsername usernameCopy"
+        "username username username"
         "signOut . ."
         "passwordForm . ."
         "deactivateProfileHeader . ."
@@ -245,52 +212,7 @@ export default () => {
       </Box>
 
       <Box gridArea="username">
-        <Text.Label>USERNAME/URL</Text.Label>
-        {isEditingUsername ? (
-          <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
-            <Box display="inline-flex">
-              <Text.Body2 mt={1}>{'nomus.me/'}</Text.Body2>
-              <Form.Input
-                ref={usernameFormRegister()}
-                name="username"
-                type="username"
-                autoComplete="username"
-                width="100%"
-                py={0}
-              />
-              <Form.Input type="submit" display="none" />
-            </Box>
-            <Form.FieldError fieldError={usernameErrors.username} />
-          </Form.Form>
-        ) : (
-          <Text.Body2 mt={2}>{'nomus.me/' + data.user.username}</Text.Body2>
-        )}
-      </Box>
-
-      <Box
-        gridArea="editUsername"
-        placeSelf={{ _: 'end', [bp]: 'start center' }}
-      >
-        {isEditingUsername ? (
-          <SaveButton
-            onClick={usernameFormHandleSubmit(onSubmitUsername)}
-            iconOnlyBp={bp}
-          />
-        ) : (
-          <EditButton
-            onClick={() => {
-              setIsEditingUsername(true)
-              setIsEditingEmail(false)
-            }}
-            iconOnlyBp={bp}
-          />
-        )}
-      </Box>
-      <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3>
-          This is your username for this account. Changing your username will
-          change your public profile link.
-        </Text.Body3>
+        <ChangeUsernameForm username={data?.user.username ?? ''} />
       </Box>
 
       <Box gridArea="signOut" display="center">

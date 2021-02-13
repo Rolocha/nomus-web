@@ -1,1 +1,3 @@
-export default () => {}
+const ChangeEmailForm = () => {}
+
+export default ChangeEmailForm
