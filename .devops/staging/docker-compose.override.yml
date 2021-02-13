@@ -1,6 +1,8 @@
 version: "3"
 
 services:
+  # db hosted in MDB Atlas
+
   nginx:
     restart: always
     ports:
@@ -11,17 +13,3 @@ services:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:staging-latest
     restart: always
     command: yarn serve
-
-  db:
-    container_name: db
-    image: mongo
-    env_file: .env
-    ports:
-      - 27017:27017
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - app-network
-
-volumes:
-  dbdata:
