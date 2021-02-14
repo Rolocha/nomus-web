@@ -7,7 +7,7 @@ import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
-import { getFormattedFullDate } from 'src/utils/date'
+import { getFormattedFullDate } from 'shared/utils/date'
 import { formatName } from 'src/utils/name'
 import { ContactsSortOption } from './utils'
 

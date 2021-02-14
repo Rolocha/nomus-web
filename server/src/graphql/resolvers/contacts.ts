@@ -19,7 +19,7 @@ import { AdminOnlyArgs } from '../auth'
 import { CardVersion } from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { DATE } from 'src/util/regex'
-import { getCurrentDateForDateInput } from 'src/util/date'
+import { getCurrentDateForDateInput } from 'shared/utils/date'
 
 @ObjectType()
 class Contact {

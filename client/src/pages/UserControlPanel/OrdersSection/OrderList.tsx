@@ -8,7 +8,7 @@ import Icon from 'src/components/Icon'
 import { ExternalLink, InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { Order } from 'src/types/order'
-import { getFormattedFullDate } from 'src/utils/date'
+import { getFormattedFullDate } from 'shared/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
 import { getUserFacingOrderState } from 'src/utils/order'
 

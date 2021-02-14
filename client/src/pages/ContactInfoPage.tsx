@@ -27,7 +27,7 @@ import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
   getFormattedFullDateFromDateInputString,
-} from 'src/utils/date'
+} from 'shared/utils/date'
 import { formatName } from 'src/utils/name'
 import FourOhFourPage from './FourOhFourPage'
 

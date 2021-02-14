@@ -13,7 +13,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "baseUrl": ".",
+    "baseUrl": "..",
+    "paths": {
+      "src/*": ["client/src/*"],
+      "shared/*": ["shared/*"]
+    },
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
     "typeRoots": ["./node_modules/@types", "./src/types"]

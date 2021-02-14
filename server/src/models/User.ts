@@ -19,7 +19,7 @@ import {
   BASE_URL,
   EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
-import { getCurrentDateForDateInput } from 'src/util/date'
+import { getCurrentDateForDateInput } from 'shared/utils/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'

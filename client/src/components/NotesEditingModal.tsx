@@ -11,7 +11,7 @@ import saveContactMutation from 'src/mutations/saveContactMutation'
 import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
 import { useAuth } from 'src/utils/auth'
-import { getCurrentDateForDateInput } from 'src/utils/date'
+import { getCurrentDateForDateInput } from 'shared/utils/date'
 import { useRegisterWithRef } from 'src/utils/form'
 import { formatName } from 'src/utils/name'
 

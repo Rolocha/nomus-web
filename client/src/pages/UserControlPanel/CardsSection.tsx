@@ -12,7 +12,7 @@ import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
 import LoadingPage from 'src/pages/LoadingPage'
-import { getMonthAbbreviation } from 'src/utils/date'
+import { getMonthAbbreviation } from 'shared/utils/date'
 import {
   CHANGE_ACTIVE_CARD_VERSION,
   UPDATE_USER_CHECKPOINTS,

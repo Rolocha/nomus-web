@@ -24,7 +24,7 @@ import * as Auth from 'src/utils/auth'
 import {
   getFormattedFullDate,
   getFormattedFullDateFromDateInputString,
-} from 'src/utils/date'
+} from 'shared/utils/date'
 import { formatName } from 'src/utils/name'
 import LoginPage from './LoginPage'
 

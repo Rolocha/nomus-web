@@ -6,7 +6,7 @@ import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { Role } from 'src/util/enums'
 import { Connection } from 'src/models'
-import { getCurrentDateForDateInput } from 'src/util/date'
+import { getCurrentDateForDateInput } from 'shared/utils/date'
 
 beforeAll(async () => {
   await initDB()
