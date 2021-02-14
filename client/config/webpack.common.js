@@ -16,8 +16,11 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
+        use: {
+          loader: 'babel-loader',
+        },
         include: PATHS.src,
-        loader: require.resolve('babel-loader'),
+        exclude: /node_modules/,
       },
       {
         test: /\.tsx?$/,
