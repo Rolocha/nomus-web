@@ -10,6 +10,10 @@ import OrderList from './OrderList'
 import { useParams, useHistory } from 'react-router-dom'
 import OrderDetailView from './OrderDetailView'
 import { useBreakpoint } from 'src/styles/breakpoints'
+import Button from 'src/components/Button'
+import Image from 'src/components/Image'
+import ordersEmptyStateSvg from './orders_empty_state.svg'
+import { css } from '@emotion/react'
 
 interface URLParams {
   orderId?: string
@@ -66,8 +70,33 @@ export default () => {
 
   return (
     <Box p={{ _: '24px', md: '48px' }} height="100%" overflowY="scroll">
+      {orders.length === 0 && (
+        <Box
+          display="grid"
+          width="100%"
+          gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+          gridRowGap="16px"
+          justifyItems="center"
+          css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}
+        >
+          <Text.SectionHeader>
+            Looks like it's time to go shopping
+          </Text.SectionHeader>
+          <Image src={ordersEmptyStateSvg} />
+          <Text.Body2>
+            There are no orders to see here, but you can fix that.
+          </Text.Body2>
+
+          {
+            <Button variant="primary" size="big" width="100%" disabled>
+              Coming soon...
+            </Button>
+          }
+        </Box>
+      )}
+
       {/* Orders list (hide if mobile-layout and an order is selected) */}
-      {!(selectedOrder != null && !isDesktopLayout) && (
+      {orders.length !== 0 && !(selectedOrder != null && !isDesktopLayout) && (
         <Box>
           <Text.H3 mb={3}>Current orders</Text.H3>
           <OrderList orders={currentOrders} />
