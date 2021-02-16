@@ -8,8 +8,37 @@ services:
     ports:
       - 80:80
       - 443:443
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./dhparam:/etc/ssl/certs
+
+  certbot:
+    command:
+      certonly --webroot --webroot-path=/var/www/html --email bibek@nomus.me
+      --agree-tos --no-eff-email -d stage.nomus.me --staging
+    container_name: certbot
+    depends_on:
+      - nginx
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt:rw
+      - certbot-var:/var/lib/letsencrypt:rw
+      - web-root:/var/www/html:rw
 
   server:
     image: 074552482398.dkr.ecr.us-east-1.amazonaws.com/nomus/server:staging-latest
     restart: always
     command: yarn serve
+
+volumes:
+  certbot-etc: {}
+  certbot-var: {}
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/rolobot
+      o: bind
