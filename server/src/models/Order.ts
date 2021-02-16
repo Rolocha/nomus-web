@@ -107,29 +107,19 @@ class Order extends BaseModel({
 
   // Mapping of current possible state transitions according to our Order Flow State Machine
   // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
-  private stateTransitionMap() {
-    type EnumDictionary<T extends string | symbol | number> = {
-      [K in T]: T[]
-    }
-    const res: EnumDictionary<OrderState> = {
-      [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
-      [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
-      [OrderState.Creating]: [OrderState.Created],
-      [OrderState.Created]: [OrderState.Enroute],
-      [OrderState.Enroute]: [OrderState.Fulfilled],
-      [OrderState.Fulfilled]: [],
-      [OrderState.Canceled]: [],
-    }
-
-    return res
+  private ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
+    [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
+    [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+    [OrderState.Creating]: [OrderState.Created],
+    [OrderState.Created]: [OrderState.Enroute],
+    [OrderState.Enroute]: [OrderState.Fulfilled],
+    [OrderState.Fulfilled]: [],
+    [OrderState.Canceled]: [],
   }
 
   // Checks if a proposed transition can be accomplished in our state machine
-  private isEligibleTransition(futureState: OrderState): boolean {
-    if (this.stateTransitionMap()[this.state].includes(futureState)) {
-      return true
-    }
-    return false
+  private isTransitionAllowed(futureState: OrderState): boolean {
+    return this.ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
   }
 
   // Public instance method to transition OrderState
@@ -138,7 +128,7 @@ class Order extends BaseModel({
     futureState: OrderState,
     trigger = OrderEventTrigger.Nomus
   ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
-    if (this.isEligibleTransition(futureState)) {
+    if (this.isTransitionAllowed(futureState)) {
       try {
         await OrderEvent.mongo.create({
           order: this.id,
