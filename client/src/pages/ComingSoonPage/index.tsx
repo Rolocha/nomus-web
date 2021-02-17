@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
@@ -118,14 +118,14 @@ const ComingSoonPage = () => {
                   mb={{ _: 2, [bp]: 0 }}
                   ref={register}
                   disabled={submitState === 'submitting'}
-                  css={css`
-                    flex-grow: 1;
-                    ${mq[bp]} {
-                      border-top-right-radius: 0;
-                      border-bottom-right-radius: 0;
-                      border-right: none;
-                    }
-                  `}
+                  css={css({
+                    flexGrow: 1,
+                    [mq[bp]]: {
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                      borderRight: 'none',
+                    },
+                  })}
                 />
                 <Button
                   css={css`

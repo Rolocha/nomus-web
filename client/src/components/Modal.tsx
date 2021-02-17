@@ -1,4 +1,4 @@
-import { css, Global } from '@emotion/core'
+import { css, Global } from '@emotion/react'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
@@ -40,6 +40,11 @@ interface ChildOptions {
   onModalClose?: () => void
 }
 
+interface HeaderDetails {
+  title: string
+  subtitle?: string
+}
+
 interface Props {
   isOpen: boolean
   onClose: (confirmed?: boolean) => void
@@ -60,6 +65,7 @@ interface Props {
   preventCloseWithOutsideClick?: boolean
   // Controls where the modal is anchored, currently either at center (typical) or anchored to the right edge
   anchorStyle: AnchorStyle
+  header?: HeaderDetails
 }
 
 const Modal = ({
@@ -69,6 +75,7 @@ const Modal = ({
   maxWidth,
   width,
   height,
+  header,
   confirmClose,
   actions,
   preventCloseWithOutsideClick,
@@ -199,6 +206,12 @@ const Modal = ({
                           position="relative"
                           zIndex={20}
                           maxWidth={maxWidth ?? '90vw'}
+                          maxHeight={
+                            {
+                              center: '80vh',
+                              right: '100vh',
+                            }[anchorStyle]
+                          }
                           width={
                             {
                               center: width ?? { _: '100%', md: '80%' },
@@ -207,7 +220,7 @@ const Modal = ({
                           }
                           height={
                             {
-                              center: 'unset',
+                              center: undefined,
                               right: '100vh',
                             }[anchorStyle]
                           }
@@ -221,7 +234,25 @@ const Modal = ({
                             actions ? 'space-between' : 'flex-start'
                           }
                         >
-                          <Box p={{ _: 3, md: 4 }} overflowX="auto">
+                          {header && (
+                            <Box
+                              p={{ _: 3, md: 4 }}
+                              borderBottom={`1px solid ${colors.superlightGray}`}
+                            >
+                              <Text.CardHeader mb={3}>
+                                {header.title}
+                              </Text.CardHeader>
+                              {header.subtitle && (
+                                <Text.Body2>{header.subtitle}</Text.Body2>
+                              )}
+                            </Box>
+                          )}
+
+                          <Box
+                            p={{ _: 3, md: 4 }}
+                            flexGrow={0}
+                            overflowY="auto"
+                          >
                             {typeof children === 'function'
                               ? children({ onModalClose: onClose })
                               : children}

@@ -29,7 +29,7 @@ export type TextProps = {
   SpaceProps &
   GridProps
 
-const Text = styled<'p', TextProps>('p')(
+const Text = styled.p<TextProps>(
   baseTextStyles,
   // Make sure the variant appears before others so that variant-set fields (e.g. fontWeight) can be overridden on a case-by-case basis
   variant({
@@ -55,7 +55,7 @@ const semanticallyStyledText = (
   as: string,
   variant?: keyof typeof theme.textStyles | null,
 ) => (props: React.ComponentProps<typeof Text>) => (
-  <Text as={as} variant={variant} {...props}>
+  <Text as={as as any} variant={variant} {...props}>
     {props.children}
   </Text>
 )

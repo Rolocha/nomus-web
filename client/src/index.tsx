@@ -1,4 +1,9 @@
-import React from 'react'
+// Needed for @babel/preset-env because we set useBuiltIns: entry See
+// https://babeljs.io/docs/en/babel-preset-env#usebuiltins and
+// https://stackoverflow.com/questions/52625979/confused-about-usebuiltins-option-of-babel-preset-env-using-browserslist-integ
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+
 import ReactDOM from 'react-dom'
 import App from './App'
 import * as serviceWorker from './serviceWorker'

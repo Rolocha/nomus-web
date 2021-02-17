@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
@@ -59,7 +59,9 @@ const EditableImage = ({
         window.confirm(TOO_LARGE_MESSAGE)
       } else {
         setUpdating(true)
-        await onImageUpdate(image)
+        try {
+          await onImageUpdate(image)
+        } catch (e) {}
         setUpdating(false)
       }
     }
@@ -74,7 +76,6 @@ const EditableImage = ({
           borderRadius="50%"
           width="100%"
           pb="100%"
-          alt="profile picture"
           overflow="hidden"
           backgroundPosition="center"
           backgroundSize="cover"

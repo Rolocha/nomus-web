@@ -1,9 +1,14 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express'
+import {
+  ApolloError,
+  AuthenticationError,
+  GraphQLUpload,
+  UserInputError,
+} from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
-import { User, validateUsername } from 'src/models/User'
+import { User } from 'src/models/User'
 import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Void } from 'src/models/scalars'
@@ -23,7 +28,7 @@ import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
 import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
-import { BASE_URL } from 'src/config'
+import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 @InputType({ description: 'Input for udpating user profile' })
@@ -80,21 +85,16 @@ class UserResolver {
   @Authorized(Role.User)
   @Mutation((type) => User)
   async changePassword(
-    @Arg('oldPassword', { nullable: false }) oldPassword: string,
+    @Arg('currentPassword', { nullable: false }) currentPassword: string,
     @Arg('newPassword', { nullable: false }) newPassword: string,
-    @Arg('confirmNewPassword', { nullable: false }) confirmNewPassword: string,
     @Ctx() context: IApolloContext
   ) {
-    const oldPasswordMatches = await bcrypt.compare(oldPassword, context.user.password)
-    if (!oldPasswordMatches) {
-      throw new Error('incorrect-old-password')
+    const currentPasswordMatches = await bcrypt.compare(currentPassword, context.user.password)
+    if (!currentPasswordMatches) {
+      throw new Error('incorrect-current-password')
     }
 
-    if (newPassword !== confirmNewPassword) {
-      throw new Error('password-confirmation-no-match')
-    }
-
-    if (zxcvbn(newPassword).score < 2) {
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
       throw new Error('password-too-weak')
     }
 
@@ -118,12 +118,13 @@ class UserResolver {
     if (!usernameUpdateResult.isSuccess) {
       switch (usernameUpdateResult.error.name) {
         case 'empty-username':
-        case 'username-too-short':
+          throw new UserInputError('Invalid request', {
+            username: 'Please enter a non-empty username.',
+          })
+        case 'reserved-route':
           throw new UserInputError('Invalid request', {
             username: 'That username is not allowed.',
           })
-
-        case 'reserved-route':
         case 'non-unique-username':
           throw new UserInputError('Invalid request', {
             username: 'That username is already taken.',
@@ -149,6 +150,11 @@ class UserResolver {
     context.user.name.first = userUpdatePayload.firstName ?? context.user.name.first
     context.user.name.middle = userUpdatePayload.middleName ?? context.user.name.middle
     context.user.name.last = userUpdatePayload.lastName ?? context.user.name.last
+    if (userUpdatePayload.email && userUpdatePayload.email !== context.user.email) {
+      context.user.email = userUpdatePayload.email
+      context.user.isEmailVerified = false
+      await context.user.sendVerificationEmail()
+    }
     context.user.headline = userUpdatePayload.headline ?? context.user.headline
     context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
     context.user.bio = userUpdatePayload.bio ?? context.user.bio
@@ -251,6 +257,30 @@ class UserResolver {
     return null
   }
 
+  @Query(() => Boolean, {
+    nullable: true,
+    description: 'Validates whether the reset password token is valid and non-expired',
+  })
+  async validateResetPasswordLink(
+    @Arg('token', { nullable: false }) token: string,
+    @Arg('userId', { nullable: false }) userId: string
+  ): Promise<boolean> {
+    const user = await User.mongo.findById(userId)
+    if (user == null) {
+      throw new UserInputError('Invalid password reset link.')
+    }
+
+    // Verify token belongs to the user and is valid
+    const tokenValidity = await PasswordResetToken.mongo.verify(token, userId)
+    switch (tokenValidity) {
+      case 'invalid':
+        throw new UserInputError('Invalid password reset link.')
+      case 'expired':
+        throw new AuthenticationError('Password reset link expired.')
+    }
+    return true
+  }
+
   @Mutation(() => Void, { nullable: true })
   async resetPassword(
     @Arg('token', { nullable: false }) token: string,
@@ -259,16 +289,23 @@ class UserResolver {
   ): Promise<void> {
     const user = await User.mongo.findById(userId)
     if (user == null) {
-      throw new Error('invalid-user')
+      throw new UserInputError('Invalid password reset link.')
     }
 
     // Verify token belongs to the user and is valid
-    const isTokenValid = await PasswordResetToken.mongo.verify(token, userId)
-    if (!isTokenValid) {
-      throw new Error('invalid-token')
+    const tokenValidity = await PasswordResetToken.mongo.verify(token, userId)
+    switch (tokenValidity) {
+      case 'invalid':
+        throw new UserInputError('Invalid password reset link.')
+      case 'expired':
+        throw new AuthenticationError('Password reset link expired.')
     }
 
     // Update the user's password, let User's pre-save hook handle hashing it
+    if (zxcvbn(newPassword).score < MINIMUM_PASSWORD_STRENGTH) {
+      throw new Error('password-too-weak')
+    }
+
     user.password = newPassword
     await user.save()
 

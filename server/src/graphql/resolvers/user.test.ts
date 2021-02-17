@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
-import { UserModel, validateUsername } from 'src/models/User'
+import { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
-import { Result } from 'src/util/error'
 import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPasswordToken'
 
 jest.mock('src/util/sendgrid')
@@ -82,22 +81,22 @@ describe('UserResolver', () => {
 
   describe('changePassword', () => {
     it('changes the password for the context user', async () => {
-      const oldPassword = 'abc123'
+      const currentPassword = 'abc123'
       const newPassword = 'horsebatterystaplecorrect'
       const user = await createMockUser({
         // Will get hashed by the mongoose pre-save hook
-        password: oldPassword,
+        password: currentPassword,
       })
       const response = await execQuery({
         source: `
-          mutation ChangePasswordTestQuery($oldPassword: String!, $newPassword: String!, $confirmNewPassword: String!) {
-            changePassword(oldPassword: $oldPassword, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword) {
+          mutation ChangePasswordTestQuery($currentPassword: String!, $newPassword: String!) {
+            changePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
               id
             }
           }
         `,
         variableValues: {
-          oldPassword,
+          currentPassword,
           newPassword,
           confirmNewPassword: newPassword,
         },
@@ -111,22 +110,22 @@ describe('UserResolver', () => {
     })
 
     it('errors if the old password is incorrect', async () => {
-      const oldPassword = 'abc123'
+      const currentPassword = 'abc123'
       const newPassword = 'def456'
       const user = await createMockUser({
         // Will get hashed by the mongoose pre-save hook
-        password: oldPassword,
+        password: currentPassword,
       })
       const response = await execQuery({
         source: `
-          mutation ChangePasswordTestQuery($oldPassword: String!, $newPassword: String!, $confirmNewPassword: String!) {
-            changePassword(oldPassword: $oldPassword, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword) {
+          mutation ChangePasswordTestQuery($currentPassword: String!, $newPassword: String!) {
+            changePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
               id
             }
           }
         `,
         variableValues: {
-          oldPassword: '', // pass INCORRECT old password
+          currentPassword: '', // pass INCORRECT old password
           newPassword,
           confirmNewPassword: newPassword,
         },
@@ -134,26 +133,26 @@ describe('UserResolver', () => {
       })
 
       expect(response.data).toBe(null)
-      expect(response.errors[0].message).toBe('incorrect-old-password')
+      expect(response.errors[0].message).toBe('incorrect-current-password')
     })
 
     it('errors if the password is too simple', async () => {
-      const oldPassword = 'abc123'
+      const currentPassword = 'abc123'
       const newPassword = 'def456'
       const user = await createMockUser({
         // Will get hashed by the mongoose pre-save hook
-        password: oldPassword,
+        password: currentPassword,
       })
       const response = await execQuery({
         source: `
-          mutation ChangePasswordTestQuery($oldPassword: String!, $newPassword: String!, $confirmNewPassword: String!) {
-            changePassword(oldPassword: $oldPassword, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword) {
+          mutation ChangePasswordTestQuery($currentPassword: String!, $newPassword: String!) {
+            changePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
               id
             }
           }
         `,
         variableValues: {
-          oldPassword,
+          currentPassword,
           newPassword,
           confirmNewPassword: newPassword,
         },
@@ -162,33 +161,6 @@ describe('UserResolver', () => {
 
       expect(response.data).toBe(null)
       expect(response.errors[0].message).toBe('password-too-weak')
-    })
-
-    it("errors if the new passwords don't match", async () => {
-      const oldPassword = 'abc123'
-      const newPassword = 'def456'
-      const user = await createMockUser({
-        // Will get hashed by the mongoose pre-save hook
-        password: oldPassword,
-      })
-      const response = await execQuery({
-        source: `
-          mutation ChangePasswordTestQuery($oldPassword: String!, $newPassword: String!, $confirmNewPassword: String!) {
-            changePassword(oldPassword: $oldPassword, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword) {
-              id
-            }
-          }
-        `,
-        variableValues: {
-          oldPassword,
-          newPassword,
-          confirmNewPassword: '', // non-matching confirmation
-        },
-        contextUser: user,
-      })
-
-      expect(response.data).toBe(null)
-      expect(response.errors[0].message).toBe('password-confirmation-no-match')
     })
   })
 
@@ -248,7 +220,7 @@ describe('UserResolver', () => {
       }
     })
 
-    it.only('can perform a partial update', async () => {
+    it('can perform a partial update', async () => {
       const user = await createMockUser({})
       const updatePayload = {
         bio: user.bio + '; added some more stuff',
@@ -354,31 +326,28 @@ describe('UserResolver', () => {
     })
   })
 
-  describe('username testing', () => {
-    it('has a username collision', async () => {
-      await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxmysox')).toStrictEqual(Result.fail('non-unique-username'))
-    })
-
-    it('does not have a collision', async () => {
-      await createMockUser({ username: 'roxmysox' })
-      expect(await validateUsername('roxyoursox')).toStrictEqual(Result.ok())
-    })
-
-    it('creates a new username for a new user', async () => {
-      const user = await createMockUser({
-        name: {
-          first: 'A',
-          last: 'A',
+  describe('updateUsername', () => {
+    it('updates the username', async () => {
+      const user = await createMockUser({})
+      const response = await execQuery({
+        source: `
+        mutation UpdateUsernameTestQuery($username: String!) {
+          updateUsername(username: $username) {
+            id
+            username
+          }
+        }
+        `,
+        variableValues: {
+          username: 'new-one',
         },
+        contextUser: user,
       })
-      expect(user.username.substring(0, 4)).toBe('a-a-')
-      expect(user.username.length).toBe(10)
-    })
-  })
-  describe('reserved routes', () => {
-    it('tries to be a reserved route', async () => {
-      expect(await validateUsername('dashboard')).toStrictEqual(Result.fail('reserved-route'))
+
+      // We should assert on the DB user as well as the one on the GraphQL response
+      const updatedUser = await UserModel.findById(response.data.updateUsername.id)
+      expect(updatedUser.username).toBe('new-one')
+      expect(response.data.updateUsername.username).toBe('new-one')
     })
   })
 
@@ -463,6 +432,32 @@ describe('UserResolver', () => {
       expect(await bcrypt.compare(newPassword, updatedUser.password)).toBe(true)
     })
 
+    it('errors if the password is too weak', async () => {
+      const newPassword = 'weak'
+      const user = await createMockUser({
+        password: 'abc123',
+      })
+      const { preHashToken } = await createMockPasswordResetToken(user.id)
+      const response = await execQuery({
+        source: `
+          mutation ResetPasswordTestQuery($token: String!, $newPassword: String!, $userId: String!) {
+            resetPassword(token: $token, newPassword: $newPassword, userId: $userId)
+          }
+        `,
+        variableValues: {
+          token: preHashToken,
+          newPassword,
+          userId: user.id,
+        },
+      })
+
+      expect(response.errors).toContainEqual(
+        expect.objectContaining({
+          message: 'password-too-weak',
+        })
+      )
+    })
+
     it('errors if the token is present but invalid', async () => {
       const newPassword = 'horsebatterystaplecorrect'
       const user = await createMockUser({
@@ -487,7 +482,7 @@ describe('UserResolver', () => {
       // Can't just check the responde.data.user bc it doesn't include the password field
       expect(response.errors).toContainEqual(
         expect.objectContaining({
-          message: 'invalid-token',
+          message: 'Invalid password reset link.',
         })
       )
     })
@@ -514,7 +509,7 @@ describe('UserResolver', () => {
       // Can't just check the responde.data.user bc it doesn't include the password field
       expect(response.errors).toContainEqual(
         expect.objectContaining({
-          message: 'invalid-user',
+          message: 'Invalid password reset link.',
         })
       )
     })

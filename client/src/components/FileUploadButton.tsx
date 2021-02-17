@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'

@@ -11,6 +11,7 @@
 # build artifacts
 /build
 /storybook-static
+.parcel-cache
 
 # misc
 .DS_Store

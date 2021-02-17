@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -37,7 +37,6 @@ const ProfilePicture = ({ name, profilePicUrl }: Props) => {
       width="100%"
       pb="100%"
       role="img"
-      alt={alt}
       bg={!profilePicUrl ? colors.africanElephant : undefined}
       position="relative"
     >

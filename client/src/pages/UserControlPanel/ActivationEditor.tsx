@@ -1,6 +1,6 @@
 import { useMutation } from 'src/apollo'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
-import UPDATE_PROFILE_MUTATION from './updateProfileMutation'
+import { UPDATE_PROFILE_MUTATION } from './mutations'
 import Box from 'src/components/Box'
 import * as React from 'react'
 import Button from 'src/components/Button'

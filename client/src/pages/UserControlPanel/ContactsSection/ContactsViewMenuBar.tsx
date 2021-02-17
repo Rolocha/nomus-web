@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import 'css.gg/icons/css/external.css'
 import * as React from 'react'
 import Box from 'src/components/Box'

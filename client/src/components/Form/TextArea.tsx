@@ -25,6 +25,7 @@ import {
 
 type TextAreaProps = {
   as?: string
+  error?: any
 } & SpaceProps &
   PositionProps &
   ColorProps &
@@ -36,7 +37,7 @@ type TextAreaProps = {
   LineHeightProps &
   TypographyProps
 
-const TextArea = styled<'textarea', TextAreaProps>('textarea')(
+const TextArea = styled.textarea<TextAreaProps>(
   {
     border: `1px solid ${theme.colors.africanElephant}`,
     borderRadius: '6px',
@@ -54,6 +55,12 @@ const TextArea = styled<'textarea', TextAreaProps>('textarea')(
   fontSize,
   lineHeight,
   typography,
+  (props) =>
+    props.error
+      ? {
+          border: `2px solid ${theme.colors.invalidRed}`,
+        }
+      : undefined,
 )
 
 TextArea.defaultProps = {

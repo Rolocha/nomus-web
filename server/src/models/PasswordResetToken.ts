@@ -52,21 +52,18 @@ export class PasswordResetToken extends BaseModel({
     this: ReturnModelType<typeof PasswordResetToken>,
     proposedToken: string,
     associatedUser: string
-  ): Promise<boolean> {
+  ): Promise<'success' | 'expired' | 'invalid'> {
     try {
       const tokensForThisUser = await this.find({ user: associatedUser })
       for (const token of tokensForThisUser) {
         const tokenMatches = await bcrypt.compare(proposedToken, token.value)
         if (tokenMatches) {
-          if (token.expiresAtMs > Date.now()) {
-            return true
-          }
-          return false
+          return token.expiresAtMs > Date.now() ? 'success' : 'expired'
         }
       }
-      return false
+      return 'invalid'
     } catch (err) {
-      return false
+      return 'invalid'
     }
   }
 

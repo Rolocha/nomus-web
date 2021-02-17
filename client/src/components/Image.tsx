@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
 import * as CSS from 'csstype'
 import {
+  background,
+  BackgroundProps,
   border,
   BorderProps,
   layout,
@@ -18,6 +20,7 @@ import {
 } from 'styled-system'
 
 type ImageProps = SpaceProps &
+  BackgroundProps &
   PositionProps &
   BorderProps &
   LayoutProps &
@@ -26,12 +29,13 @@ type ImageProps = SpaceProps &
     w?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
   }
 
-const Image = styled<'img', ImageProps>('img')(
+const Image = styled.img<ImageProps>(
   shadow,
   space,
   position,
   border,
   layout,
+  background,
   // Need to use 'w' and 'h' for width/height for Image components to avoid clashing with <img />'s width/height attributes
   system({
     w: {

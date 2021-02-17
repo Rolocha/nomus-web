@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { colors } from 'src/styles'
 import { SVGProps } from './types'
 
 const Check = ({ color, className }: SVGProps) => (
@@ -18,7 +19,7 @@ const Check = ({ color, className }: SVGProps) => (
 )
 
 Check.defaultProps = {
-  color: '#38667A',
+  color: colors.validGreen,
 }
 
 export default Check

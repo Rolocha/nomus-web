@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import { gql, useQuery, useMutation } from 'src/apollo'
 import {
@@ -136,13 +136,18 @@ export default () => {
   }, {})
 
   return (
-    <Box p={{ _: '24px', md: '48px' }} overflowY="scroll" height="100%">
+    <Box
+      p={{ _: '24px', md: '48px' }}
+      overflowY="scroll"
+      height="100%"
+      width="100%"
+    >
       {defaultCardVersion && defaultCardVersionStats && (
         <Box>
           <Text.SectionHeader mb={2}>Active card</Text.SectionHeader>
           <Box
-            display="flex"
-            flexDirection={{ _: 'column', [bp]: 'row' }}
+            display="grid"
+            gridTemplateColumns={{ _: '1fr', [bp]: '4fr 4fr 4fr' }}
             my={{ _: -2, [bp]: 0 }}
             mx={{ _: 0, [bp]: -3 }}
           >
@@ -152,11 +157,11 @@ export default () => {
               display="flex"
               flexDirection="column"
             >
-              <Box display="inline-block">
+              <Box display="inline-block" width="100%">
                 <BusinessCardImage
                   frontImageUrl={defaultCardVersion?.frontImageUrl || ''}
                   backImageUrl={defaultCardVersion?.backImageUrl || ''}
-                  width={{ _: '100%', [bp]: '300px' }}
+                  width="100%"
                 />
                 <Box
                   display="flex"
@@ -195,12 +200,7 @@ export default () => {
               </Box>
             </Box>
 
-            <Box
-              px={{ _: 0, [bp]: 3 }}
-              py={{ _: 2, [bp]: 0 }}
-              // Not worth using grid for the parent Box so we fake it here to mimic 4fr / 12fr
-              width="calc(100% * (4/12))"
-            >
+            <Box px={{ _: 0, [bp]: 3 }} py={{ _: 2, [bp]: 0 }} width="100%">
               <Text.SectionSubheader mb={2}>
                 Version information
               </Text.SectionSubheader>
