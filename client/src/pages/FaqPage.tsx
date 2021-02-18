@@ -55,6 +55,16 @@ export default () => {
       <Navbar />
       <Box>
         <Box
+          height={isDesktop ? '154px' : '142px'}
+          backgroundColor="ivory"
+          textAlign="center"
+        >
+          <Text.PageHeader pt="20px"> Need a hand?</Text.PageHeader>
+          <Text.Body>
+            Here's ours. We're here to help whenever you need us.
+          </Text.Body>
+        </Box>
+        <Box
           // display="flex"
           // flexDirection="column"
           // justifyContent="center"
@@ -65,19 +75,13 @@ export default () => {
             _: 'repeat(12, 1fr)',
             [bp]: 'repeat(12, 1fr)',
           }}
-          marginLeft="96px"
-          marginRight="96px"
+          marginLeft={isDesktop ? '96px' : '24px'}
+          marginRight={isDesktop ? '96px' : '24px'}
           pt="16px"
           pb="32px"
           gridColumnGap={{ _: 2, [bp]: 3 }}
         >
-          {/* <Box height="200px" justifyContent="center" gridColumn="3/11">
-            <Text.PageHeader> Need a hand?</Text.PageHeader>
-
-            <Box height={{ _: '48px', [bp]: '56px' }}></Box>
-          </Box> */}
-
-          <Box gridColumn={isDesktop ? '1/8' : '1/12'} py="16px">
+          <Box gridColumn={isDesktop ? '1/8' : 'span 12'} py="9px">
             <Text.SectionHeader mb="16px">
               Frequently asked questions
             </Text.SectionHeader>
@@ -128,7 +132,7 @@ export default () => {
                 support@nomus.me, and we'll sort it out for you.
               </Text.Body2>
             </Accordion>
-            <Accordion title="What size and material are the business cards made of?">
+            <Accordion title="What size and material are the business cards?">
               <Text.Body2>
                 Nomus cards are printed on high quality 18-point cardstock and
                 cut to the US standard business card size of 3.5 x 2 inches.
@@ -177,6 +181,7 @@ export default () => {
             borderRadius="16px"
             px="24px"
             py="16px"
+            marginLeft="24px"
             alignSelf="start"
             mt={isDesktop ? '24px' : '32px'}
             width="350px"
