@@ -8,26 +8,17 @@ import { colors } from 'src/styles'
 
 type SaveButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
-  iconOnlyBp?: string | null
 }
 
-const SaveButton = ({ iconOnlyBp, onClick }: SaveButtonProps) => (
+const SaveButton = ({ onClick }: SaveButtonProps) => (
   <Button onClick={onClick} variant="success" px="24px">
     <Box display="flex" flexDirection="row" alignItems="center">
       <SVG.Check
         css={css`
           width: 20px;
-          ${iconOnlyBp}
         `}
         color={colors.validGreen}
       />
-      <Box
-        display={iconOnlyBp ? { _: 'none', [iconOnlyBp]: 'block' } : 'block'}
-      >
-        <Text.Body2 fontSize="14px" color="validGreen" mr={1}>
-          Save
-        </Text.Body2>
-      </Box>
     </Box>
   </Button>
 )

@@ -132,13 +132,10 @@ const ChangeUsernameForm = ({ username }: Props) => {
             gridRowGap={1}
           >
             <Box gridArea="save">
-              <SaveButton
-                onClick={handleSubmit(onSubmitUsername)}
-                iconOnlyBp={bp}
-              />
+              <SaveButton onClick={handleSubmit(onSubmitUsername)} />
             </Box>
             <Box gridArea="cancel">
-              <DangerButton onClick={closeForm} iconOnlyBp={bp} />
+              <DangerButton onClick={closeForm} />
             </Box>
           </Box>
         ) : (

@@ -141,13 +141,10 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
             gridRowGap={1}
           >
             <Box gridArea="save">
-              <SaveButton
-                onClick={handleSubmit(onSubmitEmail)}
-                iconOnlyBp={bp}
-              />
+              <SaveButton onClick={handleSubmit(onSubmitEmail)} />
             </Box>
             <Box gridArea="cancel">
-              <DangerButton onClick={closeForm} iconOnlyBp={bp} />
+              <DangerButton onClick={closeForm} />
             </Box>
           </Box>
         ) : (
