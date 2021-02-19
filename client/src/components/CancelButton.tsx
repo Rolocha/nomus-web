@@ -9,7 +9,7 @@ type DangerButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
 }
 
-const DangerButton = ({ onClick }: DangerButtonProps) => (
+const CancelButton = ({ onClick }: DangerButtonProps) => (
   <Button onClick={onClick} variant="dangerSecondary">
     <Box display="flex" flexDirection="row" alignItems="center">
       <SVG.Close
@@ -22,4 +22,4 @@ const DangerButton = ({ onClick }: DangerButtonProps) => (
   </Button>
 )
 
-export default DangerButton
+export default CancelButton

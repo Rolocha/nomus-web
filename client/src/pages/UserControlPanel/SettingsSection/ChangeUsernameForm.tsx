@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import { useMutation } from 'src/apollo'
 import { UPDATE_USERNAME_MUTATION } from '../mutations'
-import DangerButton from 'src/components/DangerButton'
+import CancelButton from 'src/components/CancelButton'
 
 interface Props {
   username: string
@@ -133,7 +133,7 @@ const ChangeUsernameForm = ({ username }: Props) => {
               <SaveButton onClick={handleSubmit(onSubmitUsername)} />
             </Box>
             <Box gridArea="cancel">
-              <DangerButton onClick={closeForm} />
+              <CancelButton onClick={closeForm} />
             </Box>
           </Box>
         ) : (

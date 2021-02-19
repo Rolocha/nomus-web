@@ -12,7 +12,7 @@ import { useMutation } from 'src/apollo'
 import { UPDATE_PROFILE_MUTATION } from '../mutations'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import { css } from '@emotion/react'
-import DangerButton from 'src/components/DangerButton'
+import CancelButton from 'src/components/CancelButton'
 
 const bp = 'lg'
 
@@ -142,7 +142,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
               <SaveButton onClick={handleSubmit(onSubmitEmail)} />
             </Box>
             <Box gridArea="cancel">
-              <DangerButton onClick={closeForm} />
+              <CancelButton onClick={closeForm} />
             </Box>
           </Box>
         ) : (
