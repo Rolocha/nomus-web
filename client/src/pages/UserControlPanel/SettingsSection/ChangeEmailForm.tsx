@@ -83,7 +83,6 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
 
   return (
     <Box
-      overflowY="scroll"
       height="100%"
       display="grid"
       gridTemplateColumns={{
