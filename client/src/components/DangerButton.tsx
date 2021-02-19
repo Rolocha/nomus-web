@@ -10,11 +10,11 @@ type DangerButtonProps = {
 }
 
 const DangerButton = ({ onClick }: DangerButtonProps) => (
-  <Button onClick={onClick} variant="dangerSecondary" px="24px">
+  <Button onClick={onClick} variant="dangerSecondary">
     <Box display="flex" flexDirection="row" alignItems="center">
       <SVG.Close
         css={css`
-          width: 15px;
+          width: 20px;
         `}
         color={colors.invalidRed}
       />

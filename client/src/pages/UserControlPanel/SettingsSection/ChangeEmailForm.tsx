@@ -134,11 +134,9 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
             height="100%"
             display="grid"
             gridTemplateAreas={`
-            "save"
-            "cancel"
-          `}
-            gridColumnGap={1}
-            gridRowGap={1}
+              "save cancel"
+            `}
+            gridGap={2}
           >
             <Box gridArea="save">
               <SaveButton onClick={handleSubmit(onSubmitEmail)} />
