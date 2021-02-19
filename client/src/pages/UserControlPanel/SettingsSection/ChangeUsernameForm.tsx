@@ -125,11 +125,9 @@ const ChangeUsernameForm = ({ username }: Props) => {
             height="100%"
             display="grid"
             gridTemplateAreas={`
-              "save"
-              "cancel"
+              "save cancel"
             `}
-            gridColumnGap={1}
-            gridRowGap={1}
+            gridGap={2}
           >
             <Box gridArea="save">
               <SaveButton onClick={handleSubmit(onSubmitUsername)} />
