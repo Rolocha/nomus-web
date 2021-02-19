@@ -92,8 +92,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
-          cancelOrder(orderId: $orderId) {
+        mutation CancelOrderMutation($orderId: String, $futureState: String) {
+          transitionOrderState(orderId: $orderId, futureState: $futureState) {
             id
             state
           }
@@ -101,11 +101,12 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
+          futureState: OrderState.Canceled,
         },
         contextUser: user,
       })
 
-      expect(response.data?.cancelOrder?.id).toBe(order.id)
+      expect(response.data?.transitionOrderState?.id).toBe(order.id)
       const updatedOrder = await Order.mongo.findById(order.id)
       expect(updatedOrder.state).toBe(OrderState.Canceled)
     })
@@ -117,8 +118,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
-          cancelOrder(orderId: $orderId) {
+        mutation CancelOrderMutation($orderId: String, $futureState: String) {
+          transitionOrderState(orderId: $orderId, futureState: $futureState) {
             id
             state
           }
@@ -126,6 +127,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
+          futureState: OrderState.Canceled,
         },
         contextUser: contextUser,
       })
