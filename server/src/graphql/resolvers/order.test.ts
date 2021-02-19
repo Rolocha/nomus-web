@@ -101,6 +101,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
+          futureState: OrderState.Canceled,
         },
         contextUser: user,
       })
@@ -126,6 +127,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
+          futureState: OrderState.Canceled,
         },
         contextUser: contextUser,
       })
