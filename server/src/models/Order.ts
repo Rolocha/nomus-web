@@ -17,6 +17,18 @@ import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 import OrderEvent from './OrderEvent'
 
+// Mapping of current possible state transitions according to our Order Flow State Machine
+// https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
+const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
+  [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
+  [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+  [OrderState.Creating]: [OrderState.Created],
+  [OrderState.Created]: [OrderState.Enroute],
+  [OrderState.Enroute]: [OrderState.Fulfilled],
+  [OrderState.Fulfilled]: [],
+  [OrderState.Canceled]: [],
+}
+
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
     let checkDuplicate = true
@@ -105,21 +117,9 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
-  // Mapping of current possible state transitions according to our Order Flow State Machine
-  // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
-  private ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
-    [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
-    [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
-    [OrderState.Creating]: [OrderState.Created],
-    [OrderState.Created]: [OrderState.Enroute],
-    [OrderState.Enroute]: [OrderState.Fulfilled],
-    [OrderState.Fulfilled]: [],
-    [OrderState.Canceled]: [],
-  }
-
   // Checks if a proposed transition can be accomplished in our state machine
   private isTransitionAllowed(futureState: OrderState): boolean {
-    return this.ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
+    return ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
   }
 
   // Public instance method to transition OrderState
