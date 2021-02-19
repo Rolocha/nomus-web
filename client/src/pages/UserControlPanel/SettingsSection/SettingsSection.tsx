@@ -57,8 +57,6 @@ export default () => {
         "username username"
         "signOut signOut"
         "passwordForm passwordForm"
-        "deactivateProfileHeader ."
-        "deactivateProfileQuestion deactivateProfileQuestion"
       `,
         [bp]: `
         "account . ."
@@ -66,8 +64,6 @@ export default () => {
         "username username username"
         "signOut . ."
         "passwordForm . ."
-        "deactivateProfileHeader . ."
-        "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
       }}
       gridColumnGap={3}
