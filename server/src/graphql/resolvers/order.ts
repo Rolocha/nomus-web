@@ -2,9 +2,10 @@ import { DocumentType } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
-import { Address } from 'src/models/subschemas'
+import { Ref } from 'src/models/scalars'
+import { Address, OrderPrice } from 'src/models/subschemas'
 import { User } from 'src/models/User'
-import { CardSpecBaseType, OrderState, Role } from 'src/util/enums'
+import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
 import { calculateCost } from 'src/util/pricing'
 import { stripe } from 'src/util/stripe'
 import {
@@ -89,6 +90,24 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
   shippingAddress: Address
 }
 
+@InputType({ description: 'Input to update fields on an existing Order' })
+class FullOrderInput extends BaseUpsertOrderInput {
+  @Field((type) => OrderPrice, { nullable: true })
+  price: OrderPrice
+
+  @Field((type) => OrderState, { nullable: false })
+  state: OrderState
+
+  @Field({ nullable: true })
+  trackingNumber: string
+
+  @Field({ nullable: true })
+  shippingLabelUrl: string
+
+  @Field({ nullable: true })
+  printSpecUrl: string
+}
+
 @InputType({ description: 'Input to generate new or update existing custom card Order' })
 class UpsertCustomOrderInput extends BaseUpsertOrderInput {
   @Field((type) => CustomCardSpecInput)
@@ -123,6 +142,39 @@ class OrderResolver {
         return Error('User is not authorized to access order')
       }
     }
+  }
+
+  @Authorized(Role.Admin)
+  @Mutation((type) => Order)
+  async orderUpdate(
+    @Arg('orderId', { nullable: true }) orderId: string | null,
+    @Arg('payload', { nullable: true }) payload: FullOrderInput,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>> {
+    if (!context.user) {
+      throw new Error('no-user-specified')
+    }
+    const order = await Order.mongo.findOne({ _id: orderId })
+    if (!order) {
+      throw new Error('no-matching-order')
+    }
+
+    if (payload.state !== order.state) {
+      const result = await order.transition(payload.state, OrderEventTrigger.Nomus)
+      if (result.error) {
+        throw result.error
+      }
+    }
+
+    order.quantity = payload.quantity ?? order.quantity
+    order.price = payload.price ?? order.price
+    order.trackingNumber = payload.trackingNumber ?? order.trackingNumber
+    order.shippingLabelUrl = payload.shippingLabelUrl ?? order.shippingLabelUrl
+    order.printSpecUrl = payload.printSpecUrl ?? order.printSpecUrl
+    order.shippingAddress = payload.shippingAddress ?? order.shippingAddress
+
+    await order.save()
+    return order
   }
 
   @Authorized(Role.User)

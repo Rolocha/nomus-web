@@ -60,8 +60,6 @@ class Order extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Order>
 
-  static CANCELABLE_STATES = [OrderState.Captured, OrderState.Paid]
-
   @Field()
   createdAt: Date
 
@@ -108,9 +106,11 @@ class Order extends BaseModel({
   shortId: string
 
   @prop({ required: false, description: 'URL pointing to shipping label document' })
+  @Field({ nullable: true })
   shippingLabelUrl: string
 
   @prop({ required: false, description: 'URL pointing to the document to be printed' })
+  @Field({ nullable: true })
   printSpecUrl: string
 
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
