@@ -45,6 +45,7 @@ exports[`<Modal /> renders a modal with the specified content in a portal 1`] = 
                 role="button"
               >
                 <svg
+                  class="css-16syt69-StylableIcon e1ewjzba0"
                   fill="none"
                   height="24"
                   viewBox="0 0 24 24"
