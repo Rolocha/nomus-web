@@ -124,7 +124,7 @@ const LinkerPage = () => {
           gridColumnGap={3}
           gridRowGap={3}
         >
-          <Box gridArea="heading" placeSelf="center">
+          <Box gridArea="heading" placeSelf="self-start" mt={4}>
             {!formState.isSubmitSuccessful && (
               <Text.PageHeader>Sheet Linker</Text.PageHeader>
             )}
@@ -161,7 +161,7 @@ const LinkerPage = () => {
           <Box gridArea="instructions">
             {!formState.isSubmitSuccessful && (
               <Text.Body>
-                Please enter the 6 digit alphanumeric ID found on the long edge
+                Please enter the 6-digit alphanumeric ID found on the long edge
                 of the printed sheet below:
               </Text.Body>
             )}
@@ -169,7 +169,7 @@ const LinkerPage = () => {
           <Box gridArea="inputForm">
             {!formState.isSubmitSuccessful && (
               <Box>
-                <Text.Label>Short ID:</Text.Label>
+                <Text.Label>Short ID</Text.Label>
                 <Form.Form>
                   <Form.Input
                     onSubmit={handleSubmit(onSubmitLinker)}
