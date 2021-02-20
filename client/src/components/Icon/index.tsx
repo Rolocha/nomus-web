@@ -1,32 +1,23 @@
-import styled from '@emotion/styled'
-import * as React from 'react'
-import { layout, position, space, system } from 'styled-system'
-import IconLibrary from './library'
-import { IconProps } from './types'
+import { IconProps } from '@chakra-ui/icons'
+import Profile from './ProfileIcon'
+import Caret from './CaretIcon'
+import Close from './CloseIcon'
+import Menu from './MenuIcon'
 
-type IconType = keyof typeof IconLibrary
+const iconLibrary = {
+  profile: Profile,
+  caret: Caret,
+  menu: Menu,
+  close: Close,
+} as const
+
+export type IconName = keyof typeof iconLibrary
 
 interface Props extends IconProps {
-  of: IconType
+  of: IconName
 }
 
-const styledSystemProps = [
-  system({
-    transform: {
-      property: 'transform',
-    },
-  }),
-  space,
-  position,
-  layout,
-]
-
-const Icon = ({ of, ...iconProps }: Props) => {
-  const SelectedIcon = IconLibrary[of]
-  // Turn SelectedIcon into a styled component that has the styled-system props on it
-  // for easier customization
-  const StylableIcon = styled(SelectedIcon)<IconProps>(...styledSystemProps)
-  return <StylableIcon {...iconProps} />
+export default ({ of, ...restProps }: Props) => {
+  const SelectedIcon = iconLibrary[of]
+  return <SelectedIcon {...restProps} />
 }
-
-export default Icon

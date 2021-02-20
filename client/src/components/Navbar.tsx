@@ -202,9 +202,9 @@ const Navbar = (props: Props) => {
               ? [
                   <Link key="dashboard" to="/dashboard">
                     <Box display="flex" alignItems="center">
-                      <Icon of="profile" color={colors.nomusBlue} mt={4} />
+                      <Icon of="profile" color={colors.nomusBlue} />
                       <Text.Body ml={2} color={colors.nomusBlue}>
-                        profiled
+                        profile
                       </Text.Body>
                     </Box>
                   </Link>,
