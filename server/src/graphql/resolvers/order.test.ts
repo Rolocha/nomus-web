@@ -92,8 +92,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String, $futureState: String) {
-          transitionOrderState(orderId: $orderId, futureState: $futureState) {
+        mutation CancelOrderMutation($orderId: String) {
+          transitionOrderState(orderId: $orderId, futureState: "${OrderState.Canceled}") {
             id
             state
           }
@@ -101,7 +101,6 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
-          futureState: OrderState.Canceled,
         },
         contextUser: user,
       })
@@ -118,8 +117,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String, $futureState: String) {
-          transitionOrderState(orderId: $orderId, futureState: $futureState) {
+        mutation CancelOrderMutation($orderId: String) {
+          transitionOrderState(orderId: $orderId, futureState: "${OrderState.Canceled}") {
             id
             state
           }
@@ -127,7 +126,6 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
-          futureState: OrderState.Canceled,
         },
         contextUser: contextUser,
       })

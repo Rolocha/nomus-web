@@ -119,7 +119,11 @@ class Order extends BaseModel({
 
   // Checks if a proposed transition can be accomplished in our state machine
   private isTransitionAllowed(futureState: OrderState): boolean {
-    return ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
+    try {
+      return ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
+    } catch (e) {
+      return false
+    }
   }
 
   // Public instance method to transition OrderState

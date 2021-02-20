@@ -147,7 +147,7 @@ class OrderResolver {
       }
       return result.value
     } else {
-      throw new Error('invalid-future-state')
+      throw new Error('invalid-transition')
     }
   }
 
