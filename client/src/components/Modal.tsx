@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom'
 import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import * as SVG from 'src/components/SVG'
+import Icon from 'src/components/Icon'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { use100vh } from 'src/utils/ui'
@@ -268,7 +268,7 @@ const Modal = ({
                                 cursor: pointer;
                               `}
                             >
-                              <SVG.Close color={colors.midnightGray} />
+                              <Icon of="close" color={colors.midnightGray} />
                             </Box>
                           </Box>
 

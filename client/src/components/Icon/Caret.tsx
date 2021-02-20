@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { SVGProps } from './types'
 import { colors } from 'src/styles'
+import { IconProps } from './types'
 
-const Caret = ({ color, className }: SVGProps) => (
+const Caret = ({ color, className }: IconProps) => (
   <svg
     className={className}
     width="24"

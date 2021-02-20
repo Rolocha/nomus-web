@@ -47,4 +47,7 @@ const colors = {
   outlineGreen: '#B2FFD6',
 } as const
 
+export type ColorName = keyof typeof colors
+export type ColorValue = typeof colors[ColorName]
+
 export default colors

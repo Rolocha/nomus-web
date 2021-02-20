@@ -8,6 +8,7 @@ import { Input } from './Form'
 import Button from './Button'
 import { colors } from 'src/styles'
 import { FileItem } from 'src/types/files'
+import Icon from 'src/components/Icon'
 
 interface Props {
   name: string
@@ -160,7 +161,7 @@ const FileUploadButton = ({
             `}
             onClick={() => handleFileItemChange(null)}
           >
-            <SVG.Close color={colors.nomusBlue} />
+            <Icon of="close" color={colors.nomusBlue} />
           </Button>
         </Box>
       ) : (
