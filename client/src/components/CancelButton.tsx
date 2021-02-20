@@ -5,21 +5,21 @@ import * as SVG from 'src/components/SVG'
 import { css } from '@emotion/react'
 import { colors } from 'src/styles'
 
-type SaveButtonProps = {
+type DangerButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
 }
 
-const SaveButton = ({ onClick }: SaveButtonProps) => (
-  <Button onClick={onClick} variant="success">
+const CancelButton = ({ onClick }: DangerButtonProps) => (
+  <Button onClick={onClick} variant="dangerSecondary">
     <Box display="flex" flexDirection="row" alignItems="center">
-      <SVG.Check
+      <SVG.Close
         css={css`
           width: 20px;
         `}
-        color={colors.validGreen}
+        color={colors.invalidRed}
       />
     </Box>
   </Button>
 )
 
-export default SaveButton
+export default CancelButton
