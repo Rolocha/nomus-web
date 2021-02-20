@@ -3,7 +3,6 @@ import { gql, useQuery, useMutation } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import { Link } from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
@@ -17,6 +16,7 @@ import EditableImage from 'src/components/EditableImage'
 import ProfilePicture from 'src/components/ProfilePicture'
 import { formatPhoneNumber } from 'src/utils/string'
 import EditButton from 'src/components/EditButton'
+import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -212,9 +212,17 @@ export default () => {
           >
             <BusinessCardImage width="100%" placeholder />
             <Box mt={2} flexGrow={0}>
-              <Button variant="secondary" width="100%">
-                Get a Nomus card
-              </Button>
+              <Link
+                asButton={true}
+                buttonStyle="secondary"
+                to={createMailtoURL({
+                  to: 'help@nomus.me',
+                  subject: 'New Nomus Card',
+                  body: "Hi, I'd like to get a Nomus Card!",
+                })}
+              >
+                Get a Nomus Card
+              </Link>
             </Box>
           </Box>
         )}
