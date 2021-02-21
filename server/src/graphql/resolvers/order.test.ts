@@ -191,7 +191,7 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          mutation UpdateOrderTestQuery($orderId: String, $payload: FullOrderInput) {
+          mutation UpdateOrderTestQuery($orderId: String, $payload: UpdateOrderInput) {
             updateOrder(orderId: $orderId, payload: $payload) {
               id,
               state,

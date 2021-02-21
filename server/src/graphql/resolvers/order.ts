@@ -91,7 +91,20 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
 }
 
 @InputType({ description: 'Input to update fields on an existing Order' })
-class FullOrderInput extends BaseUpsertOrderInput {
+class UpdateOrderInput {
+  @Field({ nullable: true })
+  orderId: string
+
+  @Field({ nullable: true })
+  quantity: number
+
+  // Credit/debit card Stripe token we'll use for payment auth/capture
+  @Field({ nullable: true })
+  stripeToken: string
+
+  @Field((type) => Address, { nullable: true })
+  shippingAddress: Address
+
   @Field((type) => OrderPrice, { nullable: true })
   price: OrderPrice
 
@@ -147,7 +160,7 @@ class OrderResolver {
   // Use transitionOrderState instead
   async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
-    @Arg('payload', { nullable: true }) payload: FullOrderInput,
+    @Arg('payload', { nullable: true }) payload: UpdateOrderInput,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -173,8 +186,8 @@ class OrderResolver {
   @Mutation((type) => Order)
   async transitionOrderState(
     @Arg('orderId', { nullable: false }) orderId: string,
-    @Arg('futureState', { nullable: false }) futureState: string,
-    @Arg('trigger', { nullable: true }) trigger: string | null,
+    @Arg('futureState', { nullable: false }) futureState: OrderState,
+    @Arg('trigger', { nullable: true }) trigger: OrderEventTrigger | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -185,18 +198,13 @@ class OrderResolver {
       throw new Error('no-matching-order')
     }
 
-    if (futureState in OrderState) {
-      const result = await order.transition(
-        futureState as OrderState,
-        trigger in OrderEventTrigger ? (trigger as OrderEventTrigger) : undefined
-      )
-      if (!result.isSuccess) {
-        throw result.error
-      }
-      return result.value
-    } else {
-      throw new Error('invalid-transition')
+    const result = await order.transition(futureState, trigger ? trigger : undefined)
+
+    if (!result.isSuccess) {
+      throw result.error
     }
+
+    return result.value
   }
 
   //Get all orders for a User
