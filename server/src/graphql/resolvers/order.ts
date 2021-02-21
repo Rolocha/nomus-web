@@ -143,6 +143,8 @@ class OrderResolver {
 
   @Authorized(Role.Admin)
   @Mutation((type) => Order)
+  // updateOrder cannot be used to update the state of the order.
+  // Use transitionOrderState instead
   async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
     @Arg('payload', { nullable: true }) payload: FullOrderInput,
@@ -170,8 +172,9 @@ class OrderResolver {
   @Authorized(Role.User)
   @Mutation((type) => Order)
   async transitionOrderState(
-    @Arg('orderId', { nullable: false }) orderId: string | null,
-    @Arg('futureState', { nullable: false }) futureState: string | null,
+    @Arg('orderId', { nullable: false }) orderId: string,
+    @Arg('futureState', { nullable: false }) futureState: string,
+    @Arg('trigger', { nullable: true }) trigger: string | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -183,7 +186,10 @@ class OrderResolver {
     }
 
     if (futureState in OrderState) {
-      const result = await order.transition(futureState as OrderState)
+      const result = await order.transition(
+        futureState as OrderState,
+        trigger in OrderEventTrigger ? (trigger as OrderEventTrigger) : undefined
+      )
       if (!result.isSuccess) {
         throw result.error
       }
