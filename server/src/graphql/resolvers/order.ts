@@ -199,7 +199,7 @@ class OrderResolver {
       throw new Error('no-matching-order')
     }
 
-    const result = await order.transition(futureState, trigger ? trigger : undefined)
+    const result = await order.transition(futureState, trigger)
 
     if (!result.isSuccess) {
       throw result.error
