@@ -186,8 +186,9 @@ class OrderResolver {
   @Mutation((type) => Order)
   async transitionOrderState(
     @Arg('orderId', { nullable: false }) orderId: string,
-    @Arg('futureState', { nullable: false }) futureState: OrderState,
-    @Arg('trigger', { nullable: true }) trigger: OrderEventTrigger | null,
+    @Arg('futureState', (type) => OrderState, { nullable: false }) futureState: OrderState,
+    @Arg('trigger', (type) => OrderEventTrigger, { nullable: true })
+    trigger: OrderEventTrigger | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {

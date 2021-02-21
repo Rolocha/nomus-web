@@ -23,7 +23,7 @@ const bp = 'md'
 export default ({ order }: Props) => {
   const [cancelOrder, { loading: orderCancelLoading }] = useMutation(gql`
     mutation CancelOrderMutation($orderId: String!) {
-      transitionOrderState(orderId: $orderId, futureState: "${OrderState.Canceled}") {
+      transitionOrderState(orderId: $orderId, futureState: ${OrderState.Canceled}) {
         id
         state
       }
