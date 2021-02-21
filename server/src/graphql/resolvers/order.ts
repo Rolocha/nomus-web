@@ -127,8 +127,9 @@ class OrderResolver {
 
   @Authorized(Role.User)
   @Mutation((type) => Order)
-  async cancelOrder(
+  async transitionOrderState(
     @Arg('orderId', { nullable: true }) orderId: string | null,
+    @Arg('futureState', { nullable: true }) futureState: string | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -139,11 +140,15 @@ class OrderResolver {
       throw new Error('no-matching-order')
     }
 
-    const cancelationResult = await order.cancel()
-    if (!cancelationResult.isSuccess) {
-      throw cancelationResult.error
+    if (futureState in OrderState) {
+      const result = await order.transition(futureState as OrderState)
+      if (!result.isSuccess) {
+        throw result.error
+      }
+      return result.value
+    } else {
+      throw new Error('invalid-transition')
     }
-    return cancelationResult.value
   }
 
   //Get all orders for a User
