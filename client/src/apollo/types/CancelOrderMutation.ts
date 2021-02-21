@@ -20,6 +20,5 @@ export interface CancelOrderMutation {
 }
 
 export interface CancelOrderMutationVariables {
-  orderId?: string | null
-  futureState?: string | null
+  orderId: string
 }

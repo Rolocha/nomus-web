@@ -93,7 +93,7 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
+        mutation CancelOrderMutation($orderId: String!) {
           transitionOrderState(orderId: $orderId, futureState: "${OrderState.Canceled}") {
             id
             state
@@ -102,7 +102,6 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
-          futureState: OrderState.Canceled,
         },
         contextUser: user,
       })
@@ -119,7 +118,7 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
+        mutation CancelOrderMutation($orderId: String!) {
           transitionOrderState(orderId: $orderId, futureState: "${OrderState.Canceled}") {
             id
             state
@@ -128,7 +127,6 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderId: order.id,
-          futureState: OrderState.Canceled,
         },
         contextUser: contextUser,
       })
@@ -194,7 +192,7 @@ describe('OrderResolver', () => {
       const response = await execQuery({
         source: `
           mutation UpdateOrderTestQuery($orderId: String, $payload: FullOrderInput) {
-            orderUpdate(orderId: $orderId, payload: $payload) {
+            updateOrder(orderId: $orderId, payload: $payload) {
               id,
               state,
               shippingLabelUrl,
@@ -212,7 +210,6 @@ describe('OrderResolver', () => {
         variableValues: {
           orderId: order.id,
           payload: {
-            state: OrderState.Paid,
             shippingLabelUrl: shippingLabelTestUrl,
             trackingNumber: trackingNumberTest,
             price: priceTest,
@@ -220,9 +217,9 @@ describe('OrderResolver', () => {
         },
         asAdmin: true,
       })
-      expect(response.data?.orderUpdate).toMatchObject({
+      expect(response.data?.updateOrder).toMatchObject({
         id: order.id,
-        state: OrderState.Paid,
+        state: OrderState.Captured,
         shippingLabelUrl: shippingLabelTestUrl,
         trackingNumber: trackingNumberTest,
         price: priceTest,

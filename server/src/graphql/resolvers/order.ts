@@ -17,6 +17,7 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UnauthorizedError,
 } from 'type-graphql'
 
 import { AdminOnlyArgs } from '../auth'
@@ -94,9 +95,6 @@ class FullOrderInput extends BaseUpsertOrderInput {
   @Field((type) => OrderPrice, { nullable: true })
   price: OrderPrice
 
-  @Field((type) => OrderState, { nullable: false })
-  state: OrderState
-
   @Field({ nullable: true })
   trackingNumber: string
 
@@ -145,24 +143,17 @@ class OrderResolver {
 
   @Authorized(Role.Admin)
   @Mutation((type) => Order)
-  async orderUpdate(
+  async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
     @Arg('payload', { nullable: true }) payload: FullOrderInput,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
-      throw new Error('no-user-specified')
+      throw new UnauthorizedError()
     }
     const order = await Order.mongo.findOne({ _id: orderId })
     if (!order) {
       throw new Error('no-matching-order')
-    }
-
-    if (payload.state !== order.state) {
-      const result = await order.transition(payload.state, OrderEventTrigger.Nomus)
-      if (result.error) {
-        throw result.error
-      }
     }
 
     order.quantity = payload.quantity ?? order.quantity
@@ -179,8 +170,8 @@ class OrderResolver {
   @Authorized(Role.User)
   @Mutation((type) => Order)
   async transitionOrderState(
-    @Arg('orderId', { nullable: true }) orderId: string | null,
-    @Arg('futureState', { nullable: true }) futureState: string | null,
+    @Arg('orderId', { nullable: false }) orderId: string | null,
+    @Arg('futureState', { nullable: false }) futureState: string | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
