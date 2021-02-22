@@ -2,6 +2,7 @@ import { css } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import * as SVG from 'src/components/SVG'
+import Icon from 'src/components/Icon'
 import { colors } from 'src/styles'
 import Box from './Box'
 import { ResponsiveValue } from 'styled-system'
@@ -34,7 +35,7 @@ const Banner = ({
     info: colors.nomusBlue,
   }[type]
 
-  const Icon = {
+  const ChosenIcon = {
     success: SVG.CheckO,
     warning: SVG.ExclamationO,
     danger: SVG.SlashO,
@@ -93,7 +94,7 @@ const Banner = ({
         p={2}
       >
         <Box display="flex">
-          <Icon
+          <ChosenIcon
             color={color}
             css={css({ marginRight: '8px', flexShrink: 0 })}
           />
@@ -111,7 +112,7 @@ const Banner = ({
             aria-label="close banner"
             onClick={onClickClose}
           >
-            <SVG.Close color={colors.midnightGray} />
+            <Icon of="close" color={colors.midnightGray} />
           </Box>
         )}
       </Box>

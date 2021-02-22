@@ -6,11 +6,11 @@ import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import PopoverButton from 'src/components/Popover'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import logo from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
 import { useAuth } from 'src/utils/auth'
+import Icon from 'src/components/Icon'
 
 interface Props {}
 
@@ -145,10 +145,7 @@ const Navbar = (props: Props) => {
                     icon={
                       <Box display="flex" alignItems="center">
                         {titleComponent}
-                        <SVG.Caret
-                          color={colors.nomusBlue}
-                          css={css({ transform: 'rotateX(180deg)' })}
-                        />
+                        <Icon of="caret" transform="rotateX(180deg)" />
                       </Box>
                     }
                     popoverContents={
@@ -205,7 +202,7 @@ const Navbar = (props: Props) => {
               ? [
                   <Link key="dashboard" to="/dashboard">
                     <Box display="flex" alignItems="center">
-                      <SVG.Profile />
+                      <Icon of="profile" color={colors.nomusBlue} />
                       <Text.Body ml={2} color={colors.nomusBlue}>
                         profile
                       </Text.Body>
@@ -236,7 +233,7 @@ const Navbar = (props: Props) => {
           <Box display={{ _: 'flex', [bp]: 'none' }} cursor="pointer">
             {loggedIn && (
               <Link key="dashboard" to="/dashboard" mr={3}>
-                <SVG.Profile color={colors.nomusBlue} />
+                <Icon of="profile" color={colors.nomusBlue} />
               </Link>
             )}
             {/* Hamburger button */}
@@ -248,9 +245,9 @@ const Navbar = (props: Props) => {
               }}
             >
               {mobileMenuOpen ? (
-                <SVG.Close color={colors.nomusBlue} />
+                <Icon of="close" color={colors.nomusBlue} />
               ) : (
-                <SVG.Menu color={colors.nomusBlue} />
+                <Icon of="menu" color={colors.nomusBlue} />
               )}
             </Box>
           </Box>
