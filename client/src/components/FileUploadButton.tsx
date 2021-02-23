@@ -1,6 +1,5 @@
 import { css } from '@emotion/react'
 import * as React from 'react'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
@@ -192,12 +191,7 @@ const FileUploadButton = ({
             }
           `}
         >
-          <SVG.Upload
-            color={colors.nomusBlue}
-            css={css`
-              margin-right: 8px;
-            `}
-          />
+          <Icon of="upload" color={colors.nomusBlue} mr="8px" />
           Upload a file or drag and drop
         </Button>
       )}

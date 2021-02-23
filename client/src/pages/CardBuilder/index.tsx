@@ -10,22 +10,21 @@ import {
 } from 'src/apollo/types/UpsertCustomOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import Wizard from 'src/components/Wizard'
+import Wizard, { WizardTabItem } from 'src/components/Wizard'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
 import CheckoutStep from './CheckoutStep'
-import UPSERT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 import {
+  BaseType,
   cardBuilderReducer,
   CheckoutFormData,
   initialState,
-  BaseType,
 } from './reducer'
 import ReviewStep from './ReviewStep'
+import UPSERT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 
 interface ParamsType {
   buildBaseType?: string
@@ -116,9 +115,7 @@ const CardBuilder = () => {
       stripeToken: stripeToken?.id,
     }
 
-    let orderCreateResult: ExecutionResult<
-      UpsertCustomOrderMutation
-    > | null = null
+    let orderCreateResult: ExecutionResult<UpsertCustomOrderMutation> | null = null
     if (cardBuilderState.baseType === 'custom') {
       orderCreateResult = await upsertCustomOrder({
         variables: {
@@ -186,11 +183,11 @@ const CardBuilder = () => {
       ? cardBuilderState.formData
       : watchedFields
 
-  const wizardSteps = [
+  const wizardSteps: WizardTabItem[] = [
     {
       key: 'build',
       label: 'Build',
-      Icon: SVG.FormatText,
+      icon: 'formatText',
       content: (
         <BuildStep
           selectedBaseType={buildBaseType}
@@ -209,7 +206,7 @@ const CardBuilder = () => {
     {
       key: 'checkout',
       label: 'Checkout',
-      Icon: SVG.Cart,
+      icon: 'cart',
       content: (
         <CheckoutStep
           cardBuilderState={cardBuilderState}
@@ -229,7 +226,7 @@ const CardBuilder = () => {
     {
       key: 'review',
       label: 'Review',
-      Icon: SVG.CheckO,
+      icon: 'checkO',
       content: (
         <ReviewStep
           cardBuilderState={cardBuilderState}
@@ -253,7 +250,7 @@ const CardBuilder = () => {
     wizardSteps.splice(0, 0, {
       key: 'base',
       label: 'Base',
-      Icon: SVG.Stack,
+      icon: 'stack',
       content: (
         <BaseStep
           selectedBaseType={buildBaseType}

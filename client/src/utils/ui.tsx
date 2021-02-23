@@ -1,4 +1,4 @@
-import React, { useState, useEffect, HTMLAttributes } from 'react'
+import { useState, useEffect, HTMLAttributes } from 'react'
 
 // Most of these come from https://github.com/mvasin/react-div-100vh, didn't want to add a new dependency for such a small set of util methods
 export function Div100vh({

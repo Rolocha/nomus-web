@@ -1,12 +1,9 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import { InternalLink } from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-
-type ValueOf<T> = T[keyof T]
+import Icon, { IconName } from './Icon'
 
 export enum TabActionType {
   InternalLink,
@@ -16,7 +13,7 @@ export enum TabActionType {
 interface TabConfig {
   id: string | number
   title: string
-  Icon?: ValueOf<typeof SVG>
+  icon?: IconName
   actionType: TabActionType
   onClick?: () => void
   // Required if actionType is 'internalLink' or 'externalLink'
@@ -54,7 +51,7 @@ const SegmentedController = ({
     >
       {tabs.map((tabConfig) => {
         const selected = selectedTabId === tabConfig.id
-        const { Icon } = tabConfig
+        const { icon } = tabConfig
         const InnerContent = (
           <Box
             bg={selected ? selectedBg : unselectedBg}
@@ -65,12 +62,11 @@ const SegmentedController = ({
             alignItems="center"
             justifyContent="center"
           >
-            {Icon && (
+            {icon && (
               <Icon
-                css={css`
-                  height: 1rem;
-                  margin-right: 4px;
-                `}
+                of={icon}
+                boxSize="1rem"
+                mr="4px"
                 color={selected ? selectedColor : unselectedColor}
               />
             )}

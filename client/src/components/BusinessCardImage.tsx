@@ -3,22 +3,26 @@ import * as CSS from 'csstype'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import * as SVG from 'src/components/SVG'
 import businessCardFallback from 'src/images/business-card-fallback.svg'
+import { colors } from 'src/styles'
 import {
   RequiredTheme,
   ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
+import Icon from './Icon'
 
 interface CommonProps {
   nameForImageAlt?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
   height?: ResponsiveValue<
-    CSS.HeightProperty<TLengthStyledSystem>,
+    CSS.Property.Height<TLengthStyledSystem>,
     RequiredTheme
   >
-  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
+  width?: ResponsiveValue<
+    CSS.Property.Width<TLengthStyledSystem>,
+    RequiredTheme
+  >
 }
 
 type ImagesPresentProps = {
@@ -54,7 +58,7 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
       }
     `}
   >
-    <SVG.Sync />
+    <Icon of="sync" color={colors.nomusBlue} />
   </Box>
 )
 
