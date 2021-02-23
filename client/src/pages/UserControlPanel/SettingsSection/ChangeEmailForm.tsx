@@ -127,7 +127,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
         )}
       </Box>
 
-      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
+      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'end center' }}>
         {active ? (
           <Box
             height="100%"

@@ -118,7 +118,7 @@ const ChangeUsernameForm = ({ username }: Props) => {
         )}
       </Box>
 
-      <Box gridArea="editUsername" placeSelf={{ _: 'end', [bp]: 'center' }}>
+      <Box gridArea="editUsername" placeSelf={{ _: 'end', [bp]: 'end center' }}>
         {active ? (
           <Box
             height="100%"
