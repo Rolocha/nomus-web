@@ -15,10 +15,13 @@ interface CommonProps {
   nameForImageAlt?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
   height?: ResponsiveValue<
-    CSS.HeightProperty<TLengthStyledSystem>,
+    CSS.Property.Height<TLengthStyledSystem>,
     RequiredTheme
   >
-  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
+  width?: ResponsiveValue<
+    CSS.Property.Width<TLengthStyledSystem>,
+    RequiredTheme
+  >
 }
 
 type ImagesPresentProps = {

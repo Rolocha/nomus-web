@@ -25,9 +25,12 @@ const HiddenUploadInput = styled.input`
 interface Props {
   src: string | null
   editable: boolean
-  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
+  width?: ResponsiveValue<
+    CSS.Property.Width<TLengthStyledSystem>,
+    RequiredTheme
+  >
   height?: ResponsiveValue<
-    CSS.HeightProperty<TLengthStyledSystem>,
+    CSS.Property.Height<TLengthStyledSystem>,
     RequiredTheme
   >
   // eslint-disable-next-line flowtype/no-weak-types
