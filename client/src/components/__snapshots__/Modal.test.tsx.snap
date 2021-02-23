@@ -45,7 +45,7 @@ exports[`<Modal /> renders a modal with the specified content in a portal 1`] = 
                 role="button"
               >
                 <svg
-                  class="chakra-icon css-n059si"
+                  class="chakra-icon css-1bt58m8"
                   focusable="false"
                   viewBox="0 0 24 24"
                 >
