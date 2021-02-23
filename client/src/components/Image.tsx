@@ -25,8 +25,8 @@ type ImageProps = SpaceProps &
   BorderProps &
   LayoutProps &
   ShadowProps & {
-    h?: ResponsiveValue<CSS.HeightProperty<TLengthStyledSystem>, RequiredTheme>
-    w?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
+    h?: ResponsiveValue<CSS.Property.Height<TLengthStyledSystem>, RequiredTheme>
+    w?: ResponsiveValue<CSS.Property.Width<TLengthStyledSystem>, RequiredTheme>
   }
 
 const Image = styled.img<ImageProps>(

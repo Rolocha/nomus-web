@@ -52,12 +52,15 @@ interface Props {
   onClickOutside?: () => void
   children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
   maxWidth?: ResponsiveValue<
-    CSS.MaxWidthProperty<TLengthStyledSystem>,
+    CSS.Property.MaxWidth<TLengthStyledSystem>,
     RequiredTheme
   >
-  width?: ResponsiveValue<CSS.WidthProperty<TLengthStyledSystem>, RequiredTheme>
+  width?: ResponsiveValue<
+    CSS.Property.Width<TLengthStyledSystem>,
+    RequiredTheme
+  >
   height?: ResponsiveValue<
-    CSS.MaxHeightProperty<TLengthStyledSystem>,
+    CSS.Property.MaxHeight<TLengthStyledSystem>,
     RequiredTheme
   >
   confirmClose: () => boolean
@@ -268,7 +271,7 @@ const Modal = ({
                                 cursor: pointer;
                               `}
                             >
-                              <Icon of="close" color={colors.midnightGray} />
+                              <Icon of="close" />
                             </Box>
                           </Box>
 

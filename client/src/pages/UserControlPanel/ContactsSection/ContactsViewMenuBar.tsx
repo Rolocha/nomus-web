@@ -3,7 +3,6 @@ import 'css.gg/icons/css/external.css'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
-import Icon from 'src/components/Icon'
 import { InternalLink } from 'src/components/Link'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
 import * as SVG from 'src/components/SVG'
@@ -15,6 +14,7 @@ import { colors } from 'src/styles'
 import { allContactsSortOptions, ContactsSortOption } from './utils'
 import { Contact } from 'src/types/contact'
 import { useLocation } from 'react-router-dom'
+import Icon from 'src/components/Icon'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
