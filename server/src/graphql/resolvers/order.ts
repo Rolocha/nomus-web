@@ -208,7 +208,7 @@ class OrderResolver {
     return result.value
   }
 
-  //Get all orders for a User
+  // Get all orders for a User
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Order], { nullable: true })
