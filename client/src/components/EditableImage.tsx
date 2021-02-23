@@ -4,7 +4,6 @@ import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { animations, colors } from 'src/styles'
 import {
@@ -12,6 +11,7 @@ import {
   ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
+import Icon from './Icon'
 
 const HiddenUploadInput = styled.input`
   position: absolute;
@@ -122,7 +122,7 @@ const EditableImage = ({
           onClick={handleUpdatePictureClick}
         >
           <Box display="flex" alignItems="center">
-            <SVG.Pen color={colors.nomusBlue} />
+            <Icon of="pen" color={colors.nomusBlue} />
             <Text.Body2
               ml={2}
               className="edit-text"

@@ -1,18 +1,17 @@
-import * as React from 'react'
-import * as Text from 'src/components/Text'
-import * as Form from 'src/components/Form'
-import * as yup from 'yup'
-import * as SVG from 'src/components/SVG'
-import Box from 'src/components/Box'
-import SaveButton from 'src/components/SaveButton'
-import EditButton from 'src/components/EditButton'
 import { yupResolver } from '@hookform/resolvers/yup'
+import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
-import { UPDATE_PROFILE_MUTATION } from '../mutations'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
-import { css } from '@emotion/react'
+import Box from 'src/components/Box'
 import CancelButton from 'src/components/CancelButton'
+import EditButton from 'src/components/EditButton'
+import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import SaveButton from 'src/components/SaveButton'
+import * as Text from 'src/components/Text'
+import * as yup from 'yup'
+import { UPDATE_PROFILE_MUTATION } from '../mutations'
 
 const bp = 'lg'
 
@@ -118,9 +117,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
           </Form.Form>
         ) : (
           <Box display="flex" alignItems="center">
-            {!isEmailVerified && (
-              <SVG.ExclamationO css={css({ marginRight: '4px' })} />
-            )}
+            {!isEmailVerified && <Icon of="exclamationO" mr="4px" />}
 
             <Text.Body2 mt={1}>{email}</Text.Body2>
           </Box>

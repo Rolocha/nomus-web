@@ -12,10 +12,10 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import { InternalLink } from 'src/components/Link'
 import Spinner from 'src/components/Spinner'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
+import Icon, { IconName } from './Icon'
 
 export interface WizardStepProps {
   onTransitionToPreviousStep?: () => Promise<void>
@@ -23,8 +23,8 @@ export interface WizardStepProps {
   ref?: React.RefObject<any>
 }
 
-interface TabItem {
-  Icon: (...args: any) => JSX.Element
+export interface WizardTabItem {
+  icon: IconName
   label: React.ReactNode
   content: React.ReactElement<WizardStepProps>
   key: string
@@ -34,7 +34,7 @@ interface TabItem {
 }
 
 interface Props {
-  steps: Array<TabItem>
+  steps: Array<WizardTabItem>
   exitText: string
   exitPath?: string
 }
@@ -126,7 +126,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
       >
-        {steps.map(({ linkPath, key, Icon, label }, index) => {
+        {steps.map(({ linkPath, key, icon, label }, index) => {
           const sectionPath = `${routeMatch.url}/${linkPath ?? key}`
           const isCurrentSection = location.pathname.startsWith(sectionPath)
           const stepDisabled = isStepDisabled(index)
@@ -139,16 +139,11 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
               alignItems="center"
             >
               <Icon
+                of={icon}
                 color="white"
-                css={css`
-                  height: 1.5em;
-                  // Margin below in mobile; on right in desktop
-                  margin-bottom: 0.5em;
-                  ${mq[bp]} {
-                    margin-bottom: 0;
-                    margin-right: 0.7em;
-                  }
-                `}
+                boxSize="1.5em"
+                mb={{ _: '0.5em', [bp]: 0 }}
+                mr={{ _: 0, [bp]: '0.7em' }}
               />
               <Text.Plain
                 m={0}
@@ -267,8 +262,9 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                           {processingPreviousTransition ? (
                             <Spinner size="1em" />
                           ) : (
-                            <SVG.ArrowRightO
-                              css={css({ transform: 'rotate(180deg)' })}
+                            <Icon
+                              of="arrowRightO"
+                              transform="rotate(180deg)"
                               color="white"
                             />
                           )}
@@ -333,7 +329,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                           {processingNextTransition ? (
                             <Spinner size="1em" />
                           ) : (
-                            <SVG.ArrowRightO color="white" />
+                            <Icon of="arrowRightO" color="white" />
                           )}
                         </Box>
                       </Button>

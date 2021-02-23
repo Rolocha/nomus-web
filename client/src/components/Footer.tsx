@@ -11,6 +11,7 @@ import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
+import Icon from './Icon'
 
 interface FormData {
   email: string
@@ -168,12 +169,12 @@ const Footer = () => {
           <Box display="flex" px={-1} mt={{ _: 2, [bp]: 0 }}>
             {([
               {
-                Icon: SVG.Facebook,
+                iconName: 'facebook',
                 link: 'https://www.facebook.com/Nomus-110290254018786',
               },
-              { Icon: SVG.Twitter, link: 'https://twitter.com/nomusme' },
-              { Icon: SVG.Instagram, link: 'https://instagram.com/nomus.me' },
-            ] as const).map(({ Icon, link }) => (
+              { iconName: 'twitter', link: 'https://twitter.com/nomusme' },
+              { iconName: 'instagram', link: 'https://instagram.com/nomus.me' },
+            ] as const).map(({ iconName, link }) => (
               <Link key={link} to={link}>
                 <Box
                   mx={1}
@@ -185,7 +186,7 @@ const Footer = () => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Icon color={colors.nomusBlue} />
+                  <Icon of={iconName} color={colors.nomusBlue} />
                 </Box>
               </Link>
             ))}

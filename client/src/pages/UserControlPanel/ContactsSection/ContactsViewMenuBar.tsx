@@ -5,7 +5,6 @@ import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import { InternalLink } from 'src/components/Link'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
-import * as SVG from 'src/components/SVG'
 import SegmentedController, {
   TabActionType,
 } from 'src/components/SegmentedController'
@@ -14,6 +13,7 @@ import { colors } from 'src/styles'
 import { allContactsSortOptions, ContactsSortOption } from './utils'
 import { Contact } from 'src/types/contact'
 import { useLocation } from 'react-router-dom'
+import Icon from 'src/components/Icon'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -76,14 +76,13 @@ const ContactCardsList = ({
           placeholder="Search"
           pl="calc(8px + 1.3rem + 8px)"
         />
-        <SVG.Search
-          css={css`
-            position: absolute;
-            top: 50%;
-            left: 8px;
-            transform: translateY(-50%);
-            height: 1.3rem;
-          `}
+        <Icon
+          of="search"
+          position="absolute"
+          top="50%"
+          left="8px"
+          transform="translateY(-50%"
+          height="1.3rem"
           color={colors.africanElephant}
         />
       </Box>
@@ -102,7 +101,7 @@ const ContactCardsList = ({
             _: PopoverAnchorPoint.TopRight,
             md: PopoverAnchorPoint.Top,
           }}
-          icon={<SVG.Options />}
+          icon="options"
           popoverContents={
             <Box py={2}>
               <Text.Body3 px={2} color="africanElephant">
@@ -125,12 +124,7 @@ const ContactCardsList = ({
                   })}
                 >
                   {option === selectedContactSortOption ? (
-                    <SVG.Check
-                      color="black"
-                      css={css`
-                        width: 25px;
-                      `}
-                    />
+                    <Icon of="check" color="black" boxSize="25px" />
                   ) : (
                     <Box width="25px" height="25px" />
                   )}
@@ -168,9 +162,9 @@ const ContactCardsList = ({
               <Text.Body2 mr={3} color="linkBlue">
                 nomus.me/{selectedContact.username}
               </Text.Body2>
-              {/* <Box>
-                <Icon of="external" />
-              </Box> */}
+              <Box>
+                <Icon of="externalLink" color="linkBlue" boxSize="0.8em" />
+              </Box>
             </Box>
           </InternalLink>
         )}
@@ -187,7 +181,7 @@ const ContactCardsList = ({
             {
               id: 'glance',
               title: 'Glance',
-              Icon: SVG.Grid,
+              icon: 'grid',
               actionType: TabActionType.InternalLink,
               onClick: () =>
                 onSelectedContactSortOptionChange(
@@ -198,7 +192,7 @@ const ContactCardsList = ({
             {
               id: 'detail',
               title: 'Detail',
-              Icon: SVG.List,
+              icon: 'list',
               actionType: TabActionType.InternalLink,
               onClick: () =>
                 onSelectedContactSortOptionChange(

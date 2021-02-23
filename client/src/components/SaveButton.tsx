@@ -1,9 +1,9 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import * as SVG from 'src/components/SVG'
 import { css } from '@emotion/react'
 import { colors } from 'src/styles'
+import Icon from './Icon'
 
 type SaveButtonProps = {
   onClick?: (event: React.SyntheticEvent<any>) => void
@@ -12,7 +12,8 @@ type SaveButtonProps = {
 const SaveButton = ({ onClick }: SaveButtonProps) => (
   <Button onClick={onClick} variant="success">
     <Box display="flex" flexDirection="row" alignItems="center">
-      <SVG.Check
+      <Icon
+        of="check"
         css={css`
           width: 20px;
         `}

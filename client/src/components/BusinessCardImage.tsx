@@ -3,13 +3,14 @@ import * as CSS from 'csstype'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import * as SVG from 'src/components/SVG'
 import businessCardFallback from 'src/images/business-card-fallback.svg'
+import { colors } from 'src/styles'
 import {
   RequiredTheme,
   ResponsiveValue,
   TLengthStyledSystem,
 } from 'styled-system'
+import Icon from './Icon'
 
 interface CommonProps {
   nameForImageAlt?: string
@@ -57,7 +58,7 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
       }
     `}
   >
-    <SVG.Sync />
+    <Icon of="sync" color={colors.nomusBlue} />
   </Box>
 )
 

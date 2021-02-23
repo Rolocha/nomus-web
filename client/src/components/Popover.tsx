@@ -3,6 +3,7 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import { useCustomResponsiveStyles } from 'src/styles/helpers'
 import { ResponsiveValue } from 'styled-system'
+import Icon, { IconName } from 'src/components/Icon'
 
 export enum PopoverAnchorPoint {
   Top = 'Top',
@@ -11,15 +12,17 @@ export enum PopoverAnchorPoint {
 }
 
 interface Props {
-  omitIconBg: boolean
-  icon: React.ReactNode
+  omitIconBg?: boolean
+  icon: IconName
+  iconColor?: string
   popoverContents: React.ReactNode
   anchorPoint: ResponsiveValue<PopoverAnchorPoint>
 }
 
 const PopoverButton = ({
-  omitIconBg,
+  omitIconBg = false,
   icon,
+  iconColor,
   popoverContents,
   anchorPoint = PopoverAnchorPoint.Top,
 }: Props) => {
@@ -100,7 +103,7 @@ const PopoverButton = ({
         onClick={() => setIsOpen(!isOpen)}
         cursor="pointer"
       >
-        {icon}
+        <Icon of={icon} color={iconColor} />
       </Box>
       {isOpen && (
         <Box
