@@ -30,7 +30,8 @@ type InternalButtonProps = {
   React.ButtonHTMLAttributes<HTMLButtonElement>
 
 export const InternalButton = styled('button', {
-  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'size',
+  shouldForwardProp: (prop) =>
+    typeof prop === 'string' && isPropValid(prop) && prop !== 'size',
 })<InternalButtonProps>(
   baseButtonStyles,
   space,
