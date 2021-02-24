@@ -142,12 +142,7 @@ const Navbar = (props: Props) => {
                 {isNestedNavItem(item) ? (
                   <PopoverButton
                     omitIconBg
-                    icon={
-                      <Box display="flex" alignItems="center">
-                        {titleComponent}
-                        <Icon of="caret" transform="rotateX(180deg)" />
-                      </Box>
-                    }
+                    icon="caret"
                     popoverContents={
                       <Box
                         display="flex"
