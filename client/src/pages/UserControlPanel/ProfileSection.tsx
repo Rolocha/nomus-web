@@ -1,22 +1,22 @@
 import * as React from 'react'
-import { gql, useQuery, useMutation } from 'src/apollo'
+import { gql, useMutation, useQuery } from 'src/apollo'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import { Link } from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
-import * as Text from 'src/components/Text'
+import EditableImage from 'src/components/EditableImage'
+import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import { Link } from 'src/components/Link'
+import ProfilePicture from 'src/components/ProfilePicture'
+import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { colors } from 'src/styles'
-import { formatName } from 'src/utils/name'
-import ProfileEditorModal from './ProfileEditorModal'
-import EditableImage from 'src/components/EditableImage'
-import ProfilePicture from 'src/components/ProfilePicture'
-import { formatPhoneNumber } from 'src/utils/string'
-import EditButton from 'src/components/EditButton'
 import { createMailtoURL } from 'src/utils/email'
+import { formatName } from 'src/utils/name'
+import { formatPhoneNumber } from 'src/utils/string'
+import ProfileEditorModal from './ProfileEditorModal'
 
 const bp = 'md'
 
@@ -135,7 +135,7 @@ export default () => {
             px={2}
           >
             <Text.Body2 color="linkBlue">{`nomus.me/${data.user.username}`}</Text.Body2>
-            <SVG.ExternalLink color={colors.linkBlue} />
+            <Icon of="externalLink" color={colors.linkBlue} />
           </Box>
         </Link>
         <Box display={{ _: 'none', [bp]: 'block' }}>

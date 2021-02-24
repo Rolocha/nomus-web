@@ -3,8 +3,9 @@ import { action } from '@storybook/addon-actions'
 import React from 'react'
 import Box from 'src/components/Box'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
+import Icon from './Icon'
 
 export default {
   title: 'Popover',
@@ -29,7 +30,8 @@ export const AnchoredOnTop = () => {
     <Box display="inline-block" ml={6} mt={6}>
       <Popover
         anchorPoint={anchorPoint}
-        icon={<SVG.Options />}
+        icon="options"
+        iconColor={colors.nomusBlue}
         popoverContents={
           <Box p={2}>
             <Text.Body3 color="africanElephant">Anchor to</Text.Body3>
@@ -44,12 +46,7 @@ export const AnchoredOnTop = () => {
                 pr={2}
               >
                 {option === anchorPoint ? (
-                  <SVG.Check
-                    color="black"
-                    css={css`
-                      width: 25px;
-                    `}
-                  />
+                  <Icon of="check" color="black" width="25px" />
                 ) : (
                   <Box width="25px" height="25px" />
                 )}

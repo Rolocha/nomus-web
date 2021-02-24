@@ -6,16 +6,15 @@ import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import Link from 'src/components/Link'
 import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
+import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
+import { colors } from 'src/styles'
+import { validatePassword } from 'src/utils/password'
 import * as yup from 'yup'
 import { CHANGE_PASSWORD_MUTATION } from '../mutations'
-import { validatePassword } from 'src/utils/password'
-import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
-import { colors } from 'src/styles'
-import { css } from '@emotion/react'
-import Link from 'src/components/Link'
 
 interface PasswordFormData {
   currentPassword: string
@@ -169,10 +168,7 @@ const ChangePasswordForm = () => {
           <>
             <Box display="flex" alignItems="center">
               <Text.Body2 color={colors.validGreen}>
-                <SVG.CheckO
-                  color={colors.validGreen}
-                  css={css({ verticalAlign: 'bottom', marginRight: '2px' })}
-                />
+                <Icon of="checkO" verticalAlign="bottom" mr="2px" />
                 Password changed!{' '}
                 <Link to={null} onClick={() => reset()}>
                   Change again?
