@@ -1,57 +1,21 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
-import { gql, useMutation, useQuery } from 'src/apollo'
+import { gql, useQuery } from 'src/apollo'
 import { UCPSettingsSectionQuery } from 'src/apollo/types/UCPSettingsSectionQuery'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
-import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import EditButton from 'src/components/EditButton'
-import * as Form from 'src/components/Form'
-import SaveButton from 'src/components/SaveButton'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { useAuth } from 'src/utils/auth'
-import { UPDATE_PROFILE_MUTATION, UPDATE_USERNAME_MUTATION } from '../mutations'
 import ChangePasswordForm from './ChangePasswordForm'
+import ChangeUsernameForm from './ChangeUsernameForm'
+import ChangeEmailForm from './ChangeEmailForm'
 
 const bp = 'lg'
-
-interface EmailFormData {
-  email: string
-}
-
-interface UsernameFormData {
-  username: string
-}
 
 export default () => {
   const history = useHistory()
   const { logOut } = useAuth()
-  const [isEditingEmail, setIsEditingEmail] = React.useState(false)
-  const [isEditingUsername, setIsEditingUsername] = React.useState(false)
-
-  const {
-    register: emailFormRegister,
-    handleSubmit: emailFormHandleSubmit,
-    reset: emailFormReset,
-  } = useForm<EmailFormData>()
-  const {
-    register: usernameFormRegister,
-    handleSubmit: usernameFormHandleSubmit,
-    reset: usernameFormReset,
-  } = useForm<UsernameFormData>()
-
-  const haveSetDefaultRef = React.useRef(false)
-  const [updateProfile] = useMutation<UpdateProfileQuery>(
-    UPDATE_PROFILE_MUTATION,
-  )
-  const [updateUsername] = useMutation<UpdateUsernameMutation>(
-    UPDATE_USERNAME_MUTATION,
-  )
 
   const { loading, data } = useQuery<UCPSettingsSectionQuery>(
     gql`
@@ -72,34 +36,6 @@ export default () => {
     `,
   )
 
-  React.useEffect(() => {
-    if (!haveSetDefaultRef.current && data) {
-      emailFormReset({ email: data.user.email ?? '' })
-      usernameFormReset({ username: data.user.username ?? '' })
-      haveSetDefaultRef.current = true
-    }
-  }, [haveSetDefaultRef, data, emailFormReset, usernameFormReset])
-
-  const onSubmitEmail = (formData: EmailFormData) => {
-    updateProfile({
-      variables: {
-        updatedUser: { email: formData.email },
-      },
-    })
-    setIsEditingEmail(false)
-  }
-
-  const onSubmitUsername = (formData: UsernameFormData) => {
-    if (formData.username) {
-      updateUsername({
-        variables: {
-          username: formData.username,
-        },
-      })
-    }
-    setIsEditingUsername(false)
-  }
-
   if (loading || !data) {
     return <LoadingPage />
   }
@@ -107,8 +43,8 @@ export default () => {
   return (
     <Box
       p={{ _: '24px', md: '48px' }}
-      overflowY="scroll"
       height="100%"
+      width="100%"
       display="grid"
       gridTemplateColumns={{
         _: '8fr 4fr',
@@ -117,21 +53,17 @@ export default () => {
       gridTemplateAreas={{
         _: `
         "account ."
-        "email editEmail"
-        "username editUsername"
+        "email email"
+        "username username"
         "signOut signOut"
         "passwordForm passwordForm"
-        "deactivateProfileHeader ."
-        "deactivateProfileQuestion deactivateProfileQuestion"
       `,
         [bp]: `
         "account . ."
-        "email editEmail emailCopy"
-        "username editUsername usernameCopy"
+        "email email email"
+        "username username username"
         "signOut . ."
         "passwordForm . ."
-        "deactivateProfileHeader . ."
-        "deactivateProfileQuestion deactivateProfileButton deactivateProfileCopy"
       `,
       }}
       gridColumnGap={3}
@@ -144,99 +76,14 @@ export default () => {
       </Box>
 
       <Box gridArea="email">
-        <Text.Label>EMAIL</Text.Label>
-        {isEditingEmail ? (
-          <Form.Form onSubmit={emailFormHandleSubmit(onSubmitEmail)}>
-            <Form.Input
-              ref={emailFormRegister({ required: true })}
-              name="email"
-              type="email"
-              autoComplete="email"
-            />
-            <Form.Input type="submit" display="none" />
-          </Form.Form>
-        ) : (
-          <Box>
-            <Box display="flex" alignItems="center">
-              {!data.user.isEmailVerified && (
-                <SVG.ExclamationO css={css({ marginRight: '4px' })} />
-              )}
-
-              <Text.Body2 mt={1}>{data.user.email}</Text.Body2>
-            </Box>
-          </Box>
-        )}
-      </Box>
-
-      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'start center' }}>
-        {isEditingEmail ? (
-          <SaveButton
-            onClick={emailFormHandleSubmit(onSubmitEmail)}
-            iconOnlyBp={bp}
-          />
-        ) : (
-          <EditButton
-            onClick={() => {
-              setIsEditingEmail(true)
-              setIsEditingUsername(false)
-            }}
-            iconOnlyBp={bp}
-          />
-        )}
-      </Box>
-
-      <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3>
-          This is the email associated with your account. If you would like to
-          change the email on your profile, go to the Profile tab.
-        </Text.Body3>
+        <ChangeEmailForm
+          email={data?.user.email ?? ''}
+          isEmailVerified={data?.user.isEmailVerified}
+        />
       </Box>
 
       <Box gridArea="username">
-        <Text.Label>USERNAME/URL</Text.Label>
-        {isEditingUsername ? (
-          <Form.Form onSubmit={usernameFormHandleSubmit(onSubmitUsername)}>
-            <Box display="flex">
-              <Text.Body2 mt={1}>{'nomus.me/'}</Text.Body2>
-              <Form.Input
-                ref={usernameFormRegister()}
-                name="username"
-                type="username"
-                autoComplete="username"
-                py={0}
-              />
-              <Form.Input type="submit" display="none" />
-            </Box>
-          </Form.Form>
-        ) : (
-          <Text.Body2 mt={2}>{'nomus.me/' + data.user.username}</Text.Body2>
-        )}
-      </Box>
-
-      <Box
-        gridArea="editUsername"
-        placeSelf={{ _: 'end', [bp]: 'start center' }}
-      >
-        {isEditingUsername ? (
-          <SaveButton
-            onClick={usernameFormHandleSubmit(onSubmitUsername)}
-            iconOnlyBp={bp}
-          />
-        ) : (
-          <EditButton
-            onClick={() => {
-              setIsEditingUsername(true)
-              setIsEditingEmail(false)
-            }}
-            iconOnlyBp={bp}
-          />
-        )}
-      </Box>
-      <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
-        <Text.Body3>
-          This is your username for this account. Changing your username will
-          change your public profile link.
-        </Text.Body3>
+        <ChangeUsernameForm username={data?.user.username ?? ''} />
       </Box>
 
       <Box gridArea="signOut" display="center">
