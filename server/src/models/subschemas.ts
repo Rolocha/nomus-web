@@ -60,6 +60,7 @@ export class Address {
   postalCode: string
 }
 
+@InputType('OrderPriceInput')
 @ObjectType()
 export class OrderPrice {
   //Price of cards in the order

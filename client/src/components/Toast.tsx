@@ -2,10 +2,10 @@ import { useTransition, animated } from 'react-spring'
 import { css, keyframes } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
 import { colors } from 'src/styles'
 import Box from './Box'
 import ReactDOM from 'react-dom'
+import Icon from './Icon'
 
 interface Props {
   type: 'success' | 'warning' | 'danger' | 'info'
@@ -109,8 +109,9 @@ const Toast = ({
                       aria-label="close banner"
                       onClick={onClickClose}
                     >
-                      <SVG.Close
-                        css={css({ width: '16px' })}
+                      <Icon
+                        of="close"
+                        width="16px"
                         color={colors.midnightGray}
                       />
                     </Box>

@@ -38,7 +38,7 @@ const colors = {
   activeBlue: '#E5F1FF',
   outlineBlue: '#B2D6FF',
 
-  hoverRed: '#B01500',
+  hoverRed: '#FFF0F7',
   activeRed: '#9E1300',
   outlineRed: '#FFB2D6',
 
@@ -46,5 +46,8 @@ const colors = {
   activeGreen: '#E5FFF1',
   outlineGreen: '#B2FFD6',
 } as const
+
+export type ColorName = keyof typeof colors
+export type ColorValue = typeof colors[ColorName]
 
 export default colors

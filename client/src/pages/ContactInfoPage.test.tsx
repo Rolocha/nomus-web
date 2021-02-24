@@ -80,7 +80,7 @@ const ui = {
     fireEvent.click(
       renderResult
         .getByRole('button', {
-          name: 'Discard',
+          name: 'Yes, discard',
         })
         .closest('button')!,
     )
@@ -459,7 +459,7 @@ describe('Contact Info Page', () => {
 
       // Ensure discard confirmation dialog pops up
       ui.cancelNotesModal(renderResult)
-      expect(await renderResult.findByText('Discard?')).toBeInTheDocument()
+      expect(await renderResult.findByText('Yes, discard')).toBeInTheDocument()
 
       // Ensure discarding restores the notes state back to pre-edit version
       ui.confirmDiscardNotes(renderResult)

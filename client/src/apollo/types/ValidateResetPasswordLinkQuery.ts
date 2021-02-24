@@ -11,7 +11,7 @@ export interface ValidateResetPasswordLinkQuery {
   /**
    * Validates whether the reset password token is valid and non-expired
    */
-  validateResetPasswordLink: any | null
+  validateResetPasswordLink: boolean | null
 }
 
 export interface ValidateResetPasswordLinkQueryVariables {

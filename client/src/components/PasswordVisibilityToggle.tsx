@@ -1,8 +1,8 @@
 import * as React from 'react'
 import Box from './Box'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
+import Icon from './Icon'
 
 interface Props {
   visible: boolean
@@ -18,7 +18,7 @@ const PasswordVisibilityToggle = ({ visible, setVisible }: Props) => {
       alignItems="center"
       onClick={() => setVisible(!visible)}
     >
-      <SVG.Eye color={colors.nomusBlue} />
+      <Icon of="eye" color={colors.nomusBlue} />
       <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
         {visible ? 'Hide' : 'Show'} password
       </Text.Body3>

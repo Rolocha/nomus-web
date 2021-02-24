@@ -3,24 +3,23 @@ import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
-import Toast from 'src/components/Toast'
+import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
+import { ExternalLink } from 'src/components/Link'
 import MultiWorkspace from 'src/components/MultiWorkspace'
 import Navbar from 'src/components/Navbar'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import Toast from 'src/components/Toast'
 import LoadingPage from 'src/pages/LoadingPage'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
+import { resendVerificationEmail } from 'src/utils/auth'
 import { formatName } from 'src/utils/name'
 import CardsSection from './CardsSection'
 import ContactsSection from './ContactsSection'
 import OrdersSection from './OrdersSection'
 import ProfileSection from './ProfileSection'
 import SettingsSection from './SettingsSection'
-import Banner from 'src/components/Banner'
-import { ExternalLink } from 'src/components/Link'
-import { resendVerificationEmail } from 'src/utils/auth'
 
 const bp = 'md'
 
@@ -165,13 +164,13 @@ const ProfilePage = () => {
                 {
                   key: 'profile',
                   label: 'Profile',
-                  Icon: SVG.Profile,
+                  icon: 'profile',
                   content: <ProfileSection />,
                 },
                 {
                   key: 'cards',
                   label: 'Cards',
-                  Icon: SVG.Cards,
+                  icon: 'cards',
                   content: <CardsSection />,
                 },
                 {
@@ -179,7 +178,7 @@ const ProfilePage = () => {
                   linkPath: 'contacts',
                   matchPath: 'contacts/:viewMode?/:username?',
                   label: 'Contacts',
-                  Icon: SVG.Contacts,
+                  icon: 'contacts',
                   content: <ContactsSection />,
                 },
                 {
@@ -187,13 +186,13 @@ const ProfilePage = () => {
                   linkPath: 'orders',
                   matchPath: 'orders/:orderId?',
                   label: 'Orders',
-                  Icon: SVG.Orders,
+                  icon: 'orders',
                   content: <OrdersSection />,
                 },
                 {
                   key: 'settings',
                   label: 'Settings',
-                  Icon: SVG.Settings,
+                  icon: 'settings',
                   content: <SettingsSection />,
                 },
               ]}

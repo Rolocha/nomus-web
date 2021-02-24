@@ -2,9 +2,9 @@ import { DocumentType } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
-import { Address } from 'src/models/subschemas'
+import { Address, OrderPrice } from 'src/models/subschemas'
 import { User } from 'src/models/User'
-import { CardSpecBaseType, OrderState, Role } from 'src/util/enums'
+import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
 import { calculateCost } from 'src/util/pricing'
 import { stripe } from 'src/util/stripe'
 import {
@@ -17,6 +17,7 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UnauthorizedError,
 } from 'type-graphql'
 
 import { AdminOnlyArgs } from '../auth'
@@ -89,6 +90,34 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
   shippingAddress: Address
 }
 
+@InputType({ description: 'Input to update fields on an existing Order' })
+class UpdateOrderInput {
+  @Field({ nullable: true })
+  orderId: string
+
+  @Field({ nullable: true })
+  quantity: number
+
+  // Credit/debit card Stripe token we'll use for payment auth/capture
+  @Field({ nullable: true })
+  stripeToken: string
+
+  @Field((type) => Address, { nullable: true })
+  shippingAddress: Address
+
+  @Field((type) => OrderPrice, { nullable: true })
+  price: OrderPrice
+
+  @Field({ nullable: true })
+  trackingNumber: string
+
+  @Field({ nullable: true })
+  shippingLabelUrl: string
+
+  @Field({ nullable: true })
+  printSpecUrl: string
+}
+
 @InputType({ description: 'Input to generate new or update existing custom card Order' })
 class UpsertCustomOrderInput extends BaseUpsertOrderInput {
   @Field((type) => CustomCardSpecInput)
@@ -125,10 +154,41 @@ class OrderResolver {
     }
   }
 
+  @Authorized(Role.Admin)
+  @Mutation((type) => Order)
+  // updateOrder cannot be used to update the state of the order.
+  // Use transitionOrderState instead
+  async updateOrder(
+    @Arg('orderId', { nullable: true }) orderId: string | null,
+    @Arg('payload', { nullable: true }) payload: UpdateOrderInput,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>> {
+    if (!context.user) {
+      throw new UnauthorizedError()
+    }
+    const order = await Order.mongo.findOne({ _id: orderId })
+    if (!order) {
+      throw new Error('no-matching-order')
+    }
+
+    order.quantity = payload.quantity ?? order.quantity
+    order.price = payload.price ?? order.price
+    order.trackingNumber = payload.trackingNumber ?? order.trackingNumber
+    order.shippingLabelUrl = payload.shippingLabelUrl ?? order.shippingLabelUrl
+    order.printSpecUrl = payload.printSpecUrl ?? order.printSpecUrl
+    order.shippingAddress = payload.shippingAddress ?? order.shippingAddress
+
+    await order.save()
+    return order
+  }
+
   @Authorized(Role.User)
   @Mutation((type) => Order)
-  async cancelOrder(
-    @Arg('orderId', { nullable: true }) orderId: string | null,
+  async transitionOrderState(
+    @Arg('orderId', { nullable: false }) orderId: string,
+    @Arg('futureState', (type) => OrderState, { nullable: false }) futureState: OrderState,
+    @Arg('trigger', (type) => OrderEventTrigger, { nullable: true })
+    trigger: OrderEventTrigger | null,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -139,14 +199,16 @@ class OrderResolver {
       throw new Error('no-matching-order')
     }
 
-    const cancelationResult = await order.cancel()
-    if (!cancelationResult.isSuccess) {
-      throw cancelationResult.error
+    const result = await order.transition(futureState, trigger)
+
+    if (!result.isSuccess) {
+      throw result.error
     }
-    return cancelationResult.value
+
+    return result.value
   }
 
-  //Get all orders for a User
+  // Get all orders for a User
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Order], { nullable: true })

@@ -51,15 +51,15 @@ describe('OrderEventResolver', () => {
     it('Gets OrderEvents from an OrderID', async () => {
       const user = await createMockUser({ roles: [Role.Admin] })
       const order = await createMockOrder({ user: user })
-      const orderEvent1 = await createMockOrderEvent({ order: order })
-      const orderEvent2 = await createMockOrderEvent({ order: order, state: OrderState.Paid })
-      const orderEvent3 = await createMockOrderEvent({ order: order, state: OrderState.Creating })
+      await createMockOrderEvent({ order: order, state: OrderState.Paid })
+      await createMockOrderEvent({ order: order, state: OrderState.Creating })
 
       const response = await execQuery({
         source: `
         query OrderEventsTestQuery($orderId: String) {
           orderEventsForOrder(orderId: $orderId) {
-            id
+            id,
+            state
           }
         }
         `,
@@ -69,11 +69,21 @@ describe('OrderEventResolver', () => {
         contextUser: user,
       })
 
-      expect(response.data?.orderEventsForOrder).toEqual([
-        { id: orderEvent1.id },
-        { id: orderEvent2.id },
-        { id: orderEvent3.id },
-      ])
+      // There's one OrderEvent created during pre-save of order, so should be 3 but we only know the id's of 2
+      expect(response.data?.orderEventsForOrder.length).toBe(3)
+      expect(response.data?.orderEventsForOrder).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            state: OrderState.Captured,
+          }),
+          expect.objectContaining({
+            state: OrderState.Paid,
+          }),
+          expect.objectContaining({
+            state: OrderState.Creating,
+          }),
+        ])
+      )
     })
   })
 })

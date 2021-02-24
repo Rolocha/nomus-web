@@ -152,7 +152,7 @@ const OrderList = ({ orders }: Props) => {
               >
                 <Box display="flex" alignItems="center">
                   <Text.Body3 color="secondaryBlue">View order</Text.Body3>
-                  <Icon icon="chevron-right" />
+                  <Icon of="chevronRight" />
                 </Box>
               </InternalLink>
             </Box>

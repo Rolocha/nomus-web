@@ -2,8 +2,8 @@ import { css } from '@emotion/react'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
+import Icon from 'src/components/Icon'
 import Image from 'src/components/Image'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import logoFull from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
@@ -117,10 +117,7 @@ const LoginPage = () => {
           >
             {infoLines.map((line) => [
               <Box px="8px" key="check" placeSelf="start end">
-                <SVG.Check
-                  color={colors.midnightGray}
-                  css={css({ width: '32px', height: '32px' })}
-                />
+                <Icon of="check" color={colors.midnightGray} boxSize="32" />
               </Box>,
               <Box key="content">
                 <Text.SectionSubheader mb={2}>

@@ -10,6 +10,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditButton from 'src/components/EditButton'
+import Icon from 'src/components/Icon'
 import Link, { ExternalLink } from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
@@ -17,7 +18,6 @@ import NotesEditingModal, {
   NotesFormData,
 } from 'src/components/NotesEditingModal'
 import ProfilePicture from 'src/components/ProfilePicture'
-import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
@@ -422,7 +422,7 @@ const ContactInfoPage = () => {
               download={`${contact.username}.vcf`}
               href={downloadLink}
             >
-              <SVG.Download color={colors.white} />{' '}
+              <Icon of="download" color={colors.white} />{' '}
               <Box
                 as="span"
                 ml={2}
