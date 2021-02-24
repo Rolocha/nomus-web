@@ -3,7 +3,6 @@ import 'css.gg/icons/css/external.css'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
-import Icon from 'src/components/Icon'
 import { InternalLink } from 'src/components/Link'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
 import * as SVG from 'src/components/SVG'
@@ -170,7 +169,7 @@ const ContactCardsList = ({
                 nomus.me/{selectedContact.username}
               </Text.Body2>
               <Box>
-                <Icon color="linkBlue" size={0.8} icon="external" />
+                {/* <Icon color="linkBlue" boxSize={0.8} icon="external" /> */}
               </Box>
             </Box>
           </InternalLink>
