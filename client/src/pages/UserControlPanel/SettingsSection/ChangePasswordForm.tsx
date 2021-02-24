@@ -6,16 +6,15 @@ import { ChangePasswordQuery } from 'src/apollo/types/ChangePasswordQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import Link from 'src/components/Link'
 import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
+import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
+import { colors } from 'src/styles'
+import { validatePassword } from 'src/utils/password'
 import * as yup from 'yup'
 import { CHANGE_PASSWORD_MUTATION } from '../mutations'
-import { validatePassword } from 'src/utils/password'
-import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
-import { colors } from 'src/styles'
-import { css } from '@emotion/react'
-import Link from 'src/components/Link'
 
 interface PasswordFormData {
   currentPassword: string
@@ -26,11 +25,11 @@ interface PasswordFormData {
 const bp = 'lg'
 
 const ERROR_MESSAGES = {
-  INCORRECT_CURRENT_PASSWORD: 'The current password you entered is incorrect.',
+  INCORRECT_CURRENT_PASSWORD: 'The password you entered is incorrect.',
   CURRENT_PASSWORD_REQUIRED: 'Your current password is required.',
   NEW_PASSWORD_REQUIRED: 'Please choose a new password.',
   PASSWORD_TOO_WEAK:
-    'Your password is too weak. Please use a stronger password.',
+    "Your password isn't secure enough. Avoid common words and repetition or try a longer password.",
   PASSWORDS_DO_NOT_MATCH: "Passwords don't match",
 }
 
@@ -169,10 +168,7 @@ const ChangePasswordForm = () => {
           <>
             <Box display="flex" alignItems="center">
               <Text.Body2 color={colors.validGreen}>
-                <SVG.CheckO
-                  color={colors.validGreen}
-                  css={css({ verticalAlign: 'bottom', marginRight: '2px' })}
-                />
+                <Icon of="checkO" verticalAlign="bottom" mr="2px" />
                 Password changed!{' '}
                 <Link to={null} onClick={() => reset()}>
                   Change again?

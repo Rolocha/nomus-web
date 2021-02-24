@@ -1,0 +1,42 @@
+{
+  "React component file": {
+    "prefix": "rcf",
+    "body": [
+      "import * as React from 'react'",
+      "",
+      "interface Props {",
+      "",
+      "}",
+      "",
+      "const $1 = ({}: Props) => {",
+      "  $2",
+      "}",
+      "",
+      "export default $1"
+    ],
+    "description": "The basics for a new React component from a blank file"
+  },
+  "import default component": {
+    "prefix": "idc",
+    "body": ["import $1 from 'src/components/$1'"]
+  },
+  "import collection of components": {
+    "prefix": "icc",
+    "body": ["import * as $1 from 'src/components/$1'"]
+  },
+  "New icon": {
+    "prefix": "new.icon",
+    "description": "Quickly bootstrap a new Icon in src/components/Icon/{IconName}.tsx",
+    "body": [
+      "import { createIcon } from './utils'",
+      "",
+      "export default createIcon({",
+      "  displayName: '$TM_FILENAME_BASE',",
+      "  viewBox: '${2:0 0 24 24}',",
+      "  path: [",
+      "    $3",
+      "  ]",
+      "})"
+    ]
+  }
+}

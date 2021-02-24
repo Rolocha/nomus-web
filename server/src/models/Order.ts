@@ -10,11 +10,24 @@ import {
 import { CardVersion } from './CardVersion'
 import { User } from './User'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderState } from '../util/enums'
+import { OrderEventTrigger, OrderState } from '../util/enums'
 import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
+import OrderEvent from './OrderEvent'
+
+// Mapping of current possible state transitions according to our Order Flow State Machine
+// https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
+const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
+  [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
+  [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+  [OrderState.Creating]: [OrderState.Created],
+  [OrderState.Created]: [OrderState.Enroute],
+  [OrderState.Enroute]: [OrderState.Fulfilled],
+  [OrderState.Fulfilled]: [],
+  [OrderState.Canceled]: [],
+}
 
 @pre<Order>('save', async function (next) {
   if (this.isNew) {
@@ -29,7 +42,12 @@ import { EventualResult, Result } from 'src/util/error'
       }
       shortId = Math.random().toString(36).substring(2, 8).toUpperCase()
     }
-
+    // Creates a new OrderEvent at creation time
+    await OrderEvent.mongo.create({
+      order: this.id,
+      state: OrderState.Captured,
+      trigger: OrderEventTrigger.Nomus,
+    })
     next()
   }
   next()
@@ -41,8 +59,6 @@ class Order extends BaseModel({
   prefix: 'ord',
 }) {
   static mongo: ReturnModelType<typeof Order>
-
-  static CANCELABLE_STATES = [OrderState.Captured, OrderState.Paid]
 
   @Field()
   createdAt: Date
@@ -90,29 +106,47 @@ class Order extends BaseModel({
   shortId: string
 
   @prop({ required: false, description: 'URL pointing to shipping label document' })
+  @Field({ nullable: true })
   shippingLabelUrl: string
 
   @prop({ required: false, description: 'URL pointing to the document to be printed' })
+  @Field({ nullable: true })
   printSpecUrl: string
 
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
-  private canBeCanceled() {
-    return Order.CANCELABLE_STATES.includes(this.state)
+  // Checks if a proposed transition can be accomplished in our state machine
+  private isTransitionAllowed(futureState: OrderState): boolean {
+    try {
+      return ALLOWED_STATE_TRANSITIONS[this.state].includes(futureState)
+    } catch (e) {
+      return false
+    }
   }
 
-  public async cancel(
-    this: DocumentType<Order>
-  ): EventualResult<DocumentType<Order>, 'cannot-be-canceled'> {
-    if (!this.canBeCanceled()) {
-      return Result.fail('cannot-be-canceled')
+  // Public instance method to transition OrderState
+  public async transition(
+    this: DocumentType<Order>,
+    futureState: OrderState,
+    trigger = OrderEventTrigger.Nomus
+  ): EventualResult<DocumentType<Order>, 'invalid-transition' | 'save-error'> {
+    if (this.isTransitionAllowed(futureState)) {
+      try {
+        await OrderEvent.mongo.create({
+          order: this.id,
+          trigger,
+          state: futureState,
+        })
+        this.state = futureState
+        await this.save()
+        return Result.ok(this)
+      } catch (e) {
+        return Result.fail('save-error')
+      }
     }
-
-    this.state = OrderState.Canceled
-    await this.save()
-    return Result.ok(this)
+    return Result.fail('invalid-transition')
   }
 }
 

@@ -12,9 +12,10 @@ import { InternalLink } from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
+import Icon, { IconName } from './Icon'
 
 interface TabItem {
-  Icon: (...args: any) => JSX.Element
+  icon: IconName
   label: React.ReactNode
   content: React.ReactElement
   key: string
@@ -66,7 +67,7 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
       >
-        {tabs.map(({ linkPath, key, Icon, label }, index) => {
+        {tabs.map(({ linkPath, key, icon, label }, index) => {
           const sectionPath = `${routeMatch.url}/${linkPath ?? key}`
           const isCurrentSection = location.pathname.startsWith(sectionPath)
           return (
@@ -94,16 +95,11 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
                   alignItems="center"
                 >
                   <Icon
+                    of={icon}
                     color="white"
-                    css={css`
-                      height: 1.5em;
-                      // Margin below in mobile; on right in desktop
-                      margin-bottom: 0.5em;
-                      ${mq[bp]} {
-                        margin-bottom: 0;
-                        margin-right: 0.7em;
-                      }
-                    `}
+                    boxSize="1.5em"
+                    mb={{ _: '0.5em', [bp]: 0 }}
+                    mr={{ _: 0, [bp]: '0.7em' }}
                   />
                   <Text.Plain
                     m={0}

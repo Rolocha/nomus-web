@@ -1,4 +1,5 @@
 import { Order } from 'src/models'
+import { OrderPrice } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderState } from 'src/util/enums'
@@ -92,8 +93,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
-          cancelOrder(orderId: $orderId) {
+        mutation CancelOrderMutation($orderId: String!) {
+          transitionOrderState(orderId: $orderId, futureState: ${OrderState.Canceled}) {
             id
             state
           }
@@ -105,7 +106,7 @@ describe('OrderResolver', () => {
         contextUser: user,
       })
 
-      expect(response.data?.cancelOrder?.id).toBe(order.id)
+      expect(response.data?.transitionOrderState?.id).toBe(order.id)
       const updatedOrder = await Order.mongo.findById(order.id)
       expect(updatedOrder.state).toBe(OrderState.Canceled)
     })
@@ -117,8 +118,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-        mutation CancelOrderMutation($orderId: String) {
-          cancelOrder(orderId: $orderId) {
+        mutation CancelOrderMutation($orderId: String!) {
+          transitionOrderState(orderId: $orderId, futureState: ${OrderState.Canceled}) {
             id
             state
           }
@@ -172,6 +173,58 @@ describe('OrderResolver', () => {
         asAdmin: true,
       })
       expect(response.data?.orders).toEqual([{ id: order1.id }, { id: order2.id }])
+    })
+  })
+  describe('updateOrder', () => {
+    it('updates an order', async () => {
+      const user = await createMockUser()
+      const order = await createMockOrder({ user: user, printSpecUrl: 'printTest' })
+
+      const shippingLabelTestUrl = 'this-is-a-url.com'
+      const trackingNumberTest = 'woooo'
+      const priceTest: OrderPrice = {
+        subtotal: 5,
+        tax: 1,
+        shipping: 3.75,
+        total: 100,
+      }
+
+      const response = await execQuery({
+        source: `
+          mutation UpdateOrderTestQuery($orderId: String, $payload: UpdateOrderInput) {
+            updateOrder(orderId: $orderId, payload: $payload) {
+              id,
+              state,
+              shippingLabelUrl,
+              trackingNumber,
+              printSpecUrl,
+              price {
+                subtotal,
+                tax,
+                shipping,
+                total
+              }
+            }
+          }
+        `,
+        variableValues: {
+          orderId: order.id,
+          payload: {
+            shippingLabelUrl: shippingLabelTestUrl,
+            trackingNumber: trackingNumberTest,
+            price: priceTest,
+          },
+        },
+        asAdmin: true,
+      })
+      expect(response.data?.updateOrder).toMatchObject({
+        id: order.id,
+        state: OrderState.Captured,
+        shippingLabelUrl: shippingLabelTestUrl,
+        trackingNumber: trackingNumberTest,
+        price: priceTest,
+        printSpecUrl: 'printTest',
+      })
     })
   })
 })

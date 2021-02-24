@@ -3,7 +3,7 @@ import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import * as SVG from 'src/components/SVG'
+import Icon from 'src/components/Icon'
 import { colors } from 'src/styles'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 
@@ -130,7 +130,7 @@ const CardBuilderPreview = ({
       >
         <Button onClick={() => setShowGuides(!showGuides)} variant="secondary">
           <Box display="flex" alignItems="center" justifyContent="center">
-            <SVG.Ruler color={colors.nomusBlue} />
+            <Icon of="ruler" color={colors.nomusBlue} />
             <Box ml={2}>{showGuides ? 'Hide' : 'Show'} guides</Box>
           </Box>
         </Button>
@@ -141,7 +141,7 @@ const CardBuilderPreview = ({
           onClick={() => setShowBothSides(!showBothSides)}
         >
           <Box display="flex" alignItems="center" justifyContent="center">
-            <SVG.PathBack color={colors.nomusBlue} />
+            <Icon of="switchSides" color={colors.nomusBlue} />
             <Box ml={2}>
               {showBothSides ? 'Show one side' : 'Show both sides'}
             </Box>
@@ -153,7 +153,7 @@ const CardBuilderPreview = ({
           onClick={() => setShowBack(!showBack)}
         >
           <Box display="flex" alignItems="center" justifyContent="center">
-            <SVG.Sync color={colors.nomusBlue} />
+            <Icon of="sync" color={colors.nomusBlue} />
             <Box ml={2}>Flip to {showBack ? 'front' : 'back'}</Box>
           </Box>
         </Button>

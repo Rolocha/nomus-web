@@ -46,7 +46,9 @@ describe('<Modal />', () => {
 
     // Click discard button
     getByText((content, element) => {
-      return content === 'Discard' && element.tagName.toLowerCase() === 'button'
+      return (
+        content === 'Yes, discard' && element.tagName.toLowerCase() === 'button'
+      )
     }).click()
 
     expect(closeModal).toHaveBeenCalledTimes(1)

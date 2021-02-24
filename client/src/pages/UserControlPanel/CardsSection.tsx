@@ -1,28 +1,28 @@
 import { css } from '@emotion/react'
 import * as React from 'react'
-import { gql, useQuery, useMutation } from 'src/apollo'
+import { gql, useMutation, useQuery } from 'src/apollo'
+import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
 import {
   UCPCardsSectionQuery,
   UCPCardsSectionQuery_cardVersionsStats as UCPCardsSectionQueryCardVersionsStats,
 } from 'src/apollo/types/UCPCardsSectionQuery'
 import { UpdateUserCheckpoints } from 'src/apollo/types/UpdateUserCheckpoints'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
 import BusinessCardImage from 'src/components/BusinessCardImage'
+import Button from 'src/components/Button'
+import Icon from 'src/components/Icon'
+import Image from 'src/components/Image'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
-import * as SVG from 'src/components/SVG'
 import LoadingPage from 'src/pages/LoadingPage'
+import { colors } from 'src/styles'
 import { getMonthAbbreviation } from 'src/utils/date'
+import { createMailtoURL } from 'src/utils/email'
+import cardsEmptyStateSvg from './cards_empty_state.svg'
 import {
   CHANGE_ACTIVE_CARD_VERSION,
   UPDATE_USER_CHECKPOINTS,
 } from './mutations'
-import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
-import Link from 'src/components/Link'
-import cardsEmptyStateSvg from './cards_empty_state.svg'
-import Image from 'src/components/Image'
-import { colors } from 'src/styles'
-import { createMailtoURL } from 'src/utils/email'
 
 const bp = 'md'
 
@@ -335,10 +335,7 @@ export default () => {
 
           {data.user.checkpoints?.expressedInterestInOrderingNomusCard ? (
             <Box display="flex" flexDirection="column" alignItems="center">
-              <SVG.Check
-                color={colors.nomusBlue}
-                css={css({ width: '50px', height: '50px' })}
-              />{' '}
+              <Icon of="check" color={colors.nomusBlue} boxSize="50px" />{' '}
               <Text.Body3>
                 Thanks for expressing interest. We'll reach out soon!
               </Text.Body3>
