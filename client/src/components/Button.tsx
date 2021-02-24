@@ -71,25 +71,30 @@ const Button = React.forwardRef(
     }: ButtonProps,
     ref,
   ) => {
+    const contents = [
+      inProgress && (
+        <Box as="span">
+          <Spinner size="1em" />
+        </Box>
+      ),
+      leftIcon && <Box as="span">{leftIcon}</Box>,
+      inProgress && inProgressText ? inProgressText : children,
+      rightIcon,
+    ].filter(Boolean)
+
     return (
       <InternalButton
         {...internalProps}
         ref={ref as React.MutableRefObject<HTMLButtonElement>}
         disabled={inProgress || disabled}
       >
-        <Box display="flex" alignItems="center">
-          {inProgress && (
-            <Box as="span" mr={2}>
-              <Spinner size="1em" />
-            </Box>
-          )}
-          {leftIcon && (
-            <Box as="span" mr={2}>
-              {leftIcon}
-            </Box>
-          )}
-          {inProgress && inProgressText ? inProgressText : children}
-          {rightIcon}
+        <Box
+          display="grid"
+          alignItems="center"
+          gridTemplateColumns={`repeat(${contents.length}, auto)`}
+          gridColumnGap={1}
+        >
+          {contents}
         </Box>
       </InternalButton>
     )

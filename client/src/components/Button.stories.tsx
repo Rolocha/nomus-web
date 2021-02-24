@@ -116,35 +116,30 @@ export const ButtonsInAGrid = () => {
 export const WithIcons = () => {
   return (
     <>
-      <Text.Body2>
-        Some examples of left-side icon and right-side icons.
-      </Text.Body2>
-      <Box
-        display="flex"
-        maxWidth="500px"
-        justifyContent="space-between"
-        p={3}
-        borderRadius={3}
-        border={`1px solid ${colors.lightGray}`}
+      <Text.Body2>Left-side icon</Text.Body2>
+      <Button
+        leftIcon={
+          <Icon
+            of="chevronRight"
+            transform="rotateZ(180deg)"
+            color="white"
+            boxSize="1.2em"
+          />
+        }
       >
-        <Button
-          leftIcon={
-            <Icon
-              of="chevronRight"
-              transform="rotateY(180deg)"
-              color="white"
-              boxSize="1.2em"
-            />
-          }
-        >
-          Previous
-        </Button>
-        <Button
-          rightIcon={<Icon of="chevronRight" color="white" boxSize="1.2em" />}
-        >
-          Next
-        </Button>
-      </Box>
+        Previous
+      </Button>
+      <Text.Body2>Right-side icon</Text.Body2>
+      <Button
+        rightIcon={<Icon of="chevronRight" color="white" boxSize="1.2em" />}
+      >
+        Next
+      </Button>
+      <Text.Body2>
+        Just an icon (you can use either leftIcon or rightIcon)
+      </Text.Body2>
+      <Button rightIcon={<Icon of="profile" color="white" boxSize="1.2em" />} />
+      <Button leftIcon={<Icon of="profile" color="white" boxSize="1.2em" />} />
     </>
   )
 }
