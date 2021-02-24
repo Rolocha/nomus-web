@@ -271,7 +271,7 @@ const Modal = ({
                                 cursor: pointer;
                               `}
                             >
-                              <Icon of="close" />
+                              <Icon of="close" color={colors.midnightGray} />
                             </Box>
                           </Box>
 

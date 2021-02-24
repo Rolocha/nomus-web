@@ -14,7 +14,6 @@ import { colors } from 'src/styles'
 import { allContactsSortOptions, ContactsSortOption } from './utils'
 import { Contact } from 'src/types/contact'
 import { useLocation } from 'react-router-dom'
-import Icon from 'src/components/Icon'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -170,7 +169,7 @@ const ContactCardsList = ({
                 nomus.me/{selectedContact.username}
               </Text.Body2>
               <Box>
-                <Icon color="linkBlue" size={0.8} icon="external" />
+                {/* <Icon color="linkBlue" boxSize={0.8} icon="external" /> */}
               </Box>
             </Box>
           </InternalLink>
