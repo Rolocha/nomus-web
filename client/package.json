@@ -2,6 +2,14 @@
   "name": "nomus-client",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "dev": "yarn && NODE_ENV=development webpack serve --config config/webpack.dev.js --host 0.0.0.0 --open --useLocalIp --hot",
+    "build": "NODE_ENV=production webpack --config config/webpack.prod.js",
+    "test": "node scripts/test.js",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
+    "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx src --max-warnings 0",
+    "storybook": "start-storybook"
+  },
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "@apollo/react-hooks": "^4.0.0",
@@ -105,98 +113,6 @@
     "yup": "^0.30.0",
     "zxcvbn": "^4.4.2"
   },
-  "scripts": {
-    "dev": "yarn && NODE_ENV=development webpack serve --config config/webpack.dev.js --host 0.0.0.0 --open --useLocalIp --hot",
-    "build": "NODE_ENV=production webpack --config config/webpack.prod.js",
-    "test": "node scripts/test.js",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
-    "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx src --max-warnings 0",
-    "storybook": "start-storybook"
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "plugins": [
-      "@emotion"
-    ],
-    "rules": {
-      "camelcase": [
-        2,
-        {
-          "properties": "always"
-        }
-      ],
-      "@emotion/pkg-renaming": "error",
-      "react/react-in-jsx-scope": "off"
-    }
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "jest": {
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
-      "!src/**/*.d.ts"
-    ],
-    "setupFiles": [
-      "react-app-polyfill/jsdom"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/setupTests.ts",
-      "jest-extended"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/src/test-utils"
-    ],
-    "testEnvironment": "jest-environment-jsdom-fourteen",
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
-      "^.+\\.module\\.(css|sass|scss)$"
-    ],
-    "modulePaths": [
-      "<rootDir>/"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
-    ],
-    "watchPlugins": [
-      "jest-watch-typeahead/filename",
-      "jest-watch-typeahead/testname"
-    ]
-  },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/preset-env": "^7.12.11",
@@ -234,14 +150,5 @@
     "hooks": {
       "pre-commit": "yarn lint:ci && pretty-quick --staged"
     }
-  },
-  "prettier": {
-    "singleQuote": true,
-    "semi": false,
-    "printWidth": 80,
-    "tabWidth": 2,
-    "arrowParens": "always",
-    "trailingComma": "all",
-    "bracketSpacing": true
   }
 }
