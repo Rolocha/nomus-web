@@ -6,7 +6,6 @@ import {
   sizeVariants,
   styleVariants,
 } from 'src/styles/components/buttonlike'
-import * as Text from 'src/components/Text'
 import theme from 'src/styles/theme'
 import {
   grid,
@@ -24,6 +23,8 @@ type InternalButtonProps = {
   variant?: keyof typeof styleVariants
   size?: keyof typeof sizeVariants
   as?: any
+  leftIcon?: React.ReactElement
+  rightIcon?: React.ReactElement
 } & SpaceProps &
   LayoutProps &
   GridProps &
@@ -64,6 +65,8 @@ const Button = React.forwardRef(
       children,
       disabled,
       inProgressText,
+      leftIcon,
+      rightIcon,
       ...internalProps
     }: ButtonProps,
     ref,
@@ -74,14 +77,20 @@ const Button = React.forwardRef(
         ref={ref as React.MutableRefObject<HTMLButtonElement>}
         disabled={inProgress || disabled}
       >
-        {inProgress ? (
-          <Box display="flex" alignItems="center">
-            <Spinner size="1em" />
-            <Text.Plain ml={1}>{inProgressText || children}</Text.Plain>
-          </Box>
-        ) : (
-          children
-        )}
+        <Box display="flex" alignItems="center">
+          {inProgress && (
+            <Box as="span" mr={2}>
+              <Spinner size="1em" />
+            </Box>
+          )}
+          {leftIcon && (
+            <Box as="span" mr={2}>
+              {leftIcon}
+            </Box>
+          )}
+          {inProgress && inProgressText ? inProgressText : children}
+          {rightIcon}
+        </Box>
       </InternalButton>
     )
   },
