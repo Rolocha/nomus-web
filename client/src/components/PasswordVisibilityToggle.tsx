@@ -18,7 +18,7 @@ const PasswordVisibilityToggle = ({ visible, setVisible }: Props) => {
       alignItems="center"
       onClick={() => setVisible(!visible)}
     >
-      <Icon of="eye" color={colors.nomusBlue} />
+      <Icon of="eye" color={colors.nomusBlue} boxSize="1em" />
       <Text.Body3 color="nomusBlue" ml={1} fontWeight={500}>
         {visible ? 'Hide' : 'Show'} password
       </Text.Body3>
