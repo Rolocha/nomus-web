@@ -4,8 +4,8 @@ import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
+import Button from 'src/components/Button'
 import EditableImage from 'src/components/EditableImage'
-import EditButton from 'src/components/EditButton'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
 import { Link } from 'src/components/Link'
@@ -139,12 +139,15 @@ export default () => {
           </Box>
         </Link>
         <Box display={{ _: 'none', [bp]: 'block' }}>
-          <EditButton
-            text="Edit profile"
-            variant="primary"
-            iconOnlyBp={bp}
+          <Button
+            variant="tertiary"
+            leftIcon={<Icon of="pen" />}
             onClick={openProfileEditorModal}
-          />
+          >
+            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+              Edit profile
+            </Box>
+          </Button>
         </Box>
       </Box>
 
@@ -235,11 +238,15 @@ export default () => {
           right="0px"
           top="0px"
         >
-          <EditButton
+          <Button
             variant="tertiary"
-            iconOnlyBp={bp}
+            leftIcon={<Icon of="pen" />}
             onClick={openProfileEditorModal}
-          />
+          >
+            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+              Edit
+            </Box>
+          </Button>
         </Box>
 
         <Box mb={3}>

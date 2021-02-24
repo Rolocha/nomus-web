@@ -4,7 +4,6 @@ import React from 'react'
 import Box from 'src/components/Box'
 import Button, { styleVariants } from 'src/components/Button'
 import * as Text from 'src/components/Text'
-import { colors } from 'src/styles'
 import Icon from './Icon'
 
 export default {

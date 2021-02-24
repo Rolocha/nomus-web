@@ -1,7 +1,9 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import EditButton from 'src/components/EditButton'
+import Button from 'src/components/Button'
+import Icon from 'src/components/Icon'
+import { Link } from 'src/components/Link'
 import NotesEditingModal, {
   getNotesFormDataFromContact,
 } from 'src/components/NotesEditingModal'
@@ -13,7 +15,6 @@ import { getFormattedFullDate } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import ContactCardsList from './ContactCardsList'
 import ContactsEmptyState from './ContactsEmptyState'
-import { Link } from 'src/components/Link'
 import { ContactsSortOption } from './utils'
 
 interface Props {
@@ -187,7 +188,15 @@ const ContactsDetailView = ({
             </Box>
 
             <Box gridArea="editButton">
-              <EditButton iconOnlyBp={bp} onClick={openNotesModal} />
+              <Button
+                variant="tertiary"
+                leftIcon={<Icon of="pen" />}
+                onClick={openNotesModal}
+              >
+                <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+                  Edit
+                </Box>
+              </Button>
             </Box>
 
             <Box gridArea="meetingDate">

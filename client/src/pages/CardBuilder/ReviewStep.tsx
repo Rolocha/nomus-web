@@ -6,7 +6,6 @@ import * as Text from 'src/components/Text'
 import { WizardStepProps } from 'src/components/Wizard'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
-import EditButton from 'src/components/EditButton'
 import { getCostSummary } from 'src/utils/pricing'
 import { BaseType, CardBuilderState } from './reducer'
 
@@ -117,9 +116,7 @@ const ReviewStep = React.forwardRef(
               </Text.Body2>
             </Box>
 
-            <Box>
-              <EditButton />
-            </Box>
+            <Box>{/* <EditButton /> */}</Box>
           </Box>
 
           <Box
@@ -144,18 +141,14 @@ const ReviewStep = React.forwardRef(
                   <Text.Body2 key={index}>{line}</Text.Body2>
                 ))}
             </Box>
-            <Box>
-              <EditButton />
-            </Box>
+            <Box>{/* <EditButton /> */}</Box>
 
             {/* next row */}
             <Text.Body2>Delivery ETA</Text.Body2>
             <Box>
               <Text.Body2>TODO</Text.Body2>
             </Box>
-            <Box>
-              <EditButton />
-            </Box>
+            <Box>{/* <EditButton /> */}</Box>
 
             {/* next row */}
             <Text.Body2>Payment</Text.Body2>
@@ -168,9 +161,7 @@ const ReviewStep = React.forwardRef(
                 <Text.Body2 key={index}>{line}</Text.Body2>
               ))}
             </Box>
-            <Box>
-              <EditButton />
-            </Box>
+            <Box>{/* <EditButton /> */}</Box>
           </Box>
           <Box
             gridArea="costSummary"

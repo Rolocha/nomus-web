@@ -4,12 +4,11 @@ import { useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import Box from 'src/components/Box'
-import CancelButton from 'src/components/CancelButton'
-import EditButton from 'src/components/EditButton'
+import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
-import SaveButton from 'src/components/SaveButton'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
 import * as yup from 'yup'
 import { UPDATE_PROFILE_MUTATION } from '../mutations'
 
@@ -135,19 +134,32 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
             gridGap={2}
           >
             <Box gridArea="save">
-              <SaveButton onClick={handleSubmit(onSubmitEmail)} />
+              <Button
+                variant="success"
+                rightIcon={<Icon of="check" color={colors.validGreen} />}
+                onClick={handleSubmit(onSubmitEmail)}
+              />
             </Box>
             <Box gridArea="cancel">
-              <CancelButton onClick={closeForm} />
+              <Button
+                variant="dangerSecondary"
+                rightIcon={<Icon of="close" color={colors.invalidRed} />}
+                onClick={closeForm}
+              />
             </Box>
           </Box>
         ) : (
-          <EditButton
+          <Button
+            variant="tertiary"
+            leftIcon={<Icon of="pen" />}
             onClick={() => {
               setActive(true)
             }}
-            iconOnlyBp={bp}
-          />
+          >
+            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+              Edit
+            </Box>
+          </Button>
         )}
       </Box>
 
