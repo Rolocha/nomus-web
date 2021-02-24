@@ -72,12 +72,8 @@ const Button = React.forwardRef(
     ref,
   ) => {
     const contents = [
-      inProgress && (
-        <Box as="span">
-          <Spinner size="1em" />
-        </Box>
-      ),
-      leftIcon && <Box as="span">{leftIcon}</Box>,
+      inProgress && <Spinner size="1em" />,
+      leftIcon,
       inProgress && inProgressText ? inProgressText : children,
       rightIcon,
     ].filter(Boolean)
