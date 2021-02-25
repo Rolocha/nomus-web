@@ -5,7 +5,7 @@ import { animated, useTransition } from 'react-spring'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
-import PopoverButton from 'src/components/Popover'
+import Popover from 'src/components/Popover'
 import * as Text from 'src/components/Text'
 import logo from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
@@ -140,7 +140,7 @@ const Navbar = (props: Props) => {
             return (
               <Box key={item.name}>
                 {isNestedNavItem(item) ? (
-                  <PopoverButton
+                  <Popover
                     omitIconBg
                     icon="caret"
                     popoverContents={
