@@ -1,4 +1,5 @@
 import { IconProps } from '@chakra-ui/icons'
+import * as React from 'react'
 import ArrowRightOIcon from './ArrowRightOIcon'
 import CardsIcon from './CardsIcon'
 import CaretIcon from './CaretIcon'
@@ -79,7 +80,7 @@ interface Props extends IconProps {
   of: IconName
 }
 
-export default ({ of, ...restProps }: Props) => {
+export default ({ of, ...restOfProps }: Props) => {
   const SelectedIcon = iconLibrary[of]
-  return <SelectedIcon {...restProps} />
+  return React.createElement(SelectedIcon, restOfProps)
 }

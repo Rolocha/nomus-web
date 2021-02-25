@@ -19,7 +19,7 @@ interface Props {
   anchorPoint: ResponsiveValue<PopoverAnchorPoint>
 }
 
-const PopoverButton = ({
+const Popover = ({
   omitIconBg = false,
   icon,
   iconColor,
@@ -121,9 +121,9 @@ const PopoverButton = ({
   )
 }
 
-PopoverButton.defaultProps = {
+Popover.defaultProps = {
   omitIconBg: false,
   anchorPoint: PopoverAnchorPoint.Top,
 }
 
-export default PopoverButton
+export default Popover
