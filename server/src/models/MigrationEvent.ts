@@ -7,7 +7,6 @@ export class MigrationEvent extends BaseModel({
   prefix: 'migrev',
 }) {
   static mongo: ReturnModelType<typeof MigrationEvent>
-  // a reference to the User object this profile belongs to
 
   @prop({ required: true })
   migrationName: string
