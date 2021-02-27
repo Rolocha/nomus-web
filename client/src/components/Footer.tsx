@@ -115,7 +115,7 @@ const Footer = () => {
                         border-bottom-left-radius: 0;
                       }
                     `}
-                    variant="primaryGold"
+                    variant="primary"
                     type="submit"
                     disabled={submitState === 'submitting'}
                   >

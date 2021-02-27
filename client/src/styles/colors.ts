@@ -34,17 +34,21 @@ const colors = {
   offWhite: '#FDFCF7',
 
   // Buttons
-  hoverBlue: '#F0F7FF',
-  activeBlue: '#E5F1FF',
+  hoverBlue: '#224B79',
+  hoverSecondaryBlue: '#F0F7FF',
+  activeBlue: '#14355A',
+  activeSecondaryBlue: '#E5F1FF',
   outlineBlue: '#B2D6FF',
 
-  hoverRed: '#FFF0F7',
+  hoverRed: '#B01500',
+  hoverSecondaryRed: '#FFF2F0',
   activeRed: '#9E1300',
-  outlineRed: '#FFB2D6',
+  activeSecondaryRed: '#FFE9E5',
 
-  hoverGreen: '#F0FFF7',
-  activeGreen: '#E5FFF1',
-  outlineGreen: '#B2FFD6',
+  hoverGreen: '#5A9E00',
+  hoverSecondaryGreen: '#F8FFF0',
+  activeGreen: '#549400',
+  activeSecondaryGreen: '#F3FFE5',
 } as const
 
 export type ColorName = keyof typeof colors

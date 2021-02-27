@@ -3,6 +3,7 @@ import { action } from '@storybook/addon-actions'
 import React from 'react'
 import Box from 'src/components/Box'
 import Button, { styleVariants } from 'src/components/Button'
+import * as Form from 'src/components/Form'
 import * as Text from 'src/components/Text'
 import Icon from './Icon'
 
@@ -17,81 +18,36 @@ export const actionsData = {
 }
 
 export const AllVariants = () => {
-  const renderButton = (
-    variant: any,
-    enabled: boolean,
-    size: 'normal' | 'big',
-  ) => (
-    <Button
-      css={css`
-        text-transform: capitalize;
-      `}
-      m={1}
-      key={variant}
-      variant={variant}
-      size={size}
-      disabled={!enabled}
-    >
-      {variant}
-    </Button>
-  )
-
-  const combinatorics: Array<{ enabled: boolean; size: 'big' | 'normal' }> = [
-    { enabled: true, size: 'normal' },
-    { enabled: false, size: 'normal' },
-    { enabled: true, size: 'big' },
-    { enabled: false, size: 'big' },
-  ]
-
-  const cellStyles = css({
-    textAlign: 'center',
-    textTransform: 'capitalize',
-  })
+  const [isDisabled, setIsDisabled] = React.useState(false)
 
   return (
     <Box>
-      <table>
-        <thead>
-          <tr>
-            <th />
-            {Object.keys(styleVariants).map((variant) => (
-              <th css={cellStyles}>
-                <Text.Body2 fontWeight="bold">{variant}</Text.Body2>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {combinatorics.map((combinatoric) => (
-            <tr>
-              <td css={cellStyles}>
-                <Text.Body2>
-                  {[
-                    combinatoric.size,
-                    combinatoric.enabled ? '[enabled]' : '[disabled]',
-                  ].join(' ')}
-                </Text.Body2>
-              </td>
-              {Object.keys(styleVariants).map((variant) => (
-                <td
-                  css={css(cellStyles, {
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  })}
-                >
-                  {renderButton(
-                    variant,
-                    combinatoric.enabled,
-                    combinatoric.size,
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
-          <tr></tr>
-        </tbody>
-      </table>
+      <Text.Body2>Disabled?</Text.Body2>
+      <Form.Input
+        type="checkbox"
+        checked={isDisabled}
+        onChange={(event) => setIsDisabled(event.target.checked)}
+      />
+
+      <Box display="grid" gridTemplateColumns="1fr 1fr">
+        {Object.keys(styleVariants).map((variant: any) =>
+          (['normal', 'big'] as const).map((size) => (
+            <Button
+              css={css`
+                text-transform: capitalize;
+                place-self: center;
+              `}
+              m={1}
+              key={variant}
+              variant={variant}
+              size={size}
+              disabled={isDisabled}
+            >
+              {size} {variant}
+            </Button>
+          )),
+        )}
+      </Box>
     </Box>
   )
 }
