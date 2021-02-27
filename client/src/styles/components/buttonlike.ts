@@ -17,6 +17,8 @@ export const baseButtonStyles = {
   alignItems: 'center',
   justifyContent: 'center',
   outline: 'none',
+  paddingLeft: '1rem',
+  paddingRight: '1rem',
   '&:disabled': {
     cursor: 'not-allowed',
   },

@@ -1,16 +1,16 @@
-import * as React from 'react'
-import * as Text from 'src/components/Text'
-import * as Form from 'src/components/Form'
-import * as yup from 'yup'
-import Box from 'src/components/Box'
-import SaveButton from 'src/components/SaveButton'
-import EditButton from 'src/components/EditButton'
 import { yupResolver } from '@hookform/resolvers/yup'
+import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
 import { useMutation } from 'src/apollo'
+import { UpdateUsernameMutation } from 'src/apollo/types/UpdateUsernameMutation'
+import Box from 'src/components/Box'
+import Button from 'src/components/Button'
+import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
+import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
+import * as yup from 'yup'
 import { UPDATE_USERNAME_MUTATION } from '../mutations'
-import CancelButton from 'src/components/CancelButton'
 
 interface Props {
   username: string
@@ -129,19 +129,32 @@ const ChangeUsernameForm = ({ username }: Props) => {
             gridGap={2}
           >
             <Box gridArea="save">
-              <SaveButton onClick={handleSubmit(onSubmitUsername)} />
+              <Button
+                variant="success"
+                rightIcon={<Icon of="check" color={colors.validGreen} />}
+                onClick={handleSubmit(onSubmitUsername)}
+              />
             </Box>
             <Box gridArea="cancel">
-              <CancelButton onClick={closeForm} />
+              <Button
+                variant="dangerSecondary"
+                rightIcon={<Icon of="close" color={colors.invalidRed} />}
+                onClick={closeForm}
+              />
             </Box>
           </Box>
         ) : (
-          <EditButton
+          <Button
+            variant="tertiary"
+            leftIcon={<Icon of="pen" />}
             onClick={() => {
               setActive(true)
             }}
-            iconOnlyBp={bp}
-          />
+          >
+            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+              Edit
+            </Box>
+          </Button>
         )}
       </Box>
       <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>

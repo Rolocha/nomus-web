@@ -9,7 +9,6 @@ import {
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
-import EditButton from 'src/components/EditButton'
 import Icon from 'src/components/Icon'
 import Link, { ExternalLink } from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
@@ -274,7 +273,15 @@ const ContactInfoPage = () => {
             </Box>
 
             <Box gridArea="editButton">
-              <EditButton onClick={openModalAndFocusOn(meetingDateRef)} />
+              <Button
+                variant="tertiary"
+                leftIcon={<Icon of="pen" />}
+                onClick={openModalAndFocusOn(meetingDateRef)}
+              >
+                <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+                  Edit
+                </Box>
+              </Button>
             </Box>
 
             <Box gridArea="meetingDate">

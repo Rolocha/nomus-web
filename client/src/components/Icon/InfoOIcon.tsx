@@ -1,4 +1,3 @@
-import { colors } from 'src/styles'
 import { createIcon } from './utils'
 
 export default createIcon({
@@ -6,7 +5,6 @@ export default createIcon({
   viewBox: '0 0 24 24',
   defaultProps: {
     fill: 'none',
-    color: colors.nomusBlue,
   },
   path: [
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />,
