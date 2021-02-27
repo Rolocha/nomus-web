@@ -38,7 +38,8 @@
     "dev": "ts-node-dev --no-deps --respawn --poll --interval 1000 --nolazy --inspect=0.0.0.0:9229 -r tsconfig-paths/register -- src",
     "serve": "node dist",
     "test": "jest --runInBand",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
+    "migrate": "ts-node -r tsconfig-paths/register src/migrations/migrate"
   },
   "eslintConfig": {
     "extends": "react-app",
