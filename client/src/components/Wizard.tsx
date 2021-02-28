@@ -141,9 +141,8 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
               <Icon
                 of={icon}
                 color="white"
-                boxSize="1.5em"
-                mb={{ _: '0.5em', [bp]: 0 }}
-                mr={{ _: 0, [bp]: '0.7em' }}
+                mb={{ base: '0.5em', md: 0 }}
+                mr={{ base: 0, md: '24px' }}
               />
               <Text.Plain
                 m={0}

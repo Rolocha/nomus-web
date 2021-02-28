@@ -175,7 +175,7 @@ const BuildStep = React.forwardRef(
         <Box
           overflow="visible"
           css={css`
-            & > ${Box} {
+            & > div {
               height: 100%;
             }
           `}

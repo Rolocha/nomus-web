@@ -1,3 +1,4 @@
+import { ChakraProvider } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -7,7 +8,7 @@ import { ThemeProvider } from '@emotion/react'
 import React from 'react'
 import { ApolloProvider, client as apolloClient } from 'src/apollo'
 import { PageRouter } from 'src/pages'
-import theme from 'src/styles/theme'
+import { chakraTheme, theme } from 'src/styles/theme'
 
 AOS.init()
 const stripePromise = loadStripe('pk_test_BHZBEPSq17NwCwSopGfQIfTs00pTG0HM75')
@@ -58,9 +59,11 @@ class App extends React.Component<PropsType, StateType> {
           }}
         >
           <ApolloProvider client={apolloClient}>
-            <ThemeProvider theme={theme}>
+            {/* <ThemeProvider theme={theme}> */}
+            <ChakraProvider theme={chakraTheme}>
               <PageRouter />
-            </ThemeProvider>
+            </ChakraProvider>
+            {/* </ThemeProvider> */}
           </ApolloProvider>
         </Elements>
       </div>

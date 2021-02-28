@@ -1,3 +1,4 @@
+import { Box as ChakraBox } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 import {
   border,
@@ -106,4 +107,6 @@ const Box = styled.div<BoxProps>(
   background,
 )
 
-export default Box
+// export default Box
+
+export default ChakraBox

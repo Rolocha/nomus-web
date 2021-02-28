@@ -12,7 +12,7 @@ const CardBuilderPreviewLegend = () => {
       gridColumnGap={3}
       css={css`
         text-align: center;
-        ${Box} {
+        div {
           // Align text in center of boxes
           display: flex;
           align-items: center;

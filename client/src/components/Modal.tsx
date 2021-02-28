@@ -184,7 +184,7 @@ const Modal = ({
                 left="0"
                 zIndex={10}
                 width="100vw"
-                height={fullHeight}
+                height={fullHeight ?? undefined}
                 // https://stackoverflow.com/a/55003985
                 minHeight="-webkit-fill-available"
                 display="flex"
