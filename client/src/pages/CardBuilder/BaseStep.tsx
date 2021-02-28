@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
@@ -15,7 +15,7 @@ interface Props {
 
 const BaseStep = ({ selectedBaseType, updateCardBuilderState }: Props) => {
   return (
-    <Box overflowY="scroll" height="100%" p={{ _: '24px', md: '48px' }}>
+    <Box overflowY="scroll" height="100%" p={{ base: '24px', md: '48px' }}>
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
         ? {
             custom: (
@@ -55,11 +55,8 @@ const BaseStep = ({ selectedBaseType, updateCardBuilderState }: Props) => {
 
                 <Text.Body2>
                   Have any questions?{' '}
-                  <ExternalLink href="mailto:hi@nomus.me">
-                    Just ask
-                  </ExternalLink>
-                  , and our design team will get back to you as soon as they
-                  have the chance.
+                  <Link to="mailto:hi@nomus.me">Just ask</Link>, and our design
+                  team will get back to you as soon as they have the chance.
                 </Text.Body2>
               </Box>
             ),

@@ -14,13 +14,13 @@ const bp = 'md'
 
 const ContactsGlanceView = ({ contacts, selectedContactSortOption }: Props) => {
   return (
-    <Box maxHeight={{ _: undefined, [bp]: '500px' }} overflowY="auto">
+    <Box maxHeight={{ base: undefined, [bp]: '500px' }} overflowY="auto">
       {contacts.length === 0 ? (
         <Box
           py="70px"
           display="grid"
           width="100%"
-          gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+          gridTemplateColumns={{ base: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
         >
           <Box />
           <ContactsEmptyState />

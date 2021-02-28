@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { action } from '@storybook/addon-actions'
 import React from 'react'
 import Box from 'src/components/Box'
@@ -29,16 +28,18 @@ export const AllVariants = () => {
         onChange={(event) => setIsDisabled(event.target.checked)}
       />
 
-      <Box display="grid" gridTemplateColumns="1fr 1fr">
+      <Box
+        display="grid"
+        gridTemplateColumns="1fr 1fr"
+        width="800px"
+        gridColumnGap={2}
+        gridRowGap={2}
+      >
         {Object.keys(styleVariants).map((variant: any) =>
           (['normal', 'big'] as const).map((size) => (
             <Button
-              css={css`
-                text-transform: capitalize;
-                place-self: center;
-              `}
               m={1}
-              key={variant}
+              key={variant + size}
               variant={variant}
               size={size}
               disabled={isDisabled}

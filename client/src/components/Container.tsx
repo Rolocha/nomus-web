@@ -12,7 +12,7 @@ const Container = ({ children, ...props }: Props) => {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      p={{ _: 3, lg: 0 }}
+      p={{ base: 3, lg: 0 }}
     >
       <Box maxWidth="1250px" {...props}>
         {children}

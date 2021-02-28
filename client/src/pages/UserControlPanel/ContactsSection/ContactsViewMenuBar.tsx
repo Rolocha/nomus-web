@@ -1,19 +1,18 @@
-import { css } from '@emotion/react'
 import 'css.gg/icons/css/external.css'
 import * as React from 'react'
+import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
-import { InternalLink } from 'src/components/Link'
+import Icon from 'src/components/Icon'
+import Link from 'src/components/Link'
 import Popover, { PopoverAnchorPoint } from 'src/components/Popover'
 import SegmentedController, {
   TabActionType,
 } from 'src/components/SegmentedController'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { allContactsSortOptions, ContactsSortOption } from './utils'
 import { Contact } from 'src/types/contact'
-import { useLocation } from 'react-router-dom'
-import Icon from 'src/components/Icon'
+import { allContactsSortOptions, ContactsSortOption } from './utils'
 
 interface Props {
   selectedContactSortOption: ContactsSortOption
@@ -48,11 +47,11 @@ const ContactCardsList = ({
     <Box
       display="grid"
       gridTemplateColumns={{
-        _: '10fr 2fr',
+        base: '10fr 2fr',
         [bp]: '3fr 1fr 5fr 3fr',
       }}
       gridTemplateAreas={{
-        _: `
+        base: `
         "viewMode viewMode"
         "search searchActions"
       `,
@@ -61,11 +60,14 @@ const ContactCardsList = ({
     `,
       }}
       gridColumnGap={2}
-      gridRowGap={{ _: 3, [bp]: 0 }}
-      alignItems={{ _: undefined, [bp]: 'center' }}
+      gridRowGap={{ base: 3, [bp]: 0 }}
+      alignItems={{ base: undefined, [bp]: 'center' }}
     >
       <Box
-        display={{ _: hideSearchBarInMobile ? 'none' : 'block', [bp]: 'block' }}
+        display={{
+          base: hideSearchBarInMobile ? 'none' : 'block',
+          [bp]: 'block',
+        }}
         gridArea="search"
         position="relative"
       >
@@ -74,23 +76,25 @@ const ContactCardsList = ({
           value={searchQueryValue || ''}
           onChange={handleChangeSearchQueryValue}
           placeholder="Search"
-          pl="calc(8px + 1.3rem + 8px)"
+          pl="calc(8px + 24px + 8px)"
         />
         <Icon
           of="search"
           position="absolute"
           top="50%"
           left="8px"
-          transform="translateY(-50%"
-          height="1.3rem"
+          transform="translateY(-50%)"
           color={colors.africanElephant}
         />
       </Box>
 
       <Box
-        display={{ _: hideSearchBarInMobile ? 'none' : 'flex', [bp]: 'flex' }}
+        display={{
+          base: hideSearchBarInMobile ? 'none' : 'flex',
+          [bp]: 'flex',
+        }}
         gridArea="searchActions"
-        placeSelf={{ _: 'center end', [bp]: 'center start' }}
+        placeSelf={{ base: 'center end', [bp]: 'center start' }}
         alignItems="center"
         justifyContent="flex-start"
         mx={-1}
@@ -98,10 +102,10 @@ const ContactCardsList = ({
       >
         <Popover
           anchorPoint={{
-            _: PopoverAnchorPoint.TopRight,
+            base: PopoverAnchorPoint.TopRight,
             md: PopoverAnchorPoint.Top,
           }}
-          icon="options"
+          icon={<Icon of="options" color={colors.nomusBlue} />}
           popoverContents={
             <Box py={2}>
               <Text.Body3 px={2} color="africanElephant">
@@ -117,24 +121,16 @@ const ContactCardsList = ({
                   alignItems="center"
                   py={1}
                   px={2}
-                  css={css({
-                    '&:hover': {
-                      backgroundColor: colors.hoverBlue,
-                    },
-                  })}
+                  _hover={{
+                    backgroundColor: colors.hoverBlue,
+                  }}
                 >
                   {option === selectedContactSortOption ? (
                     <Icon of="check" color="black" boxSize="25px" />
                   ) : (
                     <Box width="25px" height="25px" />
                   )}
-                  <Text.Body2
-                    css={css({
-                      whiteSpace: 'nowrap',
-                    })}
-                  >
-                    {option}
-                  </Text.Body2>
+                  <Text.Body2 whiteSpace="nowrap">{option}</Text.Body2>
                 </Box>
               ))}
             </Box>
@@ -143,12 +139,12 @@ const ContactCardsList = ({
       </Box>
 
       <Box
-        display={{ _: 'none', [bp]: 'block' }}
+        display={{ base: 'none', [bp]: 'block' }}
         gridArea="userPageLink"
         placeSelf="stretch start"
       >
         {selectedContact && (
-          <InternalLink
+          <Link
             asButton
             to={`/${selectedContact.username}`}
             buttonStyle="secondary"
@@ -166,14 +162,17 @@ const ContactCardsList = ({
                 <Icon of="externalLink" color="linkBlue" boxSize="0.8em" />
               </Box>
             </Box>
-          </InternalLink>
+          </Link>
         )}
       </Box>
 
       <Box
         gridArea="viewMode"
-        display={{ _: hideSearchBarInMobile ? 'none' : 'block', [bp]: 'block' }}
-        width={{ _: '100%', [bp]: undefined }}
+        display={{
+          base: hideSearchBarInMobile ? 'none' : 'block',
+          [bp]: 'block',
+        }}
+        width={{ base: '100%', [bp]: undefined }}
         justifySelf="end"
       >
         <SegmentedController

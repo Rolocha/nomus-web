@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { gql, useMutation } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
@@ -6,7 +5,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import CopyableText from 'src/components/CopyableText'
 import Image from 'src/components/Image'
-import { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { Order } from 'src/types/order'
@@ -53,14 +52,14 @@ export default ({ order }: Props) => {
       <Box
         pt={2}
         display="flex"
-        flexDirection={{ _: 'column', [bp]: 'row' }}
-        mx={{ _: -2, [bp]: -2 }}
-        my={{ _: -2, [bp]: -2 }}
+        flexDirection={{ base: 'column', [bp]: 'row' }}
+        mx={{ base: -2, [bp]: -2 }}
+        my={{ base: -2, [bp]: -2 }}
       >
         {order.cardVersion.frontImageUrl && (
           <Image
             p={2}
-            w={{ _: '100%', [bp]: '50%' }}
+            w={{ base: '100%', [bp]: '50%' }}
             src={order.cardVersion.frontImageUrl}
             alt={`front of business card from order ${order.id}`}
           />
@@ -68,7 +67,7 @@ export default ({ order }: Props) => {
         {order.cardVersion.backImageUrl && (
           <Image
             p={2}
-            w={{ _: '100%', [bp]: '50%' }}
+            w={{ base: '100%', [bp]: '50%' }}
             src={order.cardVersion.backImageUrl}
             alt={`back of business card from order ${order.id}`}
           />
@@ -82,7 +81,7 @@ export default ({ order }: Props) => {
         gridTemplateColumns="3fr 3fr"
         gridRowGap={3}
         gridTemplateAreas={{
-          _: `
+          base: `
         "details details" 
         "pricing pricing"`,
           [bp]: `
@@ -113,16 +112,16 @@ export default ({ order }: Props) => {
         <Box gridArea="pricing">
           <Box
             boxShadow="workingWindow"
-            borderRadius={2}
+            borderRadius="lg"
             p={3}
-            css={css({
+            sx={{
               '&>*': {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               },
-            })}
+            }}
           >
             <Box>
               <Text.Body2>Subtotal</Text.Body2>
@@ -167,11 +166,11 @@ export default ({ order }: Props) => {
       <Box mt={4}>
         <Text.Body3 textAlign="center">
           Need help with your order? Shoot us an email at{' '}
-          <ExternalLink
-            href={`mailto:hi@nomus.me?subject=Issue with Nomus order (${order.id})`}
+          <Link
+            to={`mailto:hi@nomus.me?subject=Issue with Nomus order (${order.id})`}
           >
             hi@nomus.me
-          </ExternalLink>
+          </Link>
           .
         </Text.Body3>
       </Box>

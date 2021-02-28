@@ -42,16 +42,16 @@ export default () => {
 
   return (
     <Box
-      p={{ _: '24px', md: '48px' }}
+      p={{ base: '24px', md: '48px' }}
       height="100%"
       width="100%"
       display="grid"
       gridTemplateColumns={{
-        _: '8fr 4fr',
+        base: '8fr 4fr',
         [bp]: '4fr 2fr 6fr',
       }}
       gridTemplateAreas={{
-        _: `
+        base: `
         "account ."
         "email email"
         "username username"
@@ -69,7 +69,7 @@ export default () => {
       gridColumnGap={3}
       gridRowGap={3}
     >
-      <Box gridArea="account" alignSelf={{ _: 'start', lg: 'center' }}>
+      <Box gridArea="account" alignSelf={{ base: 'start', lg: 'center' }}>
         <Text.SectionHeader mb={1} mt={0}>
           Account
         </Text.SectionHeader>
@@ -88,7 +88,7 @@ export default () => {
 
       <Box gridArea="signOut" display="center">
         <Button
-          width={{ _: '100%', [bp]: '75%' }}
+          width={{ base: '100%', [bp]: '75%' }}
           variant="secondary"
           onClick={() => {
             logOut()
@@ -112,7 +112,7 @@ export default () => {
 
       {/* <Box
         gridArea="deactivateProfileHeader"
-        alignSelf={{ _: 'start', md: 'center' }}
+        alignSelf={{ base:'start', md: 'center' }}
       >
         <Text.SectionHeader mb={1} mt={0}>
           Profile deactivation
@@ -121,7 +121,7 @@ export default () => {
 
       <Box
         gridArea="deactivateProfileQuestion"
-        display={{ _: 'block', [bp]: 'block' }}
+        display={{ base:'block', [bp]: 'block' }}
       >
         <Text.Body2>Would you like to deactivate your account?</Text.Body2>
       </Box>
@@ -135,7 +135,7 @@ export default () => {
 
       <Box
         gridArea="deactivateProfileCopy"
-        display={{ _: 'none', [bp]: 'block' }}
+        display={{ base:'none', [bp]: 'block' }}
       >
         <Text.Body3>
           Upon deactivating your account, you will no longer have a public
@@ -147,7 +147,7 @@ export default () => {
 
       {/* <Box
         gridArea="accountDeletionHeader"
-        alignSelf={{ _: 'start', md: 'center' }}
+        alignSelf={{ base:'start', md: 'center' }}
       >
         <Text.SectionHeader mb={1} mt={0}>
           Delete Acccount
@@ -160,7 +160,7 @@ export default () => {
 
       {/* <Box
         gridArea="accountDeletionButton"
-        alignSelf={{ _: 'start', [bp]: 'top center' }}
+        alignSelf={{ base:'start', [bp]: 'top center' }}
       >
         <Button width="full" variant="danger">
           <Text.Plain fontSize="14px" color="invalidRed">

@@ -198,7 +198,7 @@ const Modal = ({
                 justifyContent="center"
                 bg={rgba(colors.nomusBlue, 0.8)}
                 onClick={handleOutsideClick}
-                p={{ _: 2, md: 'unset' }}
+                p={{ base: 2, md: 'unset' }}
               >
                 {foregroundTransitions.map(
                   ({ item, key, props }) =>
@@ -217,8 +217,8 @@ const Modal = ({
                           }
                           width={
                             {
-                              center: width ?? { _: '100%', md: '80%' },
-                              right: width ?? { _: '90%', md: '50%' },
+                              center: width ?? { base: '100%', md: '80%' },
+                              right: width ?? { base: '90%', md: '50%' },
                             }[anchorStyle]
                           }
                           height={
@@ -228,7 +228,7 @@ const Modal = ({
                             }[anchorStyle]
                           }
                           bg="white"
-                          borderRadius={anchorStyle === 'center' ? 2 : 0}
+                          borderRadius={anchorStyle === 'center' ? 'lg' : 0}
                           boxShadow={anchorStyle === 'center' ? 0 : undefined}
                           display="flex"
                           flexDirection="column"
@@ -239,7 +239,7 @@ const Modal = ({
                         >
                           {header && (
                             <Box
-                              p={{ _: 3, md: 4 }}
+                              p={{ base: 3, md: 4 }}
                               borderBottom={`1px solid ${colors.superlightGray}`}
                             >
                               <Text.CardHeader mb={3}>
@@ -252,7 +252,7 @@ const Modal = ({
                           )}
 
                           <Box
-                            p={{ _: 3, md: 4 }}
+                            p={{ base: 3, md: 4 }}
                             flexGrow={0}
                             overflowY="auto"
                           >
@@ -267,9 +267,7 @@ const Modal = ({
                               position="absolute"
                               top="0"
                               right="0"
-                              css={css`
-                                cursor: pointer;
-                              `}
+                              cursor="pointer"
                             >
                               <Icon of="close" color={colors.midnightGray} />
                             </Box>

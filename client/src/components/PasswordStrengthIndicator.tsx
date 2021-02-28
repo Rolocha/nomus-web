@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
@@ -13,12 +12,8 @@ const PasswordStrengthIndicator = ({ password }: Props) => {
   const currPasswordScore = getPasswordScore(password)
   return (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
-      <Box width="100%">
+      <Box width="100%" mt="4px">
         <ProgressBar
-          css={css({
-            marginTop: '4px',
-            width: '100%',
-          })}
           value={currPasswordScore.score}
           sliderColor={currPasswordScore.color}
           max={4}

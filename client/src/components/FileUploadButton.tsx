@@ -1,13 +1,12 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
-import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
+import Icon from 'src/components/Icon'
 import Image from 'src/components/Image'
-import { Input } from './Form'
-import Button from './Button'
+import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { FileItem } from 'src/types/files'
-import Icon from 'src/components/Icon'
+import Button from './Button'
+import { Input } from './Form'
 
 interface Props {
   name: string
@@ -121,7 +120,7 @@ const FileUploadButton = ({
           display="grid"
           gridTemplateColumns={showImagePreview ? '2fr 3fr 1fr' : '5fr 1fr'}
           p={2}
-          borderRadius={2}
+          borderRadius="lg"
           gridColumnGap={3}
           bg="activeBlue"
         >
@@ -137,7 +136,7 @@ const FileUploadButton = ({
                 px={2}
                 py={1}
                 bg={colors.cyanProcess}
-                borderRadius={2}
+                borderRadius="lg"
                 right="-5%"
                 bottom="-5%"
               >
@@ -155,9 +154,7 @@ const FileUploadButton = ({
           </Box>
           <Button
             variant="tertiary"
-            css={css`
-              padding: 0 !important;
-            `}
+            p="0 !imporant"
             onClick={() => handleFileItemChange(null)}
           >
             <Icon of="close" color={colors.nomusBlue} />
@@ -174,22 +171,22 @@ const FileUploadButton = ({
           onClick={() => inputRef.current?.click()}
           width={width}
           variant="unstyled"
-          css={css`
-            border: 1px dashed ${colors.nomusBlue};
-            background: white;
-            color: ${colors.nomusBlue};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            ${isDragging &&
-            `
-          background: ${colors.hoverBlue};
-          `}
-            &:hover {
-              background: ${colors.hoverBlue};
-            }
-          `}
+          border={`1px dashed ${colors.nomusBlue}`}
+          background="white"
+          color={colors.nomusBlue}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={
+            isDragging
+              ? {
+                  background: colors.hoverBlue,
+                  '&:hover': {
+                    background: colors.hoverBlue,
+                  },
+                }
+              : {}
+          }
         >
           <Icon of="upload" color={colors.nomusBlue} mr="8px" />
           Upload a file or drag and drop

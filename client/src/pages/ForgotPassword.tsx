@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import gql from 'graphql-tag'
 import * as React from 'react'
@@ -8,7 +7,7 @@ import { SendPasswordResetEmailMutation } from 'src/apollo/types/SendPasswordRes
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
-import { Link } from 'src/components/Link'
+import Link from 'src/components/Link'
 import Logo from 'src/components/Logo'
 import * as Text from 'src/components/Text'
 import * as yup from 'yup'
@@ -18,9 +17,12 @@ interface ForgotPasswordFormData {
 }
 
 const ForgotPassword = () => {
-  const { register, handleSubmit, errors, formState } = useForm<
-    ForgotPasswordFormData
-  >({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    formState,
+  } = useForm<ForgotPasswordFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -60,7 +62,7 @@ const ForgotPassword = () => {
     >
       <Box display="flex" flexDirection="column" mt={4} maxWidth={500}>
         <Link to="/">
-          <Logo css={css({ marginBottom: '32px' })} />
+          <Logo mb="32px" />
         </Link>
         <Text.PageHeader>Forgot your password?</Text.PageHeader>
         {formState.isSubmitSuccessful ? (

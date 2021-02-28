@@ -103,11 +103,9 @@ const Navbar = (props: Props) => {
         width="100%"
         display="grid"
         gridTemplateColumns="auto 1fr auto"
-        css={css({
-          alignItems: 'center',
-        })}
-        gridColumnGap={{ _: 0, [bp]: 4 }}
-        height={{ _: '60px', [bp]: '100px' }}
+        alignItems="center"
+        gridColumnGap={{ base: 0, [bp]: 4 }}
+        height={{ base: '60px', [bp]: '100px' }}
         position="relative"
         zIndex={2}
         boxShadow="navbar"
@@ -125,12 +123,12 @@ const Navbar = (props: Props) => {
 
         {/* Nav menu left-hand items */}
         <Box
-          display={{ _: 'none', [bp]: 'flex' }}
-          css={css`
-            & > *:not(:last-child) {
-              margin-right: 40px;
-            }
-          `}
+          display={{ base: 'none', [bp]: 'flex' }}
+          sx={{
+            '& > *:not(:last-child)': {
+              marginRight: '40px',
+            },
+          }}
         >
           {navItems.map((item) => {
             const titleComponent = (
@@ -142,7 +140,7 @@ const Navbar = (props: Props) => {
                 {isNestedNavItem(item) ? (
                   <Popover
                     omitIconBg
-                    icon="caret"
+                    icon={<Icon of="caret" color={colors.nomusBlue} />}
                     popoverContents={
                       <Box
                         display="flex"
@@ -161,7 +159,7 @@ const Navbar = (props: Props) => {
                             >
                               <Text.Body3
                                 color={colors.nomusBlue}
-                                css={css({ whiteSpace: 'nowrap' })}
+                                whiteSpace="nowrap"
                               >
                                 {nestedItem.name}
                               </Text.Body3>
@@ -183,15 +181,15 @@ const Navbar = (props: Props) => {
         <Box placeSelf="center end" flexDirection="row" alignItems="center">
           {/* Desktop */}
           <Box
-            display={{ _: 'none', [bp]: 'flex' }}
+            display={{ base: 'none', [bp]: 'flex' }}
             flexDirection="row"
             alignItems="center"
-            css={css`
-              & > *:not(:first-child) {
-                cursor: pointer;
-                margin-left: 16px;
-              }
-            `}
+            sx={{
+              '& > *:not(:first-child)': {
+                cursor: 'pointer',
+                marginLeft: '16px',
+              },
+            }}
           >
             {loggedIn
               ? [
@@ -225,7 +223,7 @@ const Navbar = (props: Props) => {
           </Box>
 
           {/* Mobile */}
-          <Box display={{ _: 'flex', [bp]: 'none' }} cursor="pointer">
+          <Box display={{ base: 'flex', [bp]: 'none' }} cursor="pointer">
             {loggedIn && (
               <Link key="dashboard" to="/dashboard" mr={3}>
                 <Icon of="profile" color={colors.nomusBlue} />
@@ -258,10 +256,10 @@ const Navbar = (props: Props) => {
                 onClick={handleOutsideClick}
                 zIndex={1}
                 position="fixed"
-                top={{ _: '60px', [bp]: '100px' }}
+                top={{ base: '60px', [bp]: '100px' }}
                 right="0"
                 height={{
-                  _: 'calc(100vh - 60px)',
+                  base: 'calc(100vh - 60px)',
                   [bp]: 'calc(100vh - 100px)',
                 }}
                 width="100vw"

@@ -25,7 +25,7 @@ export const AllIcons = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            borderRadius={2}
+            borderRadius="lg"
             width="125px"
             height="125px"
           >
@@ -56,7 +56,7 @@ export const ResponsivelyStyledIcon = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            borderRadius={2}
+            borderRadius="lg"
             width="125px"
             height="125px"
           >

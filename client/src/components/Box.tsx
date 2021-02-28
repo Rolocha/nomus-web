@@ -1,27 +1,19 @@
 import { Box as ChakraBox } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 import {
-  border,
+  BackgroundProps,
   BorderProps,
-  color,
   ColorProps,
-  flexbox,
   FlexboxProps,
   grid,
   GridProps,
-  layout,
   LayoutProps,
-  position,
   PositionProps,
   ResponsiveValue,
-  shadow,
   ShadowProps,
-  space,
   SpaceProps,
   system,
   ThemeValue,
-  background,
-  BackgroundProps,
 } from 'styled-system'
 
 type ContainerProp = {
@@ -52,7 +44,7 @@ type BoxProps = {
   ShadowProps &
   BackgroundProps
 
-const Box = styled.div<BoxProps>(
+const Box = styled(ChakraBox)<BoxProps>(
   {
     boxSizing: 'border-box',
     minWidth: 0,
@@ -96,17 +88,9 @@ const Box = styled.div<BoxProps>(
       property: 'transition',
     },
   }),
-  space,
-  position,
-  color,
-  border,
-  layout,
-  flexbox,
   grid,
-  shadow,
-  background,
 )
 
-// export default Box
-
-export default ChakraBox
+export default Box
+//
+// export default ChakraBox

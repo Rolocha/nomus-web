@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
@@ -73,7 +72,7 @@ const CardWithGuides = ({ showGuides, innerContent }: CardWithGuidesProps) => {
               // Content-safe area guide
               <Box
                 position="absolute"
-                css={css({ pointerEvents: 'none' })}
+                pointerEvents="none"
                 top="0"
                 left="0"
                 width="100%"

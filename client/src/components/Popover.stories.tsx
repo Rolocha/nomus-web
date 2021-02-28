@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { action } from '@storybook/addon-actions'
 import React from 'react'
 import Box from 'src/components/Box'
@@ -27,11 +26,10 @@ export const AnchoredOnTop = () => {
   //   const [selectedOption, setSelectedOption] = React.useState(options[0])
 
   return (
-    <Box display="inline-block" ml={6} mt={6}>
+    <Box display="inline-block" ml="100px" mt="100px">
       <Popover
         anchorPoint={anchorPoint}
-        icon="options"
-        iconColor={colors.nomusBlue}
+        icon={<Icon of="options" color={colors.nomusBlue} />}
         popoverContents={
           <Box p={2}>
             <Text.Body3 color="africanElephant">Anchor to</Text.Body3>
@@ -50,13 +48,7 @@ export const AnchoredOnTop = () => {
                 ) : (
                   <Box width="25px" height="25px" />
                 )}
-                <Text.Body2
-                  css={css({
-                    whiteSpace: 'nowrap',
-                  })}
-                >
-                  {option}
-                </Text.Body2>
+                <Text.Body2 whiteSpace="nowrap">{option}</Text.Body2>
               </Box>
             ))}
           </Box>

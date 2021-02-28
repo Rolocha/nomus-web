@@ -17,7 +17,7 @@ export const actionsData = {
 export const Primary = () => {
   return (
     <Router>
-      <Box borderBottom="1px solid black">
+      <Box>
         <Navbar />
       </Box>
     </Router>

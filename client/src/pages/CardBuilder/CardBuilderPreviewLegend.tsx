@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
@@ -10,15 +9,14 @@ const CardBuilderPreviewLegend = () => {
       display="grid"
       gridTemplateColumns="1fr 1fr 1fr"
       gridColumnGap={3}
-      css={css`
-        text-align: center;
-        div {
-          // Align text in center of boxes
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      `}
+      textAlign="center"
+      sx={{
+        div: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }}
     >
       <Box bg="#FBDD9D" p={2}>
         <Text.Body2>bleed</Text.Body2>

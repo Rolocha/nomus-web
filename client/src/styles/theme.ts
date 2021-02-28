@@ -1,25 +1,20 @@
+import { createBreakpoints } from '@chakra-ui/theme-tools'
 import { extendTheme } from '@chakra-ui/react'
 import colors from './colors'
 import typography from './typography'
-import breakpoints, { chakraBreakpoints } from './breakpoints'
+import { breakpoints } from './breakpoints'
 import shadows from './shadows'
+import radii from './radii'
+import buttonStyles from './components/button'
 
-export const theme = {
-  space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
-  radii: [0, 4, 8, 16, 32],
-  fontSizes: [18, 20, 24, 54],
-  fontFamilies: typography.fontFamilies,
-  textStyles: typography.textStyles,
+export default extendTheme({
   colors,
-  breakpoints,
+  radii,
+  breakpoints: createBreakpoints(breakpoints),
   shadows,
-}
-
-const chakraThemeConfig = {
-  colors,
-  breakpoints: chakraBreakpoints,
-}
-
-export const chakraTheme = extendTheme(chakraThemeConfig)
-
-export default theme
+  textStyles: typography.textStyles,
+  fonts: typography.fonts,
+  components: {
+    Button: buttonStyles,
+  },
+})

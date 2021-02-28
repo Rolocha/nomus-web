@@ -1,12 +1,12 @@
 import { mq } from '../breakpoints'
 import colors from '../colors'
 import typography from '../typography'
-const { fontFamilies } = typography
+const { fonts } = typography
 
 // Defining button styles centrally here since both <a /> and <button /> will consume them
 
 export const baseButtonStyles = {
-  fontFamily: fontFamilies.rubik,
+  fontFamily: fonts.rubik,
   letterSpacing: '0.02em',
   fontWeight: 500,
   cursor: 'pointer',
@@ -281,5 +281,15 @@ export const sizeVariants = {
     paddingBottom: '9.5px',
     fontSize: '14px',
     borderRadius: '8px',
+  },
+}
+
+export default {
+  baseStyle: baseButtonStyles,
+  sizes: sizeVariants,
+  variants: styleVariants,
+  defaultProps: {
+    size: 'normal',
+    variant: 'primary',
   },
 }

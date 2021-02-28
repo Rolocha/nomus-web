@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
@@ -43,17 +42,17 @@ const Footer = () => {
     'unsubmitted' | 'submitting' | 'success' | 'failure'
   >('unsubmitted')
   return (
-    <Box bg={colors.nomusBlue} py={{ _: '40px', [bp]: '70px' }}>
+    <Box bg={colors.nomusBlue} py={{ base: '40px', [bp]: '70px' }}>
       <Container>
         <Box
           display="flex"
           alignItems="center"
-          flexDirection={{ _: 'column', [bp]: 'row' }}
+          flexDirection={{ base: 'column', [bp]: 'row' }}
         >
           <SVG.LogoWithText color={colors.white} />
           <Text.Body
-            ml={{ _: 0, [bp]: 3 }}
-            mt={{ _: 3, [bp]: 0 }}
+            ml={{ base: 0, [bp]: 3 }}
+            mt={{ base: 3, [bp]: 0 }}
             color={colors.white}
           >
             Tap. Connect. Network with a purpose.
@@ -63,7 +62,7 @@ const Footer = () => {
         <Box
           my={4}
           display="grid"
-          gridTemplateColumns={{ _: '1fr', [bp]: '1fr 1fr' }}
+          gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr' }}
           gridColumnGap={4}
           gridRowGap={4}
         >
@@ -89,32 +88,32 @@ const Footer = () => {
               <Form.Form onSubmit={handleSubmit(onSubmit)}>
                 <Box
                   display="flex"
-                  flexDirection={{ _: 'column', [bp]: 'row' }}
+                  flexDirection={{ base: 'column', [bp]: 'row' }}
                   alignItems="stretch"
                   justifyContent="stretch"
                 >
                   <Form.Input
                     name="email"
                     placeholder="hi@nomus.me"
-                    mb={{ _: 2, [bp]: 0 }}
+                    mb={{ base: 2, [bp]: 0 }}
                     ref={register}
                     disabled={submitState === 'submitting'}
-                    css={css`
-                      flex-grow: 1;
-                      ${mq[bp]} {
-                        border-top-right-radius: 0;
-                        border-bottom-right-radius: 0;
-                        border-right: none;
-                      }
-                    `}
+                    flexGrow={1}
+                    sx={{
+                      [mq[bp]]: {
+                        borderTopRightRadius: 0,
+                        borderBottomRightadius: 0,
+                        borderRight: 'none',
+                      },
+                    }}
                   />
                   <Button
-                    css={css`
-                      ${mq[bp]} {
-                        border-top-left-radius: 0;
-                        border-bottom-left-radius: 0;
-                      }
-                    `}
+                    sx={{
+                      [mq[bp]]: {
+                        borderTopRightRadius: 0,
+                        borderBottomRightadius: 0,
+                      },
+                    }}
                     variant="primary"
                     type="submit"
                     disabled={submitState === 'submitting'}
@@ -159,14 +158,14 @@ const Footer = () => {
         {/* Contact info row */}
         <Box
           display="flex"
-          flexDirection={{ _: 'column', [bp]: 'row' }}
+          flexDirection={{ base: 'column', [bp]: 'row' }}
           justifyContent="space-between"
           alignItems="center"
         >
           <Link to="mailto:support@nomus.me">
             <Text.Body2 color={colors.white}>support@nomus.me</Text.Body2>
           </Link>
-          <Box display="flex" px={-1} mt={{ _: 2, [bp]: 0 }}>
+          <Box display="flex" px={-1} mt={{ base: 2, [bp]: 0 }}>
             {([
               {
                 iconName: 'facebook',
@@ -199,16 +198,20 @@ const Footer = () => {
         {/* Legal info row */}
         <Box
           display="flex"
-          flexDirection={{ _: 'column', [bp]: 'row' }}
+          flexDirection={{ base: 'column', [bp]: 'row' }}
           alignItems="center"
           justifyContent="space-between"
-          textAlign={{ _: 'center', [bp]: 'left' }}
+          textAlign={{ base: 'center', [bp]: 'left' }}
         >
           <Text.Body2
             color={colors.white}
           >{`© ${new Date().getFullYear()} Nomus, Inc.  /  Registered in the United States of America`}</Text.Body2>
 
-          <Box display="flex" flexDirection="row" mt={{ _: 4, [bp]: 'unset' }}>
+          <Box
+            display="flex"
+            flexDirection="row"
+            mt={{ base: 4, [bp]: 'unset' }}
+          >
             <Link to="/terms-of-service">
               <Text.Body2 color="white" mr={3}>
                 Terms of service

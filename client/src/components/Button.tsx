@@ -1,88 +1,49 @@
+// 1. Import useStyleConfig
+import { chakra, useStyleConfig } from '@chakra-ui/react'
 import * as React from 'react'
-import styled from '@emotion/styled'
-import isPropValid from '@emotion/is-prop-valid'
-import {
-  baseButtonStyles,
-  sizeVariants,
-  styleVariants,
-} from 'src/styles/components/buttonlike'
-import theme from 'src/styles/theme'
-import {
-  grid,
-  GridProps,
-  layout,
-  LayoutProps,
-  space,
-  SpaceProps,
-  variant,
-} from 'styled-system'
-import Spinner from './Spinner'
+import { sizeVariants, styleVariants } from 'src/styles/components/button'
 import Box from './Box'
+import Spinner from './Spinner'
 
-type InternalButtonProps = {
-  variant?: keyof typeof styleVariants
-  size?: keyof typeof sizeVariants
+type ButtonProps = React.ComponentProps<typeof chakra.button> & {
   as?: any
-  leftIcon?: React.ReactElement
-  rightIcon?: React.ReactElement
-} & SpaceProps &
-  LayoutProps &
-  GridProps &
-  React.ButtonHTMLAttributes<HTMLButtonElement>
-
-export const InternalButton = styled('button', {
-  shouldForwardProp: (prop) =>
-    typeof prop === 'string' && isPropValid(prop) && prop !== 'size',
-})<InternalButtonProps>(
-  baseButtonStyles,
-  space,
-  grid,
-  variant({ variants: styleVariants }),
-  variant({
-    prop: 'size',
-    variants: sizeVariants,
-  }),
-  // The 'layout' set of styles already has a "size" property that sets both width and height
-  // but we have our own custom "size" prop for Button so we want to exclude that
-  ({ size, ...props }: InternalButtonProps) => layout(props),
-)
-
-InternalButton.defaultProps = {
-  color: theme.colors.ivory,
-  variant: 'primary',
-  size: 'normal',
-}
-
-type ButtonProps = InternalButtonProps & {
   inProgress?: boolean
   inProgressText?: string
+  leftIcon?: React.ReactElement
+  rightIcon?: React.ReactElement
+  size?: keyof typeof sizeVariants
+  variant?: keyof typeof styleVariants
 }
 
 const Button = React.forwardRef(
   (
     {
-      inProgress,
       children,
       disabled,
+      inProgress,
       inProgressText,
       leftIcon,
       rightIcon,
+      size,
+      variant,
+      sx,
       ...internalProps
     }: ButtonProps,
     ref,
   ) => {
+    const styles = useStyleConfig('Button', { size, variant })
     const contents = [
       inProgress && <Spinner size="1em" />,
       leftIcon,
       inProgress && inProgressText ? inProgressText : children,
       rightIcon,
     ].filter(Boolean)
-
     return (
-      <InternalButton
-        {...internalProps}
+      <chakra.button
+        sx={{ ...styles, ...sx }}
         ref={ref as React.MutableRefObject<HTMLButtonElement>}
         disabled={inProgress || disabled}
+        {...internalProps}
       >
         <Box
           display="grid"
@@ -92,7 +53,7 @@ const Button = React.forwardRef(
         >
           {contents}
         </Box>
-      </InternalButton>
+      </chakra.button>
     )
   },
 )
@@ -103,3 +64,23 @@ Button.defaultProps = {
 
 export default Button
 export { styleVariants }
+
+// const ChakraButton = (props: ButtonProps) => {
+//   const { size, variant, ...rest } = props
+//   // 2. Reference `Button` stored in `theme.components`
+//   const styles = useStyleConfig('Button', { size, variant })
+//   // 3. Pass the computed styles into the `sx` prop
+
+//   return (
+//     <chakra.button sx={styles} {...rest}>
+//       <Box
+//         display="grid"
+//         alignItems="center"
+//         gridTemplateColumns={`repeat(${contents.length}, auto)`}
+//         gridColumnGap={1}
+//       >
+//         {contents}
+//       </Box>
+//     </chakra.button>
+//   )
+// }

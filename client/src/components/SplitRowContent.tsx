@@ -57,12 +57,12 @@ const SplitRowContent = ({
           key={key}
           display="grid"
           gridTemplateColumns={{
-            _: '100%',
+            base: '100%',
             [bp]: alternate && index % 2 !== 0 ? '45% 55%' : '55% 45%',
           }}
           gridTemplateRows={{ [bp]: 'auto 1fr' }}
           gridTemplateAreas={{
-            _: NARROW_GRID_TEMPLATE,
+            base: NARROW_GRID_TEMPLATE,
             [bp]:
               alternate && index % 2 !== 0
                 ? ODD_GRID_TEMPLATE

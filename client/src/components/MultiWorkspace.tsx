@@ -8,7 +8,7 @@ import {
   useRouteMatch,
 } from 'react-router-dom'
 import Box from 'src/components/Box'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
@@ -51,19 +51,19 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
   return (
     <Box
       display="flex"
-      flexDirection={{ _: 'column', [bp]: 'row' }}
+      flexDirection={{ base: 'column', [bp]: 'row' }}
       alignItems={{ [bp]: 'flex-start' }}
       pb={2}
     >
       {/* Menu for selecting dashboard section */}
       <Box
         display="flex"
-        flexDirection={{ _: 'row', [bp]: 'column' }}
+        flexDirection={{ base: 'row', [bp]: 'column' }}
         flexShrink={0}
         minWidth={{ [bp]: 200 }}
         bg={colors.twilight}
-        borderTopLeftRadius={{ _: 0, [bp]: 3 }}
-        borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
+        borderTopLeftRadius={{ base: 'none', [bp]: 'xl' }}
+        borderBottomLeftRadius={{ base: 'none', [bp]: 'xl' }}
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
       >
@@ -73,44 +73,47 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
           return (
             <Box
               key={key}
-              borderTopLeftRadius={{ _: 0, [bp]: index === 0 ? 3 : 0 }}
+              borderTopLeftRadius={{
+                base: 'none',
+                [bp]: index === 0 ? 'xl' : 'none',
+              }}
               borderBottomLeftRadius={{
-                _: 0,
-                [bp]: index === tabs.length - 1 ? 3 : 0,
+                base: 'none',
+                [bp]: index === tabs.length - 1 ? 'xl' : 'none',
               }}
               bg={isCurrentSection ? colors.nomusBlue : undefined}
               flexBasis={{
-                _: `${100 / tabs.length}%`,
+                base: `${100 / tabs.length}%`,
                 [bp]: 'auto',
               }}
               position="relative"
               css={isCurrentSection ? POINTY_TAB_INDICATOR : null}
             >
-              <InternalLink to={sectionPath}>
+              <Link to={sectionPath}>
                 <Box
                   py="24px"
                   px={3}
                   display="flex"
-                  flexDirection={{ _: 'column', [bp]: 'row' }}
+                  flexDirection={{ base: 'column', [bp]: 'row' }}
                   alignItems="center"
                 >
                   <Icon
                     of={icon}
                     color="white"
                     boxSize="1.5em"
-                    mb={{ _: '0.5em', [bp]: 0 }}
-                    mr={{ _: 0, [bp]: '0.7em' }}
+                    mb={{ base: '0.5em', [bp]: 0 }}
+                    mr={{ base: 0, [bp]: '0.7em' }}
                   />
                   <Text.Plain
                     m={0}
                     color="white"
-                    fontSize={{ _: 10, [bp]: 'unset' }}
+                    fontSize={{ base: 10, [bp]: 'unset' }}
                     fontWeight={isCurrentSection ? 500 : 'undefined'}
                   >
                     {label}
                   </Text.Plain>
                 </Box>
-              </InternalLink>
+              </Link>
             </Box>
           )
         })}
@@ -121,9 +124,9 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         flexGrow={1}
         boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
         bg="white"
-        borderTopRightRadius={{ [bp]: 3 }}
-        borderBottomRightRadius={{ [bp]: 3 }}
-        borderBottomLeftRadius={{ [bp]: 3 }}
+        borderTopRightRadius={{ [bp]: 'base' }}
+        borderBottomRightRadius={{ [bp]: 'base' }}
+        borderBottomLeftRadius={{ [bp]: 'base' }}
         position="relative"
         height="100%"
         minHeight="60vh"

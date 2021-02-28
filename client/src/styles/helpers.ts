@@ -22,7 +22,7 @@ export type StyleObject = { [k: string]: string | number }
 // lets you use it to reponsively customize the UI based on the custom higher-order prop ('NONE'|'DEFAULT')
 //
 // <MyComponent
-//   borderRadius={{_: 'NONE', md: 'DEFAULT' }}
+//   borderRadius={{base: 'NONE', md: 'DEFAULT' }}
 // />
 export function useCustomResponsiveStyles<T extends string | number | symbol>(
   responsiveKeys: ResponsiveValue<T>,
@@ -40,7 +40,7 @@ export function useCustomResponsiveStyles<T extends string | number | symbol>(
     const responsiveKeysToUse =
       typeof responsiveKeys === 'object'
         ? responsiveKeys
-        : { _: responsiveKeys }
+        : { base: responsiveKeys }
 
     if (
       // This isn't smart enough to deal with arrays yet so just use objects if you can

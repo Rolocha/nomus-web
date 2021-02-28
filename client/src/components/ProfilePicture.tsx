@@ -1,8 +1,7 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { IName, formatName, getInitials } from 'src/utils/name'
+import { formatName, getInitials, IName } from 'src/utils/name'
 import Box from './Box'
 import Image from './Image'
 
@@ -50,10 +49,8 @@ const ProfilePicture = ({ name, profilePicUrl }: Props) => {
           borderRadius="50%"
           width="100%"
           height="100%"
-          css={css({
-            objectFit: 'cover',
-            objectPosition: '50% 50%',
-          })}
+          objectFit="cover"
+          objectPosition="50% 50%"
         />
       )}
       {!profilePicUrl && (
@@ -61,15 +58,13 @@ const ProfilePicture = ({ name, profilePicUrl }: Props) => {
           position="absolute"
           top="50%"
           left="50%"
-          css={css({
-            transform: 'translate(-50%, -50%)',
-          })}
+          transform="translate(-50%, -50%)"
         >
           <Text.Plain
             fontWeight={500}
             fontSize={boxWidth / 2.5}
             color={colors.white}
-            css={css({ userSelect: 'none' })}
+            userSelect="none"
           >
             {getInitials(name)}
           </Text.Plain>

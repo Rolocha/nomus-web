@@ -23,7 +23,7 @@ const CreditCardInput = ({ handleChange, id, postalCode }: Props) => {
               classes: {
                 base: css({
                   padding: 10,
-                  borderRadius: '6px',
+                  borderRadius: 'base',
                   border: `1px solid ${colors.africanElephant}`,
                 }),
                 invalid: css({
@@ -33,13 +33,13 @@ const CreditCardInput = ({ handleChange, id, postalCode }: Props) => {
               },
               style: {
                 base: {
-                  fontFamily: typography.fontFamilies.rubik,
+                  fontFamily: typography.fonts.rubik,
                   fontSize: '16px',
                   color: colors.midnightGray,
                   fontSmoothing: 'antialiased',
                   '::placeholder': {
                     fontSize: '16px',
-                    fontFamily: typography.fontFamilies.rubik,
+                    fontFamily: typography.fonts.rubik,
                     color: colors.africanElephant,
                   },
                 },

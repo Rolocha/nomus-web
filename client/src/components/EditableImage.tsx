@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import * as CSS from 'csstype'
 import { rgba } from 'polished'
@@ -82,11 +81,11 @@ const EditableImage = ({
           overflow="hidden"
           backgroundPosition="center"
           backgroundSize="cover"
-          css={css({
-            animation: updating
+          animation={
+            updating
               ? `${animations.fadeIn} 0.5s ease infinite alternate`
-              : undefined,
-          })}
+              : undefined
+          }
         />
       ) : (
         fallbackImage
@@ -94,31 +93,30 @@ const EditableImage = ({
 
       {editable && (
         <Box
-          css={css`
-            position: absolute;
-            left: 0;
-            width: 100%;
-            bottom: 0;
-            height: ${updating ? '0' : '30'}%;
-            opacity: ${updating ? 0 : 1};
-            transition: 0.3s ease opacity, 0.3s ease height, 0.3s ease top,
-              0.3s ease border-radius, 0.3s ease background-color;
-            background-color: ${rgba(colors.white, 0.5)};
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            &:hover {
-              height: 100%;
-              background-color: ${rgba(colors.white, 0.8)};
-              .edit-text {
-                transform: scaleX(1);
-                max-width: 500px;
-                opacity: 1;
-              }
-            }
-          `}
+          position="absolute"
+          left="0"
+          width="100%"
+          bottom="0"
+          height={(updating ? '0' : '30') + '%'}
+          opacity={updating ? 0 : 1}
+          transition="0.3s ease opacity, 0.3s ease height, 0.3s ease top,0.3s ease border-radius, 0.3s ease background-color"
+          bg={rgba(colors.white, 0.5)}
+          color="white"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          cursor="pointer"
+          sx={{
+            '&:hover': {
+              height: '100%',
+              backgroundColor: rgba(colors.white, 0.8),
+              '.edit-text': {
+                transform: 'scaleX(1)',
+                maxWidth: '500px',
+                opacity: '1',
+              },
+            },
+          }}
           onClick={handleUpdatePictureClick}
         >
           <Box display="flex" alignItems="center">
@@ -127,15 +125,12 @@ const EditableImage = ({
               ml={2}
               className="edit-text"
               color="nomusBlue"
-              css={css`
-                transform: scaleX(0);
-                transform-origin: center;
-                max-width: 0;
-                width: auto;
-                opacity: 0;
-                transition: 0.3s ease transform, 0.3s ease opacity,
-                  0.3s ease max-width;
-              `}
+              transform="scaleX(0)"
+              transformOrigin="center"
+              maxWidth="0"
+              width="auto"
+              opacity="0"
+              transition="0.3s ease transform, 0.3s ease opacity, 0.3s ease max-width"
             >
               Edit
             </Text.Body2>
