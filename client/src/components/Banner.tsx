@@ -2,8 +2,10 @@ import * as React from 'react'
 import Icon, { IconName } from 'src/components/Icon'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { useCustomResponsiveStyles } from 'src/styles/helpers'
-import { ResponsiveValue } from 'styled-system'
+import {
+  ResponsiveCustomProperty,
+  useCustomResponsiveStyles,
+} from 'src/styles/helpers'
 import Box from './Box'
 
 export type BannerBorderRadius = 'NONE' | 'DEFAULT'
@@ -15,7 +17,7 @@ interface Props {
   className?: string
   closable?: boolean
   onClickClose?: () => void
-  borderRadius?: ResponsiveValue<BannerBorderRadius>
+  borderRadius?: ResponsiveCustomProperty<BannerBorderRadius>
 }
 
 const iconOptions: Record<BannerType, IconName> = {

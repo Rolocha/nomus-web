@@ -1,15 +1,10 @@
+import { LayoutProps } from '@chakra-ui/react'
 import styled from '@emotion/styled'
-import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { animations, colors } from 'src/styles'
-import {
-  RequiredTheme,
-  ResponsiveValue,
-  TLengthStyledSystem,
-} from 'styled-system'
 import Icon from './Icon'
 
 const HiddenUploadInput = styled.input`
@@ -24,14 +19,8 @@ const HiddenUploadInput = styled.input`
 interface Props {
   src: string | null
   editable: boolean
-  width?: ResponsiveValue<
-    CSS.Property.Width<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  height?: ResponsiveValue<
-    CSS.Property.Height<TLengthStyledSystem>,
-    RequiredTheme
-  >
+  width?: LayoutProps['width']
+  height?: LayoutProps['height']
   // eslint-disable-next-line flowtype/no-weak-types
   onImageUpdate: (image: File) => Promise<void>
   fallbackImage?: React.ReactNode

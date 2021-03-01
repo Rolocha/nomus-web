@@ -1,4 +1,4 @@
-import { LayoutProps } from '@chakra-ui/styled-system'
+import { LayoutProps } from '@chakra-ui/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'

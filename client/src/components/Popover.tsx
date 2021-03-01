@@ -1,7 +1,9 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import { useCustomResponsiveStyles } from 'src/styles/helpers'
-import { ResponsiveValue } from 'styled-system'
+import {
+  useCustomResponsiveStyles,
+  ResponsiveCustomProperty,
+} from 'src/styles/helpers'
 
 export enum PopoverAnchorPoint {
   Top = 'Top',
@@ -13,7 +15,7 @@ interface Props {
   omitIconBg?: boolean
   icon: React.ReactNode
   popoverContents: React.ReactNode
-  anchorPoint: ResponsiveValue<PopoverAnchorPoint>
+  anchorPoint: ResponsiveCustomProperty<PopoverAnchorPoint>
 }
 
 const Popover = ({

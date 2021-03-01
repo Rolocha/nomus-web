@@ -1,5 +1,5 @@
+import { LayoutProps } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
-import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
@@ -10,11 +10,6 @@ import Icon from 'src/components/Icon'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { use100vh } from 'src/utils/ui'
-import {
-  RequiredTheme,
-  ResponsiveValue,
-  TLengthStyledSystem,
-} from 'styled-system'
 
 export enum ActionType {
   Cancel = 'cancel',
@@ -51,18 +46,9 @@ interface Props {
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
   children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
-  maxWidth?: ResponsiveValue<
-    CSS.Property.MaxWidth<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  width?: ResponsiveValue<
-    CSS.Property.Width<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  height?: ResponsiveValue<
-    CSS.Property.MaxHeight<TLengthStyledSystem>,
-    RequiredTheme
-  >
+  maxWidth?: LayoutProps['maxWidth']
+  width?: LayoutProps['width']
+  height?: LayoutProps['height']
   confirmClose: () => boolean
   actions?: Actions
   preventCloseWithOutsideClick?: boolean
