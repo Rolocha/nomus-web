@@ -60,7 +60,7 @@ const Link = ({
     (linkType && linkType === 'external')
   ) {
     // Link is pointing to some other website/location, use the typical anchor element
-    return <chakra.a ref={ref} sx={styles} to={to ?? '#'} {...props} />
+    return <chakra.a ref={ref} sx={styles} href={to ?? '#'} {...props} />
   } else {
     // Link is pointing to within our app, use the Internal (React Router) version
     return (

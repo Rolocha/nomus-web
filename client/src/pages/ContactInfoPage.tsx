@@ -416,6 +416,7 @@ const ContactInfoPage = () => {
             gridRowGap={2}
           >
             <Link
+              // Force it to use an external link to enable proper download behavior
               linkType="external"
               asButton
               buttonStyle="primary"
@@ -435,7 +436,6 @@ const ContactInfoPage = () => {
 
             {loggedIn && contact.connected ? (
               <Link
-                linkType="external"
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"

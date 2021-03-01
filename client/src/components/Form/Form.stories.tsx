@@ -34,7 +34,13 @@ interface FormData {
 }
 
 export const ExampleForm = () => {
-  const { register, handleSubmit, errors, formState } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    formState,
+    watch,
+  } = useForm<FormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -47,10 +53,13 @@ export const ExampleForm = () => {
     ),
   })
 
+  const values = watch()
+
   const [passwordVisible, setPasswordVisible] = React.useState(false)
 
   const onSubmit = async (formData: FormData) => {
     await new Promise((res) => setTimeout(res, 1000))
+    window.confirm('Submit form with data: ' + JSON.stringify(formData))
   }
 
   return (
@@ -98,6 +107,10 @@ export const ExampleForm = () => {
           Continue
         </Button>
       </Form.Form>
+      <Box mt={3}>
+        <Text.Body2>Email: {values.email}</Text.Body2>
+        <Text.Body2>Password: {values.password}</Text.Body2>
+      </Box>
     </Box>
   )
 }

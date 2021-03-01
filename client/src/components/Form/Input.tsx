@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { chakra } from '@chakra-ui/system'
 import { FieldError } from 'react-hook-form'
 import theme from 'src/styles/theme'
@@ -6,9 +7,10 @@ interface Props extends React.ComponentProps<typeof chakra.input> {
   error?: FieldError | boolean
 }
 
-const Input = ({ error, ...props }: Props) => {
+const Input = React.forwardRef(({ error, ...props }: Props, ref) => {
   return (
     <chakra.input
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
       borderRadius="6px"
       padding="10px 8px"
       border={
@@ -22,7 +24,7 @@ const Input = ({ error, ...props }: Props) => {
       {...props}
     />
   )
-}
+})
 
 Input.defaultProps = {
   ...theme.textStyles.input,
