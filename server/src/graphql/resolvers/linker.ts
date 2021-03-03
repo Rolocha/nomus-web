@@ -1,6 +1,7 @@
 import { Resolver, Authorized, Mutation, Arg, ObjectType, Field } from 'type-graphql'
 import { Role } from 'src/util/enums'
-import { linkSheetToUser } from 'src/util/linker'
+import { linkSheetToUser, unlinkSheet } from 'src/util/linker'
+import { Void } from 'src/models/scalars'
 
 @ObjectType()
 class LinkedInfo {
@@ -36,6 +37,17 @@ class LinkerResolver {
         userId: null,
         sheetId: null,
       }
+    }
+  }
+  @Authorized(Role.Admin)
+  @Mutation(() => Void, {
+    nullable: true,
+    description: 'Unlink sheet from user if something went wrong',
+  })
+  async unlinkSheet(@Arg('sheetId', { nullable: false }) sheetId: string): Promise<void> {
+    const res = await unlinkSheet(sheetId)
+    if (!res.isSuccess) {
+      throw new Error('Error unlinking sheet')
     }
   }
 }

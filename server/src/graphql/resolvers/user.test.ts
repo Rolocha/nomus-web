@@ -369,7 +369,7 @@ describe('UserResolver', () => {
         source: `
           mutation SendPasswordResetEmailQuery($email: String!) {
             sendPasswordResetEmail(email: $email)
-          }
+          }1
         `,
         variableValues: {
           email: user.email,
