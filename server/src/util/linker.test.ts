@@ -7,7 +7,7 @@ import { createMockSheet } from 'src/__mocks__/models/Sheet'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { CardInteractionType, OrderState } from './enums'
 import { NamedError } from './error'
-import { getCardDataForInteractionString, linkSheetToUser } from './linker'
+import { getCardDataForInteractionString, linkSheetToUser, unlinkSheet } from './linker'
 
 beforeAll(async () => {
   await initDB()
@@ -177,6 +177,76 @@ describe('linker', () => {
 
       expect(ret.isSuccess).toBe(false)
       expect(ret.error).toEqual(new NamedError('sheet-not-found'))
+    })
+  })
+  describe('unlinkSheet', () => {
+    it('tries to unlink a sheet but fails because there is no sheet', async () => {
+      const sheetId = 'sheet_5f9caf60c9b90b8674941e7f'
+      const ret = await unlinkSheet(sheetId)
+
+      expect(ret.isSuccess).toBe(false)
+      expect(ret.error).toEqual(new NamedError('sheet-not-found'))
+    })
+    it('links a sheet then unlinks it', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion({
+        user: user.id,
+      })
+      const order = await createMockOrder({
+        user: user.id,
+        cardVersion: cardVersion.id,
+        state: OrderState.Creating,
+        quantity: 5,
+      })
+      const card1 = await createMockCard({ user: user.id, cardVersion: cardVersion.id })
+      const card2 = await createMockCard({ user: user.id, cardVersion: cardVersion.id })
+      const card3 = await createMockCard({ user: user.id, cardVersion: cardVersion.id })
+      const card4 = await createMockCard({ user: user.id, cardVersion: cardVersion.id })
+      const card5 = await createMockCard({ user: user.id, cardVersion: cardVersion.id })
+      const sheet = await createMockSheet({
+        cardVersion: cardVersion.id,
+        order: order.id,
+        cards: [card1.id, card2.id, card3.id, card4.id, card5.id],
+      })
+      const ret = await unlinkSheet(sheet.id)
+
+      expect(ret.isSuccess).toBe(true)
+
+      const sheetRes = await Sheet.mongo.find({ _id: sheet.id })
+      expect(sheetRes).toEqual([
+        expect.objectContaining({
+          cardVersion: null,
+          order: null,
+        }),
+      ])
+
+      const cardRes = await Card.mongo
+        .find()
+        .where('_id')
+        .in([card1.id, card2.id, card3.id, card4.id, card5.id])
+        .exec()
+      expect(cardRes).toEqual([
+        expect.objectContaining({
+          user: null,
+          cardVersion: null,
+        }),
+        expect.objectContaining({
+          user: null,
+          cardVersion: null,
+        }),
+        expect.objectContaining({
+          user: null,
+          cardVersion: null,
+        }),
+        expect.objectContaining({
+          user: null,
+          cardVersion: null,
+        }),
+        expect.objectContaining({
+          user: null,
+          cardVersion: null,
+        }),
+      ])
     })
   })
 })

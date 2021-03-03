@@ -136,3 +136,28 @@ export const linkSheetToUser = async (
     sheetId: sheet.id,
   })
 }
+
+export const unlinkSheet = async (
+  sheetId: string
+): Promise<Result<undefined, 'sheet-not-found' | 'save-error'>> => {
+  const sheet = await Sheet.mongo.findById(sheetId)
+  if (!sheet) {
+    return Result.fail('sheet-not-found')
+  }
+
+  sheet.cardVersion = null
+  sheet.order = null
+
+  const res = sheet.cards.map(async (cardId) => {
+    const currCard = await Card.mongo.findById(cardId)
+    currCard.user = null
+    currCard.cardVersion = null
+    return await currCard.save()
+  })
+  try {
+    await Promise.all(res.concat(sheet.save()))
+    return Result.ok()
+  } catch (e) {
+    return Result.fail('save-error')
+  }
+}
