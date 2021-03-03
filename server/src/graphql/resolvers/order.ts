@@ -12,11 +12,13 @@ import {
   Authorized,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Mutation,
   ObjectType,
   Query,
   Resolver,
+  Root,
   UnauthorizedError,
 } from 'type-graphql'
 
@@ -133,8 +135,13 @@ class UpsertOrderResponse {
   orderId: string
 }
 
-@Resolver()
+@Resolver((of) => Order)
 class OrderResolver {
+  @FieldResolver()
+  async user(@Root() order: Order) {
+    return User.mongo.findById(order.user)
+  }
+
   //Get a single order
   @Authorized(Role.User)
   @Query(() => Order, { nullable: true })

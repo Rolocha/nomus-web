@@ -1,10 +1,15 @@
 import OrderEvent from 'src/models/OrderEvent'
 import { Role } from 'src/util/enums'
 import { IApolloContext } from 'src/graphql/types'
-import { Arg, Authorized, Ctx, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, FieldResolver, Query, Resolver, Root } from 'type-graphql'
+import { Order } from 'src/models'
 
-@Resolver()
+@Resolver((of) => OrderEvent)
 class OrderEventResolver {
+  @FieldResolver()
+  async order(@Root() orderEvent: OrderEvent) {
+    return Order.mongo.findById(orderEvent.order)
+  }
   // Get a single OrderEvent
   @Authorized(Role.Admin)
   @Query(() => OrderEvent, { nullable: true })
