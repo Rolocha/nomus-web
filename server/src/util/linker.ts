@@ -84,14 +84,14 @@ const linkSheetToOrder = async (
   sheet.cardVersion = cardVersion.id
   sheet.order = order.id
 
-  const res = sheet.cards.map(async (cardId) => {
+  const sheetCardUpdatePromises = sheet.cards.map(async (cardId) => {
     const currCard = await Card.mongo.findById(cardId)
     currCard.user = order.user
     currCard.cardVersion = cardVersion
     return await currCard.save()
   })
   try {
-    await Promise.all(res.concat(sheet.save()))
+    await Promise.all(sheetCardUpdatePromises.concat(sheet.save()))
     return Result.ok()
   } catch (e) {
     return Result.fail('save-error')
@@ -148,14 +148,14 @@ export const unlinkSheet = async (
   sheet.cardVersion = null
   sheet.order = null
 
-  const res = sheet.cards.map(async (cardId) => {
+  const sheetCardUpdatePromises = sheet.cards.map(async (cardId) => {
     const currCard = await Card.mongo.findById(cardId)
     currCard.user = null
     currCard.cardVersion = null
     return await currCard.save()
   })
   try {
-    await Promise.all(res.concat(sheet.save()))
+    await Promise.all(sheetCardUpdatePromises.concat(sheet.save()))
     return Result.ok()
   } catch (e) {
     return Result.fail('save-error')
