@@ -9,7 +9,11 @@
       "request": "launch",
       "name": "[client] Jest All",
       "program": "${workspaceFolder}/client/node_modules/.bin/jest",
-      "args": ["--runInBand", "--config", "${workspaceFolder}/client/package.json"],
+      "args": [
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/client/jest.config.js"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
@@ -21,7 +25,11 @@
       "request": "launch",
       "name": "[client] Jest Current File",
       "program": "${workspaceFolder}/client/node_modules/.bin/jest",
-      "args": ["${fileBasenameNoExtension}", "--config", "${workspaceFolder}/client/package.json"],
+      "args": [
+        "${fileBasenameNoExtension}",
+        "--config",
+        "${workspaceFolder}/client/jest.config.js"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
@@ -33,24 +41,38 @@
       "request": "launch",
       "name": "[server] Jest All",
       "program": "${workspaceFolder}/client/node_modules/.bin/jest",
-      "args": ["--runInBand", "--config", "${workspaceFolder}/server/package.json"],
+      "args": [
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/server/package.json"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}/server",
-      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/server/node_modules/**/*"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/server/node_modules/**/*"
+      ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "[server] Jest Current File",
       "program": "${workspaceFolder}/server/node_modules/.bin/jest",
-      "args": ["${relativeFile}", "--config", "${workspaceFolder}/server/package.json"],
+      "args": [
+        "${relativeFile}",
+        "--config",
+        "${workspaceFolder}/server/package.json"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}/server",
-      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/server/node_modules/**/*"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/server/node_modules/**/*"
+      ]
     },
     {
       "type": "node",

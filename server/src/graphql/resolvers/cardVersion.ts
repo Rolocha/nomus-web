@@ -1,4 +1,15 @@
-import { Resolver, ObjectType, Field, Query, Ctx, Authorized, Arg, Int } from 'type-graphql'
+import {
+  Resolver,
+  ObjectType,
+  Field,
+  Query,
+  Ctx,
+  Authorized,
+  Arg,
+  Int,
+  FieldResolver,
+  Root,
+} from 'type-graphql'
 
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
@@ -19,8 +30,13 @@ class CardVersionStats {
   numTaps: number
 }
 
-@Resolver()
+@Resolver((of) => CardVersion)
 class CardVersionResolver {
+  @FieldResolver()
+  async user(@Root() cardVersion: CardVersion) {
+    return User.mongo.findById(cardVersion.user)
+  }
+
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => CardVersion, { nullable: true })
