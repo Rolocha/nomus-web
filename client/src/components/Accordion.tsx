@@ -10,11 +10,6 @@ interface Props {
   size?: 'medium' | 'small'
 }
 
-// May help understanding useState -- this is what the implementaiton might look like
-// const useState = () => {
-//   return [stateValue, updateStateValueFunction]
-// }
-
 const Accordion = ({ title, children, size = 'medium' }: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
