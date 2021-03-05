@@ -48,6 +48,4 @@ export const faqItems = [
     answer:
       'We know "Nom" in popular culture has associations with food and eating, but the "Nom" in Nomus refers to the Latin root word for "name." Nomus definitely has nothing to do with noms – unless you\'re a food business. In that case, by all means, get yourself a Nomus card already!',
   },
-
-  // ... rest of questions
 ]
