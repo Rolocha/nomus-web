@@ -7,7 +7,12 @@ interface Props extends CircularProgressProps {
 }
 
 const Spinner = (props: Props) => (
-  <CircularProgress isIndeterminate color={colors.nomusBlue} {...props} />
+  <CircularProgress
+    data-testid="spinner"
+    isIndeterminate
+    color={colors.nomusBlue}
+    {...props}
+  />
 )
 
 export default Spinner
