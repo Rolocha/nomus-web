@@ -127,8 +127,8 @@ const LoginForm = () => {
           width="100%"
           variant="primary"
           size="big"
-          inProgress={loggingIn}
-          inProgressText="Logging in"
+          isLoading={loggingIn}
+          loadingText="Logging in"
         >
           Continue
         </Button>

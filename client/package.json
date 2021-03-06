@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn && NODE_ENV=development webpack serve --config config/webpack.dev.js --host 0.0.0.0 --open --useLocalIp --hot",
+    "dev": "yarn && NODE_ENV=development webpack serve --config config/webpack.dev.js",
     "build": "NODE_ENV=production webpack --config config/webpack.prod.js",
     "test": "node scripts/test.js",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
@@ -124,6 +124,7 @@
     "@emotion/babel-plugin": "^11.1.2",
     "@emotion/eslint-plugin": "^11.0.0",
     "@storybook/addon-actions": "^6.1.18",
+    "@storybook/addon-essentials": "^6.1.21",
     "@storybook/addon-links": "^6.1.18",
     "@storybook/addon-storysource": "^6.1.18",
     "@storybook/addons": "^5.3.18",

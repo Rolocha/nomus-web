@@ -82,7 +82,9 @@ interface Props extends IconProps {
   of: IconName
 }
 
-export default ({ of, ...restOfProps }: Props) => {
+const Icon = ({ of, ...restOfProps }: Props) => {
   const SelectedIcon = iconLibrary[of]
   return React.createElement(SelectedIcon, restOfProps)
 }
+
+export default Icon

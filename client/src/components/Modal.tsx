@@ -21,8 +21,8 @@ interface Action {
   text: string
   handler?: () => void
   submitForm?: string
-  inProgress?: boolean
-  inProgressText?: string
+  isLoading?: boolean
+  loadingText?: string
 }
 
 type Actions = {
@@ -289,10 +289,8 @@ const Modal = ({
                                     form={
                                       actions.secondary.submitForm ?? undefined
                                     }
-                                    inProgress={actions.secondary.inProgress}
-                                    inProgressText={
-                                      actions.secondary.inProgressText
-                                    }
+                                    isLoading={actions.secondary.isLoading}
+                                    loadingText={actions.secondary.loadingText}
                                     type={
                                       actions.secondary.submitForm
                                         ? 'submit'
@@ -310,10 +308,8 @@ const Modal = ({
                                     form={
                                       actions.primary.submitForm ?? undefined
                                     }
-                                    inProgress={actions.primary.inProgress}
-                                    inProgressText={
-                                      actions.primary.inProgressText
-                                    }
+                                    isLoading={actions.primary.isLoading}
+                                    loadingText={actions.primary.loadingText}
                                     type={
                                       actions.primary.submitForm
                                         ? 'submit'

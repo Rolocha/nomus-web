@@ -154,8 +154,8 @@ export default ({ order }: Props) => {
           <Box px={3}>
             <Button
               variant="danger"
-              inProgress={orderCancelLoading}
-              inProgressText="Canceling your order"
+              isLoading={orderCancelLoading}
+              loadingText="Canceling your order"
               onClick={handleClickOrderCancel}
             >
               Cancel order

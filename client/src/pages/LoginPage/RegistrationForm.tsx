@@ -236,8 +236,8 @@ const RegistrationForm = () => {
             <Button
               variant="primary"
               size="big"
-              inProgress={submittingForm}
-              inProgressText="Creating your account"
+              isLoading={submittingForm}
+              loadingText="Creating your account"
               type="submit"
               width="100%"
             >

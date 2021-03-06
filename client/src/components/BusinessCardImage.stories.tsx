@@ -3,7 +3,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 
 export default {
-  title: 'BusinessCardImage',
+  title: 'components/BusinessCardImage',
   component: BusinessCardImage,
   excludeStories: /.*Data$/,
 }

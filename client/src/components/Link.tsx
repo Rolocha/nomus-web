@@ -1,7 +1,7 @@
 import { chakra, useStyleConfig } from '@chakra-ui/system'
 import * as React from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
-import * as buttonlikeStyles from 'src/styles/components/button'
+import * as buttonStyles from 'src/styles/components/button'
 import theme from 'src/styles/theme'
 
 interface LinkProps extends React.ComponentProps<typeof chakra.a> {
@@ -10,8 +10,8 @@ interface LinkProps extends React.ComponentProps<typeof chakra.a> {
   ref?: any
   asButton?: boolean
   // button variants are only used if asButton is true
-  buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
-  buttonSize?: keyof typeof buttonlikeStyles.sizeVariants
+  buttonStyle?: keyof typeof buttonStyles.styleVariants
+  buttonSize?: keyof typeof buttonStyles.sizeVariants
   underline?: boolean
   color?: string
   as?: any
@@ -57,7 +57,7 @@ const Link = ({
   if (
     to == null ||
     isExternalLink(to) ||
-    (linkType && linkType === 'external')
+    (typeof to === 'string' && linkType && linkType === 'external')
   ) {
     // Link is pointing to some other website/location, use the typical anchor element
     return <chakra.a ref={ref} sx={styles} href={to ?? '#'} {...props} />

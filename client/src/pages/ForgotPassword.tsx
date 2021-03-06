@@ -93,7 +93,7 @@ const ForgotPassword = () => {
                 width="100%"
                 variant="primary"
                 size="big"
-                inProgress={formState.isSubmitting}
+                isLoading={formState.isSubmitting}
               >
                 Email me a recovery link
               </Button>

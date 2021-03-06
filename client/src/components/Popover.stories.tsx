@@ -7,7 +7,7 @@ import { colors } from 'src/styles'
 import Icon from './Icon'
 
 export default {
-  title: 'Popover',
+  title: 'components/Popover',
   component: Popover,
   excludeStories: /.*Data$/,
 }

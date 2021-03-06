@@ -124,9 +124,9 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         flexGrow={1}
         boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
         bg="white"
-        borderTopRightRadius={{ [bp]: 'base' }}
-        borderBottomRightRadius={{ [bp]: 'base' }}
-        borderBottomLeftRadius={{ [bp]: 'base' }}
+        borderTopRightRadius={{ [bp]: 'xl' }}
+        borderBottomRightRadius={{ [bp]: 'xl' }}
+        borderBottomLeftRadius={{ [bp]: 'xl' }}
         position="relative"
         height="100%"
         minHeight="60vh"

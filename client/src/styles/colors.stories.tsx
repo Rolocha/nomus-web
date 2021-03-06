@@ -4,7 +4,7 @@ import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 
 export default {
-  title: 'Color',
+  title: 'styles/Color',
   excludeStories: /.*Data$/,
 }
 

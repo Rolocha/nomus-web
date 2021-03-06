@@ -6,7 +6,7 @@ import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
 
 export default {
-  title: 'Icon',
+  title: 'components/Icon',
   component: Icon,
   excludeStories: /.*Data$/,
 }

@@ -168,7 +168,7 @@ const ResetPassword = () => {
                   width="100%"
                   variant="primary"
                   size="big"
-                  inProgress={formState.isSubmitting}
+                  isLoading={formState.isSubmitting}
                 >
                   Update password
                 </Button>

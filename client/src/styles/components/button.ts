@@ -255,6 +255,30 @@ export const styleVariants = {
     },
   },
 
+  dashedSecondary: {
+    borderWidth: '1px',
+    borderStyle: 'dashed',
+    backgroundColor: 'transparent',
+    borderColor: colors.nomusBlue,
+    color: colors.nomusBlue,
+    transition: buttonTransition,
+    '&:hover': {
+      backgroundColor: colors.hoverSecondaryBlue,
+    },
+    '&:active': {
+      backgroundColor: colors.activeSecondaryBlue,
+    },
+    '&:focus': {
+      boxShadow: `0 0 4px 0 ${colors.outlineBlue}`,
+      outline: 'none',
+    },
+    '&:disabled': {
+      backgroundColor: 'transparent',
+      color: colors.disabledBlue,
+      borderColor: colors.disabledBlue,
+    },
+  },
+
   unstyled: {},
 } as const
 
@@ -268,23 +292,19 @@ export const sizeVariants = {
     paddingTop: '13px',
     paddingBottom: '13px',
   },
-  knob: {
-    fontSize: '16px',
-    [mq.md]: {
-      fontSize: '20px',
-    },
-    borderRadius: '2em',
-    padding: '13px',
-  },
   normal: {
     paddingTop: '9.5px',
     paddingBottom: '9.5px',
     fontSize: '14px',
     borderRadius: '8px',
   },
+  icon: {
+    padding: '9.5px',
+  },
 }
 
 export default {
+  colorSchemes: {},
   baseStyle: baseButtonStyles,
   sizes: sizeVariants,
   variants: styleVariants,

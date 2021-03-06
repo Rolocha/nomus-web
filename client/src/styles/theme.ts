@@ -6,6 +6,7 @@ import { breakpoints } from './breakpoints'
 import shadows from './shadows'
 import radii from './radii'
 import buttonStyles from './components/button'
+import iconButtonStyles from './components/icon-button'
 
 export default extendTheme({
   colors,
@@ -16,5 +17,6 @@ export default extendTheme({
   fonts: typography.fonts,
   components: {
     Button: buttonStyles,
+    IconButton: iconButtonStyles,
   },
 })

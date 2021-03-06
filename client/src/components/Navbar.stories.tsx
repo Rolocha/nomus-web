@@ -5,7 +5,7 @@ import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 
 export default {
-  title: 'Navbar',
+  title: 'components/Navbar',
   component: Navbar,
   excludeStories: /.*Data$/,
 }

@@ -12,7 +12,7 @@ import Link from '../Link'
 import PasswordVisibilityToggle from '../PasswordVisibilityToggle'
 
 export default {
-  title: 'Form',
+  title: 'components/Form',
   component: Form,
   excludeStories: /.*Data$/,
   decorators: [
@@ -101,8 +101,8 @@ export const ExampleForm = () => {
           width="100%"
           variant="primary"
           size="big"
-          inProgress={formState.isSubmitting}
-          inProgressText="Logging in"
+          isLoading={formState.isSubmitting}
+          loadingText="Logging in"
         >
           Continue
         </Button>

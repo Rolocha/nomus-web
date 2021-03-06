@@ -273,8 +273,7 @@ const CardBuilder = () => {
     >
       <Navbar />
       <Box
-        pb={{ [bp]: 4 }}
-        px={{ base: 0, [bp]: 5 }}
+        container
         width="100%"
         display="flex"
         flexDirection="column"

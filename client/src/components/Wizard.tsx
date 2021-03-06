@@ -121,8 +121,8 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         flexShrink={0}
         minWidth={{ [bp]: 200 }}
         bg={colors.twilight}
-        borderTopLeftRadius={{ base: 'none', [bp]: 'base' }}
-        borderBottomLeftRadius={{ base: 'none', [bp]: 'base' }}
+        borderTopLeftRadius={{ base: 'none', [bp]: 'xl' }}
+        borderBottomLeftRadius={{ base: 'none', [bp]: 'xl' }}
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
       >
@@ -160,11 +160,11 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
               key={key}
               borderTopLeftRadius={{
                 base: 'none',
-                [bp]: index === 0 ? 'base' : 'none',
+                [bp]: index === 0 ? 'xl' : 'none',
               }}
               borderBottomLeftRadius={{
                 base: 'none',
-                [bp]: index === steps.length - 1 ? 'base' : 'none',
+                [bp]: index === steps.length - 1 ? 'xl' : 'none',
               }}
               bg={
                 stepDisabled
@@ -195,9 +195,9 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         flexGrow={1}
         boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
         bg="white"
-        borderTopRightRadius={{ [bp]: 'base' }}
-        borderBottomRightRadius={{ [bp]: 'base' }}
-        borderBottomLeftRadius={{ [bp]: 'base' }}
+        borderTopRightRadius={{ [bp]: 'xl' }}
+        borderBottomRightRadius={{ [bp]: 'xl' }}
+        borderBottomLeftRadius={{ [bp]: 'xl' }}
         position="relative"
         height="100%"
       >

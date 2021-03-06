@@ -7,7 +7,7 @@ import Link from 'src/components/Link'
 import { createMailtoURL } from 'src/utils/email'
 
 export default {
-  title: 'Link',
+  title: 'components/Link',
   component: Link,
   excludeStories: /.*Data$/,
   decorators: [

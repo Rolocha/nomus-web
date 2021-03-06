@@ -170,13 +170,7 @@ const FileUploadButton = ({
           onDrop={handleFileDrop}
           onClick={() => inputRef.current?.click()}
           width={width}
-          variant="unstyled"
-          border={`1px dashed ${colors.nomusBlue}`}
-          background="white"
-          color={colors.nomusBlue}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+          variant="dashedSecondary"
           sx={
             isDragging
               ? {
@@ -187,8 +181,8 @@ const FileUploadButton = ({
                 }
               : {}
           }
+          leftIcon={<Icon of="upload" color={colors.nomusBlue} />}
         >
-          <Icon of="upload" color={colors.nomusBlue} mr="8px" />
           Upload a file or drag and drop
         </Button>
       )}

@@ -116,8 +116,8 @@ export default ({
           text: 'Save',
           submitForm: 'profile-editor',
           handler: handleSubmit(onFormSubmit),
-          inProgress: isSubmitting,
-          inProgressText: 'Saving',
+          isLoading: isSubmitting,
+          loadingText: 'Saving',
         },
         secondary: {
           text: 'Cancel',
