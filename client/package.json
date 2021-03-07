@@ -8,7 +8,8 @@
     "test": "node scripts/test.js",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
     "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx src --max-warnings 0",
-    "storybook": "start-storybook"
+    "storybook": "start-storybook",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@apollo/client": "^3.2.5",

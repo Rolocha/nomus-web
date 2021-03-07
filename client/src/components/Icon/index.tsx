@@ -20,6 +20,7 @@ import InfoOIcon from './InfoOIcon'
 import InstagramIcon from './InstagramIcon'
 import ListIcon from './ListIcon'
 import MenuIcon from './MenuIcon'
+import MinusIcon from './MinusIcon'
 import OptionsIcon from './OptionsIcon'
 import OrdersIcon from './OrdersIcon'
 import PenIcon from './PenIcon'
@@ -56,6 +57,7 @@ const iconLibrary = {
   instagram: InstagramIcon,
   list: ListIcon,
   menu: MenuIcon,
+  minus: MinusIcon,
   options: OptionsIcon,
   orders: OrdersIcon,
   pen: PenIcon,
