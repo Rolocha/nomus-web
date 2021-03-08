@@ -81,11 +81,11 @@ const ChangeUsernameForm = ({ username }: Props) => {
       height="100%"
       display="grid"
       gridTemplateColumns={{
-        _: '8fr 4fr',
+        base: '8fr 4fr',
         [bp]: '4fr 2fr 6fr',
       }}
       gridTemplateAreas={{
-        _: `
+        base: `
       "username editUsername"
     `,
         [bp]: `
@@ -118,7 +118,10 @@ const ChangeUsernameForm = ({ username }: Props) => {
         )}
       </Box>
 
-      <Box gridArea="editUsername" placeSelf={{ _: 'end', [bp]: 'end center' }}>
+      <Box
+        gridArea="editUsername"
+        placeSelf={{ base: 'end', [bp]: 'end center' }}
+      >
         {active ? (
           <Box
             height="100%"
@@ -151,13 +154,13 @@ const ChangeUsernameForm = ({ username }: Props) => {
               setActive(true)
             }}
           >
-            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+            <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
               Edit
             </Box>
           </Button>
         )}
       </Box>
-      <Box gridArea="usernameCopy" display={{ _: 'none', [bp]: 'block' }}>
+      <Box gridArea="usernameCopy" display={{ base: 'none', [bp]: 'block' }}>
         <Text.Body3>
           This is your username for this account. Changing your username will
           change your public profile link.

@@ -12,36 +12,31 @@ exports[`<Modal /> renders a modal with the specified content in a portal 1`] = 
     >
       <aside
         aria-modal="true"
-        class="css-7ipd20-Box e1gi27mm0"
+        class="css-1xo2kpp-Box e1gi27mm0"
         data-testid="modal"
-        display="flex"
-        height="768"
-        width="100vw"
       >
         <div
           style="display: flex; flex-direction: column; justify-content: center; align-items: center; transform: scale(0); width: 100%;"
         >
           <div
-            class="css-5s9f5k-Box e1gi27mm0"
-            display="flex"
-            width="[object Object]"
+            class="css-tzhud4-Box e1gi27mm0"
           >
             <div
-              class="css-1i6u5k9-Box e1gi27mm0"
+              class="css-753weo-Box e1gi27mm0"
             >
               <h2
-                class="css-aaj9al-Text e1pb1ozb0"
+                class="css-0"
               >
                 Test Modal
               </h2>
               <p
-                class="css-182fmg5-Text e1pb1ozb0"
+                class="css-0"
               >
                 Some content
               </p>
               <div
                 aria-label="Close Modal"
-                class="css-1g06mgi-Box-Modal e1gi27mm0"
+                class="css-1cvlce3-Box e1gi27mm0"
                 role="button"
               >
                 <svg

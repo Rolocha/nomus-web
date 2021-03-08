@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
@@ -49,7 +48,7 @@ const ReviewStep = React.forwardRef(
     const costSummary = getCostSummary(cardBuilderState.quantity)
 
     return (
-      <Box height="100%" overflowY="scroll" p={{ _: '24px', md: '48px' }}>
+      <Box height="100%" overflowY="scroll" p={{ base: '24px', md: '48px' }}>
         <Text.SectionHeader mb="24px">Your card design</Text.SectionHeader>
         <Box
           display="grid"
@@ -167,16 +166,16 @@ const ReviewStep = React.forwardRef(
             gridArea="costSummary"
             width="100%"
             boxShadow="workingWindow"
-            borderRadius={2}
+            borderRadius="lg"
             placeSelf="end end"
             p={4}
             display="grid"
             gridTemplateColumns="2fr 1fr 1fr"
-            css={css`
-              & > *:nth-child(3n) {
-                place-self: center end;
-              }
-            `}
+            sx={{
+              '& > *:nth-child(3n)': {
+                placeSelf: 'center end',
+              },
+            }}
             gridRowGap={3}
           >
             <Text.Body2>Subtotal</Text.Body2>

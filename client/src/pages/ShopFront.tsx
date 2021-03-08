@@ -1,20 +1,19 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import Container from 'src/components/Container'
-import Card from 'src/components/Card'
 import Button from 'src/components/Button'
-import Navbar from 'src/components/Navbar'
+import Card from 'src/components/Card'
+import Container from 'src/components/Container'
 import Footer from 'src/components/Footer'
+import Image from 'src/components/Image'
 import Link from 'src/components/Link'
+import Navbar from 'src/components/Navbar'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
-import cardTemplateBg from 'src/images/card-template-promo-bg.png'
 import cardCustomBg from 'src/images/card-custom-promo-bg.png'
-import { QUANTITY_TO_PRICE } from 'src/utils/pricing'
-import { formatDollarAmount } from 'src/utils/money'
+import cardTemplateBg from 'src/images/card-template-promo-bg.png'
 import { colors } from 'src/styles'
-import Image from 'src/components/Image'
+import { formatDollarAmount } from 'src/utils/money'
+import { QUANTITY_TO_PRICE } from 'src/utils/pricing'
 
 const bp = 'lg'
 
@@ -32,7 +31,7 @@ const ShopFront = () => {
         bg="offWhite"
       />
       <Container>
-        <Box position="relative" zIndex={1} px={{ _: 0, [bp]: 5 }} pb={5}>
+        <Box position="relative" zIndex={1} px={{ base: 0, [bp]: 5 }} pb={5}>
           <Box
             position="relative"
             width="100%"
@@ -43,11 +42,7 @@ const ShopFront = () => {
             <Text.PageHeader textAlign="center" mt={3} mb={1}>
               Design your Nomus card
             </Text.PageHeader>
-            <Text.Body2
-              textAlign="center"
-              mb={2}
-              css={css({ maxWidth: '80%' })}
-            >
+            <Text.Body2 textAlign="center" mb={2} maxWidth="80%">
               Whichever you choose, your cards will have a Nomus tap-to-share
               chip built in.
             </Text.Body2>
@@ -58,10 +53,10 @@ const ShopFront = () => {
               display="grid"
               gridColumnGap={3}
               gridRowGap={2}
-              gridTemplateColumns={{ _: '1fr', [bp]: '1fr 1fr' }}
-              gridTemplateRows={{ _: 'auto', [bp]: '1fr auto' }}
+              gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr' }}
+              gridTemplateRows={{ base: 'auto', [bp]: '1fr auto' }}
               gridTemplateAreas={{
-                _: `
+                base: `
                   "firstCard"
                   "firstNote"
                   "secondCard"
@@ -77,7 +72,7 @@ const ShopFront = () => {
                 bg="white"
                 gridArea="firstCard"
                 position="relative"
-                borderRadius={2}
+                borderRadius="lg"
                 boxShadow="workingWindow"
                 display="flex"
                 alignItems="center"
@@ -113,10 +108,10 @@ const ShopFront = () => {
               </Text.Body2>
 
               <Box
-                mt={{ _: 3, [bp]: 'unset' }}
+                mt={{ base: 3, [bp]: 'unset' }}
                 gridArea="secondCard"
                 position="relative"
-                borderRadius={2}
+                borderRadius="lg"
                 boxShadow="workingWindow"
                 display="flex"
                 alignItems="center"
@@ -124,14 +119,7 @@ const ShopFront = () => {
                 width="100%"
                 overflow="hidden"
               >
-                <Image
-                  src={cardCustomBg}
-                  w="100%"
-                  h="100%"
-                  css={css`
-                    object-fit: cover;
-                  `}
-                />
+                <Image src={cardCustomBg} w="100%" h="100%" objectFit="cover" />
                 <Box
                   position="absolute"
                   top="0"
@@ -164,8 +152,8 @@ const ShopFront = () => {
             </Text.SectionHeader>
             <Box
               display="grid"
-              gridTemplateColumns={{ _: undefined, [bp]: 'repeat(3, 4fr)' }}
-              gridTemplateRows={{ _: 'repeat(3, 4fr)', [bp]: 'unset' }}
+              gridTemplateColumns={{ base: undefined, [bp]: 'repeat(3, 4fr)' }}
+              gridTemplateRows={{ base: 'repeat(3, 4fr)', [bp]: 'unset' }}
               gridColumnGap={3}
               gridRowGap={3}
             >

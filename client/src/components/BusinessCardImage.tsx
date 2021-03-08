@@ -1,28 +1,16 @@
-import { css } from '@emotion/react'
-import * as CSS from 'csstype'
+import { LayoutProps } from '@chakra-ui/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import businessCardFallback from 'src/images/business-card-fallback.svg'
 import { colors } from 'src/styles'
-import {
-  RequiredTheme,
-  ResponsiveValue,
-  TLengthStyledSystem,
-} from 'styled-system'
 import Icon from './Icon'
 
 interface CommonProps {
   nameForImageAlt?: string
   // Both width and height are optional but you should probably provide at least one or the image won't show up
-  height?: ResponsiveValue<
-    CSS.Property.Height<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  width?: ResponsiveValue<
-    CSS.Property.Width<TLengthStyledSystem>,
-    RequiredTheme
-  >
+  height?: LayoutProps['height']
+  width?: LayoutProps['width']
 }
 
 type ImagesPresentProps = {
@@ -40,8 +28,6 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
     position="absolute"
     top="0"
     right="0"
-    width="30px"
-    height="30px"
     bg="white"
     borderRadius="50%"
     p={1}
@@ -49,33 +35,27 @@ const FlipButton = ({ onClick }: { onClick: () => void }) => (
     onClick={onClick}
     boxShadow="knob"
     zIndex={3}
-    css={css`
-      transform: translate(40%, -40%);
-      cursor: pointer;
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-    `}
+    transform="translate(40%, -40%)"
+    cursor="pointer"
   >
     <Icon of="sync" color={colors.nomusBlue} />
   </Box>
 )
 
-const faceStyles = css({
+const faceStyles = {
   transition: 'opacity 0.3s ease, transform 0.3s ease',
   backfaceVisibility: 'hidden',
-})
+}
 
-const visibleStyles = css({
+const visibleStyles = {
   opacity: 1,
   transform: 'rotateY(0deg)',
-})
+}
 
-const hiddenStyles = css({
+const hiddenStyles = {
   opacity: 0,
   transform: 'rotateY(-180deg)',
-})
+}
 
 const createAltText = (side: string | null, name: string | null | undefined) =>
   `${side} of ${name ?? 'user'}'s Nomus card`
@@ -135,17 +115,19 @@ const BusinessCardImage = (props: Props) => {
     <Box position="relative" display="inline-block" width={props.width}>
       <Box
         width={props.width}
-        css={css(faceStyles, showBack ? hiddenStyles : visibleStyles)}
+        sx={{ ...faceStyles, ...(showBack ? hiddenStyles : visibleStyles) }}
       >
         {frontImage}
       </Box>
       <Box
         width={props.width}
-        css={css(faceStyles, showBack ? visibleStyles : hiddenStyles, {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-        })}
+        position="absolute"
+        top={0}
+        left={0}
+        sx={{
+          ...faceStyles,
+          ...(showBack ? visibleStyles : hiddenStyles),
+        }}
       >
         {backImage}
       </Box>

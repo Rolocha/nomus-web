@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
@@ -69,7 +68,7 @@ const LoginPage = () => {
     >
       <Box
         // Don't show the squiggle thing in mobile
-        display={{ _: 'none', [bp]: 'block' }}
+        display={{ base: 'none', [bp]: 'block' }}
         position="absolute"
         zIndex={0}
         right="0"
@@ -81,14 +80,15 @@ const LoginPage = () => {
           src={{ login: signInSwoosh, register: registrationSwoosh }[mode]}
           w="100%"
           h="100%"
-          css={css({ objectFit: 'cover', objectPosition: 'left' })}
+          objectFit="cover"
+          objectPosition="left"
         />
       </Box>
       <Box
         position="relative"
         zIndex={1}
         display="grid"
-        gridTemplateColumns={{ _: '', [bp]: '1fr 4fr 2fr 5fr' }}
+        gridTemplateColumns={{ base: '', [bp]: '1fr 4fr 2fr 5fr' }}
         pt="110px"
       >
         {/* Left-hand side */}
@@ -104,7 +104,7 @@ const LoginPage = () => {
         {/* Right-hand side */}
         <Box
           position="relative"
-          display={{ _: 'none', [bp]: 'block' }}
+          display={{ base: 'none', [bp]: 'block' }}
           height="auto"
           gridColumn="4/5"
         >

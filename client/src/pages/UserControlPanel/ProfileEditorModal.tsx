@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import deepEqual from 'deep-equal'
 import * as React from 'react'
@@ -8,9 +7,9 @@ import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import Modal from 'src/components/Modal'
-import { UPDATE_PROFILE_MUTATION } from './mutations'
-import * as yup from 'yup'
 import { useRegisterWithRef } from 'src/utils/form'
+import * as yup from 'yup'
+import { UPDATE_PROFILE_MUTATION } from './mutations'
 
 interface FormData {
   firstName: string
@@ -43,9 +42,14 @@ export default ({
   fieldRefs,
 }: Props) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const { register, handleSubmit, getValues, reset, watch, errors } = useForm<
-    FormData
-  >({
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    reset,
+    watch,
+    errors,
+  } = useForm<FormData>({
     mode: 'onBlur',
     defaultValues,
     resolver: yupResolver(
@@ -112,8 +116,8 @@ export default ({
           text: 'Save',
           submitForm: 'profile-editor',
           handler: handleSubmit(onFormSubmit),
-          inProgress: isSubmitting,
-          inProgressText: 'Saving',
+          isLoading: isSubmitting,
+          loadingText: 'Saving',
         },
         secondary: {
           text: 'Cancel',
@@ -126,17 +130,18 @@ export default ({
           <Form.Form onSubmit={handleSubmit(onFormSubmit)} id="profile-editor">
             <Box
               display="flex"
-              flexDirection={{ _: 'column', md: 'row' }}
+              flexDirection={{ base: 'column', md: 'row' }}
               justifyContent="space-between"
-              mb={{ _: 0, md: 3 }}
-              css={css`
-                & > * {
-                  flex-basis: calc(100% / 3);
-                }
-              `}
+              mx={{ base: 0, md: -1 }}
+              mb={{ base: 0, md: 3 }}
+              sx={{
+                '& > *': {
+                  flexBasis: 'calc(100% / 3)',
+                },
+              }}
               overflowY="auto"
             >
-              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="firstName" required={true}>
                   FIRST NAME
                 </Form.Label>
@@ -151,7 +156,7 @@ export default ({
                 />
                 <Form.FieldError fieldError={errors.firstName} />
               </Form.Item>
-              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="middleName">MIDDLE NAME</Form.Label>
                 <Form.Input
                   name="middleName"
@@ -162,7 +167,7 @@ export default ({
                 />
                 <Form.FieldError fieldError={errors.middleName} />
               </Form.Item>
-              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="lastName" required={true}>
                   LAST NAME
                 </Form.Label>
@@ -188,17 +193,17 @@ export default ({
             </Form.Item>
             <Box
               display="flex"
-              flexDirection={{ _: 'column', md: 'row' }}
+              flexDirection={{ base: 'column', md: 'row' }}
               justifyContent="space-between"
-              mb={{ _: 0, md: 3 }}
-              mx={{ _: 0, md: -1 }}
-              css={css`
-                & > * {
-                  flex-basis: calc(100% / 2);
-                }
-              `}
+              mb={{ base: 0, md: 3 }}
+              mx={{ base: 0, md: -1 }}
+              sx={{
+                '& > *': {
+                  flexBasis: 'calc(100% / 2)',
+                },
+              }}
             >
-              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="phoneNumber">PHONE NUMBER</Form.Label>
                 <Form.Input
                   name="phoneNumber"
@@ -211,7 +216,7 @@ export default ({
                 />
                 <Form.FieldError fieldError={errors.phoneNumber} />
               </Form.Item>
-              <Form.Item px={{ _: 0, md: 1 }} mb={{ _: 3, md: 0 }}>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="email" required={true}>
                   EMAIL
                 </Form.Label>

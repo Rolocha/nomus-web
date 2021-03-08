@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import Spinner from 'src/components/Spinner'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -110,19 +110,19 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
   return (
     <Box
       display="flex"
-      flexDirection={{ _: 'column', [bp]: 'row' }}
+      flexDirection={{ base: 'column', [bp]: 'row' }}
       alignItems={{ [bp]: 'flex-start' }}
       pb={2}
     >
       {/* Menu for selecting dashboard section */}
       <Box
         display="flex"
-        flexDirection={{ _: 'row', [bp]: 'column' }}
+        flexDirection={{ base: 'row', [bp]: 'column' }}
         flexShrink={0}
         minWidth={{ [bp]: 200 }}
         bg={colors.twilight}
-        borderTopLeftRadius={{ _: 0, [bp]: 3 }}
-        borderBottomLeftRadius={{ _: 0, [bp]: 3 }}
+        borderTopLeftRadius={{ base: 'none', [bp]: 'xl' }}
+        borderBottomLeftRadius={{ base: 'none', [bp]: 'xl' }}
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
       >
@@ -135,20 +135,19 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
               py="24px"
               px={3}
               display="flex"
-              flexDirection={{ _: 'column', [bp]: 'row' }}
+              flexDirection={{ base: 'column', [bp]: 'row' }}
               alignItems="center"
             >
               <Icon
                 of={icon}
                 color="white"
-                boxSize="1.5em"
-                mb={{ _: '0.5em', [bp]: 0 }}
-                mr={{ _: 0, [bp]: '0.7em' }}
+                mb={{ base: '0.5em', md: 0 }}
+                mr={{ base: 0, md: '24px' }}
               />
               <Text.Plain
                 m={0}
                 color="white"
-                fontSize={{ _: 10, [bp]: 'unset' }}
+                fontSize={{ base: 10, [bp]: 'unset' }}
                 fontWeight={isCurrentSection ? 500 : 'undefined'}
               >
                 {`Step ${index + 1} / ${label}`}
@@ -159,10 +158,13 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
             <Box
               cursor={stepDisabled ? 'not-allowed' : 'pointer'}
               key={key}
-              borderTopLeftRadius={{ _: 0, [bp]: index === 0 ? 3 : 0 }}
+              borderTopLeftRadius={{
+                base: 'none',
+                [bp]: index === 0 ? 'xl' : 'none',
+              }}
               borderBottomLeftRadius={{
-                _: 0,
-                [bp]: index === steps.length - 1 ? 3 : 0,
+                base: 'none',
+                [bp]: index === steps.length - 1 ? 'xl' : 'none',
               }}
               bg={
                 stepDisabled
@@ -172,7 +174,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                   : undefined
               }
               flexBasis={{
-                _: `${100 / steps.length}%`,
+                base: `${100 / steps.length}%`,
                 [bp]: 'auto',
               }}
               position="relative"
@@ -181,7 +183,7 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
               {stepDisabled ? (
                 tabElement
               ) : (
-                <InternalLink to={sectionPath}>{tabElement}</InternalLink>
+                <Link to={sectionPath}>{tabElement}</Link>
               )}
             </Box>
           )
@@ -193,9 +195,9 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
         flexGrow={1}
         boxShadow={{ [bp]: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}
         bg="white"
-        borderTopRightRadius={{ [bp]: 3 }}
-        borderBottomRightRadius={{ [bp]: 3 }}
-        borderBottomLeftRadius={{ [bp]: 3 }}
+        borderTopRightRadius={{ [bp]: 'xl' }}
+        borderBottomRightRadius={{ [bp]: 'xl' }}
+        borderBottomLeftRadius={{ [bp]: 'xl' }}
         position="relative"
         height="100%"
       >
@@ -220,17 +222,15 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                     {/* Previous step button */}
                     {!isStepDisabled(index - 1) && (
                       <Button
-                        px={{ _: 2, [bp]: 4 }}
-                        py={{ _: 1, [bp]: 3 }}
-                        css={css`
-                          position: absolute;
-                          bottom: 0;
-                          left: 0;
-                          transform: translate(5%, 110%);
-                          ${mq[bp]} {
-                            transform: translate(-10%, 30%);
-                          }
-                        `}
+                        px={{ base: 2, [bp]: 4 }}
+                        py={{ base: 1, [bp]: 3 }}
+                        position="absolute"
+                        bottom="0"
+                        left="0"
+                        transform={{
+                          base: 'translate(5%, 110%)',
+                          [bp]: 'translate(-10%, 30%)',
+                        }}
                         size="big"
                         variant="primary"
                         disabled={processingPreviousTransition}
@@ -278,16 +278,15 @@ const Wizard = ({ steps, exitPath, exitText }: Props) => {
                     {(!isStepDisabled(index + 1) || // Next step exists
                       (index === steps.length - 1 && exitPath != null)) && ( // or this is the last step and an exit path is provided
                       <Button
-                        px={{ _: 2, [bp]: 4 }}
-                        css={css`
-                          position: absolute;
-                          bottom: 0;
-                          right: 0;
-                          transform: translate(-5%, 110%);
-                          ${mq[bp]} {
-                            transform: translate(10%, 30%);
-                          }
-                        `}
+                        px={{ base: 2, [bp]: 4 }}
+                        py={{ base: 1, [bp]: 3 }}
+                        position="absolute"
+                        bottom="0"
+                        right="0"
+                        transform={{
+                          base: 'translate(-5%, 110%)',
+                          [bp]: 'translate(10%, 30%)',
+                        }}
                         size="big"
                         variant={
                           index === steps.length - 1 ? 'success' : 'primary'

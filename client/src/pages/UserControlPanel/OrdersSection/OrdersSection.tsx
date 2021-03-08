@@ -1,19 +1,18 @@
 import * as React from 'react'
+import { useHistory, useParams } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
 import { UCPOrdersSectionQuery } from 'src/apollo/types/UCPOrdersSectionQuery'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
+import Image from 'src/components/Image'
 import Modal from 'src/components/Modal'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
-import OrderList from './OrderList'
-import { useParams, useHistory } from 'react-router-dom'
-import OrderDetailView from './OrderDetailView'
 import { useBreakpoint } from 'src/styles/breakpoints'
-import Button from 'src/components/Button'
-import Image from 'src/components/Image'
+import OrderDetailView from './OrderDetailView'
+import OrderList from './OrderList'
 import ordersEmptyStateSvg from './orders_empty_state.svg'
-import { css } from '@emotion/react'
 
 interface URLParams {
   orderId?: string
@@ -69,15 +68,16 @@ export default () => {
     .sort((a, b) => b.createdAt - a.createdAt)
 
   return (
-    <Box p={{ _: '24px', md: '48px' }} height="100%" overflowY="scroll">
+    <Box p={{ base: '24px', md: '48px' }} height="100%" overflowY="scroll">
       {orders.length === 0 && (
         <Box
           display="grid"
           width="100%"
-          gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+          gridTemplateColumns={{ base: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
           gridRowGap="16px"
           justifyItems="center"
-          css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}
+          textAlign="center"
+          sx={{ '&>*': { gridColumn: '2/3' } }}
         >
           <Text.SectionHeader>
             Looks like it's time to go shopping

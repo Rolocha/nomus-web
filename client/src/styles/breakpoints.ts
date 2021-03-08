@@ -1,16 +1,22 @@
 import * as React from 'react'
 
 // Unfortunately, I couldn't figure out how to type an array that would also allow string indexes so I'm typing it as any for now
-const breakpoints: any = ['20em', '38em', '64em']
-const mq = breakpoints.map((bp: any) => `@media (min-width: ${bp})`)
-breakpoints.sm = breakpoints[0]
-mq.sm = mq[0]
-breakpoints.md = breakpoints[1]
-mq.md = mq[1]
-breakpoints.lg = breakpoints[2]
-mq.lg = mq[2]
+// const breakpoints: any = ['20em', '38em', '64em', '80em']
+const makeMediaQuery = (bp: string) => `@media (min-width: ${bp})`
 
-export { mq, breakpoints as default }
+export const breakpoints = {
+  sm: '20em',
+  md: '38em',
+  lg: '64em',
+  xl: '80em',
+}
+
+export const mq = {
+  sm: makeMediaQuery(breakpoints.sm),
+  md: makeMediaQuery(breakpoints.md),
+  lg: makeMediaQuery(breakpoints.lg),
+  xl: makeMediaQuery(breakpoints.xl),
+}
 
 export const useBreakpoint = (bp: 'sm' | 'md' | 'lg') => {
   const matcher = window.matchMedia(mq[bp].replace('@media ', ''))
@@ -26,3 +32,5 @@ export const useBreakpoint = (bp: 'sm' | 'md' | 'lg') => {
   }, [matcher])
   return matches
 }
+
+export default breakpoints

@@ -1,11 +1,10 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
 import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
-import { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import MultiWorkspace from 'src/components/MultiWorkspace'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
@@ -65,7 +64,7 @@ const ProfilePage = () => {
     <Box
       bg={theme.colors.ivory}
       minHeight="100vh"
-      minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
+      minWidth={{ base: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
       display="flex"
       flexDirection="column"
@@ -77,7 +76,7 @@ const ProfilePage = () => {
       <Box
         zIndex={0}
         pb={{ [bp]: 4 }}
-        container={{ _: false, [bp]: true }}
+        container={{ base: false, [bp]: true }}
         width="100%"
         display="flex"
         flexDirection="column"
@@ -91,9 +90,9 @@ const ProfilePage = () => {
           pb={{ [bp]: 4 }}
         >
           <Box width="100%">
-            <Box width="100%" mb={{ _: 0, [bp]: 3 }}>
+            <Box width="100%" mb={{ base: 0, [bp]: 3 }}>
               {data.user.name && (
-                <Box pt={4} pb="24px" display={{ _: 'none', [bp]: 'block' }}>
+                <Box pt={4} pb="24px" display={{ base: 'none', [bp]: 'block' }}>
                   <Text.PageHeader>{`Welcome back, ${formatName(
                     data.user.name,
                   )}`}</Text.PageHeader>
@@ -105,7 +104,7 @@ const ProfilePage = () => {
                   type="warning"
                   title="Email not verified"
                   borderRadius={{
-                    _: 'NONE',
+                    base: 'NONE',
                     [bp]: 'DEFAULT',
                   }}
                   description={
@@ -114,8 +113,8 @@ const ProfilePage = () => {
                         <>
                           Please confirm your email address by clicking the
                           magic link we sent to your inbox. Didn't get an email?{' '}
-                          <ExternalLink
-                            css={css({ cursor: 'pointer' })}
+                          <Link
+                            cursor="pointer"
                             onClick={() => {
                               resendVerificationEmail().then((result) => {
                                 setResentVerificationEmailSuccessfully(result)
@@ -123,7 +122,7 @@ const ProfilePage = () => {
                             }}
                           >
                             Resend.
-                          </ExternalLink>
+                          </Link>
                         </>
                       )}
                       {resentVerificationEmailSuccessfully && (
@@ -145,18 +144,17 @@ const ProfilePage = () => {
             </Box>
 
             {data.user.isEmailVerified && showJustVerifiedEmail && (
-              <Toast
-                css={css({
-                  marginBottom: '16px',
-                })}
-                type="success"
-                title="Email verified"
-                description="Successfully verified your email address."
-                autoCloseIn={8000}
-                onClickClose={() => {
-                  setShowJustVerifiedEmail(false)
-                }}
-              />
+              <Box mb="16px">
+                <Toast
+                  type="success"
+                  title="Email verified"
+                  description="Successfully verified your email address."
+                  autoCloseIn={8000}
+                  onClickClose={() => {
+                    setShowJustVerifiedEmail(false)
+                  }}
+                />
+              </Box>
             )}
 
             <MultiWorkspace

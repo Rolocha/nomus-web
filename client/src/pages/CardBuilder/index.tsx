@@ -265,7 +265,7 @@ const CardBuilder = () => {
     <Box
       bg={theme.colors.ivory}
       minHeight={{ [bp]: '100vh' }}
-      minWidth={{ _: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
+      minWidth={{ base: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
       display="flex"
       flexDirection="column"
@@ -273,8 +273,7 @@ const CardBuilder = () => {
     >
       <Navbar />
       <Box
-        pb={{ [bp]: 4 }}
-        px={{ _: 0, [bp]: 5 }}
+        container
         width="100%"
         display="flex"
         flexDirection="column"
@@ -285,7 +284,7 @@ const CardBuilder = () => {
           display="flex"
           flexDirection="column"
         >
-          <Box mt={4} mb="24px" display={{ _: 'none', [bp]: 'block' }}>
+          <Box mt={4} mb="24px" display={{ base: 'none', [bp]: 'block' }}>
             <Text.PageHeader>Card Builder</Text.PageHeader>
           </Box>
           <Wizard

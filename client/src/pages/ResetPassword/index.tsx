@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import gql from 'graphql-tag'
 import * as React from 'react'
@@ -24,9 +23,13 @@ interface ResetPasswordFormData {
 }
 
 const ResetPassword = () => {
-  const { register, handleSubmit, errors, formState, watch } = useForm<
-    ResetPasswordFormData
-  >({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    formState,
+    watch,
+  } = useForm<ResetPasswordFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -92,7 +95,7 @@ const ResetPassword = () => {
     >
       <Box display="flex" flexDirection="column" mt={4}>
         <Link to="/">
-          <Logo css={css({ marginBottom: '32px' })} />
+          <Logo mb="32px" />
         </Link>
         <Text.PageHeader>Reset your password</Text.PageHeader>
 
@@ -165,7 +168,7 @@ const ResetPassword = () => {
                   width="100%"
                   variant="primary"
                   size="big"
-                  inProgress={formState.isSubmitting}
+                  isLoading={formState.isSubmitting}
                 >
                   Update password
                 </Button>

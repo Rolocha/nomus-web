@@ -1,53 +1,68 @@
-import { css } from '@emotion/react'
 import { action } from '@storybook/addon-actions'
+import { Story } from '@storybook/react'
 import React from 'react'
 import Box from 'src/components/Box'
-import Button, { styleVariants } from 'src/components/Button'
-import * as Form from 'src/components/Form'
+import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
+import buttonStyles from 'src/styles/components/button'
 import Icon from './Icon'
 
 export default {
-  title: 'Button',
+  title: 'components/Button',
   component: Button,
   excludeStories: /.*Data$/,
+  argTypes: {
+    size: {
+      description: 'The size of the button',
+      control: {
+        type: 'select',
+        options: Object.keys(buttonStyles.sizes),
+      },
+    },
+    variant: {
+      description: 'The style of the button',
+      control: {
+        type: 'select',
+        options: Object.keys(buttonStyles.variants),
+      },
+    },
+  },
 }
 
 export const actionsData = {
   onClick: action('clicked'),
 }
 
+//👇 We create a “template” of how args map to rendering
+const PrimaryTemplate: Story<React.ComponentProps<typeof Button>> = ({
+  ...args
+}) => <Button {...args} />
+
+export const Primary = PrimaryTemplate.bind({})
+
+Primary.args = {
+  variant: 'primary',
+  size: 'normal',
+  children: 'Click me!',
+}
+
 export const AllVariants = () => {
-  const [isDisabled, setIsDisabled] = React.useState(false)
-
   return (
-    <Box>
-      <Text.Body2>Disabled?</Text.Body2>
-      <Form.Input
-        type="checkbox"
-        checked={isDisabled}
-        onChange={(event) => setIsDisabled(event.target.checked)}
-      />
-
-      <Box display="grid" gridTemplateColumns="1fr 1fr">
-        {Object.keys(styleVariants).map((variant: any) =>
-          (['normal', 'big'] as const).map((size) => (
-            <Button
-              css={css`
-                text-transform: capitalize;
-                place-self: center;
-              `}
-              m={1}
-              key={variant}
-              variant={variant}
-              size={size}
-              disabled={isDisabled}
-            >
-              {size} {variant}
-            </Button>
-          )),
-        )}
-      </Box>
+    <Box
+      display="grid"
+      gridTemplateColumns="1fr 1fr"
+      width="800px"
+      gridColumnGap={2}
+      gridRowGap={2}
+    >
+      {Object.keys(buttonStyles.variants).map((variant: any) =>
+        (['normal', 'big'] as const).map((size) => (
+          <Button m={1} key={variant + size} variant={variant} size={size}>
+            {size} {variant}
+          </Button>
+        )),
+      )}
     </Box>
   )
 }
@@ -68,7 +83,7 @@ export const ButtonsInAGrid = () => {
   )
 }
 
-export const WithIcons = () => {
+export const ButtonsWithIcons = () => {
   return (
     <>
       <Text.Body2>Left-side icon</Text.Body2>
@@ -91,10 +106,8 @@ export const WithIcons = () => {
         Next
       </Button>
       <Text.Body2>
-        Just an icon (you can use either leftIcon or rightIcon)
+        Just an icon (use <code>{'<IconButton icon={...} />'}</code>)
       </Text.Body2>
-      <Button rightIcon={<Icon of="profile" color="white" boxSize="1.2em" />} />
-      <Button leftIcon={<Icon of="profile" color="white" boxSize="1.2em" />} />
     </>
   )
 }
@@ -105,35 +118,46 @@ export const LoadingButton = () => {
     <>
       <Box>
         <Text.Body2>
-          A button with <code>inProgress</code>. Try submitting!
+          A button with <code>isLoading</code>. Try submitting!
         </Text.Body2>
-        <Button inProgress={isSubmitting} onClick={() => setIsSubmitting(true)}>
+        <Button isLoading={isSubmitting} onClick={() => setIsSubmitting(true)}>
           Submit
         </Button>
       </Box>
       <Box>
         <Text.Body2>
-          One with custom <code>inProgressText</code>
+          One with custom <code>loadingText</code>
         </Text.Body2>
         <Button
-          inProgress={isSubmitting}
-          inProgressText="Submitting"
+          isLoading={isSubmitting}
+          loadingText="Submitting"
           onClick={() => setIsSubmitting(true)}
         >
           Submit
         </Button>
       </Box>
+    </>
+  )
+}
+
+export const OverrideButton = () => {
+  return (
+    <>
       <Box>
         <Text.Body2>
-          One with a <code>leftIcon</code>
+          A button demonstrating applying custom styles, e.g. a dashed border
+          for the secondary variant
         </Text.Body2>
         <Button
-          leftIcon={<Icon of="profile" />}
-          inProgress={isSubmitting}
-          inProgressText="Submitting"
-          onClick={() => setIsSubmitting(true)}
+          border={`1px dashed ${colors.nomusBlue}`}
+          size="normal"
+          variant="secondary"
+          borderStyle="dashed"
+          bg="white"
+          color="nomusBlue"
+          leftIcon={<Icon of="upload" color={colors.nomusBlue} />}
         >
-          Submit
+          Upload a file or drag and drop
         </Button>
       </Box>
     </>

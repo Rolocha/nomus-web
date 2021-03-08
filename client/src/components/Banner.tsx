@@ -1,11 +1,12 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
-import * as Text from 'src/components/Text'
 import Icon, { IconName } from 'src/components/Icon'
+import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
+import {
+  ResponsiveCustomProperty,
+  useCustomResponsiveStyles,
+} from 'src/styles/helpers'
 import Box from './Box'
-import { ResponsiveValue } from 'styled-system'
-import { useCustomResponsiveStyles } from 'src/styles/helpers'
 
 export type BannerBorderRadius = 'NONE' | 'DEFAULT'
 export type BannerType = 'success' | 'warning' | 'danger' | 'info'
@@ -16,7 +17,7 @@ interface Props {
   className?: string
   closable?: boolean
   onClickClose?: () => void
-  borderRadius?: ResponsiveValue<BannerBorderRadius>
+  borderRadius?: ResponsiveCustomProperty<BannerBorderRadius>
 }
 
 const iconOptions: Record<BannerType, IconName> = {
@@ -46,10 +47,10 @@ const Banner = ({
     borderRadius,
     {
       NONE: {
-        borderRadius: 0,
+        borderRadius: 'none',
       },
       DEFAULT: {
-        borderRadius: 2,
+        borderRadius: 'md',
       },
     },
   )
@@ -58,12 +59,12 @@ const Banner = ({
     borderRadius,
     {
       NONE: {
-        borderTopLeftRadius: 0,
-        borderBottomLeftRadius: 0,
+        borderTopLeftRadius: 'none',
+        borderBottomLeftRadius: 'base',
       },
       DEFAULT: {
-        borderTopLeftRadius: 2,
-        borderBottomLeftRadius: 2,
+        borderTopLeftRadius: 'none',
+        borderBottomLeftRadius: 'base',
       },
     },
   )
@@ -96,9 +97,9 @@ const Banner = ({
         <Box display="flex">
           <Icon of={iconOptions[type]} color={color} mr="8px" flexShrink={0} />
           <Text.Body2>
-            <span css={css({ fontWeight: 500, marginRight: '8px' })}>
+            <Box as="span" fontWeight={500} mr="8px">
               {title}
-            </span>
+            </Box>
             {description}
           </Text.Body2>
         </Box>

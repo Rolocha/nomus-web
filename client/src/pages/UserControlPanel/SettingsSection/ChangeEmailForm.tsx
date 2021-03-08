@@ -84,11 +84,11 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
       height="100%"
       display="grid"
       gridTemplateColumns={{
-        _: '8fr 4fr',
+        base: '8fr 4fr',
         [bp]: '4fr 2fr 6fr',
       }}
       gridTemplateAreas={{
-        _: `
+        base: `
         "email editEmail"
       `,
         [bp]: `
@@ -123,7 +123,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
         )}
       </Box>
 
-      <Box gridArea="editEmail" placeSelf={{ _: 'end', [bp]: 'end center' }}>
+      <Box gridArea="editEmail" placeSelf={{ base: 'end', [bp]: 'end center' }}>
         {active ? (
           <Box
             height="100%"
@@ -156,14 +156,14 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
               setActive(true)
             }}
           >
-            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+            <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
               Edit
             </Box>
           </Button>
         )}
       </Box>
 
-      <Box gridArea="emailCopy" display={{ _: 'none', [bp]: 'block' }}>
+      <Box gridArea="emailCopy" display={{ base: 'none', [bp]: 'block' }}>
         <Text.Body3>
           This is the email associated with your account. If you would like to
           change the email on your profile, go to the Profile tab.

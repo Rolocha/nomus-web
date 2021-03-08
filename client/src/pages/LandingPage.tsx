@@ -14,26 +14,26 @@ import { mq } from 'src/styles/breakpoints'
 
 const LandingPage = () => {
   return (
-    <Box overflowX="hidden" position="relative" css={css({ zIndex: 0 })}>
-      <Box position="relative" css={css({ zIndex: 2 })}>
+    <Box overflowX="hidden" position="relative" zIndex={0}>
+      <Box position="relative" zIndex={2}>
         <Navbar />
       </Box>
-      <Box position="relative" css={css({ zIndex: 1 })}>
+      <Box position="relative" zIndex={1}>
         <Hero />
 
         <SplitRowContent
           alternate
           wrapperProps={{
-            px: { _: '30px', [bp]: '0' },
+            px: { base: '30px', [bp]: '0' },
           }}
           rowProps={{
-            mt: { _: '40px', [bp]: '120px' },
+            mt: { base: '40px', [bp]: '120px' },
           }}
           titleProps={{
-            px: { _: '0', [bp]: '50px' },
+            px: { base: '0', [bp]: '50px' },
           }}
           contentProps={{
-            px: { _: '0', [bp]: '50px' },
+            px: { base: '0', [bp]: '50px' },
           }}
         >
           {[
@@ -47,7 +47,7 @@ const LandingPage = () => {
                   data-aos-once="true"
                 >
                   <Box
-                    mb={{ _: 'calc(8vw)', [bp]: '0' }}
+                    mb={{ base: 'calc(8vw)', [bp]: '0' }}
                     pr={{ [bp]: '20px' }}
                     display="grid"
                     gridTemplateAreas={`
@@ -77,7 +77,7 @@ const LandingPage = () => {
                           }
                           align-self: ${index < 2 ? 'flex-end' : 'flex-start'};
                         `}
-                        minWidth={{ _: '300px', [bp]: '0' }}
+                        minWidth={{ base: '300px', [bp]: '0' }}
                         m="10px"
                       >
                         <Comp
@@ -132,14 +132,14 @@ const LandingPage = () => {
                     alt="preview of top of contact page"
                     position="relative"
                     zIndex={1}
-                    maxHeight={{ _: '400px', [bp]: '600px' }}
+                    maxHeight={{ base: '400px', [bp]: '600px' }}
                   />
                   <Image
                     src={profilePagePreview2}
                     alt="preview of bottom of contact page"
                     zIndex={0}
                     position="relative"
-                    maxHeight={{ _: '400px', [bp]: '600px' }}
+                    maxHeight={{ base: '400px', [bp]: '600px' }}
                     css={css`
                       transform: translateX(-13%);
                     `}

@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { Redirect, useHistory, useParams } from 'react-router-dom'
 import { useQuery } from 'src/apollo'
@@ -10,7 +9,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import Icon from 'src/components/Icon'
-import Link, { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
   getNotesFormDataFromContact,
@@ -21,7 +20,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { mq, useBreakpoint } from 'src/styles/breakpoints'
+import { useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -146,11 +145,11 @@ const ContactInfoPage = () => {
         position="relative"
       >
         <Box
-          py={{ _: 0, md: '48px' }}
+          py={{ base: 0, md: '48px' }}
           display="grid"
-          gridTemplateColumns={{ _: '1fr', [bp]: '7fr 5fr' }}
+          gridTemplateColumns={{ base: '1fr', [bp]: '7fr 5fr' }}
           gridTemplateAreas={{
-            _: `
+            base: `
               "buttons"
               "info"
               "notes"
@@ -160,7 +159,7 @@ const ContactInfoPage = () => {
               "buttons notes"
             `,
           }}
-          mb={{ _: '100px', [bp]: 0 }}
+          mb={{ base: '100px', [bp]: 0 }}
           gridColumnGap={3}
           gridRowGap={4}
         >
@@ -168,15 +167,15 @@ const ContactInfoPage = () => {
             display="grid"
             gridArea="info"
             gridTemplateColumns={{
-              _: '4fr 8fr',
+              base: '4fr 8fr',
               [bp]: '2fr 5fr',
             }}
             gridTemplateRows={{
-              _: '',
+              base: '',
               [bp]: 'auto 1fr',
             }}
             gridTemplateAreas={{
-              _: `
+              base: `
               "profilePic nameplate"
               "businessCard businessCard"
               "profileInfo profileInfo"
@@ -197,7 +196,10 @@ const ContactInfoPage = () => {
               />
             </Box>
 
-            <Box gridArea="nameplate" alignSelf={{ _: 'center', md: 'center' }}>
+            <Box
+              gridArea="nameplate"
+              alignSelf={{ base: 'center', md: 'center' }}
+            >
               {contact.name && (
                 <Text.PageHeader mb={1} mt={0}>
                   {formatName(contact.name)}
@@ -209,9 +211,9 @@ const ContactInfoPage = () => {
             {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
               <Box
                 gridArea="businessCard"
-                width={{ _: '50%', [bp]: '100%' }}
-                mb={{ _: 0, [bp]: 2 }}
-                mr={{ _: 2, [bp]: 0 }}
+                width={{ base: '50%', [bp]: '100%' }}
+                mb={{ base: 0, [bp]: 2 }}
+                mr={{ base: 2, [bp]: 0 }}
               >
                 <BusinessCardImage
                   width="100%"
@@ -254,12 +256,12 @@ const ContactInfoPage = () => {
             gridTemplateColumns="2fr 1fr"
             gridColumnGap={3}
             gridRowGap="24px"
-            borderRadius={3}
-            ml={{ _: 0, [bp]: 4 }}
+            borderRadius="lg"
+            ml={{ base: 0, [bp]: 4 }}
             borderTop={`16px solid ${colors.gold}`}
             alignContent="flex-start"
             bg={colors.ivory}
-            padding={{ _: '24px', [bp]: '50px' }}
+            padding={{ base: '24px', [bp]: '50px' }}
             gridTemplateAreas={`
             "title editButton"
             "meetingDate meetingDate"
@@ -278,7 +280,7 @@ const ContactInfoPage = () => {
                 leftIcon={<Icon of="pen" />}
                 onClick={openModalAndFocusOn(meetingDateRef)}
               >
-                <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
                   Edit
                 </Box>
               </Button>
@@ -354,10 +356,7 @@ const ContactInfoPage = () => {
             <Box gridArea="notes">
               <Text.Label>Additional Notes</Text.Label>
               {contact.notes ? (
-                <Text.Body2
-                  css={css({ whiteSpace: 'pre-wrap' })}
-                  data-testid="notes"
-                >
+                <Text.Body2 whiteSpace="pre-wrap" data-testid="notes">
                   {contact.notes}
                 </Text.Body2>
               ) : (
@@ -405,49 +404,45 @@ const ContactInfoPage = () => {
             gridArea="buttons"
             placeSelf="end stretch"
             display="grid"
-            css={css`
-              position: fixed;
-              bottom: 0;
-              left: 0;
-              width: 100%;
-              padding: 16px;
-              ${mq[bp]} {
-                padding: 0;
-                position: static;
-              }
-            `}
+            position={{ base: 'fixed', [bp]: 'static' }}
+            bottom="0"
+            left="0"
+            width="100%"
+            padding={{ base: '16px', [bp]: 0 }}
             bg="white"
-            boxShadow={{ _: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ _: 'auto 1fr', [bp]: '3fr 3fr 1fr' }}
-            gridColumnGap={{ _: 2, [bp]: 3 }}
+            boxShadow={{ base: 'workingWindow', [bp]: 'unset' }}
+            gridTemplateColumns={{ base: 'auto 1fr', [bp]: '3fr 3fr 1fr' }}
+            gridColumnGap={{ base: 2, [bp]: 3 }}
             gridRowGap={2}
           >
-            <ExternalLink
+            <Link
+              // Force it to use an external link to enable proper download behavior
+              linkType="external"
               asButton
               buttonStyle="primary"
               buttonSize={isDesktopWidth ? 'big' : 'knob'}
               download={`${contact.username}.vcf`}
-              href={downloadLink}
+              to={downloadLink}
             >
               <Icon of="download" color={colors.white} />{' '}
               <Box
                 as="span"
                 ml={2}
-                display={{ _: 'none', [bp]: 'inline-block' }}
+                display={{ base: 'none', [bp]: 'inline-block' }}
               >
                 Save contact
               </Box>
-            </ExternalLink>
+            </Link>
 
             {loggedIn && contact.connected ? (
-              <ExternalLink
+              <Link
                 asButton
                 buttonStyle="secondary"
                 buttonSize="big"
-                href={`/dashboard/contacts/detail/${username}`}
+                to={`/dashboard/contacts/detail/${username}`}
               >
                 View in dashboard
-              </ExternalLink>
+              </Link>
             ) : (
               <Link
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}

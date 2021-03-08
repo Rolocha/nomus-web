@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from '@emotion/react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -38,27 +37,25 @@ const CopyableText = ({ copyText, children }: Props) => {
       as="span"
       position="relative"
       onMouseOver={() => setDidCopy(false)}
-      css={css`
-        &:hover {
-          > :first-child {
-            display: block;
-          }
-          > :nth-child(2) {
-            background-color: ${colors.hoverBlue};
-          }
-        }
-      `}
+      sx={{
+        '&:hover': {
+          '> :first-child': {
+            display: 'block',
+          },
+          '> :nth-child(2)': {
+            backgroundColor: colors.hoverBlue,
+          },
+        },
+      }}
       onClick={handleCopy}
     >
       <Box
-        css={css({
-          display: 'none',
-          position: 'absolute',
-          bottom: '110%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          borderRadius: '4px',
-        })}
+        display="none"
+        position="absolute"
+        bottom="110%"
+        left="50%"
+        transform="translateX(-50%)"
+        borderRadius="base"
         bg="hoverBlue"
         py={1}
         px={2}

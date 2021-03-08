@@ -1,57 +1,17 @@
+import { chakra, system } from '@chakra-ui/react'
 import styled from '@emotion/styled'
-import {
-  border,
-  BorderProps,
-  color,
-  ColorProps,
-  flexbox,
-  FlexboxProps,
-  grid,
-  GridProps,
-  layout,
-  LayoutProps,
-  position,
-  PositionProps,
-  ResponsiveValue,
-  shadow,
-  ShadowProps,
-  space,
-  SpaceProps,
-  system,
-  ThemeValue,
-  background,
-  BackgroundProps,
-} from 'styled-system'
+
+interface BoxProps extends React.ComponentProps<typeof chakra.div> {}
 
 type ContainerProp = {
   maxWidth: string
   minPadding: string
 }
 
-const isContainerPropBoolean = (cp: ContainerProp | Boolean): cp is Boolean =>
+const isContainerPropBoolean = (cp: ContainerProp | boolean): cp is boolean =>
   typeof cp === 'boolean'
 
-type BoxProps = {
-  as?: string
-  container?: ResponsiveValue<ThemeValue<'container', any>>
-  placeSelf?: ResponsiveValue<ThemeValue<'placeSelf', any>>
-  placeContent?: ResponsiveValue<ThemeValue<'placeContent', any>>
-  justifySelf?: ResponsiveValue<ThemeValue<'justifySelf', any>>
-  transform?: ResponsiveValue<ThemeValue<'transform', any>>
-  cursor?: ResponsiveValue<ThemeValue<'cursor', any>>
-  textAlign?: ResponsiveValue<ThemeValue<'textAlign', any>>
-  transition?: ResponsiveValue<ThemeValue<'transition', any>>
-} & SpaceProps &
-  PositionProps &
-  ColorProps &
-  BorderProps &
-  LayoutProps &
-  FlexboxProps &
-  GridProps &
-  ShadowProps &
-  BackgroundProps
-
-const Box = styled.div<BoxProps>(
+const Box = styled(chakra.div)<BoxProps>(
   {
     boxSizing: 'border-box',
     minWidth: 0,
@@ -61,7 +21,7 @@ const Box = styled.div<BoxProps>(
   system({
     container: {
       properties: ['paddingLeft', 'paddingRight'],
-      transform: (value: ContainerProp | Boolean, scale) => {
+      transform: (value: BoxProps['container'], scale) => {
         if (value) {
           const maxWidth = isContainerPropBoolean(value)
             ? '1280px'
@@ -73,37 +33,7 @@ const Box = styled.div<BoxProps>(
         }
       },
     },
-    placeSelf: {
-      property: 'placeSelf',
-    },
-    placeContent: {
-      property: 'placeContent',
-    },
-    justifySelf: {
-      property: 'justifySelf',
-    },
-    transform: {
-      property: 'transform',
-    },
-    cursor: {
-      property: 'cursor',
-    },
-    textAlign: {
-      property: 'textAlign',
-    },
-    transition: {
-      property: 'transition',
-    },
   }),
-  space,
-  position,
-  color,
-  border,
-  layout,
-  flexbox,
-  grid,
-  shadow,
-  background,
 )
 
 export default Box

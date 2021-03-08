@@ -42,9 +42,13 @@ ShortId on Sheet Edge:
 }
 
 const LinkerPage = () => {
-  const { register, handleSubmit, formState, setError, errors } = useForm<
-    LinkerFormData
-  >({
+  const {
+    register,
+    handleSubmit,
+    formState,
+    setError,
+    errors,
+  } = useForm<LinkerFormData>({
     resolver: yupResolver(
       yup.object().shape({
         shortId: yup.string().required('short-Id is required'),
@@ -106,7 +110,7 @@ const LinkerPage = () => {
         <Box
           display="grid"
           gridTemplateAreas={{
-            _: `
+            base: `
               "heading"
               "explain"
               "instructions"
@@ -188,7 +192,7 @@ const LinkerPage = () => {
               <Button
                 onClick={handleSubmit(onSubmitLinker)}
                 variant="secondary"
-                width={{ _: '100%', [bp]: '100%' }}
+                width={{ base: '100%', [bp]: '100%' }}
                 mb={3}
               >
                 <Box display="flex" flexDirection="row" alignItems="center">

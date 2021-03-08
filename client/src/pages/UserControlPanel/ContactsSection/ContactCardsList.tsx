@@ -2,7 +2,7 @@ import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
@@ -147,11 +147,11 @@ const ContactCardsList = ({
                 }
                 flexWrap={viewMode === 'grid' ? 'wrap' : 'nowrap'}
                 overflowX={{
-                  _: 'hidden',
+                  base: 'hidden',
                   // Required visible in linear mode to allow selected contact caret (>) to be visible
                   [bp]: viewMode === 'grid' ? 'auto' : 'visible',
                 }}
-                mx={{ _: 0, [bp]: -2 }}
+                mx={{ base: 0, [bp]: -2 }}
               >
                 {groupedContacts[groupKey].map((contact) => {
                   const isSelectedContact = contact.id === selectedContact?.id
@@ -160,7 +160,7 @@ const ContactCardsList = ({
                       id={`contact-${contact.username ?? contact.id}`}
                       key={contact.id}
                       display="inline-block"
-                      borderRadius={1}
+                      borderRadius="md"
                       position="relative"
                       overflowX="visible"
                       p={2}
@@ -175,7 +175,7 @@ const ContactCardsList = ({
                           : undefined
                       }
                     >
-                      <InternalLink
+                      <Link
                         to={`/dashboard/contacts/detail/${
                           contact.username ?? contact.id
                         }`}
@@ -231,7 +231,7 @@ const ContactCardsList = ({
                             </Box>
                           )}
                         </Box>
-                      </InternalLink>
+                      </Link>
                     </Box>
                   )
                 })}

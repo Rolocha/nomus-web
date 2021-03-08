@@ -1,18 +1,17 @@
-import { css } from '@emotion/react'
+import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import Spinner from 'src/components/Spinner'
 import * as Form from 'src/components/Form'
 import Image from 'src/components/Image'
+import Navbar from 'src/components/Navbar'
+import Spinner from 'src/components/Spinner'
 import * as Text from 'src/components/Text'
 import { mq, useBreakpoint } from 'src/styles/breakpoints'
+import * as yup from 'yup'
 import background from './background.svg'
 import coffeeCupIllustration from './coffee-cup-illustration.svg'
-import Navbar from 'src/components/Navbar'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 interface FormData {
   email: string
 }
@@ -64,21 +63,21 @@ const ComingSoonPage = () => {
         flexDirection="column"
         alignItems="center"
         backgroundImage={`url(${background})`}
-        backgroundSize={{ _: '200% auto', [bp]: '100%' }}
-        backgroundPosition={{ _: '75% bottom', [bp]: 'bottom' }}
+        backgroundSize={{ base: '200% auto', [bp]: '100%' }}
+        backgroundPosition={{ base: '75% bottom', [bp]: 'bottom' }}
         backgroundRepeat="no-repeat"
       />
       <Box
-        px={{ _: '24px', [bp]: '96px' }}
+        px={{ base: '24px', [bp]: '96px' }}
         position="relative"
-        mt={{ _: '70px', [bp]: '120px' }}
+        mt={{ base: '70px', [bp]: '120px' }}
         display="grid"
         gridTemplateColumns={{
-          _: '2fr 4fr 4fr 2fr',
+          base: '2fr 4fr 4fr 2fr',
           [bp]: '2fr 3fr 3fr 4fr',
         }}
         gridTemplateAreas={{
-          _: `
+          base: `
             ". copy copy ."
             ". . coffeeCup coffeeCup"
           `,
@@ -87,7 +86,7 @@ const ComingSoonPage = () => {
           ". copy copy coffeeCup"
           `,
         }}
-        gridColumnGap={{ _: 2, [bp]: 3 }}
+        gridColumnGap={{ base: 2, [bp]: 3 }}
       >
         <Box gridArea="copy">
           {isDesktop ? (
@@ -108,32 +107,33 @@ const ComingSoonPage = () => {
             <Form.Form onSubmit={handleSubmit(onSubmit)}>
               <Box
                 display="flex"
-                flexDirection={{ _: 'column', [bp]: 'row' }}
+                flexDirection={{ base: 'column', [bp]: 'row' }}
                 alignItems="stretch"
                 justifyContent="stretch"
               >
                 <Form.Input
                   name="email"
                   placeholder="hi@nomus.me"
-                  mb={{ _: 2, [bp]: 0 }}
+                  mb={{ base: 2, [bp]: 0 }}
                   ref={register}
                   disabled={submitState === 'submitting'}
-                  css={css({
-                    flexGrow: 1,
+                  flexGrow={1}
+                  sx={{
                     [mq[bp]]: {
-                      borderTopRightRadius: 0,
-                      borderBottomRightRadius: 0,
+                      borderTopRightRadius: 'none',
+                      borderBottomRightRadius: 'none',
                       borderRight: 'none',
                     },
-                  })}
+                  }}
                 />
                 <Button
-                  css={css`
-                    ${mq[bp]} {
-                      border-top-left-radius: 0;
-                      border-bottom-left-radius: 0;
-                    }
-                  `}
+                  sx={{
+                    [mq[bp]]: {
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                      borderRight: 'none',
+                    },
+                  }}
                   variant="primary"
                   type="submit"
                   disabled={submitState === 'submitting' || !formState.isValid}
@@ -176,7 +176,7 @@ const ComingSoonPage = () => {
 
         <Box gridArea="coffeeCup" placeSelf="end start">
           <Image
-            h={{ _: '200px', [bp]: 'unset' }}
+            h={{ base: '200px', [bp]: 'unset' }}
             w={{ [bp]: '100%' }}
             src={coffeeCupIllustration}
           />

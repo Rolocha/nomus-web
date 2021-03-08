@@ -3,7 +3,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import Icon from 'src/components/Icon'
-import { Link } from 'src/components/Link'
+import Link from 'src/components/Link'
 import NotesEditingModal, {
   getNotesFormDataFromContact,
 } from 'src/components/NotesEditingModal'
@@ -42,10 +42,10 @@ const ContactsDetailView = ({
 
   return (
     <Box
-      display={{ _: undefined, [bp]: 'grid' }}
-      maxHeight={{ _: undefined, [bp]: '500px' }}
+      display={{ base: undefined, [bp]: 'grid' }}
+      maxHeight={{ base: undefined, [bp]: '500px' }}
       gridTemplateAreas={{
-        _: undefined,
+        base: undefined,
         [bp]: `
       "list selectedContact"
       `,
@@ -55,7 +55,7 @@ const ContactsDetailView = ({
     >
       <Box
         display={{
-          _: selectedContact ? 'none' : 'block',
+          base: selectedContact ? 'none' : 'block',
           [bp]: 'block',
         }}
         gridArea="list"
@@ -80,14 +80,14 @@ const ContactsDetailView = ({
       {selectedContact && (
         <Box
           gridArea="selectedContact"
-          p={{ _: 1, [bp]: 3 }}
+          p={{ base: 1, [bp]: 3 }}
           display="grid"
           gridTemplateColumns={{
-            _: '4fr 8fr',
+            base: '4fr 8fr',
             [bp]: '11em 6fr',
           }}
           gridTemplateAreas={{
-            _: `
+            base: `
             "profilePic nameplate"
             "cards cards"
             "contactInfo contactInfo"
@@ -114,7 +114,7 @@ const ContactsDetailView = ({
             />
           </Box>
 
-          <Box gridArea="nameplate" alignSelf={{ _: 'start', md: 'center' }}>
+          <Box gridArea="nameplate" alignSelf={{ base: 'start', md: 'center' }}>
             <Text.SectionSubheader mb={1} mt={0}>
               {formatName(selectedContact.name)}
             </Text.SectionSubheader>
@@ -153,10 +153,10 @@ const ContactsDetailView = ({
             selectedContact.cardBackImageUrl && (
               <Box
                 gridArea="cards"
-                width={{ _: '100%', [bp]: '100%' }}
+                width={{ base: '100%', [bp]: '100%' }}
                 display="flex"
                 px={2}
-                flexDirection={{ _: 'row', [bp]: 'column' }}
+                flexDirection={{ base: 'row', [bp]: 'column' }}
               >
                 <BusinessCardImage
                   width="100%"
@@ -193,7 +193,7 @@ const ContactsDetailView = ({
                 leftIcon={<Icon of="pen" />}
                 onClick={openNotesModal}
               >
-                <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
                   Edit
                 </Box>
               </Button>

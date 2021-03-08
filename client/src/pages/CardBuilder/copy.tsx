@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 
 export const specs = [
   ['Card dimensions', '3.5 x 2"'],
@@ -11,7 +11,7 @@ export const specs = [
     'Additional note',
     <span>
       {`N-mark to indicate NFC compatibility (`}
-      <InternalLink to="#">Download N-mark .png file</InternalLink>
+      <Link to="#">Download N-mark .png file</Link>
       {')'}
     </span>,
   ],

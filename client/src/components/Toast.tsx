@@ -1,10 +1,10 @@
-import { useTransition, animated } from 'react-spring'
-import { css, keyframes } from '@emotion/react'
+import { keyframes } from '@emotion/react'
 import * as React from 'react'
+import ReactDOM from 'react-dom'
+import { animated, useTransition } from 'react-spring'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import Box from './Box'
-import ReactDOM from 'react-dom'
 import Icon from './Icon'
 
 interface Props {
@@ -70,7 +70,7 @@ const Toast = ({
           <animated.div key={key} style={props}>
             <Box
               className={className}
-              borderRadius={2}
+              borderRadius="lg"
               display="flex"
               width="250px"
               alignItems="center"
@@ -80,8 +80,8 @@ const Toast = ({
               <Box
                 width="8px"
                 alignSelf="stretch"
-                borderTopLeftRadius={2}
-                borderBottomLeftRadius={2}
+                borderTopLeftRadius="base"
+                borderBottomLeftRadius="base"
                 // Used to prevent bg={color} in child from spilling out of this element's rounded borders
                 overflow="hidden"
               >
@@ -89,14 +89,14 @@ const Toast = ({
                   bg={color}
                   width="100%"
                   height="100%"
-                  css={css({
-                    animation: autoCloseIn
+                  animation={
+                    autoCloseIn
                       ? `${autoCloseTimerAnimation} ${
                           autoCloseIn / 1000
                         }s forwards`
-                      : undefined,
-                    transformOrigin: 'bottom center',
-                  })}
+                      : undefined
+                  }
+                  transformOrigin="bottom center"
                 />
               </Box>
               <Box width="100%" alignSelf="stretch" alignItems="center" p={2}>

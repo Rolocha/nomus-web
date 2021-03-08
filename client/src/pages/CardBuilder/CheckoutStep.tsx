@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as stripeJs from '@stripe/stripe-js'
 import * as React from 'react'
 import { UseFormMethods } from 'react-hook-form'
@@ -6,7 +5,7 @@ import Box from 'src/components/Box'
 import Card from 'src/components/Card'
 import CreditCardInput from 'src/components/CreditCardInput'
 import * as Form from 'src/components/Form'
-import { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { WizardStepProps } from 'src/components/Wizard'
@@ -96,35 +95,36 @@ const CheckoutStep = React.forwardRef(
       const price = QUANTITY_TO_PRICE[quantity]
       const selected = cardBuilderState.quantity === quantity
       return (
-        <Card
-          css={css`
-            transition: 0.3s ease transform;
-            transform: scale(${selected ? 1.05 : 1});
-          `}
-          key={quantity}
-          topBarColor={
-            cardBuilderState.quantity === quantity ? 'gold' : 'disabledBlue'
-          }
-          align="mix"
-          size="small"
-          icon={icon}
-          header={`${quantity} cards / ${formatDollarAmount(price)}`}
-          subheader={`${formatDollarAmount(
-            Math.round(price / quantity),
-          )} per card`}
-          bodyText={description}
-          boxShadow={selected ? 'prominent' : 'workingWindow'}
-          onClick={() =>
-            updateCardBuilderState({
-              quantity,
-            })
-          }
-        />
+        <Box
+          transition="0.3s ease transform"
+          transform={`scale(${selected ? 1.05 : 1})`}
+        >
+          <Card
+            key={quantity}
+            topBarColor={
+              cardBuilderState.quantity === quantity ? 'gold' : 'disabledBlue'
+            }
+            align="mix"
+            size="small"
+            icon={icon}
+            header={`${quantity} cards / ${formatDollarAmount(price)}`}
+            subheader={`${formatDollarAmount(
+              Math.round(price / quantity),
+            )} per card`}
+            bodyText={description}
+            boxShadow={selected ? 'prominent' : 'workingWindow'}
+            onClick={() =>
+              updateCardBuilderState({
+                quantity,
+              })
+            }
+          />
+        </Box>
       )
     })
 
     return (
-      <Box height="100%" overflowY="scroll" p={{ _: '24px', md: '48px' }}>
+      <Box height="100%" overflowY="scroll" p={{ base: '24px', md: '48px' }}>
         <Text.SectionHeader mb="24px">Order details</Text.SectionHeader>
         <Text.SectionSubheader mb={2}>
           How many cards do you want?
@@ -137,11 +137,11 @@ const CheckoutStep = React.forwardRef(
         >
           {quantityOptions}
           <Box gridColumn="3/4" gridRow="2/2" placeSelf="start end">
-            <ExternalLink href="#">
+            <Link to="#">
               <Text.Body2 color="inherit">
                 Need more than 100? Let us know.
               </Text.Body2>
-            </ExternalLink>
+            </Link>
           </Box>
         </Box>
 
@@ -232,16 +232,16 @@ const CheckoutStep = React.forwardRef(
             <Box
               width="100%"
               boxShadow="workingWindow"
-              borderRadius={2}
+              borderRadius="lg"
               placeSelf="end end"
               p={4}
               display="grid"
               gridTemplateColumns="2fr 1fr 1fr"
-              css={css`
-                & > *:nth-child(3n) {
-                  place-self: center end;
-                }
-              `}
+              sx={{
+                '& > *:nth-child(3n)': {
+                  placeSelf: 'center end',
+                },
+              }}
               gridRowGap={3}
             >
               <Text.Body2>Subtotal</Text.Body2>
