@@ -21,7 +21,6 @@ import ResetPassword from 'src/pages/ResetPassword'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import FaqPage from 'src/pages/FaqPage'
-import CardBuilder from './CardBuilder'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -138,11 +137,12 @@ export const routes: Array<RouteType> = [
     Component: UserControlPanel,
     requiredAuthLevel: Role.User,
   },
-  {
-    path: '/card-studio/:buildBaseType?',
-    Component: CardBuilder,
-    requiredAuthLevel: Role.User,
-  },
+  // {
+
+  //   path: '/card-studio/:buildBaseType?',
+  //   Component: CardBuilder,
+  //   requiredAuthLevel: Role.User,
+  // },
   {
     path: '/admin/linker/:routeStr',
     Component: LinkerPage,
