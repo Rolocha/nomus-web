@@ -55,7 +55,7 @@ export default () => {
       <Navbar />
       <Box>
         <Box
-          height={{ _: '142px', [bp]: '154px' }}
+          height={{ base: '142px', [bp]: '154px' }}
           backgroundColor="ivory"
           textAlign="center"
         >
@@ -67,15 +67,15 @@ export default () => {
         <Box
           display="grid"
           gridTemplateColumns={{
-            _: 'repeat(12, 1fr)',
+            base: 'repeat(12, 1fr)',
             [bp]: 'repeat(12, 1fr)',
           }}
-          mx={{ _: '24px', [bp]: '96px' }}
+          mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           pb="32px"
-          gridColumnGap={{ _: 2, [bp]: 3 }}
+          gridColumnGap={{ base: 2, [bp]: 3 }}
         >
-          <Box gridColumn={{ _: 'span 12', [bp]: '1/8' }} py="9px">
+          <Box gridColumn={{ base: 'span 12', [bp]: '1/8' }} py="9px">
             <Text.SectionHeader mb="16px">
               Frequently asked questions
             </Text.SectionHeader>
@@ -87,14 +87,14 @@ export default () => {
             ))}
           </Box>
           <Box
-            gridColumn={{ _: '1/12', [bp]: '9/12' }}
+            gridColumn={{ base: '1/12', [bp]: '9/12' }}
             boxShadow="workingWindow"
             borderRadius="16px"
             px="24px"
             py="16px"
             marginLeft="24px"
             alignSelf="start"
-            mt={{ _: '32px', [bp]: '24px' }}
+            mt={{ base: '32px', [bp]: '24px' }}
             width="150%"
             justifySelf="center"
           >
@@ -137,14 +137,14 @@ export default () => {
                   ref={register({ required: true })}
                   rows={4}
                   error={errors.entry}
-                  height={{ _: '100px', [bp]: '100%' }}
+                  height={{ base: '100px', [bp]: '100%' }}
                 />
                 <Form.FieldError fieldError={errors.entry} />
               </Form.Item>
               <Box display="flex" justifyContent="center" gridColumn="span 2">
                 <Button
                   type="submit"
-                  width={{ _: '45%', [bp]: '55%' }}
+                  width={{ base: '45%', [bp]: '55%' }}
                   variant="secondary"
                   size="normal"
                   inProgress={formState.isSubmitting}
