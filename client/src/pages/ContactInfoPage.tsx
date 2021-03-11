@@ -132,6 +132,11 @@ const ContactInfoPage = () => {
   // Data is loaded at this point
   const { publicContact: contact } = data
 
+  const downloadLinkProps = {
+    download: `${contact.username}.vcf`,
+    href: downloadLink,
+  }
+
   return contact ? (
     <Box>
       <Navbar />
@@ -423,8 +428,7 @@ const ContactInfoPage = () => {
                 linkType="external"
                 buttonStyle="primary"
                 buttonSize="big"
-                download={`${contact.username}.vcf`}
-                to={downloadLink}
+                {...downloadLinkProps}
               >
                 <Icon of="download" color={colors.white} />{' '}
                 <Box
@@ -438,8 +442,8 @@ const ContactInfoPage = () => {
             ) : (
               <IconButton
                 as="a"
-                download={`${contact.username}.vcf`}
-                to={downloadLink}
+                {...downloadLinkProps}
+                aria-label="Save contact"
                 icon={<Icon of="download" color={colors.white} />}
                 isRound
                 height="100%"
