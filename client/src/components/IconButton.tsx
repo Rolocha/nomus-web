@@ -2,13 +2,6 @@ import { useStyleConfig } from '@chakra-ui/react'
 import { chakra, PropsOf } from '@chakra-ui/system'
 import * as React from 'react'
 
-// type Omitted =
-//   | 'leftIcon'
-//   | 'isFullWidth'
-//   | 'rightIcon'
-//   | 'loadingText'
-//   | 'iconSpacing'
-
 export interface IconButtonProps extends PropsOf<typeof chakra.button> {
   /**
    * The icon to be used in the button.
