@@ -125,7 +125,6 @@ export default () => {
           display="inline-block"
           px="24px"
           to={`/${data.user.username}`}
-          asButton
           buttonStyle="secondary"
         >
           <Box
@@ -216,7 +215,6 @@ export default () => {
             <BusinessCardImage width="100%" placeholder />
             <Box mt={2} flexGrow={0}>
               <Link
-                asButton={true}
                 buttonStyle="secondary"
                 to={createMailtoURL({
                   to: 'help@nomus.me',

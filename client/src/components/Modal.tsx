@@ -329,7 +329,7 @@ const Modal = ({
                 {confirmClose() && (
                   <Box zIndex={30}>
                     <Modal
-                      preventCloseWithOutsideClick={true}
+                      preventCloseWithOutsideClick
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
                       maxWidth="90%"

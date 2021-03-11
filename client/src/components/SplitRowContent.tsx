@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import Box from 'src/components/Box'
+import Box, { BoxProps } from 'src/components/Box'
 
 interface ISplitRow {
   key: string
@@ -12,11 +12,11 @@ interface ISplitRow {
 type SplitRowContentProps = {
   alternate?: Boolean
   children: ISplitRow[]
-  wrapperProps?: React.ComponentProps<typeof Box>
-  rowProps?: React.ComponentProps<typeof Box>
-  titleProps?: React.ComponentProps<typeof Box>
-  imageProps?: React.ComponentProps<typeof Box>
-  contentProps?: React.ComponentProps<typeof Box>
+  wrapperProps?: BoxProps
+  rowProps?: BoxProps
+  titleProps?: BoxProps
+  imageProps?: BoxProps
+  contentProps?: BoxProps
 }
 
 export const bp = 'lg'
@@ -45,7 +45,7 @@ const SplitRowContent = ({
   imageProps,
   contentProps,
 }: SplitRowContentProps) => (
-  <Box container={true}>
+  <Box container>
     <Box
       display="flex"
       flexDirection="column"

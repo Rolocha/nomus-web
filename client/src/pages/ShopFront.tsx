@@ -2,7 +2,6 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import Card from 'src/components/Card'
-import Container from 'src/components/Container'
 import Footer from 'src/components/Footer'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
@@ -30,7 +29,7 @@ const ShopFront = () => {
         height="250px"
         bg="offWhite"
       />
-      <Container>
+      <Box container>
         <Box position="relative" zIndex={1} px={{ base: 0, [bp]: 5 }} pb={5}>
           <Box
             position="relative"
@@ -132,7 +131,6 @@ const ShopFront = () => {
                 >
                   <Link
                     minWidth="calc(100% * (4/6))"
-                    asButton
                     buttonStyle="primary"
                     buttonSize="big"
                     to="/card-studio/custom"
@@ -204,7 +202,7 @@ const ShopFront = () => {
             </Box>
           </Box>
         </Box>
-      </Container>
+      </Box>
       <Footer />
     </Box>
   )

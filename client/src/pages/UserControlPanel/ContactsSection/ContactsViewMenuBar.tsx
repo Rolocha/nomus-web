@@ -145,7 +145,6 @@ const ContactCardsList = ({
       >
         {selectedContact && (
           <Link
-            asButton
             to={`/${selectedContact.username}`}
             buttonStyle="secondary"
             overrideStyles={{

@@ -9,6 +9,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import Icon from 'src/components/Icon'
+import IconButton from 'src/components/IconButton'
 import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
@@ -361,6 +362,7 @@ const ContactInfoPage = () => {
                 </Text.Body2>
               ) : (
                 <Button
+                  whiteSpace="initial"
                   variant="tertiary"
                   onClick={openModalAndFocusOn(notesRef)}
                 >
@@ -415,28 +417,37 @@ const ContactInfoPage = () => {
             gridColumnGap={{ base: 2, [bp]: 3 }}
             gridRowGap={2}
           >
-            <Link
-              // Force it to use an external link to enable proper download behavior
-              linkType="external"
-              asButton
-              buttonStyle="primary"
-              buttonSize={isDesktopWidth ? 'big' : 'knob'}
-              download={`${contact.username}.vcf`}
-              to={downloadLink}
-            >
-              <Icon of="download" color={colors.white} />{' '}
-              <Box
-                as="span"
-                ml={2}
-                display={{ base: 'none', [bp]: 'inline-block' }}
+            {isDesktopWidth ? (
+              <Link
+                // Force it to use an external link to enable proper download behavior
+                linkType="external"
+                buttonStyle="primary"
+                buttonSize="big"
+                download={`${contact.username}.vcf`}
+                to={downloadLink}
               >
-                Save contact
-              </Box>
-            </Link>
+                <Icon of="download" color={colors.white} />{' '}
+                <Box
+                  as="span"
+                  ml={2}
+                  display={{ base: 'none', [bp]: 'inline-block' }}
+                >
+                  Save contact
+                </Box>
+              </Link>
+            ) : (
+              <IconButton
+                as="a"
+                download={`${contact.username}.vcf`}
+                to={downloadLink}
+                icon={<Icon of="download" color={colors.white} />}
+                isRound
+                height="100%"
+              />
+            )}
 
             {loggedIn && contact.connected ? (
               <Link
-                asButton
                 buttonStyle="secondary"
                 buttonSize="big"
                 to={`/dashboard/contacts/detail/${username}`}
@@ -446,7 +457,6 @@ const ContactInfoPage = () => {
             ) : (
               <Link
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
-                asButton
                 buttonStyle="secondary"
                 buttonSize="big"
               >

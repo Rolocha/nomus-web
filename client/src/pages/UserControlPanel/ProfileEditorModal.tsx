@@ -142,7 +142,7 @@ export default ({
               overflowY="auto"
             >
               <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
-                <Form.Label htmlFor="firstName" required={true}>
+                <Form.Label htmlFor="firstName" required>
                   FIRST NAME
                 </Form.Label>
                 <Form.Input
@@ -168,7 +168,7 @@ export default ({
                 <Form.FieldError fieldError={errors.middleName} />
               </Form.Item>
               <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
-                <Form.Label htmlFor="lastName" required={true}>
+                <Form.Label htmlFor="lastName" required>
                   LAST NAME
                 </Form.Label>
                 <Form.Input
@@ -217,7 +217,7 @@ export default ({
                 <Form.FieldError fieldError={errors.phoneNumber} />
               </Form.Item>
               <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
-                <Form.Label htmlFor="email" required={true}>
+                <Form.Label htmlFor="email" required>
                   EMAIL
                 </Form.Label>
                 <Form.Input

@@ -161,13 +161,7 @@ const RegistrationForm = () => {
               </Text.Body2>
             )}
           </Box>
-          <Link
-            mt={3}
-            to="/dashboard"
-            asButton
-            buttonStyle="primary"
-            buttonSize="big"
-          >
+          <Link mt={3} to="/dashboard" buttonStyle="primary" buttonSize="big">
             Continue to your dashboard
           </Link>
         </>

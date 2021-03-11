@@ -21,7 +21,9 @@ const Accordion = ({ title, children, size = 'medium' }: Props) => {
     <Box>
       <Box
         borderTop={`1px solid ${colors.africanElephant}`}
-        borderBottom={!isOpen ? `1px solid ${colors.africanElephant}` : null}
+        borderBottom={
+          !isOpen ? `1px solid ${colors.africanElephant}` : undefined
+        }
         height={
           {
             medium: '64px',

@@ -1,8 +1,8 @@
-import { chakra } from '@chakra-ui/system'
+import { chakra, PropsOf } from '@chakra-ui/system'
 import * as React from 'react'
 import typography from 'src/styles/typography'
 
-export type TextProps = React.ComponentProps<typeof chakra.p>
+export type TextProps = PropsOf<typeof chakra.p>
 
 const semanticallyStyledText = (
   as: React.ElementType<any>,

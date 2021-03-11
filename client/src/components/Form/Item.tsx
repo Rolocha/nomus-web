@@ -1,7 +1,8 @@
+import { PropsOf } from '@chakra-ui/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 
-interface Props extends React.ComponentProps<typeof Box> {
+interface Props extends PropsOf<typeof Box> {
   children: React.ReactNode
 }
 

@@ -179,7 +179,6 @@ export default () => {
                 >
                   <Box px={1} display="flex" justifyContent="stretch">
                     <Link
-                      asButton
                       buttonStyle="primary"
                       to={sendReorderEmail(defaultCardVersion.id)}
                     >
@@ -188,7 +187,6 @@ export default () => {
                   </Box>
                   <Box px={1} display="flex" justifyContent="stretch">
                     <Link
-                      asButton
                       buttonStyle="secondary"
                       to={sendModifyEmail(defaultCardVersion.id)}
                     >
@@ -281,7 +279,6 @@ export default () => {
                   >
                     <Box px={1} display="flex" justifyContent="stretch">
                       <Link
-                        asButton
                         buttonStyle="primary"
                         to={sendReorderEmail(cv.id)}
                         padding="9.5px 6px"
@@ -291,7 +288,6 @@ export default () => {
                     </Box>
                     <Box px={1} display="flex" justifyContent="stretch">
                       <Link
-                        asButton
                         buttonStyle="secondary"
                         to={sendModifyEmail(cv.id)}
                         padding="9.5px 6px"

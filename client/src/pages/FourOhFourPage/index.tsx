@@ -51,11 +51,10 @@ const FourOhFourPage = () => {
           gridRowGap={3}
           placeContent={{ base: 'center', lg: 'center stretch' }}
         >
-          <Link asButton buttonStyle="primary" buttonSize="big" to="/">
+          <Link buttonStyle="primary" buttonSize="big" to="/">
             Return to homepage
           </Link>
           <Link
-            asButton
             buttonStyle="secondary"
             buttonSize="big"
             to="mailto:hello@nomus.me"

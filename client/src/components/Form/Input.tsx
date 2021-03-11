@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { chakra } from '@chakra-ui/system'
+import { chakra, PropsOf } from '@chakra-ui/system'
 import { FieldError } from 'react-hook-form'
 import theme from 'src/styles/theme'
 
-interface Props extends React.ComponentProps<typeof chakra.input> {
+interface Props extends PropsOf<typeof chakra.input> {
   error?: FieldError | boolean
 }
 
