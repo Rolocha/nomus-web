@@ -112,7 +112,6 @@ const ResetPassword = () => {
             </Text.Body2>
             <Link
               mt={2}
-              asButton
               buttonStyle="primary"
               buttonSize="big"
               to="/forgot-password"

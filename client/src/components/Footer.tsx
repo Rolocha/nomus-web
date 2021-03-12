@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import Container from 'src/components/Container'
 import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
 import Spinner from 'src/components/Spinner'
@@ -43,7 +42,7 @@ const Footer = () => {
   >('unsubmitted')
   return (
     <Box bg={colors.nomusBlue} py={{ base: '40px', [bp]: '70px' }}>
-      <Container>
+      <Box container>
         <Box
           display="flex"
           alignItems="center"
@@ -222,7 +221,7 @@ const Footer = () => {
             </Link>
           </Box>
         </Box>
-      </Container>
+      </Box>
     </Box>
   )
 }

@@ -1,15 +1,13 @@
-import { chakra, useStyleConfig } from '@chakra-ui/system'
+import { chakra, PropsOf, useStyleConfig } from '@chakra-ui/system'
 import * as React from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import * as buttonStyles from 'src/styles/components/button'
 import theme from 'src/styles/theme'
 
-interface LinkProps extends React.ComponentProps<typeof chakra.a> {
+interface LinkProps extends PropsOf<typeof chakra.a> {
   // We use `to` for both internal and external links so we don't have to think about which one we're using
   to?: React.ComponentProps<typeof ReactRouterLink>['to'] | null
   ref?: any
-  asButton?: boolean
-  // button variants are only used if asButton is true
   buttonStyle?: keyof typeof buttonStyles.styleVariants
   buttonSize?: keyof typeof buttonStyles.sizeVariants
   underline?: boolean

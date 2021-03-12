@@ -21,7 +21,7 @@ describe('<Modal />', () => {
 
   it('renders a modal with the specified content in a portal', () => {
     render(
-      <Modal isOpen={true} onClose={() => {}}>
+      <Modal isOpen onClose={() => {}}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,
@@ -35,7 +35,7 @@ describe('<Modal />', () => {
     const closeModal = jest.fn()
 
     const { getByText, getByLabelText } = render(
-      <Modal isOpen={true} onClose={closeModal} confirmClose={() => true}>
+      <Modal isOpen onClose={closeModal} confirmClose={() => true}>
         <PageHeader>Test Modal</PageHeader>
         <Body>Some content</Body>
       </Modal>,

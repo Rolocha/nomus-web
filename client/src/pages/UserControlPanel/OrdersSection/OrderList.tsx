@@ -133,7 +133,6 @@ const OrderList = ({ orders }: Props) => {
             >
               <Link
                 to={`${location.pathname}/${order.id}`}
-                asButton
                 buttonStyle="tertiary"
                 sx={{
                   // We don't want all the extra button padding in this case

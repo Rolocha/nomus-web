@@ -230,7 +230,7 @@ describe('Contact Info Page', () => {
       await new Promise((resolve) => setTimeout(resolve, 0)) // wait for response
 
       const saveContactCardLink = renderResult
-        .getByText('Save contact')
+        .getByLabelText('Save contact')
         .closest('a')
 
       expect(

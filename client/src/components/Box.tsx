@@ -1,7 +1,7 @@
-import { chakra, system } from '@chakra-ui/react'
+import { chakra, PropsOf, system } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 
-interface BoxProps extends React.ComponentProps<typeof chakra.div> {}
+export interface BoxProps extends PropsOf<typeof chakra.div> {}
 
 type ContainerProp = {
   maxWidth: string

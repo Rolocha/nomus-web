@@ -211,7 +211,6 @@ const Navbar = (props: Props) => {
                   <Link
                     key="register"
                     to="/register"
-                    asButton
                     buttonStyle="secondary"
                     buttonSize="big"
                     py={2}
@@ -326,7 +325,6 @@ const Navbar = (props: Props) => {
                           >
                             {!loggedIn && [
                               <Link
-                                asButton
                                 buttonStyle="secondary"
                                 to="/register"
                                 key="register"
@@ -334,7 +332,6 @@ const Navbar = (props: Props) => {
                                 get started
                               </Link>,
                               <Link
-                                asButton
                                 buttonStyle="tertiary"
                                 to="/login"
                                 key="login"
