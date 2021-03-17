@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import { InternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import Icon, { IconName } from './Icon'
@@ -81,13 +81,13 @@ const SegmentedController = ({
         return {
           [TabActionType.InternalLink]: (
             <Box key={tabConfig.id} width={`${100 / tabs.length}%`}>
-              <InternalLink
+              <Link
                 // @ts-ignore
                 to={tabConfig.linkTo}
                 onClick={tabConfig.onClick}
               >
                 {InnerContent}
-              </InternalLink>
+              </Link>
             </Box>
           ),
           [TabActionType.OnClick]: (

@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
@@ -6,7 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
-import Link, { ExternalLink } from 'src/components/Link'
+import Link from 'src/components/Link'
 import PasswordStrengthIndicator from 'src/components/PasswordStrengthIndicator'
 import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import * as Text from 'src/components/Text'
@@ -45,9 +44,13 @@ const RegistrationForm = () => {
     null | boolean
   >(null)
 
-  const { register, handleSubmit, formState, errors, watch } = useForm<
-    RegistrationFormData
-  >({
+  const {
+    register,
+    handleSubmit,
+    formState,
+    errors,
+    watch,
+  } = useForm<RegistrationFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
@@ -137,12 +140,9 @@ const RegistrationForm = () => {
             {resentEmailSuccessfully === null && (
               <Text.Body2>
                 Didn’t get an email?{' '}
-                <ExternalLink
-                  css={css({ cursor: 'pointer' })}
-                  onClick={handleResendEmail}
-                >
+                <Button cursor="pointer" onClick={handleResendEmail}>
                   Resend the magic link.
-                </ExternalLink>{' '}
+                </Button>{' '}
                 Oooh.
               </Text.Body2>
             )}
@@ -161,13 +161,7 @@ const RegistrationForm = () => {
               </Text.Body2>
             )}
           </Box>
-          <Link
-            mt={3}
-            to="/dashboard"
-            asButton
-            buttonStyle="primary"
-            buttonSize="big"
-          >
+          <Link mt={3} to="/dashboard" buttonStyle="primary" buttonSize="big">
             Continue to your dashboard
           </Link>
         </>
@@ -236,8 +230,8 @@ const RegistrationForm = () => {
             <Button
               variant="primary"
               size="big"
-              inProgress={submittingForm}
-              inProgressText="Creating your account"
+              isLoading={submittingForm}
+              loadingText="Creating your account"
               type="submit"
               width="100%"
             >

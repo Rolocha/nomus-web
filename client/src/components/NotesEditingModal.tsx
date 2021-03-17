@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
@@ -65,9 +64,13 @@ const NotesEditingModal = ({
   fieldRefs,
 }: Props) => {
   const wasModalJustClosed = React.useRef(false)
-  const { handleSubmit, register, watch, reset, formState } = useForm<
-    NotesFormData
-  >({
+  const {
+    handleSubmit,
+    register,
+    watch,
+    reset,
+    formState,
+  } = useForm<NotesFormData>({
     mode: 'onChange',
     defaultValues: {
       ...defaultValues,
@@ -157,9 +160,9 @@ const NotesEditingModal = ({
       <Form.Form onSubmit={handleSubmit(saveNotes)} id="notes-form">
         <Box
           display="grid"
-          gridTemplateColumns={{ _: '1fr', [bp]: '1fr 1fr 1fr' }}
+          gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr 1fr' }}
           gridTemplateAreas={{
-            _: `
+            base: `
           "meetingDate"
           "meetingPlace"
           "tags"
@@ -173,9 +176,7 @@ const NotesEditingModal = ({
           }}
           gridColumnGap={3}
           gridRowGap={3}
-          css={css({
-            placeItems: 'start stretch',
-          })}
+          placeItems="start stretch"
         >
           <Form.Item alignItems="stretch" gridArea="meetingDate" width="100%">
             <Form.Label>Meeting Date</Form.Label>
@@ -206,10 +207,8 @@ const NotesEditingModal = ({
             <Form.Label>
               Tags{' '}
               <Text.Body3
-                css={css({
-                  textTransform: 'none',
-                })}
                 as="span"
+                textTransform="none"
                 color={colors.midnightGray}
               >
                 (comma-separated)

@@ -5,7 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
-import { Link } from 'src/components/Link'
+import Link from 'src/components/Link'
 import PasswordVisibilityToggle from 'src/components/PasswordVisibilityToggle'
 import * as Text from 'src/components/Text'
 import { useAuth } from 'src/utils/auth'
@@ -127,8 +127,8 @@ const LoginForm = () => {
           width="100%"
           variant="primary"
           size="big"
-          inProgress={loggingIn}
-          inProgressText="Logging in"
+          isLoading={loggingIn}
+          loadingText="Logging in"
         >
           Continue
         </Button>

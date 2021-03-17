@@ -179,10 +179,10 @@ const ChangePasswordForm = () => {
         ) : (
           <Button
             mt={3}
-            width={{ _: '100%', [bp]: '75%' }}
+            width={{ base: '100%', [bp]: '75%' }}
             variant="secondary"
             type="submit"
-            inProgress={formState.isSubmitting}
+            isLoading={formState.isSubmitting}
           >
             Change password
           </Button>

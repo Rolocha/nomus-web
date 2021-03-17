@@ -1,5 +1,5 @@
+import { LayoutProps } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
-import * as CSS from 'csstype'
 import { rgba } from 'polished'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
@@ -10,11 +10,6 @@ import Icon from 'src/components/Icon'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { use100vh } from 'src/utils/ui'
-import {
-  RequiredTheme,
-  ResponsiveValue,
-  TLengthStyledSystem,
-} from 'styled-system'
 
 export enum ActionType {
   Cancel = 'cancel',
@@ -26,8 +21,8 @@ interface Action {
   text: string
   handler?: () => void
   submitForm?: string
-  inProgress?: boolean
-  inProgressText?: string
+  isLoading?: boolean
+  loadingText?: string
 }
 
 type Actions = {
@@ -51,18 +46,9 @@ interface Props {
   // If omitted, defaults to using onClose
   onClickOutside?: () => void
   children: React.ReactNode | ((options: ChildOptions) => React.ReactNode)
-  maxWidth?: ResponsiveValue<
-    CSS.Property.MaxWidth<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  width?: ResponsiveValue<
-    CSS.Property.Width<TLengthStyledSystem>,
-    RequiredTheme
-  >
-  height?: ResponsiveValue<
-    CSS.Property.MaxHeight<TLengthStyledSystem>,
-    RequiredTheme
-  >
+  maxWidth?: LayoutProps['maxWidth']
+  width?: LayoutProps['width']
+  height?: LayoutProps['height']
   confirmClose: () => boolean
   actions?: Actions
   preventCloseWithOutsideClick?: boolean
@@ -184,7 +170,7 @@ const Modal = ({
                 left="0"
                 zIndex={10}
                 width="100vw"
-                height={fullHeight}
+                height={fullHeight ?? undefined}
                 // https://stackoverflow.com/a/55003985
                 minHeight="-webkit-fill-available"
                 display="flex"
@@ -198,7 +184,7 @@ const Modal = ({
                 justifyContent="center"
                 bg={rgba(colors.nomusBlue, 0.8)}
                 onClick={handleOutsideClick}
-                p={{ _: 2, md: 'unset' }}
+                p={{ base: 2, md: 'unset' }}
               >
                 {foregroundTransitions.map(
                   ({ item, key, props }) =>
@@ -217,8 +203,8 @@ const Modal = ({
                           }
                           width={
                             {
-                              center: width ?? { _: '100%', md: '80%' },
-                              right: width ?? { _: '90%', md: '50%' },
+                              center: width ?? { base: '100%', md: '80%' },
+                              right: width ?? { base: '90%', md: '50%' },
                             }[anchorStyle]
                           }
                           height={
@@ -228,7 +214,7 @@ const Modal = ({
                             }[anchorStyle]
                           }
                           bg="white"
-                          borderRadius={anchorStyle === 'center' ? 2 : 0}
+                          borderRadius={anchorStyle === 'center' ? 'lg' : 0}
                           boxShadow={anchorStyle === 'center' ? 0 : undefined}
                           display="flex"
                           flexDirection="column"
@@ -239,7 +225,7 @@ const Modal = ({
                         >
                           {header && (
                             <Box
-                              p={{ _: 3, md: 4 }}
+                              p={{ base: 3, md: 4 }}
                               borderBottom={`1px solid ${colors.superlightGray}`}
                             >
                               <Text.CardHeader mb={3}>
@@ -252,7 +238,7 @@ const Modal = ({
                           )}
 
                           <Box
-                            p={{ _: 3, md: 4 }}
+                            p={{ base: 3, md: 4 }}
                             flexGrow={0}
                             overflowY="auto"
                           >
@@ -267,9 +253,7 @@ const Modal = ({
                               position="absolute"
                               top="0"
                               right="0"
-                              css={css`
-                                cursor: pointer;
-                              `}
+                              cursor="pointer"
                             >
                               <Icon of="close" color={colors.midnightGray} />
                             </Box>
@@ -305,10 +289,8 @@ const Modal = ({
                                     form={
                                       actions.secondary.submitForm ?? undefined
                                     }
-                                    inProgress={actions.secondary.inProgress}
-                                    inProgressText={
-                                      actions.secondary.inProgressText
-                                    }
+                                    isLoading={actions.secondary.isLoading}
+                                    loadingText={actions.secondary.loadingText}
                                     type={
                                       actions.secondary.submitForm
                                         ? 'submit'
@@ -326,10 +308,8 @@ const Modal = ({
                                     form={
                                       actions.primary.submitForm ?? undefined
                                     }
-                                    inProgress={actions.primary.inProgress}
-                                    inProgressText={
-                                      actions.primary.inProgressText
-                                    }
+                                    isLoading={actions.primary.isLoading}
+                                    loadingText={actions.primary.loadingText}
                                     type={
                                       actions.primary.submitForm
                                         ? 'submit'
@@ -349,7 +329,7 @@ const Modal = ({
                 {confirmClose() && (
                   <Box zIndex={30}>
                     <Modal
-                      preventCloseWithOutsideClick={true}
+                      preventCloseWithOutsideClick
                       isOpen={confirmingClose}
                       onClose={cancelCloseConfirm}
                       maxWidth="90%"

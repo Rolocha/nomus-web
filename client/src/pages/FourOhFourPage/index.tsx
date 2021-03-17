@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
@@ -14,10 +13,10 @@ const FourOhFourPage = () => {
       <Box
         container
         display="grid"
-        gridTemplateColumns={{ _: '1fr', lg: '9fr 3fr' }}
-        gridTemplateRows={{ _: '1fr 4fr 4fr 3fr', lg: '1fr' }}
+        gridTemplateColumns={{ base: '1fr', lg: '9fr 3fr' }}
+        gridTemplateRows={{ base: '1fr 4fr 4fr 3fr', lg: '1fr' }}
         gridTemplateAreas={{
-          _: `"." "cards" "buttons" "."`,
+          base: `"." "cards" "buttons" "."`,
           lg: `"cards buttons"`,
         }}
         placeContent="center"
@@ -35,18 +34,14 @@ const FourOhFourPage = () => {
             src={fourOhFourCardBack}
             w="70%"
             boxShadow="businessCard"
-            css={css({
-              transform: 'scale(0.866) translate(-25%) rotateZ(-30deg)',
-            })}
+            transform="scale(0.866) translate(-25%) rotateZ(-30deg)"
           />
           <Image
             src={fourOhFourCardFront}
             w="70%"
             boxShadow="businessCard"
             position="absolute"
-            css={css({
-              transform: 'scale(0.866) translate(25%, 4%) rotateZ(-10deg)',
-            })}
+            transform="scale(0.866) translate(25%, 4%) rotateZ(-10deg)"
           />
         </Box>
         <Box
@@ -54,13 +49,12 @@ const FourOhFourPage = () => {
           gridArea="buttons"
           gridTemplateColumns="1fr"
           gridRowGap={3}
-          placeContent={{ _: 'center', lg: 'center stretch' }}
+          placeContent={{ base: 'center', lg: 'center stretch' }}
         >
-          <Link asButton buttonStyle="primary" buttonSize="big" to="/">
+          <Link buttonStyle="primary" buttonSize="big" to="/">
             Return to homepage
           </Link>
           <Link
-            asButton
             buttonStyle="secondary"
             buttonSize="big"
             to="mailto:hello@nomus.me"

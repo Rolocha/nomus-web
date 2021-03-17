@@ -20,6 +20,7 @@ import LoginPage from 'src/pages/LoginPage'
 import ResetPassword from 'src/pages/ResetPassword'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
+import FaqPage from 'src/pages/FaqPage'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -74,10 +75,7 @@ export const routes: Array<RouteType> = [
   {
     path: '/faq',
     exact: true,
-    redirect: {
-      to: 'https://www.notion.so/FAQ-4cb5ad040eb34b939e279bc15adf929a',
-      type: 'external',
-    },
+    Component: FaqPage,
   },
   {
     path: '/about',

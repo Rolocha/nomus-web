@@ -1,85 +1,20 @@
+import { chakra, PropsOf, useStyleConfig } from '@chakra-ui/system'
 import * as React from 'react'
-import isPropValid from '@emotion/is-prop-valid'
-import styled from '@emotion/styled'
-import { space, SpaceProps, layout, LayoutProps } from 'styled-system'
 import { Link as ReactRouterLink } from 'react-router-dom'
-import * as buttonlikeStyles from 'src/styles/components/buttonlike'
+import * as buttonStyles from 'src/styles/components/button'
 import theme from 'src/styles/theme'
 
-const linkBaseStyles = (props: LinkStyleProps) => ({
-  textDecoration: props.underline ? 'underline' : 'none',
-  color: props.color ?? theme.colors.linkBlue,
-  cursor: 'pointer',
-})
-
-interface LinkStyleProps extends SpaceProps, LayoutProps {
-  asButton?: boolean
-  // button variants are only used if asButton is true
-  buttonStyle?: keyof typeof buttonlikeStyles.styleVariants
-  buttonSize?: keyof typeof buttonlikeStyles.sizeVariants
+interface LinkProps extends PropsOf<typeof chakra.a> {
+  // We use `to` for both internal and external links so we don't have to think about which one we're using
+  to?: React.ComponentProps<typeof ReactRouterLink>['to'] | null
+  ref?: any
+  buttonStyle?: keyof typeof buttonStyles.styleVariants
+  buttonSize?: keyof typeof buttonStyles.sizeVariants
   underline?: boolean
   color?: string
   as?: any
   overrideStyles?: any
-}
-
-// We sometimes want to style Links identically to the way we style
-// Buttons so this component creates an easy-use adapter via
-// the asButton, buttonStyle, and buttonSize props
-
-// We export both an internal and external link from this file
-// They are styled identically but are based on a different
-// underlying component (<a /> vs React Router's <Link />) so
-// the styled component definition args are identical
-const args = [
-  space,
-  layout,
-  (props: LinkStyleProps) =>
-    props.asButton
-      ? {
-          ...buttonlikeStyles.baseButtonStyles,
-          // Mimic button variants with a "button-" prefix
-          ...(props.buttonStyle
-            ? buttonlikeStyles.styleVariants[props.buttonStyle]
-            : {}),
-          ...(props.buttonSize
-            ? buttonlikeStyles.sizeVariants[props.buttonSize]
-            : {}),
-          textDecoration: 'none',
-        }
-      : linkBaseStyles(props),
-  (props: LinkStyleProps) => props.overrideStyles,
-] as const
-
-interface InternalLinkProps
-  extends React.ComponentProps<typeof ReactRouterLink>,
-    LinkStyleProps {}
-
-// @ts-ignore
-const ExternalLink = styled('a', {
-  shouldForwardProp: (prop: string | number | symbol) =>
-    typeof prop === 'string' && isPropValid(prop) && prop !== 'underline',
-})(...args)
-// @ts-ignore
-const InternalLink = styled(ReactRouterLink, {
-  shouldForwardProp: (prop: string | number | symbol) =>
-    typeof prop === 'string' && isPropValid(prop) && prop !== 'underline',
-})(...args)
-
-const defaultProps = {
-  asButton: false,
-  buttonStyle: 'primary',
-  buttonSize: 'normal',
-} as const
-ExternalLink.defaultProps = defaultProps
-InternalLink.defaultProps = defaultProps
-
-interface UnifiedLinkProps
-  extends Omit<InternalLinkProps, 'to'>,
-    LinkStyleProps {
-  to: React.ComponentProps<typeof ReactRouterLink>['to'] | null
-  type?: 'internal' | 'external'
-  ref?: any
+  linkType?: 'internal' | 'external'
 }
 
 const isExternalLink = (
@@ -94,28 +29,46 @@ const isExternalLink = (
 // An isomorphic Link component where the link is always passed in via the "to" prop so that you
 // don't have to decide whether to pass in "to" for the react-router InternalLink or "href" for
 // the traditional <a /> ExternalLink
-const UnifiedLink = ({
+const Link = ({
   to,
   ref,
   defaultValue,
   referrerPolicy,
+  linkType,
+  buttonSize = undefined,
+  buttonStyle = undefined,
   ...props
-}: UnifiedLinkProps) => {
-  if (to == null || isExternalLink(to)) {
-    // @ts-ignore
-    return <ExternalLink ref={ref} {...props} href={to} />
+}: LinkProps) => {
+  // Piggy-back on button style variants
+  const buttonStyles = useStyleConfig('Button', {
+    size: buttonSize,
+    variant: buttonStyle,
+  })
+
+  const styles = {
+    textDecoration: props.underline ? 'underline' : 'none',
+    color: props.color ?? theme.colors.linkBlue,
+    cursor: 'pointer',
+    ...(buttonSize || buttonStyle ? buttonStyles : {}),
+  }
+
+  if (
+    to == null ||
+    isExternalLink(to) ||
+    (typeof to === 'string' && linkType && linkType === 'external')
+  ) {
+    // Link is pointing to some other website/location, use the typical anchor element
+    return <chakra.a ref={ref} sx={styles} href={to ?? '#'} {...props} />
   } else {
+    // Link is pointing to within our app, use the Internal (React Router) version
     return (
-      <InternalLink
-        {...props}
-        // @ts-ignore
-        to={to}
-        defaultValue={defaultValue}
-        referrerPolicy={referrerPolicy}
-      />
+      <chakra.a as={ReactRouterLink} ref={ref} sx={styles} to={to} {...props} />
     )
   }
 }
 
-export { ExternalLink, InternalLink, UnifiedLink as Link }
-export default UnifiedLink
+export default Link
+
+export const ExternalLink = (props: LinkProps) => (
+  <Link {...props} linkType="external" />
+)

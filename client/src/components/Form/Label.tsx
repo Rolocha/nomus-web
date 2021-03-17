@@ -1,9 +1,8 @@
 import styled from '@emotion/styled'
-import { variant } from 'styled-system'
 
 import theme from 'src/styles/theme'
 import { LabelHTMLAttributes } from 'react'
-import { colors } from 'src/styles'
+import { colors, typography } from 'src/styles'
 
 export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   variant?: keyof typeof theme.textStyles | null
@@ -15,10 +14,8 @@ const Label = styled.label<LabelProps>(
   {
     textTransform: 'uppercase',
     display: 'block',
+    ...typography.textStyles.label,
   },
-  variant({
-    variants: theme.textStyles,
-  }),
   (props) =>
     props.required
       ? {

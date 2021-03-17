@@ -8,7 +8,7 @@ import Button from 'src/components/Button'
 import EditableImage from 'src/components/EditableImage'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
-import { Link } from 'src/components/Link'
+import Link from 'src/components/Link'
 import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -90,15 +90,15 @@ export default () => {
     <Box
       display="grid"
       gridTemplateColumns={{
-        _: '4fr 6fr 2fr',
+        base: '4fr 6fr 2fr',
         [bp]: '2fr 3fr 5fr 2fr',
       }}
       gridTemplateRows={{
-        _: '',
+        base: '',
         [bp]: undefined,
       }}
       gridTemplateAreas={{
-        _: `
+        base: `
         "topBar topBar topBar"
         "profilePic nameplate nameplate"
         "cards cards cards"
@@ -112,11 +112,11 @@ export default () => {
       }}
       gridColumnGap={3}
       gridRowGap={3}
-      p={{ _: '24px', [bp]: '48px' }}
+      p={{ base: '24px', [bp]: '48px' }}
     >
       <Box
         gridArea="topBar"
-        justifySelf={{ _: 'stretch', [bp]: 'stretch' }}
+        justifySelf={{ base: 'stretch', [bp]: 'stretch' }}
         display="flex"
         alignItems="flex-start"
         justifyContent="space-between"
@@ -125,7 +125,6 @@ export default () => {
           display="inline-block"
           px="24px"
           to={`/${data.user.username}`}
-          asButton
           buttonStyle="secondary"
         >
           <Box
@@ -138,13 +137,13 @@ export default () => {
             <Icon of="externalLink" color={colors.linkBlue} />
           </Box>
         </Link>
-        <Box display={{ _: 'none', [bp]: 'block' }}>
+        <Box display={{ base: 'none', [bp]: 'block' }}>
           <Button
             variant="tertiary"
             leftIcon={<Icon of="pen" />}
             onClick={openProfileEditorModal}
           >
-            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+            <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
               Edit profile
             </Box>
           </Button>
@@ -162,7 +161,7 @@ export default () => {
         )}
       </Box>
 
-      <Box gridArea="nameplate" alignSelf={{ _: 'start', [bp]: 'center' }}>
+      <Box gridArea="nameplate" alignSelf={{ base: 'start', [bp]: 'center' }}>
         {data.user.name ? (
           <Text.SectionHeader mb={1} mt={0}>
             {formatName(data.user.name)}
@@ -195,9 +194,9 @@ export default () => {
         (data.user.defaultCardVersion.frontImageUrl ||
           data.user.defaultCardVersion.backImageUrl) ? (
           <Box
-            width={{ _: '50%', [bp]: '100%' }}
-            mb={{ _: 0, [bp]: 2 }}
-            mr={{ _: 2, [bp]: 0 }}
+            width={{ base: '50%', [bp]: '100%' }}
+            mb={{ base: 0, [bp]: 2 }}
+            mr={{ base: 2, [bp]: 0 }}
           >
             <BusinessCardImage
               width="100%"
@@ -216,7 +215,6 @@ export default () => {
             <BusinessCardImage width="100%" placeholder />
             <Box mt={2} flexGrow={0}>
               <Link
-                asButton={true}
                 buttonStyle="secondary"
                 to={createMailtoURL({
                   to: 'help@nomus.me',
@@ -233,7 +231,7 @@ export default () => {
 
       <Box gridArea="profileInfo" position="relative">
         <Box
-          display={{ _: 'block', [bp]: 'none' }}
+          display={{ base: 'block', [bp]: 'none' }}
           position="absolute"
           right="0px"
           top="0px"
@@ -243,7 +241,7 @@ export default () => {
             leftIcon={<Icon of="pen" />}
             onClick={openProfileEditorModal}
           >
-            <Box as="span" display={{ _: 'none', [bp]: 'inline' }}>
+            <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
               Edit
             </Box>
           </Button>

@@ -6,7 +6,7 @@ import * as Text from 'src/components/Text'
 import Box from 'src/components/Box'
 
 export default {
-  title: 'Icon',
+  title: 'components/Icon',
   component: Icon,
   excludeStories: /.*Data$/,
 }
@@ -25,7 +25,7 @@ export const AllIcons = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            borderRadius={2}
+            borderRadius="lg"
             width="125px"
             height="125px"
           >
@@ -38,12 +38,12 @@ export const AllIcons = () => {
   )
 }
 
-export const StyledIcon = () => {
+export const ResponsivelyStyledIcon = () => {
   return (
     <>
       <Text.Body2>
-        Here are all the icons styled with the poppy color and made to be size
-        50!
+        Here are all the icons styled with one color in mobile, another in
+        desktop.
       </Text.Body2>
       <Box display="flex" flexWrap="wrap" mx={-2}>
         {iconNames.map((iconName) => (
@@ -56,11 +56,14 @@ export const StyledIcon = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            borderRadius={2}
+            borderRadius="lg"
             width="125px"
             height="125px"
           >
-            <Icon of={iconName} color={colors.poppy} boxSize="50px" />
+            <Icon
+              of={iconName}
+              color={{ base: colors.poppy, md: colors.activeGreen }}
+            />
             <Text.Body3 mt={2}>{iconName}</Text.Body3>
           </Box>
         ))}

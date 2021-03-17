@@ -145,7 +145,12 @@ local ALWAYS_CONDITION = {};
       runCmd("client", "yarn lint:ci", ALWAYS_CONDITION),
       runCmd("client", "yarn test", ALWAYS_CONDITION),
 
-      buildClient(STAGING_OR_PRODUCTION_DEPLOY_CONDITION),
+      // We used to only build when we needed the built assets (i.e. when deploying)
+      // but this caused there to occasionally be errors that only show up during build time
+      // resulting in builds succeeding while the PR is up but then failing once merged into master.
+      // Building always causes PR builds to take 1.5+ minutes longer but it's worth it to avoid
+      // the annoyance of having builds on master fail unexpectedly.
+      buildClient(ALWAYS_CONDITION),
 
       // Staging
       syncToBucket("stage.nomus.me", "us-east-1", STAGING_DEPLOY_CONDITION),

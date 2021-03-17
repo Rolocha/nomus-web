@@ -1,9 +1,9 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import { useCustomResponsiveStyles } from 'src/styles/helpers'
-import { ResponsiveValue } from 'styled-system'
-import Icon, { IconName } from 'src/components/Icon'
+import {
+  useCustomResponsiveStyles,
+  ResponsiveCustomProperty,
+} from 'src/styles/helpers'
 
 export enum PopoverAnchorPoint {
   Top = 'Top',
@@ -13,16 +13,14 @@ export enum PopoverAnchorPoint {
 
 interface Props {
   omitIconBg?: boolean
-  icon: IconName
-  iconColor?: string
+  icon: React.ReactNode
   popoverContents: React.ReactNode
-  anchorPoint: ResponsiveValue<PopoverAnchorPoint>
+  anchorPoint: ResponsiveCustomProperty<PopoverAnchorPoint>
 }
 
 const Popover = ({
   omitIconBg = false,
   icon,
-  iconColor,
   popoverContents,
   anchorPoint = PopoverAnchorPoint.Top,
 }: Props) => {
@@ -81,13 +79,6 @@ const Popover = ({
     boxShadow: 'knob',
     borderRadius: '50%',
     p: 1,
-    css: css`
-      &,
-      svg {
-        width: 2rem;
-        height: 2rem;
-      }
-    `,
   }
 
   return (
@@ -103,7 +94,7 @@ const Popover = ({
         onClick={() => setIsOpen(!isOpen)}
         cursor="pointer"
       >
-        <Icon of={icon} color={iconColor} />
+        {icon}
       </Box>
       {isOpen && (
         <Box
@@ -112,7 +103,7 @@ const Popover = ({
           {...anchorPointStyles}
           bg="white"
           boxShadow="workingWindow"
-          borderRadius={2}
+          borderRadius="lg"
         >
           {popoverContents}
         </Box>

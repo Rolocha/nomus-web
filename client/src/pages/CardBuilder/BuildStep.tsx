@@ -1,16 +1,15 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
-import Image from 'src/components/Image'
 import Box from 'src/components/Box'
 import FileUploadButton from 'src/components/FileUploadButton'
 import * as Form from 'src/components/Form'
-import { ExternalLink } from 'src/components/Link'
+import Image from 'src/components/Image'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
+import { WizardStepProps } from 'src/components/Wizard'
 import { FileItem } from 'src/types/files'
 import CardBuilderPreview from './CardBuilderPreview'
 import { acceptableImageFileTypes } from './config'
 import { specs } from './copy'
-import { WizardStepProps } from 'src/components/Wizard'
 import { CardBuilderAction, CardBuilderState } from './reducer'
 
 interface Props {
@@ -66,7 +65,7 @@ const BuildStep = React.forwardRef(
         display="grid"
         gridTemplateColumns="4fr 8fr"
         gridColumnGap={3}
-        p={{ _: '24px', md: '48px' }}
+        p={{ base: '24px', md: '48px' }}
       >
         {selectedBaseType === 'custom' || selectedBaseType === 'template'
           ? {
@@ -79,9 +78,7 @@ const BuildStep = React.forwardRef(
                     <Text.Body2 mb={2}>
                       This side should include an N-mark to indicate NFC
                       compatibility.{' '}
-                      <ExternalLink href="#">
-                        Download N-mark .png file
-                      </ExternalLink>
+                      <Link to="#">Download N-mark .png file</Link>
                     </Text.Body2>
                     <FileUploadButton
                       name="frontImage"
@@ -174,11 +171,11 @@ const BuildStep = React.forwardRef(
           : null}
         <Box
           overflow="visible"
-          css={css`
-            & > ${Box} {
-              height: 100%;
-            }
-          `}
+          sx={{
+            '& > div': {
+              height: '100%',
+            },
+          }}
         >
           <CardBuilderPreview
             frontImage={

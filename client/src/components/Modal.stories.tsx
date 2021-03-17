@@ -7,7 +7,7 @@ import Button from 'src/components/Button'
 import * as Form from './Form'
 
 export default {
-  title: 'Modal',
+  title: 'components/Modal',
   component: Modal,
   excludeStories: /.*Data$/,
 }

@@ -31,7 +31,7 @@ export default ({ activatedValue, pageSizeBp }: Props) => {
       {activatedValue ? (
         <Box>
           <Button
-            width={{ _: '100%', [pageSizeBp]: '85%' }}
+            width={{ base: '100%', [pageSizeBp]: '85%' }}
             variant="danger"
             onClick={() => setIsConfirming(true)}
             key={0}
@@ -74,7 +74,7 @@ export default ({ activatedValue, pageSizeBp }: Props) => {
         </Box>
       ) : (
         <Button
-          width={{ _: '100%', [pageSizeBp]: '85%' }}
+          width={{ base: '100%', [pageSizeBp]: '85%' }}
           variant="success"
           onClick={async () => {
             await onActivationChange(true)

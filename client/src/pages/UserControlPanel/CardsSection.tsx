@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import { gql, useMutation, useQuery } from 'src/apollo'
 import { ChangeActiveCardVersion } from 'src/apollo/types/ChangeActiveCardVersion'
@@ -97,7 +96,7 @@ export default () => {
   )
 
   const createCardActivationHandler = React.useCallback(
-    (cardVersionId: string) => async (_: any) =>
+    (cardVersionId: string) => async (base: any) =>
       await changeActiveCardVersion({
         variables: {
           cardVersionId,
@@ -137,7 +136,7 @@ export default () => {
 
   return (
     <Box
-      p={{ _: '24px', md: '48px' }}
+      p={{ base: '24px', md: '48px' }}
       overflowY="scroll"
       height="100%"
       width="100%"
@@ -147,13 +146,13 @@ export default () => {
           <Text.SectionHeader mb={2}>Active card</Text.SectionHeader>
           <Box
             display="grid"
-            gridTemplateColumns={{ _: '1fr', [bp]: '4fr 4fr 4fr' }}
-            my={{ _: -2, [bp]: 0 }}
-            mx={{ _: 0, [bp]: -3 }}
+            gridTemplateColumns={{ base: '1fr', [bp]: '4fr 4fr 4fr' }}
+            my={{ base: -2, [bp]: 0 }}
+            mx={{ base: 0, [bp]: -3 }}
           >
             <Box
-              px={{ _: 0, [bp]: 3 }}
-              py={{ _: 2, [bp]: 0 }}
+              px={{ base: 0, [bp]: 3 }}
+              py={{ base: 2, [bp]: 0 }}
               display="flex"
               flexDirection="column"
             >
@@ -169,18 +168,17 @@ export default () => {
                   justifyContent="stretch"
                   mt={3}
                   mx={-1}
-                  css={css`
-                    & > * {
-                      flex-grow: 1;
-                      > * {
-                        width: 100%;
-                      }
-                    }
-                  `}
+                  sx={{
+                    '& > *': {
+                      flexGrow: 1,
+                      '> *': {
+                        width: '100%',
+                      },
+                    },
+                  }}
                 >
                   <Box px={1} display="flex" justifyContent="stretch">
                     <Link
-                      asButton
                       buttonStyle="primary"
                       to={sendReorderEmail(defaultCardVersion.id)}
                     >
@@ -189,7 +187,6 @@ export default () => {
                   </Box>
                   <Box px={1} display="flex" justifyContent="stretch">
                     <Link
-                      asButton
                       buttonStyle="secondary"
                       to={sendModifyEmail(defaultCardVersion.id)}
                     >
@@ -200,14 +197,18 @@ export default () => {
               </Box>
             </Box>
 
-            <Box px={{ _: 0, [bp]: 3 }} py={{ _: 2, [bp]: 0 }} width="100%">
+            <Box
+              px={{ base: 0, [bp]: 3 }}
+              py={{ base: 2, [bp]: 0 }}
+              width="100%"
+            >
               <Text.SectionSubheader mb={2}>
                 Version information
               </Text.SectionSubheader>
               <Box
                 display="grid"
                 gridTemplateColumns="1fr 1fr"
-                gridRowGap={{ _: 1, [bp]: 2 }}
+                gridRowGap={{ base: 1, [bp]: 2 }}
               >
                 <Text.Body2>Date created</Text.Body2>
                 <Text.Body2>
@@ -244,7 +245,7 @@ export default () => {
                 <Box
                   key={cv.id}
                   display="inline-block"
-                  css={css({ flexShrink: 0 })}
+                  flexShrink={0}
                   py={2}
                   px={2}
                 >
@@ -252,12 +253,12 @@ export default () => {
                     <BusinessCardImage
                       frontImageUrl={cv.frontImageUrl}
                       backImageUrl={cv.backImageUrl}
-                      width={{ _: '60vw', [bp]: '300px' }}
+                      width={{ base: '60vw', [bp]: '300px' }}
                     />
                   ) : (
                     <BusinessCardImage
                       placeholder
-                      width={{ _: '60vw', [bp]: '300px' }}
+                      width={{ base: '60vw', [bp]: '300px' }}
                     />
                   )}
                   {cardVersionStatsById[cv.id] && (
@@ -278,24 +279,18 @@ export default () => {
                   >
                     <Box px={1} display="flex" justifyContent="stretch">
                       <Link
-                        asButton
                         buttonStyle="primary"
                         to={sendReorderEmail(cv.id)}
-                        css={css`
-                          padding: 9.5px 6px;
-                        `}
+                        padding="9.5px 6px"
                       >
                         Reorder card
                       </Link>
                     </Box>
                     <Box px={1} display="flex" justifyContent="stretch">
                       <Link
-                        asButton
                         buttonStyle="secondary"
                         to={sendModifyEmail(cv.id)}
-                        css={css`
-                          padding: 9.5px 6px;
-                        `}
+                        padding="9.5px 6px"
                       >
                         Modify card
                       </Link>
@@ -319,10 +314,11 @@ export default () => {
       {defaultCardVersion == null && nonDefaultCardVersions.length === 0 && (
         <Box
           display="grid"
-          gridTemplateColumns={{ _: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
+          gridTemplateColumns={{ base: '1fr 10fr 1fr', [bp]: '4fr 4fr 4fr' }}
           gridRowGap="16px"
           justifyItems="center"
-          css={css({ textAlign: 'center', '&>*': { gridColumn: '2/3' } })}
+          textAlign="center"
+          sx={{ '&>*': { gridColumn: '2/3' } }}
         >
           <Text.SectionHeader>
             Normal business cards are cool...

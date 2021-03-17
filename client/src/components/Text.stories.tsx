@@ -3,7 +3,7 @@ import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 
 export default {
-  title: 'Text',
+  title: 'components/Text',
   component: Text,
 }
 

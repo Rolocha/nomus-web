@@ -3,7 +3,7 @@ import Box from 'src/components/Box'
 import EditableImage from 'src/components/EditableImage'
 
 export default {
-  title: 'EditableImage',
+  title: 'components/EditableImage',
   component: EditableImage,
   excludeStories: /.*Data$/,
 }

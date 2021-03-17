@@ -22,11 +22,12 @@ const ProgressBar = ({
 }: Props) => (
   <Box
     className={className}
+    width="100%"
     display="flex"
     flexDirection="row"
     alignItems="center"
   >
-    <Box height={15} width="100%" bg={bgColor} borderRadius={50}>
+    <Box height={15} width="100%" bg={bgColor} borderRadius="full">
       <Box
         height="100%"
         width={`${(value / max) * 100}%`}

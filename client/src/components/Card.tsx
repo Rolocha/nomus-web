@@ -35,7 +35,7 @@ const Card = ({
   return (
     <Box
       className={className}
-      borderRadius={2}
+      borderRadius="lg"
       boxShadow={boxShadow ?? 'workingWindow'}
       onClick={onClick}
       cursor={onClick != null ? 'pointer' : undefined}
@@ -43,8 +43,8 @@ const Card = ({
       {/* Top bar */}
       <Box
         height="16px"
-        borderTopLeftRadius={2}
-        borderTopRightRadius={2}
+        borderTopLeftRadius="base"
+        borderTopRightRadius="base"
         bg={topBarColor}
       />
       {/* Content */}

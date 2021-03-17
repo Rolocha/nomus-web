@@ -1,70 +1,30 @@
-import styled from '@emotion/styled'
+import * as React from 'react'
+import { chakra, PropsOf } from '@chakra-ui/system'
 import { FieldError } from 'react-hook-form'
 import theme from 'src/styles/theme'
-import {
-  border,
-  BorderProps,
-  color,
-  ColorProps,
-  flexbox,
-  FlexboxProps,
-  fontSize,
-  FontSizeProps,
-  grid,
-  GridProps,
-  layout,
-  LayoutProps,
-  lineHeight,
-  LineHeightProps,
-  position,
-  PositionProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system'
 
-interface InputProps
-  extends SpaceProps,
-    PositionProps,
-    ColorProps,
-    BorderProps,
-    LayoutProps,
-    FlexboxProps,
-    GridProps,
-    FontSizeProps,
-    LineHeightProps,
-    TypographyProps {
-  as?: string
+interface Props extends PropsOf<typeof chakra.input> {
   error?: FieldError | boolean
 }
 
-const Input = styled.input<InputProps>(
-  {
-    borderRadius: '6px',
-    padding: '10px 8px',
-    border: `1px solid ${theme.colors.africanElephant}`,
-    '&::placeholder': {
-      color: theme.colors.africanElephant,
-    },
-  },
-  space,
-  position,
-  color,
-  border,
-  layout,
-  flexbox,
-  grid,
-  fontSize,
-  lineHeight,
-  typography,
-  (props) =>
-    props.error
-      ? {
-          border: `2px solid ${theme.colors.invalidRed}`,
-        }
-      : undefined,
-)
+const Input = React.forwardRef(({ error, ...props }: Props, ref) => {
+  return (
+    <chakra.input
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
+      borderRadius="6px"
+      padding="10px 8px"
+      border={
+        error
+          ? `2px solid ${theme.colors.invalidRed}`
+          : `1px solid ${theme.colors.africanElephant}`
+      }
+      _placeholder={{
+        color: theme.colors.africanElephant,
+      }}
+      {...props}
+    />
+  )
+})
 
 Input.defaultProps = {
   ...theme.textStyles.input,

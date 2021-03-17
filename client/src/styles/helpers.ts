@@ -1,4 +1,4 @@
-import { ResponsiveValue } from 'styled-system'
+import { Token } from '@chakra-ui/styled-system/dist/types/utils/types'
 
 export type StyleObject = { [k: string]: string | number }
 
@@ -6,6 +6,7 @@ export type StyleObject = { [k: string]: string | number }
 // e.g.
 // const MyComponent = () => {
 //   const borderRadiusStyles = useCustomResponsiveStyles<'NONE'|'DEFAULT'>(
+//     borderRadius,
 //     {
 //       NONE: {
 //         borderRadius: 0,
@@ -14,7 +15,6 @@ export type StyleObject = { [k: string]: string | number }
 //         borderRadius: 2,
 //       },
 //     },
-//     borderRadius,
 //   )
 //   return <Box borderRadius={borderRadiusStyles} />
 // }
@@ -22,10 +22,13 @@ export type StyleObject = { [k: string]: string | number }
 // lets you use it to reponsively customize the UI based on the custom higher-order prop ('NONE'|'DEFAULT')
 //
 // <MyComponent
-//   borderRadius={{_: 'NONE', md: 'DEFAULT' }}
+//   borderRadius={{base: 'NONE', md: 'DEFAULT' }}
 // />
+
+export type ResponsiveCustomProperty<T> = Token<T>
+
 export function useCustomResponsiveStyles<T extends string | number | symbol>(
-  responsiveKeys: ResponsiveValue<T>,
+  responsiveKeys: ResponsiveCustomProperty<any>,
   customStyles: { [k in T]: StyleObject },
 ) {
   const styleKeysToApply = Array.from(
@@ -40,7 +43,7 @@ export function useCustomResponsiveStyles<T extends string | number | symbol>(
     const responsiveKeysToUse =
       typeof responsiveKeys === 'object'
         ? responsiveKeys
-        : { _: responsiveKeys }
+        : { base: responsiveKeys }
 
     if (
       // This isn't smart enough to deal with arrays yet so just use objects if you can

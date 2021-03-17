@@ -1,9 +1,9 @@
+import { ChakraProvider } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
-import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import { ThemeProvider } from '@emotion/react'
 import React from 'react'
 import { ApolloProvider, client as apolloClient } from 'src/apollo'
 import { PageRouter } from 'src/pages'
@@ -58,9 +58,9 @@ class App extends React.Component<PropsType, StateType> {
           }}
         >
           <ApolloProvider client={apolloClient}>
-            <ThemeProvider theme={theme}>
+            <ChakraProvider theme={theme}>
               <PageRouter />
-            </ThemeProvider>
+            </ChakraProvider>
           </ApolloProvider>
         </Elements>
       </div>

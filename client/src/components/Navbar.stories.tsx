@@ -5,7 +5,7 @@ import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 
 export default {
-  title: 'Navbar',
+  title: 'components/Navbar',
   component: Navbar,
   excludeStories: /.*Data$/,
 }
@@ -17,7 +17,7 @@ export const actionsData = {
 export const Primary = () => {
   return (
     <Router>
-      <Box borderBottom="1px solid black">
+      <Box>
         <Navbar />
       </Box>
     </Router>

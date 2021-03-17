@@ -5,3 +5,4 @@
 
 # Non-development .env files
 .env
+.DS_Store
