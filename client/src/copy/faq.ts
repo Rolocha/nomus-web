@@ -1,10 +1,5 @@
 export const faqItems = [
   {
-    question: 'How does Nomus work?',
-    answer:
-      "Build up your public profile and create your business card right on the Nomus Card Builder. After you've placed your order, we'll send you your pack of custom business cards, each with an NFC chip embedded inside. When you open up your package, you'll see instructions on how to set up your cards, or you can find set-up instructions right on the site. As soon as you link your card to your digital profile, you're ready to start tapping away, sharing your profile and adding contacts to Nomus. Learn more about Nomus and our story on our [About](https://nomus.me/about) page.",
-  },
-  {
     question: 'What is NFC?',
     answer:
       'Inside these business cards, there’s something that sets it apart from all the others – an NFC (near-field communication) chip. You might have used similar contactless payment through your credit card or technologies like Apple Pay. Nomus cards use the same technology, but instead of using it to pay, you can use it to network. With just a tap of your Nomus card to the back of a smartphone, you can share your digital contact page with anyone around you.',

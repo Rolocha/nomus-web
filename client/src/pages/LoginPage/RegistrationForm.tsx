@@ -223,6 +223,8 @@ const RegistrationForm = () => {
                 type={passwordVisible ? 'text' : 'password'}
                 autoComplete="current-password"
                 error={errors.password}
+                autoCorrect="off"
+                autoCapitalize="off"
               />
               <PasswordStrengthIndicator password={watch('password')} />
               <Form.FieldError fieldError={errors.password} />
