@@ -162,6 +162,12 @@ class OrderResolver {
   }
 
   @Authorized(Role.Admin)
+  @Query(() => [Order], { nullable: true })
+  async printBatchOrders(): Promise<Order[] | Error> {
+    return await Order.mongo.find({ state: { $in: [OrderState.Paid, OrderState.Creating] } })
+  }
+
+  @Authorized(Role.Admin)
   @Mutation((type) => Order)
   // updateOrder cannot be used to update the state of the order.
   // Use transitionOrderState instead

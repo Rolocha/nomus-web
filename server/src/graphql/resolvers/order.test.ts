@@ -227,4 +227,73 @@ describe('OrderResolver', () => {
       })
     })
   })
+  describe('retool', () => {
+    it('gets all orders in Paid and Creating with the User names', async () => {
+      const userJohn = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      const order1 = await createMockOrder({ user: userJohn, state: OrderState.Paid })
+      const order2 = await createMockOrder({ user: userJeff, state: OrderState.Creating })
+      await createMockOrder({ user: userJohn, state: OrderState.Captured }) // this shouldn't be in the response
+
+      const response = await execQuery({
+        source: `
+          query RetoolPrintBatchTestQuery {
+            printBatchOrders {
+              id,
+              user {
+                name {
+                  first,
+                  middle,
+                  last,
+                },
+                email,
+              },
+              quantity,
+              state,
+              shortId,
+            }
+          }
+        `,
+        asAdmin: true,
+      })
+
+      expect(response.data?.printBatchOrders?.length).toBe(2)
+      expect(response.data?.printBatchOrders).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            user: {
+              name: {
+                first: userJohn.name.first,
+                middle: userJohn.name.middle,
+                last: userJohn.name.last,
+              },
+              email: userJohn.email,
+            },
+            id: order1.id,
+            quantity: order1.quantity,
+            state: order1.state,
+            shortId: order1.shortId,
+          }),
+          expect.objectContaining({
+            user: {
+              name: {
+                first: userJeff.name.first,
+                middle: userJeff.name.middle,
+                last: userJeff.name.last,
+              },
+              email: userJeff.email,
+            },
+            id: order2.id,
+            quantity: order2.quantity,
+            state: order2.state,
+            shortId: order2.shortId,
+          }),
+        ])
+      )
+    })
+  })
 })
