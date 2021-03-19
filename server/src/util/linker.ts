@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { Card, CardVersion, Order, Sheet } from 'src/models'
+import { Card, CardVersion, Order, Sheet, User } from 'src/models'
 import { CardInteractionType, OrderEventTrigger, OrderState } from './enums'
 import { Result } from './error'
 
@@ -37,6 +37,7 @@ export const getCardDataForInteractionString = async (
       cardVersion: CardVersion
       card: Card | null
       interactionType: CardInteractionType
+      cardUser: User
     },
     'invalid-card-id'
   >
@@ -52,6 +53,7 @@ export const getCardDataForInteractionString = async (
       cardVersion: card.cardVersion as CardVersion,
       card,
       interactionType: CardInteractionType.Tap,
+      cardUser: await User.mongo.findById(card.user),
     })
   }
 
@@ -63,6 +65,7 @@ export const getCardDataForInteractionString = async (
       // we don't know which `card` was used for QR interaction strings
       card: null,
       interactionType: CardInteractionType.QRCode,
+      cardUser: await User.mongo.findById(cardVersion.user),
     })
   }
 

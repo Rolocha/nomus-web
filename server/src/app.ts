@@ -53,7 +53,7 @@ app.get(
       return
     }
 
-    const { cardVersion, card, interactionType } = cardDataResult.value
+    const { cardVersion, card, interactionType, cardUser } = cardDataResult.value
 
     // Log an interaction with this card
     if (cardVersion) {
@@ -64,7 +64,6 @@ app.get(
       })
     }
 
-    const cardUser = await User.mongo.findById(card.user)
     if (cardUser) {
       res.redirect(307, `/${cardUser.username}`)
     } else if (interactionType === CardInteractionType.Tap) {
