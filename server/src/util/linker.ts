@@ -5,6 +5,7 @@ import { Result } from './error'
 
 export const SHEET_CARD_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
 export const CARDV_REGEX = /(cardv_[a-f0-9]{24})/i
+export const USER_REGEX = /(user_[a-f0-9]{24})/i
 
 // responsible for splicing the NFC string in a URL to Sheet Id and Card Id
 const spliceNFCString = (
@@ -23,6 +24,16 @@ const spliceQRString = (qrString: string): Result<{ cardVersionId: string }, 'in
   const cardVersionMatch = qrString.match(CARDV_REGEX)
   if (cardVersionMatch && cardVersionMatch.length === 2) {
     return Result.ok({ cardVersionId: cardVersionMatch[1] })
+  }
+
+  return Result.fail('invalid-format')
+}
+
+// responsible for splicing QR string, getting the User Id
+const spliceUserString = (userString: string): Result<{ userId: string }, 'invalid-format'> => {
+  const userMatch = userString.match(USER_REGEX)
+  if (userMatch && userMatch.length === 2) {
+    return Result.ok({ userId: userMatch[1] })
   }
 
   return Result.fail('invalid-format')
@@ -53,7 +64,7 @@ export const getCardDataForInteractionString = async (
       cardVersion: card.cardVersion as CardVersion,
       card,
       interactionType: CardInteractionType.Tap,
-      cardUser: await User.mongo.findById(card.user),
+      cardUser: (await User.mongo.findById(card.user)) ?? null,
     })
   }
 
@@ -66,6 +77,19 @@ export const getCardDataForInteractionString = async (
       card: null,
       interactionType: CardInteractionType.QRCode,
       cardUser: await User.mongo.findById(cardVersion.user),
+    })
+  }
+
+  const userParseResult = spliceUserString(interactionString)
+  if (userParseResult.isSuccess) {
+    const cardUser = await User.mongo.findById(userParseResult.value.userId)
+    const cardVersion = await CardVersion.mongo.findById(cardUser.defaultCardVersion)
+    return Result.ok({
+      cardVersion,
+      // we don't know which `card` was used for QR interaction strings
+      card: null,
+      interactionType: CardInteractionType.QRCode,
+      cardUser,
     })
   }
 

@@ -22,7 +22,7 @@ describe('linker', () => {
     await dropAllCollections()
   })
 
-  describe('getCardDataForInteractionString', () => {
+  describe('cardRouter', () => {
     it('fails incorrectly formatted routeStr, miss-spelled', async () => {
       const badRoute = 'sheet_jsdldnfskl-card_fsfljs'
       const result = await getCardDataForInteractionString(badRoute)
@@ -40,9 +40,10 @@ describe('linker', () => {
       )
     })
 
-    it('properly parses a tap (NFC) URL', async () => {
-      const cardVersion = await createMockCardVersion()
-      const card = await createMockCard({ cardVersion: cardVersion.id })
+    it('properly parses a linked tap (NFC) URL', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion({ user: user.id })
+      const card = await createMockCard({ cardVersion: cardVersion.id, user: user.id })
       const sheet = await createMockSheet({ cards: [card] })
 
       const routeStr = [sheet.id, card.id].join('-')
@@ -51,16 +52,32 @@ describe('linker', () => {
       expect(result.value.card.id).toStrictEqual(card.id)
       expect(result.value.cardVersion.id).toStrictEqual(cardVersion.id)
       expect(result.value.interactionType).toStrictEqual(CardInteractionType.Tap)
+      expect(result.value.cardUser.username).toStrictEqual(user.username)
     })
 
-    it('properly parses a QR scan URL', async () => {
-      const cardVersion = await createMockCardVersion()
+    it('properly parses an un-linked tap (NFC) URL', async () => {
+      const card = await createMockCard({ cardVersion: null, user: null })
+      const sheet = await createMockSheet({ cards: [card] })
 
-      const routeStr = cardVersion.id
+      const routeStr = [sheet.id, card.id].join('-')
       const result = await getCardDataForInteractionString(routeStr)
 
-      expect(result.value.cardVersion.id).toStrictEqual(cardVersion.id)
+      expect(result.value.card.id).toStrictEqual(card.id)
+      expect(result.value.cardVersion).toStrictEqual(null)
+      expect(result.value.interactionType).toStrictEqual(CardInteractionType.Tap)
+      expect(result.value.cardUser).toStrictEqual(null)
+    })
+
+    it('properly parses a QR scan URL with an userId', async () => {
+      const user = await createMockUser()
+
+      const routeStr = user.id
+      const result = await getCardDataForInteractionString(routeStr)
+
+      expect(result.value.card).toStrictEqual(null)
+      expect(result.value.cardVersion).toStrictEqual(null)
       expect(result.value.interactionType).toStrictEqual(CardInteractionType.QRCode)
+      expect(result.value.cardUser.username).toStrictEqual(user.username)
     })
   })
 
