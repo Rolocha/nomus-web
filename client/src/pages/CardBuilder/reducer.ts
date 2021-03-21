@@ -5,6 +5,13 @@ export type TemplateID = 'foobar'
 
 export type BaseType = 'custom' | 'template'
 
+export type CardBuilderStep =
+  | 'base'
+  | 'build'
+  | 'review'
+  | 'checkout'
+  | 'complete'
+
 export type OrderQuantityOption = 25 | 50 | 100
 
 // Data from the order details form
@@ -18,6 +25,8 @@ export interface CheckoutFormData {
 }
 
 export type CardBuilderState = {
+  currentStep: CardBuilderStep
+
   baseType: BaseType
   quantity: OrderQuantityOption | null
   formData: CheckoutFormData | null
@@ -37,6 +46,7 @@ export type CardBuilderState = {
 }
 
 export const initialState: CardBuilderState = {
+  currentStep: 'build',
   baseType: 'custom',
   quantity: 50,
   templateId: null,

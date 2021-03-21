@@ -3,7 +3,7 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
 import {
   UpsertCustomOrderMutation,
   UpsertCustomOrderMutationVariables,
@@ -11,7 +11,7 @@ import {
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
-import Wizard, { WizardTabItem } from 'src/components/Wizard'
+import Wizard, { WizardStep } from 'src/components/Wizard'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
@@ -20,6 +20,7 @@ import CheckoutStep from './CheckoutStep'
 import {
   BaseType,
   cardBuilderReducer,
+  CardBuilderStep,
   CheckoutFormData,
   initialState,
 } from './reducer'
@@ -34,6 +35,8 @@ const bp = 'md'
 
 const CardBuilder = () => {
   const { buildBaseType } = useParams<ParamsType>()
+  const location = useLocation()
+  const history = useHistory()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
@@ -167,6 +170,12 @@ const CardBuilder = () => {
     backImageDataUrl,
   ])
 
+  React.useEffect(() => {
+    if (!location.pathname.endsWith(cardBuilderState.currentStep)) {
+      // history.push(cardBuilderState.currentStep)
+    }
+  }, [cardBuilderState.currentStep, history, location])
+
   const isValidBaseType = (type?: string): type is BaseType =>
     type != null && ['custom', 'template'].includes(type)
 
@@ -183,84 +192,44 @@ const CardBuilder = () => {
       ? cardBuilderState.formData
       : watchedFields
 
-  const wizardSteps: WizardTabItem[] = [
-    {
-      key: 'build',
-      label: 'Build',
-      icon: 'formatText',
-      content: (
-        <BuildStep
-          selectedBaseType={buildBaseType}
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-          handleOrderUpdate={handleOrderUpdate}
-        />
-      ),
-      accessCondition: [
-        {
-          custom: true,
-          template: cardBuilderState.templateId != null,
-        }[buildBaseType],
-      ].every(Boolean),
-    },
-    {
-      key: 'checkout',
-      label: 'Checkout',
-      icon: 'cart',
-      content: (
-        <CheckoutStep
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-          handleCardSubmit={handleCardSubmit}
-          handleOrderUpdate={handleOrderUpdate}
-          checkoutFormMethods={checkoutFormMethods}
-        />
-      ),
-      accessCondition: [
-        ...{
-          custom: [cardBuilderState.frontDesignFile != null],
-          template: [],
-        }[cardBuilderState.baseType],
-      ].every(Boolean),
-    },
-    {
-      key: 'review',
-      label: 'Review',
-      icon: 'checkO',
-      content: (
-        <ReviewStep
-          cardBuilderState={cardBuilderState}
-          handleOrderSubmit={handleOrderSubmit}
-        />
-      ),
-      accessCondition: () =>
-        [
-          formData.addressLine1,
-          formData.state,
-          formData.city,
-          formData.postalCode,
-          formData.name,
-          cardBuilderState.cardEntryComplete,
-        ].every(Boolean),
-    },
-  ]
+  const handleWizardStepTransition = async (_goingToStep: string) => {
+    const comingFromStep = cardBuilderState.currentStep
+    const goingToStep = _goingToStep as CardBuilderStep
 
-  // If template base type, add in a step at the beginning for template selection
-  if (isValidBaseType(buildBaseType) && buildBaseType === 'template') {
-    wizardSteps.splice(0, 0, {
-      key: 'base',
-      label: 'Base',
-      icon: 'stack',
-      content: (
-        <BaseStep
-          selectedBaseType={buildBaseType}
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-        />
-      ),
-      accessCondition: true,
+    updateCardBuilderState({
+      currentStep: goingToStep,
     })
+
+    // TODO: Flesh out this state machine / transition handler
+    switch (comingFromStep) {
+      case 'build':
+        if (goingToStep === 'checkout') {
+          // updateOrderState()
+        }
+        break
+      case 'checkout':
+        // Moving to any step
+        updateCardBuilderState({
+          formData: checkoutFormMethods.getValues(),
+        })
+
+        // Only when moving forward
+        if (goingToStep === 'review') {
+          await handleOrderUpdate()
+          if (!cardBuilderState.stripeToken) {
+            await handleCardSubmit()
+          }
+        }
+        break
+      case 'review':
+        // TODO: Figure out a better way to handle wizard completion than using a hardcoded step
+        if (goingToStep === 'complete') {
+          handleOrderSubmit()
+        }
+        break
+    }
   }
+
   return (
     <Box
       bg={theme.colors.ivory}
@@ -290,8 +259,72 @@ const CardBuilder = () => {
           <Wizard
             exitPath="/dashboard/orders"
             exitText="Submit order"
-            steps={wizardSteps}
-          />
+            currentStep={cardBuilderState.currentStep}
+            handleStepTransition={handleWizardStepTransition}
+          >
+            {isValidBaseType(buildBaseType) && buildBaseType === 'template' && (
+              <WizardStep id="base" icon="stack" label="Base">
+                <BaseStep
+                  selectedBaseType={buildBaseType}
+                  cardBuilderState={cardBuilderState}
+                />
+              </WizardStep>
+            )}
+            <WizardStep
+              id="build"
+              icon="formatText"
+              label="Build"
+              accessCondition={[
+                ...{
+                  custom: [],
+                  // For template base type, the template must have been chosen
+                  template: [cardBuilderState.templateId != null],
+                }[cardBuilderState.baseType],
+              ].every(Boolean)}
+            >
+              <BuildStep
+                selectedBaseType={buildBaseType}
+                cardBuilderState={cardBuilderState}
+                updateCardBuilderState={updateCardBuilderState}
+              />
+            </WizardStep>
+            <WizardStep
+              id="checkout"
+              icon="cart"
+              label="Checkout"
+              accessCondition={[
+                ...{
+                  // For custom base type, at least the front design file must have been provided
+                  custom: [cardBuilderState.frontDesignFile != null],
+                  // TBD requirements for template
+                  template: [],
+                }[cardBuilderState.baseType],
+              ].every(Boolean)}
+            >
+              <CheckoutStep
+                cardBuilderState={cardBuilderState}
+                updateCardBuilderState={updateCardBuilderState}
+                handleCardSubmit={handleCardSubmit}
+                checkoutFormMethods={checkoutFormMethods}
+              />
+            </WizardStep>
+            <WizardStep
+              id="review"
+              icon="checkO"
+              label="Review"
+              // All required form fields must have been filled out from checkout step
+              accessCondition={[
+                formData.addressLine1,
+                formData.state,
+                formData.city,
+                formData.postalCode,
+                formData.name,
+                cardBuilderState.cardEntryComplete,
+              ].every(Boolean)}
+            >
+              <ReviewStep cardBuilderState={cardBuilderState} />
+            </WizardStep>
+          </Wizard>
         </Box>
       </Box>
     </Box>

@@ -4,5 +4,6 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": false
     }
-  }
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative"
 }

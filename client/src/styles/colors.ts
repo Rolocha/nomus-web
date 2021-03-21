@@ -1,4 +1,18 @@
 // Some colors appear more than once to provide useful alternate aliases
+// const colors = {
+//   nomusBlue: {
+//     10: '#E5EEF7',
+//     20: '#CCDDF0',
+//     40: '#99BAE0',
+//     60: '#6698D1',
+//     80: '#3876BC',
+//     100: '#295689',
+//     120: '#21456E',
+//     150: '#193452',
+//   },
+
+// }
+
 const colors = {
   // Primary
   nomusBlue: '#295689',

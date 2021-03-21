@@ -1,105 +1,73 @@
-import { rgba } from 'polished'
+import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
+import FileUploadButton from 'src/components/FileUploadButton'
 import Icon from 'src/components/Icon'
+import * as Text from 'src/components/Text'
+import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
+import { FileItem } from 'src/types/files'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
+import CardWithGuides from './CardWithGuides'
 
-interface Props {
-  frontFallback: React.ReactNode | null
-  backFallback: React.ReactNode | null
-  frontImage: React.ReactNode | null
-  backImage: React.ReactNode | null
-}
+const CardContainer = ({
+  name,
+  fileItem,
+  showGuides,
+  changeHandler,
+}: {
+  name: 'front' | 'back'
+  fileItem: FileItem | null
+  showGuides?: boolean
+  changeHandler: (file: FileItem | null) => void
+}) => {
+  const uploadText = { front: `Upload front`, back: 'Upload back' }[name]
+  const labelText = { front: `Front`, back: 'Back' }[name]
 
-interface CardWithGuidesProps {
-  showGuides: boolean
-  innerContent?: React.ReactNode | null
-}
-
-// https://www.notion.so/GetSmart-NFC-Card-Specifications-2935b1ea8ac145a5bbdb62dea4c54df5
-const specMeasurements = {
-  width: 88.9,
-  height: 50.8,
-  xBleed: 2.05,
-  yBleed: 1.6,
-} as const
-
-const CardWithGuides = ({ showGuides, innerContent }: CardWithGuidesProps) => {
-  const { width, height, xBleed, yBleed } = specMeasurements
-  const outerBleedPadding = {
-    x: `calc(100% * ${xBleed / (width + xBleed * 2)})`,
-    y: `calc(100% * ${yBleed / (height + yBleed * 2)})`,
-  }
-  const innerBleedDimensions = {
-    x: `calc(100% * ${(width - xBleed * 2) / width})`,
-    y: `calc(100% * ${(height - yBleed * 2) / height})`,
-  }
+  const imageUrl = fileItem?.url
 
   return (
-    <Box
-      width="100%"
-      px={showGuides ? outerBleedPadding.x : 0}
-      py={showGuides ? outerBleedPadding.y : 0}
-      bg={rgba(colors.gold, 0.5)}
-      overflow="visible"
-    >
-      <Box width="100%">
-        <Box
-          position="relative"
-          border={showGuides ? '2px solid #444' : undefined}
-          boxShadow={!showGuides ? 'businessCard' : undefined}
-          overflow="visible"
-        >
-          <Box width="100%" pb="calc(100% * (4/7))" position="relative">
-            <Box
-              position="absolute"
-              top="0"
-              left="0"
-              width="100%"
-              height="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              overflow="hidden"
-              bg="white"
-            >
-              {innerContent}
-            </Box>
-
-            {showGuides && (
-              // Content-safe area guide
-              <Box
-                position="absolute"
-                pointerEvents="none"
-                top="0"
-                left="0"
-                width="100%"
-                height="100%"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Box
-                  height={innerBleedDimensions.y}
-                  width={innerBleedDimensions.x}
-                  border={`2px dashed ${colors.brightCoral}`}
-                />
-              </Box>
-            )}
-          </Box>
-        </Box>
-      </Box>
+    <Box display="flex" flexDirection="column" alignItems="center">
+      {/* <Box width="100%" height="100%"> */}
+      {imageUrl ? (
+        <CardWithGuides
+          cardImageUrl={imageUrl}
+          showGuides={showGuides ?? false}
+          css={css({
+            flexBasis: 'auto',
+            maxHeight: '500px',
+          })}
+        />
+      ) : (
+        <FileUploadButton
+          name={`${name}DesignFile`}
+          width="100%"
+          height="100%"
+          accept={acceptableImageFileTypes.join(' ')}
+          selectedFileItem={fileItem}
+          handleFileItemChange={changeHandler}
+          uploadText={uploadText}
+        />
+      )}
+      {/* </Box> */}
+      <Text.Body2>{labelText}</Text.Body2>
     </Box>
   )
 }
 
+interface Props {
+  selectedFrontImageFile: FileItem | null
+  selectedBackImageFile: FileItem | null
+  handleFrontImageFileChange: (file: FileItem | null) => void
+  handleBackImageFileChange: (file: FileItem | null) => void
+}
+
 const CardBuilderPreview = ({
-  frontImage,
-  backImage,
-  frontFallback,
-  backFallback,
+  selectedBackImageFile,
+  selectedFrontImageFile,
+  handleBackImageFileChange,
+  handleFrontImageFileChange,
 }: Props) => {
   const [showGuides, setShowGuides] = React.useState(false)
   const [showBack, setShowBack] = React.useState(false)
@@ -109,14 +77,20 @@ const CardBuilderPreview = ({
   // we should (the first time) change the preview mode to show the image they just uploaded
   const [hasAutoShownBack, setHasAutoShownBack] = React.useState(false)
   React.useEffect(() => {
-    if (backImage != null && !hasAutoShownBack) {
+    if (selectedBackImageFile?.url != null && !hasAutoShownBack) {
       setShowBothSides(true)
       setHasAutoShownBack(true)
     }
-  }, [hasAutoShownBack, frontImage, backImage, setShowBack, setShowBothSides])
+  }, [
+    hasAutoShownBack,
+    selectedBackImageFile,
+    selectedFrontImageFile,
+    setShowBack,
+    setShowBothSides,
+  ])
 
-  const frontContent = frontImage ?? frontFallback
-  const backContent = backImage ?? backFallback
+  const missingBothImages =
+    selectedBackImageFile?.url == null && selectedFrontImageFile?.url == null
 
   return (
     <Box display="grid" gridTemplateRows="auto 1fr auto">
@@ -127,50 +101,61 @@ const CardBuilderPreview = ({
         gridColumnGap={3}
         mb={3}
       >
-        <Button onClick={() => setShowGuides(!showGuides)} variant="secondary">
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <Icon of="ruler" color={colors.nomusBlue} />
-            <Box ml={2}>{showGuides ? 'Hide' : 'Show'} guides</Box>
-          </Box>
+        <Button
+          variant="secondary"
+          disabled={missingBothImages}
+          onClick={() => setShowGuides(!showGuides)}
+          leftIcon={<Icon of="ruler" color={colors.nomusBlue} />}
+        >
+          {showGuides ? 'Hide' : 'Show'} guides
         </Button>
         {/* Empty box to take up the space of the 2nd column */}
         <Box />
         <Button
           variant="secondary"
+          // disabled={backImage == null && frontImage == null}
           onClick={() => setShowBothSides(!showBothSides)}
+          leftIcon={<Icon of="switchSides" color={colors.nomusBlue} />}
         >
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <Icon of="switchSides" color={colors.nomusBlue} />
-            <Box ml={2}>
-              {showBothSides ? 'Show one side' : 'Show both sides'}
-            </Box>
-          </Box>
+          {showBothSides ? 'Show one side' : 'Show both sides'}
         </Button>
         <Button
           variant="secondary"
-          disabled={backContent == null || showBothSides}
+          disabled={missingBothImages || showBothSides}
           onClick={() => setShowBack(!showBack)}
+          leftIcon={<Icon of="sync" color={colors.nomusBlue} />}
         >
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <Icon of="sync" color={colors.nomusBlue} />
-            <Box ml={2}>Flip to {showBack ? 'front' : 'back'}</Box>
-          </Box>
+          Flip to {showBack ? 'front' : 'back'}
         </Button>
       </Box>
 
       <Box
         placeSelf="center center"
         width="100%"
-        // height="100%"
         display="grid"
         gridTemplateColumns={showBothSides ? '1fr 1fr' : '1fr'}
         gridColumnGap={2}
+        sx={{
+          '& > canvas': {
+            placeSelf: 'center',
+          },
+        }}
       >
         {(!showBack || showBothSides) && (
-          <CardWithGuides innerContent={frontContent} showGuides={showGuides} />
+          <CardContainer
+            name="front"
+            fileItem={selectedFrontImageFile ?? null}
+            showGuides={showGuides}
+            changeHandler={handleFrontImageFileChange}
+          />
         )}
         {(showBack || showBothSides) && (
-          <CardWithGuides innerContent={backContent} showGuides={showGuides} />
+          <CardContainer
+            name="back"
+            fileItem={selectedBackImageFile ?? null}
+            showGuides={showGuides}
+            changeHandler={handleBackImageFileChange}
+          />
         )}
       </Box>
 
