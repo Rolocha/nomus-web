@@ -3,7 +3,7 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useParams } from 'react-router-dom'
 import {
   SubmitCustomOrderMutation,
   SubmitCustomOrderMutationVariables,
@@ -16,14 +16,14 @@ import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
-import CheckoutStep from './CheckoutStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
   initialState,
 } from './card-builder-state'
-import { BaseType, CardBuilderStep, CheckoutFormData } from './types'
+import CheckoutStep from './CheckoutStep'
 import ReviewStep from './ReviewStep'
+import { BaseType, CardBuilderStep, CheckoutFormData } from './types'
 import SUBMIT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 
 interface ParamsType {
@@ -34,7 +34,6 @@ const bp = 'md'
 
 const CardBuilder = () => {
   const { buildBaseType } = useParams<ParamsType>()
-  const location = useLocation()
   const history = useHistory()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
@@ -170,12 +169,6 @@ const CardBuilder = () => {
       `/dashboard/orders/${createOrderResult.data.submitCustomOrder.orderId}`,
     )
   }, [confirmCardPayment, createOrder, history])
-
-  React.useEffect(() => {
-    if (!location.pathname.endsWith(cardBuilderState.currentStep)) {
-      // history.push(cardBuilderState.currentStep)
-    }
-  }, [cardBuilderState.currentStep, history, location])
 
   const isValidBaseType = (type?: string): type is BaseType =>
     type != null && ['custom', 'template'].includes(type)

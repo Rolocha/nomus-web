@@ -90,7 +90,9 @@ const CardBuilderPreview = ({
   ])
 
   const missingBothImages =
-    selectedBackImageFile?.url == null && selectedFrontImageFile?.url == null
+    selectedBackImageFile == null && selectedFrontImageFile == null
+  const missingAtLeastOneImage =
+    selectedBackImageFile == null || selectedFrontImageFile == null
 
   return (
     <Box display="grid" gridTemplateRows="auto 1fr auto">
@@ -113,7 +115,7 @@ const CardBuilderPreview = ({
         <Box />
         <Button
           variant="secondary"
-          // disabled={backImage == null && frontImage == null}
+          disabled={missingAtLeastOneImage}
           onClick={() => setShowBothSides(!showBothSides)}
           leftIcon={<Icon of="switchSides" color={colors.nomusBlue} />}
         >
