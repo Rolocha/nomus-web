@@ -5,7 +5,7 @@ export interface WizardStepProps<ValidStepType extends string> {
   id: ValidStepType
   icon: IconName
   label: React.ReactNode
-  accessCondition?: boolean | (() => boolean)
+  isReadyForNextStep?: boolean | (() => boolean)
   children: React.ReactNode
 }
 

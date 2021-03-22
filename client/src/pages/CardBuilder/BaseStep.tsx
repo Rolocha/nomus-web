@@ -5,7 +5,7 @@ import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
-import { CardBuilderState } from './reducer'
+import { CardBuilderState } from './card-builder-state'
 
 interface Props {
   selectedBaseType: string | undefined

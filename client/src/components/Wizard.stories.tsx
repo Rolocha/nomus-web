@@ -57,7 +57,12 @@ export const WizardWithDisabledSteps = () => {
           currentStep={wizardStep}
           handleStepTransition={handleStepTransition}
         >
-          <WizardStep id="start" icon="cards" label="Start">
+          <WizardStep
+            id="start"
+            icon="cards"
+            label="Start"
+            isReadyForNextStep={checkedBox}
+          >
             Check this box before moving on
             <Box>
               <Form.Input
@@ -70,12 +75,7 @@ export const WizardWithDisabledSteps = () => {
               Check me!
             </Box>
           </WizardStep>
-          <WizardStep
-            id="middle"
-            icon="contacts"
-            label="Restricted"
-            accessCondition={checkedBox}
-          >
+          <WizardStep id="middle" icon="contacts" label="Restricted">
             Nice, you checked the box. Welcome to the party.
           </WizardStep>
         </Wizard>

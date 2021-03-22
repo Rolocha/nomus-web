@@ -1,10 +1,12 @@
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
+import { cardTemplateDetails } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
 import { getCostSummary } from 'src/utils/pricing'
-import { BaseType, CardBuilderState } from './reducer'
+import { BaseType } from './types'
+import { CardBuilderState } from './card-builder-state'
 
 interface Props {
   cardBuilderState: CardBuilderState
@@ -33,7 +35,7 @@ const ReviewStep = ({ cardBuilderState }: Props) => {
   const costSummary = getCostSummary(cardBuilderState.quantity)
 
   return (
-    <Box height="100%" overflowY="scroll">
+    <Box height="100%">
       <Text.SectionHeader mb="24px">Your card design</Text.SectionHeader>
       <Box
         display="grid"
@@ -81,7 +83,16 @@ const ReviewStep = ({ cardBuilderState }: Props) => {
         >
           <Box>
             <Text.Body2 fontWeight="500">Item</Text.Body2>
-            <Text.Body2>Nomus Velia template card</Text.Body2>
+            <Text.Body2>
+              {
+                {
+                  custom: 'Custom design Nomus card',
+                  template: cardBuilderState.templateId
+                    ? cardTemplateDetails[cardBuilderState.templateId]
+                    : 'Unknown template',
+                }[cardBuilderState.baseType]
+              }
+            </Text.Body2>
           </Box>
 
           <Box>

@@ -2,6 +2,7 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
+import { ComplexCondition } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 import { mq } from 'src/styles/breakpoints'
 import Icon from '../Icon'
@@ -16,9 +17,9 @@ interface Props<ValidStepType extends string> {
   // allStepDetails: Array<WizardStep>
   children: Array<WizardStepElement<ValidStepType>>
   currentStep: ValidStepType
-  exitText?: string
-  exitPath?: string
+  completionButtonLabel?: string
   handleStepTransition: (goingToStep: string) => void | Promise<void>
+  handleSubmit?: () => Promise<void>
 }
 
 const bp = 'md'
@@ -39,11 +40,23 @@ const POINTY_TAB_INDICATOR = {
   },
 }
 
+// Method for properly handling complex conditions that are booleans or return booleans
+const checkComplexCondition = (complexCondition: ComplexCondition): boolean => {
+  if (complexCondition == null) {
+    return true
+  } else if (typeof complexCondition === 'boolean') {
+    return complexCondition
+  } else {
+    return complexCondition()
+  }
+}
+
 function Wizard<ValidStepType extends string>({
-  exitText,
+  completionButtonLabel,
   children,
   currentStep,
   handleStepTransition,
+  handleSubmit,
 }: Props<ValidStepType>): JSX.Element | null {
   const [
     processingNextTransition,
@@ -60,36 +73,28 @@ function Wizard<ValidStepType extends string>({
       return child.props as WizardStepProps<ValidStepType>
     })?.filter(Boolean) || []
 
-  const isStepAtIndexAccessible = React.useCallback(
-    (atIndex: number) => {
-      // Short circuit to false if either
-      if (
-        // a. the requested index is out of range
-        atIndex < 0 ||
-        atIndex >= allStepDetails.length ||
-        // b. the previous step exists but isn't accessible
-        (atIndex > 0 && !isStepAtIndexAccessible(atIndex - 1))
-      ) {
-        return false
-      }
-
-      const step = allStepDetails[atIndex]
-      if (step == null) {
-        return false
-      } else if (step.accessCondition == null) {
-        return true
-      } else if (typeof step.accessCondition === 'boolean') {
-        return step.accessCondition
-      } else if (typeof step.accessCondition === 'function') {
-        return step.accessCondition()
-      }
-    },
-    [allStepDetails],
-  )
+  const isReadyToMoveForwardFromStepAtIndex = (atIndex: number): boolean => {
+    if (atIndex < -1 || atIndex >= allStepDetails.length) {
+      // Check for invalid index
+      return false
+    } else if (atIndex === -1) {
+      // Always allowed to be at first step
+      return true
+    } else {
+      const isAllowedToBeAtThisStep = isReadyToMoveForwardFromStepAtIndex(
+        atIndex - 1,
+      )
+      const hasMetExitConditionsForThisStep = checkComplexCondition(
+        allStepDetails[atIndex].isReadyForNextStep ?? null,
+      )
+      return isAllowedToBeAtThisStep && hasMetExitConditionsForThisStep
+    }
+  }
 
   const currentStepIndex = allStepDetails.findIndex(
     (step) => step.id === currentStep,
   )
+  const isFirstStep = currentStepIndex === 0
   const isLastStep = currentStepIndex === allStepDetails.length - 1
 
   if (currentStepIndex === -1) {
@@ -113,6 +118,8 @@ function Wizard<ValidStepType extends string>({
     try {
       if (stepIndex >= 0 && stepIndex < allStepDetails.length) {
         await handleStepTransition(allStepDetails[stepIndex].id)
+      } else if (stepIndex === allStepDetails.length && handleSubmit) {
+        await handleSubmit()
       }
     } finally {
       setProcessingTransition(false)
@@ -145,7 +152,9 @@ function Wizard<ValidStepType extends string>({
           const { id, icon, label } = stepDetails
 
           const isCurrentSection = currentStep === id
-          const isStepAccessible = isStepAtIndexAccessible(index)
+          const isStepAccessible = isReadyToMoveForwardFromStepAtIndex(
+            index - 1,
+          )
           return (
             <Box
               cursor={!isStepAccessible ? 'not-allowed' : 'pointer'}
@@ -220,7 +229,7 @@ function Wizard<ValidStepType extends string>({
         <Box overflowY="hidden" height="100%">
           {/* Content for selected section */}
           <Box
-            overflowY="hidden"
+            overflow="visible"
             height="100%"
             p={{ base: '24px', md: '48px' }}
           >
@@ -228,7 +237,7 @@ function Wizard<ValidStepType extends string>({
           </Box>
 
           {/* Previous step button */}
-          {isStepAtIndexAccessible(currentStepIndex - 1) && (
+          {!isFirstStep && (
             <Button
               px={{ base: 2, [bp]: 4 }}
               py={{ base: 1, [bp]: 3 }}
@@ -256,8 +265,8 @@ function Wizard<ValidStepType extends string>({
             </Button>
           )}
           {/* Next step (or submit) button */}
-          {currentStepIndex < allStepDetails.length - 1 &&
-            isStepAtIndexAccessible(currentStepIndex + 1) && (
+          {isReadyToMoveForwardFromStepAtIndex(currentStepIndex) &&
+            (!isLastStep || completionButtonLabel) && (
               <Button
                 px={{ base: 2, [bp]: 4 }}
                 py={{ base: 1, [bp]: 3 }}
@@ -276,7 +285,7 @@ function Wizard<ValidStepType extends string>({
                 onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
               >
                 {isLastStep
-                  ? exitText || ''
+                  ? completionButtonLabel || ''
                   : `Next step: ${allStepDetails[currentStepIndex + 1].label}`}
               </Button>
             )}

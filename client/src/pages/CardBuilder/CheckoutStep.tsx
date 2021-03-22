@@ -10,7 +10,7 @@ import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { formatDollarAmount } from 'src/utils/money'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/utils/pricing'
-import { CardBuilderAction, CardBuilderState } from './reducer'
+import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
   cardBuilderState: CardBuilderState

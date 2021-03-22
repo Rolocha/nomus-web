@@ -180,10 +180,11 @@ class UserResolver {
   @Authorized(Role.User)
   @Mutation((type) => User)
   async updateProfilePicture(
-    @Arg('file', (type) => GraphQLUpload) file: FileUpload,
+    @Arg('file', (type) => GraphQLUpload) file: Promise<FileUpload>,
     @Ctx() context: IApolloContext
   ): Promise<User> {
-    await context.user.updateProfilePic(file)
+    const awaitedFile = await file
+    await context.user.updateProfilePic(awaitedFile)
     return await this.userFromMongoDocument(context.user)
   }
 

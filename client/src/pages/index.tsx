@@ -22,6 +22,7 @@ import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import FaqPage from 'src/pages/FaqPage'
 import CardBuilder from 'src/pages/CardBuilder'
+import ShopFront from 'src/pages/ShopFront'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -130,6 +131,11 @@ export const routes: Array<RouteType> = [
     path: '/dashboard',
     Component: UserControlPanel,
     requiredAuthLevel: Role.User,
+  },
+  {
+    path: '/shop',
+    Component: ShopFront,
+    exclude: inProduction,
   },
   {
     path: '/card-studio/:buildBaseType?',

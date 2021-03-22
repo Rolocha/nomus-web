@@ -10,7 +10,7 @@ import { getImageDimensions } from 'src/utils/image'
 import CardBuilderPreview from './CardBuilderPreview'
 import { acceptableImageFileTypes } from './config'
 import { specs } from './copy'
-import { CardBuilderAction, CardBuilderState } from './reducer'
+import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
   selectedBaseType: string | undefined
