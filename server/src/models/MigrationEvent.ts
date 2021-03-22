@@ -8,7 +8,7 @@ export class MigrationEvent extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof MigrationEvent>
 
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   migrationName: string
 }
 
