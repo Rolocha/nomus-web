@@ -12,7 +12,7 @@ export const CARDV_REGEX = /(cardv_[a-f0-9]{24})/i
 export const USER_REGEX = /(user_[a-f0-9]{24})/i
 
 // responsible for splicing the NFC string in a URL to Sheet Id and Card Id
-const spliceNFCString = (
+export const spliceNFCString = (
   nfcString: string
 ): Result<{ sheetId: string; cardId: string }, 'invalid-format'> => {
   const sheetCardMatch = nfcString.match(SHEET_CARD_REGEX)
@@ -142,6 +142,7 @@ cardRouter.get(
       res.redirect(302, `/admin/linker/${interactionString}`)
     } else {
       res.status(400).json({
+        // This should never happen
         message: `Got a non-tap (${interactionType}) interaction for a card without an associated user`,
       })
     }
