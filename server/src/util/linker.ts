@@ -50,7 +50,7 @@ export const getCardDataForInteractionString = async (
       interactionType: CardInteractionType
       cardUser: User
     },
-    'invalid-card-id' | 'invalid-cardVersion-id'
+    'invalid-interaction-string' | 'invalid-card-id' | 'invalid-cardVersion-id' | 'invalid-user-id'
   >
 > => {
   const nfcParseResult = spliceNFCString(interactionString)
@@ -86,6 +86,9 @@ export const getCardDataForInteractionString = async (
   const userParseResult = spliceUserString(interactionString)
   if (userParseResult.isSuccess) {
     const cardUser = await User.mongo.findById(userParseResult.value.userId)
+    if (cardUser == null) {
+      return Result.fail('invalid-user-id')
+    }
     const cardVersion = await CardVersion.mongo.findById(cardUser.defaultCardVersion)
     return Result.ok({
       cardVersion,
@@ -96,7 +99,7 @@ export const getCardDataForInteractionString = async (
     })
   }
 
-  return Result.fail('invalid-card-id')
+  return Result.fail('invalid-interaction-string')
 }
 
 // assigns fields on Sheet, CardVersion and Order

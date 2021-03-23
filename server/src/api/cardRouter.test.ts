@@ -67,14 +67,14 @@ describe('GET /d/:nfcId', () => {
     expect(cardInteractions.length).toBe(0)
   })
 
-  it('fails if the routeStr is improperly formatted', async () => {
+  it('fails if the routeStr malformed', async () => {
     // missing last 3 digits
     const routeStr = 'sheet_5f9caf5ec9b90b8674941cc5-card_5f9caf5ec9b90b8674941'
 
     const response = await request(app).get(`/d/${routeStr}`)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe('invalid-card-id')
+    expect(response.body.message).toBe('invalid-interaction-string')
 
     const cardInteractions = await CardInteraction.mongo.find({
       card: 'card_5f9caf5ec9b90b8674941',
@@ -84,7 +84,7 @@ describe('GET /d/:nfcId', () => {
 })
 
 describe('GET /d/:cardVersionId', () => {
-  it('responds with a contact page', async () => {
+  it('responds with a contact page if successful', async () => {
     const user = await createMockUser()
     const cardVersion = await createMockCardVersion({ user: user.id })
     const routeStr = cardVersion.id
@@ -117,17 +117,77 @@ describe('GET /d/:cardVersionId', () => {
     expect(cardInteractions.length).toBe(0)
   })
 
-  it('fails if the input is malformed', async () => {
+  it('fails if cardVersionId malformed', async () => {
     const routeStr = 'cardv_xyz'
 
     const response = await request(app).get(`/d/${routeStr}`)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe('invalid-card-id')
+    expect(response.body.message).toBe('invalid-interaction-string')
 
     const cardInteractions = await CardInteraction.mongo.find({
       cardVersion: 'cardv_xyz',
     })
+    expect(cardInteractions.length).toBe(0)
+  })
+})
+
+describe('GET /d/:userId', () => {
+  it('responds with a contact page if successful', async () => {
+    const user = await createMockUser()
+    const routeStr = user.id
+
+    const response = await request(app).get(`/d/${routeStr}`)
+
+    expect(response.status).toBe(307)
+    expect(response.headers.location).toBe(`/${user.username}`)
+
+    const cardInteractions = await CardInteraction.mongo.find()
+    expect(cardInteractions.length).toBe(0)
+  })
+
+  it('responds with a contact page if successful (with default cardVersion)', async () => {
+    const user = await createMockUser()
+    const cardVersion = await createMockCardVersion({ user })
+    user.defaultCardVersion = cardVersion
+    await user.save()
+    const routeStr = user.id
+
+    const response = await request(app).get(`/d/${routeStr}`)
+
+    expect(response.status).toBe(307)
+    expect(response.headers.location).toBe(`/${user.username}`)
+
+    const cardInteractions = await CardInteraction.mongo.find({ cardVersion: cardVersion.id })
+    expect(cardInteractions.length).toBe(1)
+    expect(cardInteractions[0]).toMatchObject({
+      card: undefined,
+      cardVersion: cardVersion.id,
+      interactionType: CardInteractionType.QRCode,
+    })
+  })
+
+  it('fails if userId does not exist', async () => {
+    const routeStr = 'user_5f8377935423e81574283c28'
+
+    const response = await request(app).get(`/d/${routeStr}`)
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('invalid-user-id')
+
+    const cardInteractions = await CardInteraction.mongo.find()
+    expect(cardInteractions.length).toBe(0)
+  })
+
+  it('fails if userId malformed', async () => {
+    const routeStr = 'user_xyz'
+
+    const response = await request(app).get(`/d/${routeStr}`)
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('invalid-interaction-string')
+
+    const cardInteractions = await CardInteraction.mongo.find()
     expect(cardInteractions.length).toBe(0)
   })
 })
