@@ -50,7 +50,7 @@ export const getCardDataForInteractionString = async (
       interactionType: CardInteractionType
       cardUser: User
     },
-    'invalid-card-id'
+    'invalid-card-id' | 'invalid-cardVersion-id'
   >
 > => {
   const nfcParseResult = spliceNFCString(interactionString)
@@ -71,6 +71,9 @@ export const getCardDataForInteractionString = async (
   const qrParseResult = spliceQRString(interactionString)
   if (qrParseResult.isSuccess) {
     const cardVersion = await CardVersion.mongo.findById(qrParseResult.value.cardVersionId)
+    if (cardVersion == null) {
+      return Result.fail('invalid-cardVersion-id')
+    }
     return Result.ok({
       cardVersion,
       // we don't know which `card` was used for QR interaction strings
