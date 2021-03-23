@@ -10,9 +10,6 @@ import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
 import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
-import { getCardDataForInteractionString } from './util/linker'
-import { CardInteraction, User } from './models'
-import { CardInteractionType } from './util/enums'
 import { cardRouter } from './api/cardRouter'
 
 db.init()
