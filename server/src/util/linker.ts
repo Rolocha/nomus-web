@@ -1,6 +1,6 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { spliceNFCString } from 'src/api/cardRouter'
 import { Card, CardVersion, Order, Sheet } from 'src/models'
+import { spliceNFCString } from './cardRouter'
 import { OrderEventTrigger, OrderState } from './enums'
 import { Result } from './error'
 
