@@ -27,14 +27,6 @@ describe('getCardDataForInteractionString', () => {
     expect(result.error).toEqual(new NamedError(`Incorrectly formatted routeStr: ${badRoute}`))
   })
 
-  it('fails incorrectly formatted routeStr, repeated', async () => {
-    const repeatedRoute =
-      'sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345-sheet_abcdefabcdefabcdef012345-card_abcdefabcdefabcdef012345'
-    const result = await getCardDataForInteractionString(repeatedRoute)
-    expect(result.isSuccess).toBeFalsy()
-    expect(result.error).toEqual(new NamedError(`Incorrectly formatted routeStr: ${repeatedRoute}`))
-  })
-
   it('properly parses a linked tap (NFC) URL', async () => {
     const user = await createMockUser()
     const cardVersion = await createMockCardVersion({ user: user.id })

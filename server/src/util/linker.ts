@@ -1,8 +1,8 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, CardVersion, Order, Sheet } from 'src/models'
-import { spliceNFCString } from './cardRouter'
 import { OrderEventTrigger, OrderState } from './enums'
 import { Result } from './error'
+import { spliceNFCString } from './splicer'
 
 // assigns fields on Sheet, CardVersion and Order
 // goes through all Cards in the Sheet, assigning CardVersion and User
