@@ -13,6 +13,7 @@ import { server as gqlServer } from 'src/graphql'
 import { getCardDataForInteractionString } from './util/linker'
 import { CardInteraction, User } from './models'
 import { CardInteractionType } from './util/enums'
+import { cardRouter } from './api/cardRouter'
 
 db.init()
 
@@ -33,9 +34,12 @@ gqlServer.applyMiddleware({ app, path: '/graphql' })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
 
+app.use('/d', cookieMiddleware, bodyParser.json(), cardRouter)
+
 // interactionString should take one of the following formats based on InteractionType
 //   - InteractionType.Tap (NFC): sheet_x_card_y
 //   - InteractionType.QRCode   : cardv_z
+//                              : user_a
 app.get(
   '/d/:interactionString',
   cookieMiddleware,
