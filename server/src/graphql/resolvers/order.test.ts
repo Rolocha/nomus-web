@@ -140,7 +140,7 @@ describe('OrderResolver', () => {
   })
 
   describe('orders', () => {
-    it.only('fetches orders from a list of order ids', async () => {
+    it('fetches orders from a list of order ids', async () => {
       const user = await createMockUser()
       const order1 = await createMockOrder({ user: user })
       const order2 = await createMockOrder({ user: user })
@@ -181,7 +181,47 @@ describe('OrderResolver', () => {
         })
       )
     })
-    it('fetches orders from a list of states', async () => {})
+    it('fetches orders from a list of states', async () => {
+      const user = await createMockUser()
+      const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const notInQueryOrder = await createMockOrder({ user: user })
+
+      const response = await execQuery({
+        source: `
+          query OrdersListTestQuery($payload: OrdersInput) {
+            orders(payload: $payload) {
+              id,
+              state
+            }
+          }
+        `,
+        variableValues: {
+          payload: {
+            states: [OrderState.Paid, OrderState.Creating],
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.orders.length).toBe(2)
+      expect(response.data?.orders).toEqual([
+        expect.objectContaining({
+          id: order1.id,
+          state: OrderState.Creating,
+        }),
+        expect.objectContaining({
+          id: order2.id,
+          state: OrderState.Paid,
+        }),
+      ])
+      expect(response.data?.orders).not.toContain(
+        expect.objectContaining({
+          id: notInQueryOrder.id,
+          state: OrderState.Captured,
+        })
+      )
+    })
     it('fetches orders for a user', async () => {})
     it('fetches orders for a trackingNumber', async () => {})
     it('fetches orders for a trackingNumber and state list', async () => {})
