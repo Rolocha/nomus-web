@@ -1,4 +1,4 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { DocumentType, mongoose } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
@@ -213,6 +213,50 @@ class OrderResolver {
     }
 
     return result.value
+  }
+
+  // Transition a batch of orderIds. Used by Order Management System once ready to send to Hudson
+  @Authorized(Role.Admin)
+  @Mutation((type) => [Order])
+  async batchTransitionOrderState(
+    @Arg('orderIds', (type) => [String], { nullable: false }) orderIds: [string],
+    @Arg('futureState', (type) => OrderState, { nullable: false }) futureState: OrderState,
+    @Arg('trigger', (type) => OrderEventTrigger, { nullable: true })
+    trigger: OrderEventTrigger | null,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>[]> {
+    if (!context.user) {
+      throw new Error('no-user-specified')
+    }
+
+    // start a mongoose Transaction, will only commit to db if all orders succeed.
+    // Any errors thrown will result in rollback and no commit to the db
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+      const orders = await Order.mongo.find({ _id: { $in: orderIds } })
+      if (!orders) {
+        throw new Error('no-orders-found')
+      }
+      try {
+        const orderTransitionPromises = orders.map(async (order) => {
+          const res = await order.transition(futureState, trigger)
+          if (!res.isSuccess) {
+            throw res.error
+          }
+        })
+        await Promise.all(orderTransitionPromises)
+      } catch (err) {
+        throw new Error(err)
+      }
+      await session.commitTransaction()
+      return orders
+    } catch (err) {
+      await session.abortTransaction()
+      throw new Error(err)
+    } finally {
+      session.endSession()
+    }
   }
 
   // Get all orders for a User

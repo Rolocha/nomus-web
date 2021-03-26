@@ -2,7 +2,7 @@ import { Order } from 'src/models'
 import { OrderPrice } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderState } from 'src/util/enums'
+import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 
@@ -225,6 +225,99 @@ describe('OrderResolver', () => {
         price: priceTest,
         printSpecUrl: 'printTest',
       })
+    })
+  })
+  describe('batchTransitionOrderState', () => {
+    it('transitions a bunch of orders (happy path)', async () => {
+      const userJohn = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', last: 'Winger' },
+        email: 'fakelawyer@greendale.com',
+      })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
+      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Paid })
+
+      const response = await execQuery({
+        source: `
+          mutation BatchTransitionMutation($orderIds: [String!]!, $futureState: OrderState!, $trigger: OrderEventTrigger!) {
+            batchTransitionOrderState(orderIds: $orderIds, futureState: $futureState, trigger: $trigger) {
+              id,
+              state
+            }
+          }
+        `,
+        variableValues: {
+          orderIds: [orderJohn.id, orderJeff.id],
+          futureState: OrderState.Creating,
+          trigger: OrderEventTrigger.Internal,
+        },
+        asAdmin: true,
+      })
+
+      const orders = await Order.mongo.find()
+
+      expect(orders).toEqual([
+        expect.objectContaining({
+          id: orderJohn.id,
+          state: OrderState.Creating,
+        }),
+        expect.objectContaining({
+          id: orderJeff.id,
+          state: OrderState.Creating,
+        }),
+      ])
+
+      expect(response.data?.batchTransitionOrderState).toEqual([
+        expect.objectContaining({
+          id: orderJohn.id,
+          state: OrderState.Creating,
+        }),
+        expect.objectContaining({
+          id: orderJeff.id,
+          state: OrderState.Creating,
+        }),
+      ])
+    })
+    it('fails on an improper transition, does not commit to db', async () => {
+      const userJohn = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', last: 'Winger' },
+        email: 'fakelawyer@greendale.com',
+      })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
+      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Created })
+
+      const response = await execQuery({
+        source: `
+          mutation BatchTransitionMutation($orderIds: [String!]!, $futureState: OrderState!, $trigger: OrderEventTrigger!) {
+            batchTransitionOrderState(orderIds: $orderIds, futureState: $futureState, trigger: $trigger) {
+              id,
+              state
+            }
+          }
+        `,
+        variableValues: {
+          orderIds: [orderJohn.id, orderJeff.id],
+          futureState: OrderState.Creating,
+          trigger: OrderEventTrigger.Internal,
+        },
+        asAdmin: true,
+      })
+
+      const orders = await Order.mongo.find()
+
+      expect(orders).toEqual([
+        expect.objectContaining({
+          id: orderJohn.id,
+          state: OrderState.Paid,
+        }),
+        expect.objectContaining({
+          id: orderJeff.id,
+          state: OrderState.Created,
+        }),
+      ])
+
+      expect(response.errors[0].message).toBe('Error: invalid-transition')
     })
   })
 })
