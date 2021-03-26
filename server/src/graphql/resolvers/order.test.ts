@@ -237,7 +237,12 @@ describe('OrderResolver', () => {
           query OrdersListTestQuery($payload: OrdersInput) {
             orders(payload: $payload) {
               id,
-              state
+              state,
+              user {
+                name {
+                  first
+                }
+              }
             }
           }
         `,
@@ -254,16 +259,31 @@ describe('OrderResolver', () => {
         expect.objectContaining({
           id: order1.id,
           state: OrderState.Creating,
+          user: {
+            name: {
+              first: 'John',
+            },
+          },
         }),
         expect.objectContaining({
           id: order2.id,
           state: OrderState.Paid,
+          user: {
+            name: {
+              first: 'John',
+            },
+          },
         }),
       ])
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
           state: OrderState.Captured,
+          user: {
+            name: {
+              first: 'Jeff',
+            },
+          },
         })
       )
     })
