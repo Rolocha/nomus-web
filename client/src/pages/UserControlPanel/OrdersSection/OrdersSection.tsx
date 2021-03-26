@@ -26,7 +26,7 @@ export default () => {
   const { loading, data } = useQuery<UCPOrdersSectionQuery>(
     gql`
       query UCPOrdersSectionQuery {
-        orders {
+        userOrders {
           id
           cardVersion {
             frontImageUrl

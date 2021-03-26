@@ -215,7 +215,7 @@ class OrderResolver {
     return result.value
   }
 
-  // Transition a batch of orderIds. Used by Order Management System once ready to send to Hudson
+  // Transition a batch of orderIds. Used by Order Management Retool System once ready to send to Hudson
   @Authorized(Role.Admin)
   @Mutation((type) => [Order])
   async batchTransitionOrderState(
@@ -263,7 +263,7 @@ class OrderResolver {
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Order], { nullable: true })
-  async orders(
+  async userOrders(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
   ): Promise<Order[]> {

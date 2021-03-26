@@ -138,7 +138,7 @@ describe('OrderResolver', () => {
       )
     })
   })
-  describe('orders', () => {
+  describe('userOrders', () => {
     it('fetches all orders for a user', async () => {
       const user = await createMockUser()
       const order1 = await createMockOrder({ user: user })
@@ -146,14 +146,14 @@ describe('OrderResolver', () => {
       const response = await execQuery({
         source: `
           query OrdersTestQuery {
-            orders {
+            userOrders {
               id
             }
           }
           `,
         contextUser: user,
       })
-      expect(response.data?.orders).toEqual([{ id: order1.id }, { id: order2.id }])
+      expect(response.data?.userOrders).toEqual([{ id: order1.id }, { id: order2.id }])
     })
     it('fetches all users orders for an admin', async () => {
       const user = await createMockUser()
@@ -162,7 +162,7 @@ describe('OrderResolver', () => {
       const response = await execQuery({
         source: `
           query OrdersTestQuery($userId: String!) {
-            orders(userId: $userId) {
+            userOrders(userId: $userId) {
               id
             }
           }
@@ -172,7 +172,7 @@ describe('OrderResolver', () => {
         },
         asAdmin: true,
       })
-      expect(response.data?.orders).toEqual([{ id: order1.id }, { id: order2.id }])
+      expect(response.data?.userOrders).toEqual([{ id: order1.id }, { id: order2.id }])
     })
   })
   describe('updateOrder', () => {
