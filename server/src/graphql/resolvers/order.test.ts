@@ -222,9 +222,107 @@ describe('OrderResolver', () => {
         })
       )
     })
-    it('fetches orders for a user', async () => {})
-    it('fetches orders for a trackingNumber', async () => {})
-    it('fetches orders for a trackingNumber and state list', async () => {})
+    it('fetches orders for a user', async () => {
+      const user = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', last: 'Winger' },
+        email: 'fakelawyer@greendale.com',
+      })
+      const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const notInQueryOrder = await createMockOrder({ user: userJeff })
+
+      const response = await execQuery({
+        source: `
+          query OrdersListTestQuery($payload: OrdersInput) {
+            orders(payload: $payload) {
+              id,
+              state
+            }
+          }
+        `,
+        variableValues: {
+          payload: {
+            user: user.id,
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.orders.length).toBe(2)
+      expect(response.data?.orders).toEqual([
+        expect.objectContaining({
+          id: order1.id,
+          state: OrderState.Creating,
+        }),
+        expect.objectContaining({
+          id: order2.id,
+          state: OrderState.Paid,
+        }),
+      ])
+      expect(response.data?.orders).not.toContain(
+        expect.objectContaining({
+          id: notInQueryOrder.id,
+          state: OrderState.Captured,
+        })
+      )
+    })
+    it('fetches orders with multi-field payload', async () => {
+      const user = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', last: 'Winger' },
+        email: 'fakelawyer@greendale.com',
+      })
+      const order1 = await createMockOrder({
+        user: user,
+        state: OrderState.Creating,
+        trackingNumber: 'AAAA',
+      })
+      const order2 = await createMockOrder({
+        user: user,
+        state: OrderState.Creating,
+        trackingNumber: 'BBBB',
+      })
+      const notInQueryOrder = await createMockOrder({ user: userJeff })
+
+      const response = await execQuery({
+        source: `
+          query OrdersListTestQuery($payload: OrdersInput) {
+            orders(payload: $payload) {
+              id,
+              state
+            }
+          }
+        `,
+        variableValues: {
+          payload: {
+            trackingNumber: 'AAAA',
+            states: [OrderState.Creating],
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.orders.length).toBe(1)
+      expect(response.data?.orders).toEqual([
+        expect.objectContaining({
+          id: order1.id,
+          state: OrderState.Creating,
+        }),
+      ])
+      expect(response.data?.orders).not.toContain(
+        expect.objectContaining({
+          id: notInQueryOrder.id,
+          state: OrderState.Captured,
+        })
+      )
+      expect(response.data?.orders).not.toContain(
+        expect.objectContaining({
+          id: order2.id,
+          state: OrderState.Creating,
+        })
+      )
+    })
   })
 
   describe('userOrders', () => {
