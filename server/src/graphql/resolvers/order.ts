@@ -120,6 +120,18 @@ class UpdateOrderInput {
   printSpecUrl: string
 }
 
+@InputType({ description: 'Input to find orders' })
+class OrdersInput extends UpdateOrderInput {
+  @Field((type) => [String], { nullable: true })
+  orderIds: [string]
+
+  @Field((type) => [OrderState], { nullable: true })
+  states: [OrderState]
+
+  @Field({ nullable: true })
+  user: string
+}
+
 @InputType({ description: 'Input to generate new or update existing custom card Order' })
 class UpsertCustomOrderInput extends BaseUpsertOrderInput {
   @Field((type) => CustomCardSpecInput)
@@ -159,6 +171,26 @@ class OrderResolver {
         return Error('User is not authorized to access order')
       }
     }
+  }
+
+  // Get multiple orders with flexible queries
+  @Authorized(Role.Admin)
+  @Query(() => [Order])
+  async orders(
+    @Arg('payload', { nullable: true }) payload: OrdersInput
+  ): Promise<DocumentType<Order>[]> {
+    const strippedPayload = {
+      ...payload,
+    }
+    if (strippedPayload.orderIds) {
+      strippedPayload['_id'] = { $in: payload.orderIds }
+      delete strippedPayload.orderIds
+    }
+    if (payload.states) {
+      strippedPayload['state'] = { $in: payload.states }
+      delete strippedPayload.states
+    }
+    return Order.mongo.find(strippedPayload)
   }
 
   @Authorized(Role.Admin)
