@@ -343,6 +343,76 @@ describe('OrderResolver', () => {
         })
       )
     })
+    it('queries for paid, null shipping label and null tracking number', async () => {
+      const user = await createMockUser()
+      const userJeff = await createMockUser({
+        name: { first: 'Jeff', last: 'Winger' },
+        email: 'fakelawyer@greendale.com',
+      })
+      const order1 = await createMockOrder({
+        user: user,
+        state: OrderState.Paid,
+        shippingLabelUrl: null,
+        trackingNumber: null,
+      })
+      const order2 = await createMockOrder({
+        user: user,
+        state: OrderState.Paid,
+        shippingLabelUrl: null,
+        trackingNumber: null,
+      })
+      const notInQueryOrder = await createMockOrder({
+        user: userJeff,
+        state: OrderState.Paid,
+        shippingLabelUrl: 'AAAA',
+        trackingNumber: 'BBBB',
+      })
+
+      const response = await execQuery({
+        source: `
+          query OrdersListTestQuery($payload: OrdersInput) {
+            orders(payload: $payload) {
+              id,
+              state,
+              shippingLabelUrl,
+              trackingNumber
+            }
+          }
+        `,
+        variableValues: {
+          payload: {
+            states: [OrderState.Paid],
+            shippingLabelUrl: null,
+            trackingNumber: null,
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.orders.length).toBe(2)
+      expect(response.data?.orders).toEqual([
+        expect.objectContaining({
+          id: order1.id,
+          state: OrderState.Paid,
+          shippingLabelUrl: null,
+          trackingNumber: null,
+        }),
+        expect.objectContaining({
+          id: order2.id,
+          state: OrderState.Paid,
+          shippingLabelUrl: null,
+          trackingNumber: null,
+        }),
+      ])
+      expect(response.data?.orders).not.toContain(
+        expect.objectContaining({
+          id: notInQueryOrder.id,
+          state: OrderState.Paid,
+          shippingLabelUrl: 'AAAA',
+          trackingNumber: 'BBBB',
+        })
+      )
+    })
   })
 
   describe('userOrders', () => {
