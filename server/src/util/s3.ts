@@ -85,7 +85,11 @@ export const uploadGraphQLFileToS3 = async (
   if (!fileExtension) {
     return Result.fail('invalid-mime-type')
   }
-  const filepath = path.join(tmpDirForThisRequest, `${filename}.${fileExtension}`)
+  const filepath = path.join(
+    tmpDirForThisRequest,
+    // Add file extension if not already present
+    filename.endsWith(`.${fileExtension}`) ? filename : `${filename}.${fileExtension}`
+  )
   ensureDirectoryExistence(filepath)
 
   const { createReadStream } = file
