@@ -1,4 +1,4 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { DocumentType, mongoose } from '@typegoose/typegoose'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import { CardVersionModel } from 'src/models/CardVersion'
@@ -93,31 +93,48 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
 }
 
 @InputType({ description: 'Input to update fields on an existing Order' })
-class UpdateOrderInput {
-  @Field({ nullable: true })
+class OrdersQueryInput {
+  @Field({ nullable: true, description: 'specify a single order ID to query/update' })
   orderId: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'quantity of cards in an order' })
   quantity: number
 
-  // Credit/debit card Stripe token we'll use for payment auth/capture
-  @Field({ nullable: true })
+  @Field({
+    nullable: true,
+    description: 'Credit/debit card Stripe token used for payment auth/capture',
+  })
   stripeToken: string
 
-  @Field((type) => Address, { nullable: true })
+  @Field((type) => Address, { nullable: true, description: 'shipping address for the order' })
   shippingAddress: Address
 
-  @Field((type) => OrderPrice, { nullable: true })
+  @Field((type) => OrderPrice, { nullable: true, description: 'price calculated and paid for' })
   price: OrderPrice
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'XPS ship tracking number for package' })
   trackingNumber: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'shipping label stored in S3 for Hudson to print' })
   shippingLabelUrl: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'print spec to print on empty sheets stored in S3' })
   printSpecUrl: string
+}
+
+@InputType({ description: 'Input to find orders' })
+class OrdersInput extends OrdersQueryInput {
+  @Field((type) => [String], { nullable: true, description: 'list of orderIds to filter for' })
+  orderIds: [string]
+
+  @Field((type) => [OrderState], {
+    nullable: true,
+    description: 'list of order states to filter for',
+  })
+  states: [OrderState]
+
+  @Field({ nullable: true, description: 'user to filter for' })
+  user: string
 }
 
 @InputType({ description: 'Input to generate new or update existing custom card Order' })
@@ -161,13 +178,30 @@ class OrderResolver {
     }
   }
 
+  // Get multiple orders with flexible queries
+  @Authorized(Role.Admin)
+  @Query(() => [Order])
+  async orders(
+    @Arg('params', { nullable: true }) params: OrdersInput
+  ): Promise<DocumentType<Order>[]> {
+    const { orderIds, states, ...findOptions } = params
+    if (orderIds) {
+      findOptions['_id'] = { $in: orderIds }
+    }
+    if (states) {
+      findOptions['state'] = { $in: states }
+    }
+
+    return Order.mongo.find(findOptions)
+  }
+
   @Authorized(Role.Admin)
   @Mutation((type) => Order)
   // updateOrder cannot be used to update the state of the order.
   // Use transitionOrderState instead
   async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
-    @Arg('payload', { nullable: true }) payload: UpdateOrderInput,
+    @Arg('payload', { nullable: true }) payload: OrdersQueryInput,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
@@ -215,11 +249,55 @@ class OrderResolver {
     return result.value
   }
 
+  // Transition a batch of orderIds. Used by Order Management Retool System once ready to send to Hudson
+  @Authorized(Role.Admin)
+  @Mutation((type) => [Order])
+  async batchTransitionOrderState(
+    @Arg('orderIds', (type) => [String], { nullable: false }) orderIds: [string],
+    @Arg('futureState', (type) => OrderState, { nullable: false }) futureState: OrderState,
+    @Arg('trigger', (type) => OrderEventTrigger, { nullable: true })
+    trigger: OrderEventTrigger | null,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<Order>[]> {
+    if (!context.user) {
+      throw new Error('no-user-specified')
+    }
+
+    // start a mongoose Transaction, will only commit to db if all orders succeed.
+    // Any errors thrown will result in rollback and no commit to the db
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+      const orders = await Order.mongo.find({ _id: { $in: orderIds } })
+      if (!orders) {
+        throw new Error('no-orders-found')
+      }
+      try {
+        const orderTransitionPromises = orders.map(async (order) => {
+          const res = await order.transition(futureState, trigger)
+          if (!res.isSuccess) {
+            throw res.error
+          }
+        })
+        await Promise.all(orderTransitionPromises)
+      } catch (err) {
+        throw new Error(err)
+      }
+      await session.commitTransaction()
+      return orders
+    } catch (err) {
+      await session.abortTransaction()
+      throw new Error(err)
+    } finally {
+      session.endSession()
+    }
+  }
+
   // Get all orders for a User
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => [Order], { nullable: true })
-  async orders(
+  async userOrders(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
   ): Promise<Order[]> {
