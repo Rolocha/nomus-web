@@ -63,9 +63,9 @@ export interface ProfileUpdateInput {
 }
 
 /**
- * Input to generate new or update existing custom card Order
+ * Payload for submitting an order
  */
-export interface UpsertCustomOrderInput {
+export interface SubmitCustomOrderInput {
   orderId?: string | null
   quantity?: number | null
   stripeToken?: string | null

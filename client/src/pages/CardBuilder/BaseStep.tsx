@@ -5,17 +5,16 @@ import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
-import { CardBuilderAction, CardBuilderState } from './reducer'
+import { CardBuilderState } from './card-builder-state'
 
 interface Props {
   selectedBaseType: string | undefined
   cardBuilderState: CardBuilderState
-  updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
 
-const BaseStep = ({ selectedBaseType, updateCardBuilderState }: Props) => {
+const BaseStep = ({ selectedBaseType }: Props) => {
   return (
-    <Box overflowY="scroll" height="100%" p={{ base: '24px', md: '48px' }}>
+    <Box overflowY="scroll" height="100%">
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
         ? {
             custom: (

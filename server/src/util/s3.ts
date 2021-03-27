@@ -1,12 +1,14 @@
 import AWS from 'aws-sdk'
 import fs from 'fs'
+import path from 'path'
+import { FileUpload } from 'graphql-upload'
 import mime from 'mime-types'
 import { EventualResult, Result } from 'src/util/error'
 import { promisify } from 'util'
 
 export enum S3AssetCategory {
   ProfilePictures = 'profile-pictures',
-  BusinessCards = 'business-cards',
+  CardVersions = 'card-versions',
   QRCodes = 'qr-codes',
   EncodingCSV = 'encoding-csv',
 }
@@ -62,6 +64,69 @@ export const uploadFileToS3 = async (
   } catch (err) {
     return Result.fail(err.message)
   }
+}
+
+function ensureDirectoryExistence(filePath: string) {
+  const dirname = path.dirname(filePath)
+  if (fs.existsSync(dirname)) {
+    return true
+  }
+  ensureDirectoryExistence(dirname)
+  fs.mkdirSync(dirname)
+}
+
+export const uploadGraphQLFileToS3 = async (
+  file: FileUpload,
+  filename: string,
+  assetCategory: S3AssetCategory
+): Promise<Result<string, 'invalid-mime-type'>> => {
+  const tmpDirForThisRequest = path.join('/tmp', 'nomus-s3-upload', String(Date.now()))
+  const fileExtension = mime.extension(file.mimetype)
+  if (!fileExtension) {
+    return Result.fail('invalid-mime-type')
+  }
+  const filepath = path.join(
+    tmpDirForThisRequest,
+    // Add file extension if not already present
+    filename.endsWith(`.${fileExtension}`) ? filename : `${filename}.${fileExtension}`
+  )
+  ensureDirectoryExistence(filepath)
+
+  const { createReadStream } = file
+
+  try {
+    const writableStream = fs.createWriteStream(filepath, {
+      autoClose: true,
+    })
+
+    await new Promise((res, rej) => {
+      createReadStream()
+        .pipe(writableStream)
+        .on('finish', () => res(true))
+        .on('error', () => rej(false))
+    })
+  } catch (err) {
+    console.log(err)
+    throw new Error('Error creating write or readstream')
+  }
+
+  try {
+    const result = await uploadFileToS3(filepath, filename, assetCategory)
+    if (!result.isSuccess) {
+      throw new Error(`Failed to upload to S3: ${result.error}`)
+    }
+
+    return Result.ok(result.getValue())
+  } catch (err) {
+    throw new Error(`unknown error: ${err}`)
+  } finally {
+    // and delete the temporary folder we made in tmp
+    fs.rmdir(tmpDirForThisRequest, { recursive: true }, () => {})
+  }
+}
+
+export const getObjectUrl = (key: string) => {
+  return `https://nomus-assets.s3.amazonaws.com/${key}`
 }
 
 export const getSignedUrl = async (

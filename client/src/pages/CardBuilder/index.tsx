@@ -3,28 +3,28 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useParams } from 'react-router-dom'
 import {
-  UpsertCustomOrderMutation,
-  UpsertCustomOrderMutationVariables,
-} from 'src/apollo/types/UpsertCustomOrderMutation'
+  SubmitCustomOrderMutation,
+  SubmitCustomOrderMutationVariables,
+} from 'src/apollo/types/SubmitCustomOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
-import Wizard, { WizardTabItem } from 'src/components/Wizard'
+import Wizard, { WizardStep } from 'src/components/Wizard'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import BaseStep from './BaseStep'
 import BuildStep from './BuildStep'
-import CheckoutStep from './CheckoutStep'
 import {
-  BaseType,
+  CardBuilderAction,
   cardBuilderReducer,
-  CheckoutFormData,
   initialState,
-} from './reducer'
+} from './card-builder-state'
+import CheckoutStep from './CheckoutStep'
 import ReviewStep from './ReviewStep'
-import UPSERT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
+import { BaseType, CardBuilderStep, CheckoutFormData } from './types'
+import SUBMIT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
 
 interface ParamsType {
   buildBaseType?: string
@@ -34,6 +34,7 @@ const bp = 'md'
 
 const CardBuilder = () => {
   const { buildBaseType } = useParams<ParamsType>()
+  const history = useHistory()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
@@ -48,10 +49,7 @@ const CardBuilder = () => {
 
   const stripe = useStripe()
   const elements = useElements()
-  const [upsertCustomOrder] = useMutation(UPSERT_CUSTOM_ORDER_MUTATION)
-
-  const frontImageDataUrl = cardBuilderState.frontDesignFile?.url
-  const backImageDataUrl = cardBuilderState.backDesignFile?.url
+  const [submitCustomOrder] = useMutation(SUBMIT_CUSTOM_ORDER_MUTATION)
 
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
@@ -74,18 +72,30 @@ const CardBuilder = () => {
     }
   }, [stripe, elements])
 
-  const handleOrderUpdate = React.useCallback(async () => {
-    console.log('TODO: call upsertCustomOrder')
-  }, [])
+  const confirmCardPayment = React.useCallback(
+    async (clientSecret: string) => {
+      if (stripe == null || cardBuilderState.stripeToken == null) {
+        // TODO: Handle errors gracefully
+        throw new Error('stripe is not defined or the token is missing')
+      }
 
-  const handleOrderSubmit = React.useCallback(async () => {
-    debugger
+      return stripe.confirmCardPayment(clientSecret, {
+        // eslint-disable-next-line camelcase
+        payment_method: {
+          card: {
+            token: cardBuilderState.stripeToken.id,
+          },
+          // eslint-disable-next-line camelcase
+          billing_details: {
+            name: cardBuilderState.formData.name,
+          },
+        },
+      })
+    },
+    [cardBuilderState, stripe],
+  )
 
-    if (stripe == null) {
-      // TODO: Handle errors gracefully
-      return
-    }
-
+  const createOrder = React.useCallback(async () => {
     const { formData, stripeToken } = cardBuilderState
 
     if (
@@ -102,7 +112,7 @@ const CardBuilder = () => {
     }
 
     const basePayload: Partial<
-      UpsertCustomOrderMutationVariables['payload']
+      SubmitCustomOrderMutationVariables['payload']
     > = {
       shippingAddress: {
         line1: formData?.addressLine1,
@@ -115,15 +125,15 @@ const CardBuilder = () => {
       stripeToken: stripeToken?.id,
     }
 
-    let orderCreateResult: ExecutionResult<UpsertCustomOrderMutation> | null = null
+    let orderCreateResult: ExecutionResult<SubmitCustomOrderMutation> | null = null
     if (cardBuilderState.baseType === 'custom') {
-      orderCreateResult = await upsertCustomOrder({
+      orderCreateResult = await submitCustomOrder({
         variables: {
           payload: {
             ...basePayload,
             cardSpec: {
-              frontImageDataUrl,
-              backImageDataUrl,
+              frontImageDataUrl: cardBuilderState.frontDesignFile?.file,
+              backImageDataUrl: cardBuilderState.backDesignFile?.file,
             },
           },
         },
@@ -131,41 +141,34 @@ const CardBuilder = () => {
     } else if (cardBuilderState.baseType === 'template') {
       // TODO: Implement template
     }
+    return orderCreateResult
+  }, [cardBuilderState, submitCustomOrder])
 
-    if (orderCreateResult?.data?.upsertCustomOrder.clientSecret == null) {
-      throw new Error('boo')
+  const handleWizardSubmit = React.useCallback(async () => {
+    const createOrderResult = await createOrder()
+    if (createOrderResult?.data?.submitCustomOrder.clientSecret == null) {
+      console.log(createOrderResult?.errors)
+      throw new Error('Failed to create order: ')
     }
 
-    const payload = await stripe.confirmCardPayment(
-      orderCreateResult?.data?.upsertCustomOrder.clientSecret,
-      {
-        // eslint-disable-next-line camelcase
-        payment_method: {
-          card: {
-            token: stripeToken.id,
-          },
-          // eslint-disable-next-line camelcase
-          billing_details: {
-            name: formData.name,
-          },
-        },
-      },
+    const cardConfirmationResult = await confirmCardPayment(
+      createOrderResult.data.submitCustomOrder?.clientSecret,
     )
 
-    if (payload.error) {
-      throw payload.error
-    } else if (payload.paymentIntent == null) {
+    if (cardConfirmationResult.error) {
+      throw cardConfirmationResult.error
+    } else if (cardConfirmationResult.paymentIntent == null) {
       throw new Error('paymentIntent in response undefined')
-    } else {
-      updateCardBuilderState({ paymentIntent: payload.paymentIntent })
     }
-  }, [
-    stripe,
-    cardBuilderState,
-    upsertCustomOrder,
-    frontImageDataUrl,
-    backImageDataUrl,
-  ])
+    updateCardBuilderState({
+      paymentIntent: cardConfirmationResult.paymentIntent,
+    })
+
+    // All done, redirect to the dashboard for this order
+    history.push(
+      `/dashboard/orders/${createOrderResult.data.submitCustomOrder.orderId}`,
+    )
+  }, [confirmCardPayment, createOrder, history])
 
   const isValidBaseType = (type?: string): type is BaseType =>
     type != null && ['custom', 'template'].includes(type)
@@ -176,91 +179,40 @@ const CardBuilder = () => {
   }
 
   // When the checkout form is mounted, the most up-to-date data comes from watchedFields
-  // When it isn't (e.g. when user is on the final "Review" step), watchedFields is empty
-  // so we need to get the cached data from cardBuilderState instead
+  // since the user may be editing the fields. On wizard step change, we cache the form data to
+  // cardBuilderState before react-hook-form unmounts the input (and watchedFields becomes empty)
+  // so if we're not on the checkout step, use that cache instead
   const formData =
-    Object.keys(watchedFields).length === 0 && cardBuilderState.formData
-      ? cardBuilderState.formData
-      : watchedFields
+    cardBuilderState.currentStep === 'checkout'
+      ? watchedFields
+      : cardBuilderState.formData
 
-  const wizardSteps: WizardTabItem[] = [
-    {
-      key: 'build',
-      label: 'Build',
-      icon: 'formatText',
-      content: (
-        <BuildStep
-          selectedBaseType={buildBaseType}
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-          handleOrderUpdate={handleOrderUpdate}
-        />
-      ),
-      accessCondition: [
-        {
-          custom: true,
-          template: cardBuilderState.templateId != null,
-        }[buildBaseType],
-      ].every(Boolean),
-    },
-    {
-      key: 'checkout',
-      label: 'Checkout',
-      icon: 'cart',
-      content: (
-        <CheckoutStep
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-          handleCardSubmit={handleCardSubmit}
-          handleOrderUpdate={handleOrderUpdate}
-          checkoutFormMethods={checkoutFormMethods}
-        />
-      ),
-      accessCondition: [
-        ...{
-          custom: [cardBuilderState.frontDesignFile != null],
-          template: [],
-        }[cardBuilderState.baseType],
-      ].every(Boolean),
-    },
-    {
-      key: 'review',
-      label: 'Review',
-      icon: 'checkO',
-      content: (
-        <ReviewStep
-          cardBuilderState={cardBuilderState}
-          handleOrderSubmit={handleOrderSubmit}
-        />
-      ),
-      accessCondition: () =>
-        [
-          formData.addressLine1,
-          formData.state,
-          formData.city,
-          formData.postalCode,
-          formData.name,
-          cardBuilderState.cardEntryComplete,
-        ].every(Boolean),
-    },
-  ]
+  const handleWizardStepTransition = async (_goingToStep: string) => {
+    const comingFromStep = cardBuilderState.currentStep
+    const goingToStep = _goingToStep as CardBuilderStep
 
-  // If template base type, add in a step at the beginning for template selection
-  if (isValidBaseType(buildBaseType) && buildBaseType === 'template') {
-    wizardSteps.splice(0, 0, {
-      key: 'base',
-      label: 'Base',
-      icon: 'stack',
-      content: (
-        <BaseStep
-          selectedBaseType={buildBaseType}
-          cardBuilderState={cardBuilderState}
-          updateCardBuilderState={updateCardBuilderState}
-        />
-      ),
-      accessCondition: true,
+    const cardBuilderStateUpdate: CardBuilderAction = {}
+
+    // (base) => build => checkout => review
+    switch (comingFromStep) {
+      case 'checkout':
+        // Cache the current form data in cardBuilderState since react-hook-form
+        // will drop it when the form fields unmount
+        cardBuilderStateUpdate.formData = checkoutFormMethods.getValues()
+        if (!cardBuilderState.stripeToken) {
+          await handleCardSubmit()
+        }
+        break
+      default:
+        break
+    }
+
+    updateCardBuilderState({
+      ...cardBuilderStateUpdate,
+      currentStep: goingToStep,
     })
   }
+
   return (
     <Box
       bg={theme.colors.ivory}
@@ -288,10 +240,73 @@ const CardBuilder = () => {
             <Text.PageHeader>Card Builder</Text.PageHeader>
           </Box>
           <Wizard
-            exitPath="/dashboard/orders"
-            exitText="Submit order"
-            steps={wizardSteps}
-          />
+            completionButtonLabel="Submit order"
+            currentStep={cardBuilderState.currentStep}
+            handleStepTransition={handleWizardStepTransition}
+            handleSubmit={handleWizardSubmit}
+          >
+            {isValidBaseType(buildBaseType) && buildBaseType === 'template' && (
+              <WizardStep
+                id="base"
+                icon="stack"
+                label="Base"
+                isReadyForNextStep={[
+                  ...{
+                    custom: [],
+                    // For template base type, the template must have been chosen
+                    template: [cardBuilderState.templateId != null],
+                  }[cardBuilderState.baseType],
+                ].every(Boolean)}
+              >
+                <BaseStep
+                  selectedBaseType={buildBaseType}
+                  cardBuilderState={cardBuilderState}
+                />
+              </WizardStep>
+            )}
+            <WizardStep
+              id="build"
+              icon="formatText"
+              label="Build"
+              isReadyForNextStep={[
+                ...{
+                  // For custom base type, at least the front design file must have been provided
+                  custom: [cardBuilderState.frontDesignFile != null],
+                  // TBD requirements for template
+                  template: [],
+                }[cardBuilderState.baseType],
+              ].every(Boolean)}
+            >
+              <BuildStep
+                selectedBaseType={buildBaseType}
+                cardBuilderState={cardBuilderState}
+                updateCardBuilderState={updateCardBuilderState}
+              />
+            </WizardStep>
+            <WizardStep
+              id="checkout"
+              icon="cart"
+              label="Checkout"
+              isReadyForNextStep={[
+                formData.addressLine1,
+                formData.state,
+                formData.city,
+                formData.postalCode,
+                formData.name,
+                cardBuilderState.cardEntryComplete,
+              ].every(Boolean)}
+            >
+              <CheckoutStep
+                cardBuilderState={cardBuilderState}
+                updateCardBuilderState={updateCardBuilderState}
+                handleCardSubmit={handleCardSubmit}
+                checkoutFormMethods={checkoutFormMethods}
+              />
+            </WizardStep>
+            <WizardStep id="review" icon="checkO" label="Review">
+              <ReviewStep cardBuilderState={cardBuilderState} />
+            </WizardStep>
+          </Wizard>
         </Box>
       </Box>
     </Box>

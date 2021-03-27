@@ -21,10 +21,13 @@ import ResetPassword from 'src/pages/ResetPassword'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import FaqPage from 'src/pages/FaqPage'
+import CardBuilder from 'src/pages/CardBuilder'
+import ShopFront from 'src/pages/ShopFront'
 
 interface RouteCommon {
   path: string | null // null to handle 404
   exact?: boolean // default is false
+  exclude?: boolean
 }
 interface ComponentRouteType extends RouteCommon {
   requiredAuthLevel?: AuthLevel
@@ -39,6 +42,8 @@ interface RedirectRouteType extends RouteCommon {
 }
 
 type RouteType = ComponentRouteType | RedirectRouteType
+
+const inProduction = process.env.NODE_ENV === 'production'
 
 export const routes: Array<RouteType> = [
   {
@@ -111,22 +116,12 @@ export const routes: Array<RouteType> = [
       type: 'internal',
     },
   },
-  // Non-prod-only routes
-  ...(process.env.NODE_ENV !== 'production'
-    ? [
-        // /loading route to test the LoadingPage
-        {
-          exact: true,
-          path: '/loading',
-          Component: () => <LoadingPage fullscreen />,
-        },
-      ]
-    : []),
-  // {
-  //   exact: true,
-  //   path: '/shop',
-  //   Component: ShopFront,
-  // },
+  {
+    exact: true,
+    path: '/loading',
+    Component: () => <LoadingPage fullscreen />,
+    exclude: inProduction,
+  },
   {
     path: '/dashboard/contacts/save',
     Component: ContactSaver,
@@ -137,12 +132,17 @@ export const routes: Array<RouteType> = [
     Component: UserControlPanel,
     requiredAuthLevel: Role.User,
   },
-  // {
-
-  //   path: '/card-studio/:buildBaseType?',
-  //   Component: CardBuilder,
-  //   requiredAuthLevel: Role.User,
-  // },
+  {
+    path: '/shop',
+    Component: ShopFront,
+    exclude: inProduction,
+  },
+  {
+    path: '/card-studio/:buildBaseType?',
+    Component: CardBuilder,
+    requiredAuthLevel: Role.User,
+    exclude: inProduction,
+  },
   {
     path: '/admin/linker/:routeStr',
     Component: LinkerPage,
@@ -190,57 +190,59 @@ export const PageRouter = () => {
   return (
     <Router>
       <Switch>
-        {routes.map((routeConfig) => {
-          if ('redirect' in routeConfig && routeConfig.redirect) {
-            const { redirect, path } = routeConfig
-            return (
-              <Route key={path} path={path}>
-                {() => {
-                  switch (redirect.type) {
-                    case 'internal':
-                      return <Redirect to={redirect.to} />
-                    case 'external':
-                      window.location.replace(redirect.to)
-                      return
-                  }
-                }}
-              </Route>
-            )
-          } else if ('Component' in routeConfig) {
-            const {
-              path,
-              requiredAuthLevel,
-              noLoginRequired,
-              Component,
-              ...rest
-            } = routeConfig
-            const componentToRender = noLoginRequired ? (
-              <Component />
-            ) : (
-              <AttemptLogin>
-                <Component />
-              </AttemptLogin>
-            )
-
-            const routeElement =
-              requiredAuthLevel == null ? (
-                <Route key={path ?? '404'} path={path ?? undefined} {...rest}>
-                  {componentToRender}
+        {routes
+          .filter((route) => !route.exclude)
+          .map((routeConfig) => {
+            if ('redirect' in routeConfig && routeConfig.redirect) {
+              const { redirect, path } = routeConfig
+              return (
+                <Route key={path} path={path}>
+                  {() => {
+                    switch (redirect.type) {
+                      case 'internal':
+                        return <Redirect to={redirect.to} />
+                      case 'external':
+                        window.location.replace(redirect.to)
+                        return
+                    }
+                  }}
                 </Route>
-              ) : (
-                <ProtectedRoute
-                  key={path}
-                  path={path ?? undefined}
-                  requiredAuthLevel={requiredAuthLevel}
-                  {...rest}
-                >
-                  {componentToRender}
-                </ProtectedRoute>
               )
-            return routeElement
-          }
-          return null
-        })}
+            } else if ('Component' in routeConfig) {
+              const {
+                path,
+                requiredAuthLevel,
+                noLoginRequired,
+                Component,
+                ...rest
+              } = routeConfig
+              const componentToRender = noLoginRequired ? (
+                <Component />
+              ) : (
+                <AttemptLogin>
+                  <Component />
+                </AttemptLogin>
+              )
+
+              const routeElement =
+                requiredAuthLevel == null ? (
+                  <Route key={path ?? '404'} path={path ?? undefined} {...rest}>
+                    {componentToRender}
+                  </Route>
+                ) : (
+                  <ProtectedRoute
+                    key={path}
+                    path={path ?? undefined}
+                    requiredAuthLevel={requiredAuthLevel}
+                    {...rest}
+                  >
+                    {componentToRender}
+                  </ProtectedRoute>
+                )
+              return routeElement
+            }
+            return null
+          })}
       </Switch>
     </Router>
   )
