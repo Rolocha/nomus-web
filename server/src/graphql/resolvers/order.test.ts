@@ -148,15 +148,15 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($payload: OrdersInput) {
-            orders(payload: $payload) {
+          query OrdersListTestQuery($params: OrdersInput) {
+            orders(params: $params) {
               id,
               state
             }
           }
         `,
         variableValues: {
-          payload: {
+          params: {
             orderIds: [order1.id, order2.id],
           },
         },
@@ -189,15 +189,15 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($payload: OrdersInput) {
-            orders(payload: $payload) {
+          query OrdersListTestQuery($params: OrdersInput) {
+            orders(params: $params) {
               id,
               state
             }
           }
         `,
         variableValues: {
-          payload: {
+          params: {
             states: [OrderState.Paid, OrderState.Creating],
           },
         },
@@ -234,8 +234,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($payload: OrdersInput) {
-            orders(payload: $payload) {
+          query OrdersListTestQuery($params: OrdersInput) {
+            orders(params: $params) {
               id,
               state,
               user {
@@ -247,7 +247,7 @@ describe('OrderResolver', () => {
           }
         `,
         variableValues: {
-          payload: {
+          params: {
             user: user.id,
           },
         },
@@ -307,15 +307,15 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($payload: OrdersInput) {
-            orders(payload: $payload) {
+          query OrdersListTestQuery($params: OrdersInput) {
+            orders(params: $params) {
               id,
               state
             }
           }
         `,
         variableValues: {
-          payload: {
+          params: {
             trackingNumber: 'AAAA',
             states: [OrderState.Creating],
           },
@@ -370,8 +370,8 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($payload: OrdersInput) {
-            orders(payload: $payload) {
+          query OrdersListTestQuery($params: OrdersInput) {
+            orders(params: $params) {
               id,
               state,
               shippingLabelUrl,
@@ -380,7 +380,7 @@ describe('OrderResolver', () => {
           }
         `,
         variableValues: {
-          payload: {
+          params: {
             states: [OrderState.Paid],
             shippingLabelUrl: null,
             trackingNumber: null,
