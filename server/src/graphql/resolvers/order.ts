@@ -93,42 +93,47 @@ class BaseUpsertOrderInput implements Pick<Order, 'quantity'> {
 }
 
 @InputType({ description: 'Input to update fields on an existing Order' })
-class UpdateOrderInput {
-  @Field({ nullable: true })
+class OrdersQueryInput {
+  @Field({ nullable: true, description: 'specify a single order ID to query/update' })
   orderId: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'quantity of cards in an order' })
   quantity: number
 
-  // Credit/debit card Stripe token we'll use for payment auth/capture
-  @Field({ nullable: true })
+  @Field({
+    nullable: true,
+    description: 'Credit/debit card Stripe token used for payment auth/capture',
+  })
   stripeToken: string
 
-  @Field((type) => Address, { nullable: true })
+  @Field((type) => Address, { nullable: true, description: 'shipping address for the order' })
   shippingAddress: Address
 
-  @Field((type) => OrderPrice, { nullable: true })
+  @Field((type) => OrderPrice, { nullable: true, description: 'price calculated and paid for' })
   price: OrderPrice
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'XPS ship tracking number for package' })
   trackingNumber: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'shipping label stored in S3 for Hudson to print' })
   shippingLabelUrl: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'print spec to print on empty sheets stored in S3' })
   printSpecUrl: string
 }
 
 @InputType({ description: 'Input to find orders' })
-class OrdersInput extends UpdateOrderInput {
-  @Field((type) => [String], { nullable: true })
+class OrdersInput extends OrdersQueryInput {
+  @Field((type) => [String], { nullable: true, description: 'list of orderIds to filter for' })
   orderIds: [string]
 
-  @Field((type) => [OrderState], { nullable: true })
+  @Field((type) => [OrderState], {
+    nullable: true,
+    description: 'list of order states to filter for',
+  })
   states: [OrderState]
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'user to filter for' })
   user: string
 }
 
@@ -177,20 +182,17 @@ class OrderResolver {
   @Authorized(Role.Admin)
   @Query(() => [Order])
   async orders(
-    @Arg('payload', { nullable: true }) payload: OrdersInput
+    @Arg('params', { nullable: true }) params: OrdersInput
   ): Promise<DocumentType<Order>[]> {
-    const strippedPayload = {
-      ...payload,
+    const { orderIds, states, ...findOptions } = params
+    if (orderIds) {
+      findOptions['_id'] = { $in: orderIds }
     }
-    if (strippedPayload.orderIds) {
-      strippedPayload['_id'] = { $in: payload.orderIds }
-      delete strippedPayload.orderIds
+    if (states) {
+      findOptions['state'] = { $in: states }
     }
-    if (payload.states) {
-      strippedPayload['state'] = { $in: payload.states }
-      delete strippedPayload.states
-    }
-    return Order.mongo.find(strippedPayload)
+
+    return Order.mongo.find(findOptions)
   }
 
   @Authorized(Role.Admin)
@@ -199,7 +201,7 @@ class OrderResolver {
   // Use transitionOrderState instead
   async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
-    @Arg('payload', { nullable: true }) payload: UpdateOrderInput,
+    @Arg('payload', { nullable: true }) payload: OrdersQueryInput,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<Order>> {
     if (!context.user) {
