@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
-import Accordion from 'src/components/Accordion'
+import AccordionComponent from 'src/components/Accordion'
 import * as Form from 'src/components/Form'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
@@ -81,7 +81,7 @@ export default () => {
               Frequently asked questions
             </Text.SectionHeader>
 
-            <Accordion title="How does Nomus work?">
+            <AccordionComponent title="How does Nomus work?">
               <Text.Body2>
                 Build up your public profile and create your business card right
                 on the Nomus Card Builder. After you've placed your order, we'll
@@ -94,12 +94,12 @@ export default () => {
                 about Nomus and our story on our{' '}
                 {<Link to="/about">About</Link>} page.
               </Text.Body2>
-            </Accordion>
-            {faqItems.map(({ question, answer }) => (
+            </AccordionComponent>
+            {/* {faqItems.map(({ question, answer }) => (
               <Accordion key={question} title={question}>
                 <Text.Body2>{answer}</Text.Body2>
               </Accordion>
-            ))}
+            ))} */}
           </Box>
           <Box
             gridColumn={{ base: '1/12', [bp]: '9/12' }}
