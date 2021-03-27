@@ -248,12 +248,15 @@ describe('getCardDataForInteractionString', () => {
 
   it('properly parses a QR scan URL with an userId', async () => {
     const user = await createMockUser()
+    const cardVersion = await createMockCardVersion({ user })
+    user.defaultCardVersion = cardVersion
+    await user.save()
 
     const routeStr = user.id
     const result = await getCardDataForInteractionString(routeStr)
 
     expect(result.value.card).toStrictEqual(null)
-    expect(result.value.cardVersion).toStrictEqual(null)
+    expect(result.value.cardVersion.id).toStrictEqual(cardVersion.id)
     expect(result.value.interactionType).toStrictEqual(CardInteractionType.QRCode)
     expect(result.value.cardUser.username).toStrictEqual(user.username)
   })
