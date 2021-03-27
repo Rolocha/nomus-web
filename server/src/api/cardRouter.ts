@@ -38,7 +38,9 @@ export const getCardDataForInteractionString = async (
 
   const qrParseResult = spliceCardVersionString(interactionString)
   if (qrParseResult.isSuccess) {
-    const cardVersion = await CardVersion.mongo.findById(qrParseResult.value.cardVersionId)
+    const cardVersion = await CardVersion.mongo
+      .findById(qrParseResult.value.cardVersionId)
+      .populate('user')
     if (cardVersion == null) {
       return Result.fail('invalid-cardVersion-id')
     }
@@ -47,20 +49,23 @@ export const getCardDataForInteractionString = async (
       // we don't know which `card` was used for QR interaction strings
       card: null,
       interactionType: CardInteractionType.QRCode,
-      cardUser: await User.mongo.findById(cardVersion.user),
+      cardUser: cardVersion.user as User,
     })
   }
 
   const userParseResult = spliceUserString(interactionString)
   if (userParseResult.isSuccess) {
-    const cardUser = await User.mongo.findById(userParseResult.value.userId)
+    const cardUser = await User.mongo
+      .findById(userParseResult.value.userId)
+      .populate('defaultCardVersion')
     if (cardUser == null) {
       return Result.fail('invalid-user-id')
     }
-    const cardVersion = await CardVersion.mongo.findById(cardUser.defaultCardVersion)
+    const cardVersion = cardUser.defaultCardVersion as CardVersion
     return Result.ok({
       cardVersion,
       // we don't know which `card` was used for QR interaction strings
+      // this gets hit if the QR code is encoded with a userId instead of cardVersionId
       card: null,
       interactionType: CardInteractionType.QRCode,
       cardUser,

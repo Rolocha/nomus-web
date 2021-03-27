@@ -20,7 +20,7 @@ afterEach(async () => {
 })
 
 describe('GET /d/:nfcId', () => {
-  it('responds with a contact page if linked', async () => {
+  it('redirects to a contact page if linked', async () => {
     const user = await createMockUser()
     const cardVersion = await createMockCardVersion({ user: user.id })
     const card = await createMockCard({ cardVersion: cardVersion.id, user: user.id })
@@ -41,7 +41,7 @@ describe('GET /d/:nfcId', () => {
     })
   })
 
-  it('responds with a linker page if unlinked', async () => {
+  it('redirects to a linker page if unlinked', async () => {
     const card = await createMockCard({ cardVersion: null, user: null })
     const sheet = await createMockSheet({ cards: [card] })
     const routeStr = [sheet.id, card.id].join('-')
@@ -86,7 +86,7 @@ describe('GET /d/:nfcId', () => {
 })
 
 describe('GET /d/:cardVersionId', () => {
-  it('responds with a contact page if successful', async () => {
+  it('redirects to a contact page if successful', async () => {
     const user = await createMockUser()
     const cardVersion = await createMockCardVersion({ user: user.id })
     const routeStr = cardVersion.id
@@ -135,7 +135,7 @@ describe('GET /d/:cardVersionId', () => {
 })
 
 describe('GET /d/:userId', () => {
-  it('responds with a contact page if successful', async () => {
+  it('redirects to a contact page if successful', async () => {
     const user = await createMockUser()
     const routeStr = user.id
 
@@ -148,7 +148,7 @@ describe('GET /d/:userId', () => {
     expect(cardInteractions.length).toBe(0)
   })
 
-  it('responds with a contact page if successful (with default cardVersion)', async () => {
+  it('redirects to a contact page if successful (with default cardVersion)', async () => {
     const user = await createMockUser()
     const cardVersion = await createMockCardVersion({ user })
     user.defaultCardVersion = cardVersion
@@ -199,7 +199,7 @@ describe('getCardDataForInteractionString', () => {
     await dropAllCollections()
   })
 
-  it('fails incorrectly formatted routeStr, miss-spelled', async () => {
+  it('fails incorrectly formatted routeStr, misspelled', async () => {
     const badRoute = 'sheet_jsdldnfskl-card_fsfljs'
     const result = await getCardDataForInteractionString(badRoute)
     expect(result.isSuccess).toBeFalsy()
