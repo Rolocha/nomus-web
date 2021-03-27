@@ -26,7 +26,7 @@ export default () => {
   const { loading, data } = useQuery<UCPOrdersSectionQuery>(
     gql`
       query UCPOrdersSectionQuery {
-        orders {
+        userOrders {
           id
           cardVersion {
             frontImageUrl
@@ -52,24 +52,24 @@ export default () => {
     return <LoadingPage />
   }
 
-  const { orders } = data
-  if (orders == null) {
+  const { userOrders } = data
+  if (userOrders == null) {
     return null
   }
 
-  const selectedOrder = orders.find((order) => order.id === params.orderId)
+  const selectedOrder = userOrders.find((order) => order.id === params.orderId)
 
-  const currentOrders = orders
+  const currentOrders = userOrders
     .filter((order) => order.state !== OrderState.Fulfilled)
     .sort((a, b) => b.createdAt - a.createdAt)
 
-  const previousOrders = orders
+  const previousOrders = userOrders
     .filter((order) => order.state === OrderState.Fulfilled)
     .sort((a, b) => b.createdAt - a.createdAt)
 
   return (
     <Box p={{ base: '24px', md: '48px' }} height="100%" overflowY="scroll">
-      {orders.length === 0 && (
+      {userOrders.length === 0 && (
         <Box
           display="grid"
           width="100%"
@@ -96,7 +96,7 @@ export default () => {
       )}
 
       {/* Orders list (hide if mobile-layout and an order is selected) */}
-      {orders.length !== 0 && !(selectedOrder != null && !isDesktopLayout) && (
+      {userOrders.length !== 0 && !(selectedOrder != null && !isDesktopLayout) && (
         <Box>
           <Text.H3 mb={3}>Current orders</Text.H3>
           <OrderList orders={currentOrders} />
