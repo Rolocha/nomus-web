@@ -12,20 +12,24 @@ interface Props {
   name: string
   accept?: string
   width?: string
+  height?: string
   selectedFileItem: FileItem | null
   handleFileItemChange: (file: FileItem | null) => void
   createObjectUrl: boolean
   showImagePreview: boolean
+  uploadText?: string
 }
 
 const FileUploadButton = ({
   name,
   width,
+  height,
   accept,
   selectedFileItem,
   handleFileItemChange,
   createObjectUrl,
   showImagePreview,
+  uploadText,
 }: Props) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
@@ -101,7 +105,7 @@ const FileUploadButton = ({
   )
 
   return (
-    <Box>
+    <>
       <Input
         ref={inputRef}
         type="file"
@@ -122,7 +126,7 @@ const FileUploadButton = ({
           p={2}
           borderRadius="lg"
           gridColumnGap={3}
-          bg="activeBlue"
+          bg="activeSecondaryBlue"
         >
           {showImagePreview && (
             <Box position="relative">
@@ -170,23 +174,24 @@ const FileUploadButton = ({
           onDrop={handleFileDrop}
           onClick={() => inputRef.current?.click()}
           width={width}
+          height={height}
           variant="dashedSecondary"
           sx={
             isDragging
               ? {
-                  background: colors.hoverBlue,
+                  background: colors.hoverSecondaryBlue,
                   '&:hover': {
-                    background: colors.hoverBlue,
+                    background: colors.hoverSecondaryBlue,
                   },
                 }
               : {}
           }
           leftIcon={<Icon of="upload" color={colors.nomusBlue} />}
         >
-          Upload a file or drag and drop
+          {uploadText ?? 'Upload a file or drag and drop'}
         </Button>
       )}
-    </Box>
+    </>
   )
 }
 

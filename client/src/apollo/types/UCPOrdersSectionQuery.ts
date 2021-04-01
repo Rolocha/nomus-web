@@ -9,13 +9,13 @@ import { OrderState } from './globalTypes'
 // GraphQL query operation: UCPOrdersSectionQuery
 // ====================================================
 
-export interface UCPOrdersSectionQuery_orders_cardVersion {
+export interface UCPOrdersSectionQuery_userOrders_cardVersion {
   __typename: 'CardVersion'
   frontImageUrl: string | null
   backImageUrl: string | null
 }
 
-export interface UCPOrdersSectionQuery_orders_price {
+export interface UCPOrdersSectionQuery_userOrders_price {
   __typename: 'OrderPrice'
   subtotal: number
   tax: number
@@ -23,11 +23,11 @@ export interface UCPOrdersSectionQuery_orders_price {
   total: number
 }
 
-export interface UCPOrdersSectionQuery_orders {
+export interface UCPOrdersSectionQuery_userOrders {
   __typename: 'Order'
   id: string
-  cardVersion: UCPOrdersSectionQuery_orders_cardVersion
-  price: UCPOrdersSectionQuery_orders_price
+  cardVersion: UCPOrdersSectionQuery_userOrders_cardVersion
+  price: UCPOrdersSectionQuery_userOrders_price
   quantity: number
   state: OrderState
   createdAt: any
@@ -35,5 +35,5 @@ export interface UCPOrdersSectionQuery_orders {
 }
 
 export interface UCPOrdersSectionQuery {
-  orders: UCPOrdersSectionQuery_orders[] | null
+  userOrders: UCPOrdersSectionQuery_userOrders[] | null
 }

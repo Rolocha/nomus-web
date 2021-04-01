@@ -60,10 +60,10 @@ const Banner = ({
     {
       NONE: {
         borderTopLeftRadius: 'none',
-        borderBottomLeftRadius: 'base',
+        borderBottomLeftRadius: 'none',
       },
       DEFAULT: {
-        borderTopLeftRadius: 'none',
+        borderTopLeftRadius: 'base',
         borderBottomLeftRadius: 'base',
       },
     },

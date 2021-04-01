@@ -9,6 +9,6 @@ export const isValidQuantity = (quantity: number) => {
   return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))
 }
 
-export const calculateCost = (quantity: number) => {
+export const calculateCost = (quantity: number): number | null => {
   return QUANTITY_TO_PRICE[quantity] || null
 }

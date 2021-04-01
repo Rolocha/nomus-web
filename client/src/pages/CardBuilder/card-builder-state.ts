@@ -1,26 +1,19 @@
 import { PaymentIntent, Token } from '@stripe/stripe-js'
+import {
+  CardBuilderStep,
+  BaseType,
+  OrderQuantityOption,
+  CheckoutFormData,
+  TemplateID,
+} from './types'
 import { FileItem } from 'src/types/files'
 
-export type TemplateID = 'foobar'
-
-export type BaseType = 'custom' | 'template'
-
-export type OrderQuantityOption = 25 | 50 | 100
-
-// Data from the order details form
-export interface CheckoutFormData {
-  name: string
-  addressLine1: string
-  addressLine2?: string
-  city: string
-  state: string
-  postalCode: string
-}
-
 export type CardBuilderState = {
+  currentStep: CardBuilderStep
+
   baseType: BaseType
   quantity: OrderQuantityOption | null
-  formData: CheckoutFormData | null
+  formData: CheckoutFormData
 
   // Template details
   templateId: TemplateID | null
@@ -37,13 +30,21 @@ export type CardBuilderState = {
 }
 
 export const initialState: CardBuilderState = {
+  currentStep: 'build',
   baseType: 'custom',
   quantity: 50,
   templateId: null,
   frontDesignFile: null,
   backDesignFile: null,
   graphicElementFile: null,
-  formData: null,
+  formData: {
+    name: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+  },
   stripeToken: null,
   paymentIntent: null,
   cardEntryComplete: false,
