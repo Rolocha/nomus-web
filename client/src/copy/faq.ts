@@ -26,7 +26,7 @@ export const faqItems = [
   },
   {
     question: 'Can I get a sample?',
-    answer: 'We offer sample boxes of 25 cards.',
+    answer: 'We offer sample boxes of 25 cards for purchase.',
   },
   {
     question: 'How long will my cards take to get to me?',

@@ -13,53 +13,24 @@ import {
 interface Props {
   title: string
   children: React.ReactNode
-  size?: 'medium' | 'small'
 }
 
-const AccordionComponent = ({ title, children, size = 'medium' }: Props) => {
-  // const [isOpen, setIsOpen] = React.useState(false)
-
-  // const handleButtonClick = () => {
-  //   setIsOpen(!isOpen)
-  // }
-
+const AccordionComponent = ({ title, children }: Props) => {
   return (
     <Accordion allowMultiple allowToggle>
       <AccordionItem>
-        <Box
-          // borderTop={`1px solid ${colors.africanElephant}`}
-          // borderBottom={!isOpen ? `1px solid ${colors.afrdockicanElephant}` : null}
-          // height={
-          //   {
-          //     medium: '64px',
-          //     small: '42px',
-          //   }[size]
-          // }
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <AccordionButton>
+        <AccordionButton>
+          <Box flex="1" textAlign="left">
             <Text.SectionSubheader>{title}</Text.SectionSubheader>
-            <AccordionIcon />
-          </AccordionButton>
-          {/* <Box role="button" cursor="pointer" onClick={handleButtonClick}>
-          {isOpen ? (
-            <Icon of="minus" color={colors.midnightGray} />
-          ) : (
-            <Icon of="plus" color={colors.midnightGray} />
-          )}
-        </Box> */}
-        </Box>
+          </Box>
+          <AccordionIcon justifySelf="right" />
+        </AccordionButton>
+        <AccordionPanel>
+          <Box borderBottom={`1px solid ${colors.africanElephant}`} pb="20px">
+            {children}
+          </Box>
+        </AccordionPanel>
       </AccordionItem>
-
-      {/* {isOpen && ( */}
-      <AccordionPanel>
-        <Box borderBottom={`1px solid ${colors.africanElephant}`} pb="20px">
-          {children}
-        </Box>
-      </AccordionPanel>
-      {/* )} */}
     </Accordion>
   )
 }

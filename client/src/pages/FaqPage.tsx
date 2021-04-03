@@ -10,7 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { createMailtoURL } from 'src/utils/email'
 import { faqItems } from 'src/copy/faq'
-import { Link } from 'src/components/Link'
+import Link from 'src/components/Link'
 
 interface FormData {
   name: string
@@ -95,14 +95,14 @@ export default () => {
                 {<Link to="/about">About</Link>} page.
               </Text.Body2>
             </AccordionComponent>
-            {/* {faqItems.map(({ question, answer }) => (
-              <Accordion key={question} title={question}>
+            {faqItems.map(({ question, answer }) => (
+              <AccordionComponent key={question} title={question}>
                 <Text.Body2>{answer}</Text.Body2>
-              </Accordion>
-            ))} */}
+              </AccordionComponent>
+            ))}
           </Box>
           <Box
-            gridColumn={{ base: '1/12', [bp]: '9/12' }}
+            gridColumn={{ base: 'span 12', [bp]: '9/12' }}
             boxShadow="workingWindow"
             borderRadius="16px"
             px="24px"
@@ -110,7 +110,7 @@ export default () => {
             marginLeft="24px"
             alignSelf="start"
             mt={{ base: '32px', [bp]: '24px' }}
-            width="150%"
+            width={{ base: '', [bp]: '150%' }}
             justifySelf="center"
           >
             <Text.SectionHeader mb="16px">
@@ -133,7 +133,7 @@ export default () => {
                 <Form.FieldError fieldError={errors.name} />
               </Form.Item>
               <Form.Item mb="16px">
-                <Form.Label htmlFor="email">EMAIL</Form.Label>
+                <Form.Label htmlFor="email">EMAIL *</Form.Label>
                 <Form.Input
                   name="email"
                   ref={register({ required: true })}
@@ -145,7 +145,7 @@ export default () => {
               </Form.Item>
               <Form.Item mb="16px">
                 <Form.Label htmlFor="entry">
-                  WHAT DO YOU WANT TO KNOW?
+                  WHAT DO YOU WANT TO KNOW? *
                 </Form.Label>
                 <Form.TextArea
                   name="entry"
