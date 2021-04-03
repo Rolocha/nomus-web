@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { colors } from 'src/styles'
 import Box from './Box'
 import * as Text from './Text'
 import {
@@ -26,9 +25,7 @@ const AccordionComponent = ({ title, children }: Props) => {
           <AccordionIcon justifySelf="right" />
         </AccordionButton>
         <AccordionPanel>
-          <Box borderBottom={`1px solid ${colors.africanElephant}`} pb="20px">
-            {children}
-          </Box>
+          <Box>{children}</Box>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>

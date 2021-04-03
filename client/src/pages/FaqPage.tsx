@@ -133,7 +133,9 @@ export default () => {
                 <Form.FieldError fieldError={errors.name} />
               </Form.Item>
               <Form.Item mb="16px">
-                <Form.Label htmlFor="email">EMAIL *</Form.Label>
+                <Form.Label htmlFor="email" required>
+                  EMAIL
+                </Form.Label>
                 <Form.Input
                   name="email"
                   ref={register({ required: true })}
@@ -144,8 +146,8 @@ export default () => {
                 <Form.FieldError fieldError={errors.email} />
               </Form.Item>
               <Form.Item mb="16px">
-                <Form.Label htmlFor="entry">
-                  WHAT DO YOU WANT TO KNOW? *
+                <Form.Label htmlFor="entry" required>
+                  WHAT DO YOU WANT TO KNOW?
                 </Form.Label>
                 <Form.TextArea
                   name="entry"
