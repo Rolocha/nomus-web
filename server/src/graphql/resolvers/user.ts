@@ -8,8 +8,6 @@ import {
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
 import { IApolloContext } from 'src/graphql/types'
-import { User } from 'src/models/User'
-import CardVersion from 'src/models/CardVersion'
 import { Role } from 'src/util/enums'
 import { Void } from 'src/models/scalars'
 import {
@@ -30,6 +28,7 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { CardVersion, User } from 'src/models'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -311,6 +310,12 @@ class UserResolver {
     await user.save()
 
     return null
+  }
+
+  @Mutation(() => Void)
+  async deleteUserAccount(@Ctx() context: IApolloContext): Promise<void> {
+    await CardVersion.mongo.deleteMany({ user: context.user.id })
+    await User.mongo.deleteOne({ id: context.user.id })
   }
 }
 export default UserResolver
