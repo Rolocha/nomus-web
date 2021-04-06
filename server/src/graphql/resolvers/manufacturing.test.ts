@@ -5,7 +5,7 @@ import { Role } from 'src/util/enums'
 import { Sheet, Card } from 'src/models'
 import AWS from 'aws-sdk'
 import * as AWSMock from 'aws-sdk-mock'
-import { SHEET_CARD_REGEX } from 'src/util/linker'
+import { SHEET_CARD_REGEX } from 'src/util/splicer'
 
 beforeAll(async () => {
   await initDB()

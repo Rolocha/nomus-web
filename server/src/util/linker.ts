@@ -1,73 +1,8 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, CardVersion, Order, Sheet } from 'src/models'
-import { CardInteractionType, OrderEventTrigger, OrderState } from './enums'
+import { OrderEventTrigger, OrderState } from './enums'
 import { Result } from './error'
-
-export const SHEET_CARD_REGEX = /(sheet_[a-f0-9]{24})-(card_[a-f0-9]{24})/i
-export const CARDV_REGEX = /(cardv_[a-f0-9]{24})/i
-
-// responsible for splicing the NFC string in a URL to Sheet Id and Card Id
-const spliceNFCString = (
-  nfcString: string
-): Result<{ sheetId: string; cardId: string }, 'invalid-format'> => {
-  const sheetCardMatch = nfcString.match(SHEET_CARD_REGEX)
-  if (sheetCardMatch && sheetCardMatch.length === 3) {
-    return Result.ok({ sheetId: sheetCardMatch[1], cardId: sheetCardMatch[2] })
-  }
-
-  return Result.fail('invalid-format')
-}
-
-// responsible for splicing QR string, getting the CardVersion Id
-const spliceQRString = (qrString: string): Result<{ cardVersionId: string }, 'invalid-format'> => {
-  const cardVersionMatch = qrString.match(CARDV_REGEX)
-  if (cardVersionMatch && cardVersionMatch.length === 2) {
-    return Result.ok({ cardVersionId: cardVersionMatch[1] })
-  }
-
-  return Result.fail('invalid-format')
-}
-
-// determines the right interaction string and parses the relevant data with interaction type
-export const getCardDataForInteractionString = async (
-  interactionString: string
-): Promise<
-  Result<
-    {
-      cardVersion: CardVersion
-      card: Card | null
-      interactionType: CardInteractionType
-    },
-    'invalid-card-id'
-  >
-> => {
-  const nfcParseResult = spliceNFCString(interactionString)
-  if (nfcParseResult.isSuccess) {
-    const card = await Card.mongo.findById(nfcParseResult.value.cardId).populate('cardVersion')
-    if (card == null) {
-      return Result.fail('invalid-card-id')
-    }
-    return Result.ok({
-      // (as CardVersion) is safe since we populate it on card above
-      cardVersion: card.cardVersion as CardVersion,
-      card,
-      interactionType: CardInteractionType.Tap,
-    })
-  }
-
-  const qrParseResult = spliceQRString(interactionString)
-  if (qrParseResult.isSuccess) {
-    const cardVersion = await CardVersion.mongo.findById(qrParseResult.value.cardVersionId)
-    return Result.ok({
-      cardVersion,
-      // we don't know which `card` was used for QR interaction strings
-      card: null,
-      interactionType: CardInteractionType.QRCode,
-    })
-  }
-
-  return Result.fail('invalid-card-id')
-}
+import { spliceNFCString } from './splicer'
 
 // assigns fields on Sheet, CardVersion and Order
 // goes through all Cards in the Sheet, assigning CardVersion and User
