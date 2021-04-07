@@ -1,8 +1,4 @@
-import { rgba } from 'polished'
-import templateLibrary from 'src/templates'
-import { TemplateOptionsType } from 'src/components/TemplateCard/types'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
-import { TemplateID } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 import { ImageDimensions } from 'src/utils/image'
 
@@ -48,34 +44,6 @@ export const rgb2hex = (rgb: string) => {
     : ''
 }
 
-export const drawOuterBleed = (
-  canvas: HTMLCanvasElement,
-  cardDimensions: ImageDimensions,
-) => {
-  // Draw the image onto a canvas each time it changes or we toggle showGuides
-  const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
-  const xBleedPct = xBleed / cardWidth
-  const yBleedPct = yBleed / cardHeight
-
-  const context = canvas.getContext('2d')!
-
-  const actualXBleed = cardDimensions.width * xBleedPct
-  const actualYBleed = cardDimensions.height * yBleedPct
-
-  canvas.width = cardDimensions.width
-  canvas.height = cardDimensions.height
-
-  const outerBleedWidth = cardDimensions.width + actualXBleed * 2
-  const outerBleedHeight = cardDimensions.height + actualYBleed * 2
-
-  // Update canvas dimensions to include bleed
-  canvas.width = outerBleedWidth
-  canvas.height = outerBleedHeight
-
-  context.fillStyle = rgba(colors.gold, 0.5)
-  context.fillRect(0, 0, outerBleedWidth, outerBleedHeight)
-}
-
 export const drawInnerBleed = (
   canvas: HTMLCanvasElement,
   cardDimensions: ImageDimensions,
@@ -100,43 +68,4 @@ export const drawInnerBleed = (
     innerBleedWidth,
     innerBleedHeight,
   )
-}
-
-// Converts template customization form fields into the actual options to be passed in to the form.
-// This mapping is generally 1:1 but differs for the following field types
-// - file: the form uses FileItem but the template only accepts the URL
-export const createOptionsFromForm = (
-  templateId: TemplateID,
-  formFields: Record<string, any>,
-) => {
-  const { customizableOptions: customization } = templateLibrary[templateId]
-  const customizationKeys = Object.keys(
-    customization,
-  ) as (keyof typeof customization)[]
-
-  return customizationKeys.reduce((acc, customizationKey) => {
-    const customizationDetails = customization[customizationKey]
-    switch (customizationDetails.type) {
-      case 'image':
-        acc[customizationKey] = formFields[customizationKey]?.url ?? undefined
-        break
-      default:
-        acc[customizationKey] = formFields[customizationKey]
-    }
-    return acc
-  }, {} as any)
-}
-
-export async function templateToImageDataUrl<T extends TemplateID>(
-  templateId: T,
-  options: TemplateOptionsType<T>,
-) {
-  const frontCanvas = document.createElement('canvas')
-  const backCanvas = document.createElement('canvas')
-  await templateLibrary[templateId].renderFront(frontCanvas, options)
-  await templateLibrary[templateId].renderBack(backCanvas, options)
-  return {
-    front: frontCanvas.toDataURL('image/png'),
-    back: backCanvas.toDataURL('image/png'),
-  }
 }
