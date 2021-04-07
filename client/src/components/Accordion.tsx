@@ -1,6 +1,7 @@
 import * as React from 'react'
 import Box from './Box'
 import * as Text from './Text'
+import { colors } from 'src/styles'
 import {
   Accordion as ChakraAccordion,
   AccordionItem,
@@ -8,6 +9,7 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react'
+import Icon from './Icon'
 
 interface Props {
   title: string
@@ -15,14 +17,23 @@ interface Props {
 }
 
 const Accordion = ({ title, children }: Props) => {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const handleButtonClick = () => {
+    setIsOpen(!isOpen)
+  }
+
   return (
     <ChakraAccordion allowMultiple allowToggle>
       <AccordionItem>
-        <AccordionButton>
+        <AccordionButton onClick={handleButtonClick}>
           <Box flex="1" textAlign="left">
             <Text.SectionSubheader>{title}</Text.SectionSubheader>
           </Box>
-          <AccordionIcon justifySelf="right" />
+          {isOpen ? (
+            <Icon of="minus" color={colors.africanElephant} />
+          ) : (
+            <Icon of="plus" color={colors.africanElephant} />
+          )}
         </AccordionButton>
         <AccordionPanel>{children}</AccordionPanel>
       </AccordionItem>
