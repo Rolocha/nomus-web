@@ -200,13 +200,7 @@ export default class CardTemplate<T> {
   }
 
   drawInnerBleed(ctx: CanvasRenderingContext2D) {
-    // Draw the image onto a canvas each time it changes or we toggle showGuides
-    const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
-    const xBleedPct = xBleed / cardWidth
-    const yBleedPct = yBleed / cardHeight
-
-    const actualXBleed = this.usableWidth * xBleedPct
-    const actualYBleed = this.usableHeight * yBleedPct
+    const { x: actualXBleed, y: actualYBleed } = this.bleed
 
     const innerBleedWidth = this.usableWidth - actualXBleed * 2
     const innerBleedHeight = this.usableHeight - actualYBleed * 2
