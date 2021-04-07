@@ -1,8 +1,17 @@
+import CardTemplate from 'src/templates/base'
 import Velia from 'src/templates/velia'
 
 export const templateLibrary = {
   velia: Velia,
 } as const
+
+export type TemplateID = keyof typeof templateLibrary
+
+type extractGeneric<Type> = Type extends CardTemplate<infer X> ? X : never
+
+export type TemplateOptionsType<T extends TemplateID> = extractGeneric<
+  typeof templateLibrary[T]
+>
 
 export const templateNames = Object.keys(
   templateLibrary,

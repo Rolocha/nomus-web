@@ -1,8 +1,6 @@
 import * as React from 'react'
-import Box from 'src/components/Box'
 import Icon from 'src/components/Icon'
-import Image from 'src/components/Image'
-import * as Text from 'src/components/Text'
+import SelectedImagePreview from 'src/components/SelectedImagePreview'
 import { colors } from 'src/styles'
 import { FileItem } from 'src/types/files'
 import Button from './Button'
@@ -10,13 +8,13 @@ import { Input } from './Form'
 
 interface Props {
   name: string
-  accept?: string
-  width?: string
-  height?: string
   selectedFileItem: FileItem | null
   handleFileItemChange: (file: FileItem | null) => void
   createObjectUrl: boolean
   showImagePreview: boolean
+  accept?: string
+  width?: string
+  height?: string
   uploadText?: string
 }
 
@@ -58,7 +56,7 @@ const FileUploadButton = ({
       const fileItem = createObjectUrl
         ? {
             file,
-            url: window.URL.createObjectURL(files[0]),
+            url: window.URL.createObjectURL(file),
           }
         : {
             file,
@@ -120,50 +118,10 @@ const FileUploadButton = ({
         }}
       />
       {selectedFileItem ? (
-        <Box
-          display="grid"
-          gridTemplateColumns={showImagePreview ? '2fr 3fr 1fr' : '5fr 1fr'}
-          p={2}
-          borderRadius="lg"
-          gridColumnGap={3}
-          bg="activeSecondaryBlue"
-        >
-          {showImagePreview && (
-            <Box position="relative">
-              <Image
-                w="100%"
-                border="1px solid #ccc"
-                src={selectedFileItem.url}
-              />
-              <Box
-                position="absolute"
-                px={2}
-                py={1}
-                bg={colors.cyanProcess}
-                borderRadius="lg"
-                right="-5%"
-                bottom="-5%"
-              >
-                <Text.Plain color="white" fontSize="10px">
-                  {selectedFileItem.file.type.split('/')[1].toUpperCase()}
-                </Text.Plain>
-              </Box>
-            </Box>
-          )}
-          <Box>
-            <Text.Body2>{selectedFileItem.file.name}</Text.Body2>
-            <Text.Body3 color="africanElephant">
-              {Math.round(selectedFileItem.file.size / 10) / 10}kb
-            </Text.Body3>
-          </Box>
-          <Button
-            variant="tertiary"
-            p="0 !imporant"
-            onClick={() => handleFileItemChange(null)}
-          >
-            <Icon of="close" color={colors.nomusBlue} />
-          </Button>
-        </Box>
+        <SelectedImagePreview
+          selectedFileItem={selectedFileItem}
+          handleDiscardFile={() => handleFileItemChange(null)}
+        />
       ) : (
         <Button
           ref={buttonRef}

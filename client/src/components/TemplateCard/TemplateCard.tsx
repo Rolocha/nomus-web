@@ -1,9 +1,6 @@
 import * as React from 'react'
 import templates from 'src/templates'
-import {
-  TemplateID,
-  TemplateOptionsType,
-} from 'src/components/TemplateCard/types'
+import { TemplateID, TemplateOptionsType } from 'src/templates'
 import shadows from 'src/styles/shadows'
 
 interface Props<T extends TemplateID> {
@@ -36,9 +33,9 @@ function TemplateCard<T extends TemplateID>({
 
       isRenderingRef.current = true
       if (side === 'front') {
-        await template.renderFront(canvas, options)
+        await template.renderFrontToCanvas(canvas, options)
       } else if (side === 'back') {
-        await template.renderBack(canvas, options)
+        await template.renderBackToCanvas(canvas, options)
       }
       isRenderingRef.current = false
       template.drawBorder(canvas.getContext('2d')!)

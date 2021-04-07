@@ -2,17 +2,33 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
+import templateLibrary, { templateNames } from 'src/templates'
 import * as Text from 'src/components/Text'
+import { colors } from 'src/styles'
+import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
-import { CardBuilderState } from './card-builder-state'
 
 interface Props {
   selectedBaseType: string | undefined
   cardBuilderState: CardBuilderState
+  updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
 
-const BaseStep = ({ selectedBaseType }: Props) => {
+// const templateKeys = Object.keys(
+//   templateLibrary,
+// ) as (keyof typeof templateLibrary)[]
+
+const BaseStep = ({
+  selectedBaseType,
+  cardBuilderState,
+  updateCardBuilderState,
+}: Props) => {
+  // const [
+  //   selectedTemplateId,
+  //   setSelectedTemplateId,
+  // ] = React.useState<TemplateID>(templateKeys[0])
+
   return (
     <Box overflowY="scroll" height="100%">
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
@@ -70,13 +86,41 @@ const BaseStep = ({ selectedBaseType }: Props) => {
                   gridColumnGap={3}
                   gridRowGap={3}
                 >
-                  {Array(8)
-                    .fill(null)
-                    .map(() => (
-                      <Box>
-                        <Image w="100%" src="https://placehold.it/700x400" />
+                  {templateNames.map((templateId) => {
+                    const templateDetails = templateLibrary[templateId]
+                    return (
+                      <Box
+                        role="button"
+                        onClick={() => {
+                          updateCardBuilderState({ templateId })
+                        }}
+                        cursor="pointer"
+                        borderRadius={2}
+                        position="relative"
+                        border={
+                          cardBuilderState.templateId === templateId
+                            ? `4px solid ${colors.outlineBlue}`
+                            : undefined
+                        }
+                      >
+                        <Image w="100%" src={templateDetails.demoImageUrl} />
+                        <Box
+                          position="absolute"
+                          bg="rgba(0,0,0,0.5)"
+                          bottom={0}
+                          left={0}
+                          width="100%"
+                          // height="20%"
+                          px={2}
+                          py={1}
+                        >
+                          <Text.Body2 color={colors.white}>
+                            {templateDetails.name}
+                          </Text.Body2>
+                        </Box>
                       </Box>
-                    ))}
+                    )
+                  })}
                 </Box>
               </Box>
             ),
