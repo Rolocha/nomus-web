@@ -57,10 +57,7 @@ export const drawOuterBleed = (
   const xBleedPct = xBleed / cardWidth
   const yBleedPct = yBleed / cardHeight
 
-  // if (canvas) {
   const context = canvas.getContext('2d')!
-
-  // const cardDimensions = await getImageDimensions(cardImageUrl)
 
   const actualXBleed = cardDimensions.width * xBleedPct
   const actualYBleed = cardDimensions.height * yBleedPct
@@ -68,32 +65,26 @@ export const drawOuterBleed = (
   canvas.width = cardDimensions.width
   canvas.height = cardDimensions.height
 
-  // if (showGuides) {
-  // Draw outer bleed
   const outerBleedWidth = cardDimensions.width + actualXBleed * 2
   const outerBleedHeight = cardDimensions.height + actualYBleed * 2
+
   // Update canvas dimensions to include bleed
   canvas.width = outerBleedWidth
   canvas.height = outerBleedHeight
 
   context.fillStyle = rgba(colors.gold, 0.5)
   context.fillRect(0, 0, outerBleedWidth, outerBleedHeight)
-  // }
 }
 
 export const drawInnerBleed = (
   canvas: HTMLCanvasElement,
   cardDimensions: ImageDimensions,
 ) => {
-  // Draw the image onto a canvas each time it changes or we toggle showGuides
   const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
   const xBleedPct = xBleed / cardWidth
   const yBleedPct = yBleed / cardHeight
 
-  // if (canvas) {
   const context = canvas.getContext('2d')!
-
-  // const cardDimensions = await getImageDimensions(cardImageUrl)
 
   const actualXBleed = cardDimensions.width * xBleedPct
   const actualYBleed = cardDimensions.height * yBleedPct
@@ -126,8 +117,7 @@ export const createOptionsFromForm = (
   return customizationKeys.reduce((acc, customizationKey) => {
     const customizationDetails = customization[customizationKey]
     switch (customizationDetails.type) {
-      case 'file':
-        // debugger
+      case 'image':
         acc[customizationKey] = formFields[customizationKey]?.url ?? undefined
         break
       default:
