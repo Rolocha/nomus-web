@@ -15,20 +15,11 @@ interface Props {
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
 
-// const templateKeys = Object.keys(
-//   templateLibrary,
-// ) as (keyof typeof templateLibrary)[]
-
 const BaseStep = ({
   selectedBaseType,
   cardBuilderState,
   updateCardBuilderState,
 }: Props) => {
-  // const [
-  //   selectedTemplateId,
-  //   setSelectedTemplateId,
-  // ] = React.useState<TemplateID>(templateKeys[0])
-
   return (
     <Box overflowY="scroll" height="100%">
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
@@ -110,7 +101,6 @@ const BaseStep = ({
                           bottom={0}
                           left={0}
                           width="100%"
-                          // height="20%"
                           px={2}
                           py={1}
                         >

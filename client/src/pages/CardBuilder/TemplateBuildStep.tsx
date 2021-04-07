@@ -85,7 +85,6 @@ const TemplateBuildStep = ({
                 } else {
                   return !fieldDetails.hidden(templateCardOptions)
                 }
-                // customizableOptions[fieldName] == null || customizableOptions[fieldName].hidden == null || customizableOptions[fieldName].hidden(templateCardOptions)
               })
               .map((fieldName) => {
                 const fieldDetails = customizableOptions[fieldName]

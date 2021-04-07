@@ -37,7 +37,6 @@ const CardContainer = ({
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
-      {/* <Box width="100%" height="100%"> */}
       {imageUrl ? (
         <CardWithGuides
           cardImageUrl={imageUrl}
@@ -58,7 +57,6 @@ const CardContainer = ({
           uploadText={uploadText}
         />
       )}
-      {/* </Box> */}
       <Text.Body2>{labelText}</Text.Body2>
     </Box>
   )
