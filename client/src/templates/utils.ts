@@ -1,6 +1,4 @@
-import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import { ImageDimensions } from 'src/utils/image'
 
 export const createNFCTapIconSVG = ({
   color = colors.nomusBlue,
@@ -42,30 +40,4 @@ export const rgb2hex = (rgb: string) => {
         ('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
         ('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
     : ''
-}
-
-export const drawInnerBleed = (
-  canvas: HTMLCanvasElement,
-  cardDimensions: ImageDimensions,
-) => {
-  const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
-  const xBleedPct = xBleed / cardWidth
-  const yBleedPct = yBleed / cardHeight
-
-  const context = canvas.getContext('2d')!
-
-  const actualXBleed = cardDimensions.width * xBleedPct
-  const actualYBleed = cardDimensions.height * yBleedPct
-
-  const innerBleedWidth = cardDimensions.width - actualXBleed * 2
-  const innerBleedHeight = cardDimensions.height - actualYBleed * 2
-
-  context.strokeStyle = colors.brightCoral
-  context.setLineDash([6])
-  context.strokeRect(
-    actualXBleed * 2,
-    actualYBleed * 2,
-    innerBleedWidth,
-    innerBleedHeight,
-  )
 }
