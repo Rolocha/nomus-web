@@ -1,4 +1,22 @@
+import Link from 'src/components/Link'
+
 export const faqItems = [
+  {
+    question: 'How does Nomus work?',
+    answer: (
+      <>
+        Build up your public profile and create your business card right on the
+        Nomus Card Builder. After you've placed your order, we'll send you your
+        pack of custom business cards, each with an NFC chip embedded inside.
+        When you open up your package, you'll see instructions on how to set up
+        your cards, or you can find set-up instructions right on the site. As
+        soon as you link your card to your digital profile, you're ready to
+        start tapping away, sharing your profile and adding contacts to Nomus.
+        Learn more about Nomus and our story on our{' '}
+        {<Link to="/about">About</Link>} page.
+      </>
+    ),
+  },
   {
     question: 'What is NFC?',
     answer:

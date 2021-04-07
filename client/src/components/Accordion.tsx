@@ -2,7 +2,7 @@ import * as React from 'react'
 import Box from './Box'
 import * as Text from './Text'
 import {
-  Accordion,
+  Accordion as ChakraAccordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
@@ -14,9 +14,9 @@ interface Props {
   children: React.ReactNode
 }
 
-const AccordionComponent = ({ title, children }: Props) => {
+const Accordion = ({ title, children }: Props) => {
   return (
-    <Accordion allowMultiple allowToggle>
+    <ChakraAccordion allowMultiple allowToggle>
       <AccordionItem>
         <AccordionButton>
           <Box flex="1" textAlign="left">
@@ -24,12 +24,10 @@ const AccordionComponent = ({ title, children }: Props) => {
           </Box>
           <AccordionIcon justifySelf="right" />
         </AccordionButton>
-        <AccordionPanel>
-          <Box>{children}</Box>
-        </AccordionPanel>
+        <AccordionPanel>{children}</AccordionPanel>
       </AccordionItem>
-    </Accordion>
+    </ChakraAccordion>
   )
 }
 
-export default AccordionComponent
+export default Accordion

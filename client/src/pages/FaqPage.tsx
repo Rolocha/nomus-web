@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
-import AccordionComponent from 'src/components/Accordion'
+import Accordion from 'src/components/Accordion'
 import * as Form from 'src/components/Form'
 import Navbar from 'src/components/Navbar'
 import Button from 'src/components/Button'
@@ -10,7 +10,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { createMailtoURL } from 'src/utils/email'
 import { faqItems } from 'src/copy/faq'
-import Link from 'src/components/Link'
 
 interface FormData {
   name: string
@@ -80,25 +79,10 @@ export default () => {
             <Text.SectionHeader mb="16px">
               Frequently asked questions
             </Text.SectionHeader>
-
-            <AccordionComponent title="How does Nomus work?">
-              <Text.Body2>
-                Build up your public profile and create your business card right
-                on the Nomus Card Builder. After you've placed your order, we'll
-                send you your pack of custom business cards, each with an NFC
-                chip embedded inside. When you open up your package, you'll see
-                instructions on how to set up your cards, or you can find set-up
-                instructions right on the site. As soon as you link your card to
-                your digital profile, you're ready to start tapping away,
-                sharing your profile and adding contacts to Nomus. Learn more
-                about Nomus and our story on our{' '}
-                {<Link to="/about">About</Link>} page.
-              </Text.Body2>
-            </AccordionComponent>
             {faqItems.map(({ question, answer }) => (
-              <AccordionComponent key={question} title={question}>
+              <Accordion key={question} title={question}>
                 <Text.Body2>{answer}</Text.Body2>
-              </AccordionComponent>
+              </Accordion>
             ))}
           </Box>
           <Box

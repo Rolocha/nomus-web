@@ -74,38 +74,37 @@ const ForgotPassword = () => {
             instructions on resetting your password.
           </Text.Body2>
         ) : (
-          <Box>
-            <Text.Body2
-              mb={{ _: '16px', [bp]: '32px' }}
-              // mb={4} delete later
-            >
-              Don't worry, it happens to the best of us. Enter your email
-              address and we'll email you a link to reset it.
-            </Text.Body2>
-            <Form.Form onSubmit={handleSubmit(onSubmit)}>
-              <Form.Item mb={{ _: '16px', [bp]: '32px' }}>
-                <Form.Label htmlFor="email">EMAIL</Form.Label>
-                <Form.Input
-                  name="email"
-                  ref={register({ required: true })}
-                  type="text"
-                  autoComplete="email"
-                  error={errors.email}
-                />
-                <Form.FieldError fieldError={errors.email} />
-              </Form.Item>
-              <Button
-                type="submit"
-                width="100%"
-                variant="primary"
-                size="big"
-                isLoading={formState.isSubmitting}
+            <Box>
+              <Text.Body2
+                mb={{ _: '16px', [bp]: '32px' }}
               >
-                Email me a recovery link
+                Don't worry, it happens to the best of us. Enter your email
+                address and we'll email you a link to reset it.
+            </Text.Body2>
+              <Form.Form onSubmit={handleSubmit(onSubmit)}>
+                <Form.Item mb={{ _: '16px', [bp]: '32px' }}>
+                  <Form.Label htmlFor="email">EMAIL</Form.Label>
+                  <Form.Input
+                    name="email"
+                    ref={register({ required: true })}
+                    type="text"
+                    autoComplete="email"
+                    error={errors.email}
+                  />
+                  <Form.FieldError fieldError={errors.email} />
+                </Form.Item>
+                <Button
+                  type="submit"
+                  width="100%"
+                  variant="primary"
+                  size="big"
+                  isLoading={formState.isSubmitting}
+                >
+                  Email me a recovery link
               </Button>
-            </Form.Form>
-          </Box>
-        )}
+              </Form.Form>
+            </Box>
+          )}
       </Box>
     </Box>
   )
