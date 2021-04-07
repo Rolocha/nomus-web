@@ -62,7 +62,7 @@ const Velia = new CardTemplate<VeliaOptions>({
       hidden: () => true,
     },
     logoUrl: {
-      type: 'file',
+      type: 'image',
       label: 'Logo',
     },
     logoSize: {

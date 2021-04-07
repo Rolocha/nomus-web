@@ -8,16 +8,20 @@ import {
   rgb2hex,
 } from './utils'
 
+// The scaling factor for how much we increase the resolution
+// of the template cards when rendered - might make sense to
+// move this to TemplateCard
 const RESOLUTION_FACTOR = 5
 
 export interface GenericCustomizableFieldSpec<T> {
-  type: 'text' | 'color' | 'file' | 'range'
+  type: 'text' | 'color' | 'image' | 'range'
   label?: string
   placeholder?: string
   required?: boolean
   defaultValue?: any
   hidden?: (options: T) => boolean
 }
+
 export interface CustomizableRangeFieldSpec<T>
   extends GenericCustomizableFieldSpec<T> {
   type: 'range'
@@ -32,7 +36,7 @@ export type CustomizableFieldSpec<T> =
   | CustomizableRangeFieldSpec<T>
   | GenericCustomizableFieldSpec<T>
 
-export interface BaseCardOptions<T> {
+export interface CardTemplateDefinition<T> {
   name: string
   width: number
   height: number
@@ -46,25 +50,31 @@ interface RenderResponse {
   isComplete: boolean
 }
 
+// Instances of CardTemplate represent specific templates that we offer
+// e.g.
+// const VeliaTemplate = new CardTemplate(veliaTemplateDefinition)
+//
+// Using this instance also gives the template definition's render functions
+// access to useful utility methods such as drawNomusLogo, drawQRCode, etc.
 export default class CardTemplate<T> {
-  public name: BaseCardOptions<T>['name']
-  public customizableOptions: BaseCardOptions<T>['customizableOptions']
-  public width: BaseCardOptions<T>['width']
-  public height: BaseCardOptions<T>['height']
-  public demoImageUrl: BaseCardOptions<T>['demoImageUrl']
+  public name: CardTemplateDefinition<T>['name']
+  public customizableOptions: CardTemplateDefinition<T>['customizableOptions']
+  public width: CardTemplateDefinition<T>['width']
+  public height: CardTemplateDefinition<T>['height']
+  public demoImageUrl: CardTemplateDefinition<T>['demoImageUrl']
 
-  private _renderFront: BaseCardOptions<T>['renderFront']
-  private _renderBack: BaseCardOptions<T>['renderBack']
+  private _renderFront: CardTemplateDefinition<T>['renderFront']
+  private _renderBack: CardTemplateDefinition<T>['renderBack']
   private userSpecifiedOptions: T | null = null
 
-  constructor(opts: BaseCardOptions<T>) {
-    this.name = opts.name
-    this.width = opts.width
-    this.height = opts.height
-    this.demoImageUrl = opts.demoImageUrl
-    this.customizableOptions = opts.customizableOptions
-    this._renderFront = opts.renderFront
-    this._renderBack = opts.renderBack
+  constructor(definition: CardTemplateDefinition<T>) {
+    this.name = definition.name
+    this.width = definition.width
+    this.height = definition.height
+    this.demoImageUrl = definition.demoImageUrl
+    this.customizableOptions = definition.customizableOptions
+    this._renderFront = definition.renderFront
+    this._renderBack = definition.renderBack
   }
 
   get usableWidth() {
@@ -95,7 +105,7 @@ export default class CardTemplate<T> {
     return { x: actualXBleed, y: actualYBleed }
   }
 
-  get customizableFieldNames(): (keyof BaseCardOptions<T>['customizableOptions'])[] {
+  get customizableFieldNames(): (keyof CardTemplateDefinition<T>['customizableOptions'])[] {
     return Object.keys(this.customizableOptions) as any[]
   }
 
@@ -105,18 +115,33 @@ export default class CardTemplate<T> {
   get storybookArgTypes() {
     return this.customizableFieldNames.reduce<any>(
       (acc, customizableFieldName) => {
-        const fieldDetails = this.customizableOptions[customizableFieldName]
-        acc[customizableFieldName] = {
-          control: {
-            type: fieldDetails.type,
-          },
-        }
+        acc[customizableFieldName] = {}
 
-        if (fieldDetails.type === 'range') {
-          const rangeFieldDetails = fieldDetails as CustomizableRangeFieldSpec<any>
-          acc[customizableFieldName].control.min = rangeFieldDetails.range.min
-          acc[customizableFieldName].control.max = rangeFieldDetails.range.max
-          acc[customizableFieldName].control.step = rangeFieldDetails.range.step
+        const fieldDetails = this.customizableOptions[customizableFieldName]
+        switch (fieldDetails.type) {
+          case 'range':
+            const rangeFieldDetails = fieldDetails as CustomizableRangeFieldSpec<any>
+            acc[customizableFieldName].control = {
+              type: 'range',
+              min: rangeFieldDetails.range.min,
+              max: rangeFieldDetails.range.max,
+              step: rangeFieldDetails.range.step,
+            }
+            break
+          // The storybook version we use doesn't have a file selector so
+          // just show a basic url text input instead
+          case 'image':
+            acc[customizableFieldName].control = {
+              type: 'text',
+            }
+            break
+          default:
+            acc[customizableFieldName] = {
+              control: {
+                type: fieldDetails.type,
+              },
+            }
+            break
         }
         return acc
       },
@@ -162,10 +187,12 @@ export default class CardTemplate<T> {
     }
   }
 
+  // Proportionalizes a canvas coordinate value to match the resolution factor
   proportionalize(val: number) {
     return val * RESOLUTION_FACTOR
   }
 
+  // Draws a 2px black border around the entire card
   drawBorder(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = 'black'
     ctx.lineWidth = 2
