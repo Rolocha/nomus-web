@@ -1,9 +1,9 @@
 import { mongoose } from '@typegoose/typegoose'
 import DeletedObject from 'src/models/DeletedObject'
 
-export const deleteObject = (model: { id: string; mongo: typeof mongoose.Model }) => {
+export const deleteObject = (model) => {
   DeletedObject.mongo.create({
-    id: model.id,
+    id: model._id,
     deletedObject: JSON.stringify(this),
   })
   model.mongo.deleteOne({ id: model.id })
