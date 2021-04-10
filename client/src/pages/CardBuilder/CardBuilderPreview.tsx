@@ -1,98 +1,32 @@
-import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
-import FileUploadButton from 'src/components/FileUploadButton'
 import Icon from 'src/components/Icon'
-import * as Text from 'src/components/Text'
-import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import { FileItem } from 'src/types/files'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
-import CardWithGuides from './CardWithGuides'
 
-const CardContainer = ({
-  name,
-  fileItem,
-  showGuides,
-  changeHandler,
-}: {
-  name: 'front' | 'back'
-  fileItem: FileItem | null
-  showGuides?: boolean
-  changeHandler: (file: FileItem | null) => void
-}) => {
-  const uploadText = { front: `Upload front`, back: 'Upload back' }[name]
-  const labelText = { front: `Front`, back: 'Back' }[name]
-
-  const imageUrl = fileItem?.url
-
-  return (
-    <Box display="flex" flexDirection="column" alignItems="center">
-      {/* <Box width="100%" height="100%"> */}
-      {imageUrl ? (
-        <CardWithGuides
-          cardImageUrl={imageUrl}
-          showGuides={showGuides ?? false}
-          css={css({
-            flexBasis: 'auto',
-            maxHeight: '500px',
-          })}
-        />
-      ) : (
-        <FileUploadButton
-          name={`${name}DesignFile`}
-          width="100%"
-          height="100%"
-          accept={acceptableImageFileTypes.join(' ')}
-          selectedFileItem={fileItem}
-          handleFileItemChange={changeHandler}
-          uploadText={uploadText}
-        />
-      )}
-      {/* </Box> */}
-      <Text.Body2>{labelText}</Text.Body2>
-    </Box>
-  )
-}
+type SideRenderer = (opts: { showGuides: boolean }) => React.ReactNode
 
 interface Props {
-  selectedFrontImageFile: FileItem | null
-  selectedBackImageFile: FileItem | null
-  handleFrontImageFileChange: (file: FileItem | null) => void
-  handleBackImageFileChange: (file: FileItem | null) => void
+  cardOrientation?: 'horizontal' | 'vertical'
+  renderFront: SideRenderer | null
+  renderBack: SideRenderer | null
 }
 
 const CardBuilderPreview = ({
-  selectedBackImageFile,
-  selectedFrontImageFile,
-  handleBackImageFileChange,
-  handleFrontImageFileChange,
+  cardOrientation = 'horizontal',
+  renderFront,
+  renderBack,
 }: Props) => {
+  const missingBothImages = renderBack == null && renderFront == null
+  const missingAtLeastOneImage = renderBack == null || renderFront == null
+
   const [showGuides, setShowGuides] = React.useState(false)
   const [showBack, setShowBack] = React.useState(false)
-  const [showBothSides, setShowBothSides] = React.useState(false)
+  const [showBothSides, setShowBothSides] = React.useState(true)
 
-  // Since by default we show only the front card in the preview, if the user uploads the back image
-  // we should (the first time) change the preview mode to show the image they just uploaded
-  const [hasAutoShownBack, setHasAutoShownBack] = React.useState(false)
-  React.useEffect(() => {
-    if (selectedBackImageFile?.url != null && !hasAutoShownBack) {
-      setShowBothSides(true)
-      setHasAutoShownBack(true)
-    }
-  }, [
-    hasAutoShownBack,
-    selectedBackImageFile,
-    selectedFrontImageFile,
-    setShowBack,
-    setShowBothSides,
-  ])
-
-  const missingBothImages =
-    selectedBackImageFile == null && selectedFrontImageFile == null
-  const missingAtLeastOneImage =
-    selectedBackImageFile == null || selectedFrontImageFile == null
+  const backSide = renderBack ? renderBack({ showGuides }) : null
+  const frontSide = renderFront ? renderFront({ showGuides }) : null
 
   return (
     <Box display="grid" gridTemplateRows="auto 1fr auto">
@@ -135,30 +69,22 @@ const CardBuilderPreview = ({
         placeSelf="center center"
         width="100%"
         display="grid"
-        gridTemplateColumns={showBothSides ? '1fr 1fr' : '1fr'}
+        gridTemplateColumns={
+          showBothSides
+            ? { vertical: '1fr 1fr', horizontal: '1fr' }[cardOrientation]
+            : '1fr'
+        }
         gridColumnGap={2}
+        gridRowGap={2}
         sx={{
           '& > canvas': {
             placeSelf: 'center',
+            width: '100%',
           },
         }}
       >
-        {(!showBack || showBothSides) && (
-          <CardContainer
-            name="front"
-            fileItem={selectedFrontImageFile ?? null}
-            showGuides={showGuides}
-            changeHandler={handleFrontImageFileChange}
-          />
-        )}
-        {(showBack || showBothSides) && (
-          <CardContainer
-            name="back"
-            fileItem={selectedBackImageFile ?? null}
-            showGuides={showGuides}
-            changeHandler={handleBackImageFileChange}
-          />
-        )}
+        {(!showBack || showBothSides) && frontSide}
+        {(showBack || showBothSides) && backSide}
       </Box>
 
       {showGuides ? (

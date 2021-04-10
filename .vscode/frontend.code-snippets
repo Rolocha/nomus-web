@@ -8,11 +8,11 @@
       "",
       "}",
       "",
-      "const $1 = ({}: Props) => {",
+      "const $TM_FILENAME_BASE = ({}: Props) => {",
       "  $2",
       "}",
       "",
-      "export default $1"
+      "export default $TM_FILENAME_BASE"
     ],
     "description": "The basics for a new React component from a blank file"
   },

@@ -1,7 +1,7 @@
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
-import { cardTemplateDetails } from 'src/pages/CardBuilder/config'
+import templateLibrary from 'src/templates'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
 import { getCostSummary } from 'src/utils/pricing'
@@ -88,7 +88,7 @@ const ReviewStep = ({ cardBuilderState }: Props) => {
                 {
                   custom: 'Custom design Nomus card',
                   template: cardBuilderState.templateId
-                    ? cardTemplateDetails[cardBuilderState.templateId]
+                    ? templateLibrary[cardBuilderState.templateId].name
                     : 'Unknown template',
                 }[cardBuilderState.baseType]
               }

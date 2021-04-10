@@ -4,8 +4,8 @@ import { colors } from 'src/styles'
 import {
   createNFCTapIconSVG,
   createNomusLogoSVG,
-  RGBA_REGEX,
   rgb2hex,
+  RGBA_REGEX,
 } from './utils'
 
 // The scaling factor for how much we increase the resolution
@@ -56,18 +56,18 @@ interface RenderResponse {
 //
 // Using this instance also gives the template definition's render functions
 // access to useful utility methods such as drawNomusLogo, drawQRCode, etc.
-export default class CardTemplate<T> {
-  public name: CardTemplateDefinition<T>['name']
-  public customizableOptions: CardTemplateDefinition<T>['customizableOptions']
-  public width: CardTemplateDefinition<T>['width']
-  public height: CardTemplateDefinition<T>['height']
-  public demoImageUrl: CardTemplateDefinition<T>['demoImageUrl']
+export default class CardTemplate<TemplateOptions extends {}> {
+  public name: CardTemplateDefinition<TemplateOptions>['name']
+  public width: CardTemplateDefinition<TemplateOptions>['width']
+  public height: CardTemplateDefinition<TemplateOptions>['height']
+  public demoImageUrl: CardTemplateDefinition<TemplateOptions>['demoImageUrl']
+  public customizableOptions: CardTemplateDefinition<TemplateOptions>['customizableOptions']
 
-  private _renderFront: CardTemplateDefinition<T>['renderFront']
-  private _renderBack: CardTemplateDefinition<T>['renderBack']
-  private userSpecifiedOptions: T | null = null
+  private _renderFront: CardTemplateDefinition<TemplateOptions>['renderFront']
+  private _renderBack: CardTemplateDefinition<TemplateOptions>['renderBack']
+  private userSpecifiedOptions: TemplateOptions | null = null
 
-  constructor(definition: CardTemplateDefinition<T>) {
+  constructor(definition: CardTemplateDefinition<TemplateOptions>) {
     this.name = definition.name
     this.width = definition.width
     this.height = definition.height
@@ -77,43 +77,93 @@ export default class CardTemplate<T> {
     this._renderBack = definition.renderBack
   }
 
-  get usableWidth() {
+  /**
+   * Various useful getters
+   */
+
+  public get proportionalizedWidth() {
     return this.proportionalize(this.width)
   }
-  get usableHeight() {
+  public get proportionalizedHeight() {
     return this.proportionalize(this.height)
   }
+  public get customizableOptionNames(): (keyof CardTemplateDefinition<TemplateOptions>['customizableOptions'])[] {
+    return Object.keys(this.customizableOptions) as any[]
+  }
 
-  get isComplete(): boolean {
-    const customizableFields = Object.keys(
-      this.customizableOptions,
-    ) as (keyof T)[]
-    return customizableFields.every(
+  public get isComplete(): boolean {
+    return this.customizableOptionNames.every(
       (field) =>
         !this.customizableOptions[field].required ||
         (this.userSpecifiedOptions && this.userSpecifiedOptions[field]),
     )
   }
 
-  get bleed(): { x: number; y: number } {
-    const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
-    const xBleedPct = xBleed / cardWidth
-    const yBleedPct = yBleed / cardHeight
+  /**
+   * Core renderers
+   *
+   * The core public-facing methods of a template that allow you to render
+   * the design onto HTMLCanvasElements
+   */
 
-    const actualXBleed = this.usableWidth * xBleedPct
-    const actualYBleed = this.usableHeight * yBleedPct
-    return { x: actualXBleed, y: actualYBleed }
+  // Renders the front side of the card on the provided canvas element
+  // using the specified options
+  public async renderFrontToCanvas(
+    canvas: HTMLCanvasElement,
+    options: TemplateOptions,
+  ): Promise<RenderResponse> {
+    this.userSpecifiedOptions = options
+    canvas.height = this.proportionalizedHeight
+    canvas.width = this.proportionalizedWidth
+    await this._renderFront(canvas, options)
+    return {
+      isComplete: this.isComplete,
+    }
   }
 
-  get customizableFieldNames(): (keyof CardTemplateDefinition<T>['customizableOptions'])[] {
-    return Object.keys(this.customizableOptions) as any[]
+  // Renders the back side of the card on the provided canvas element
+  // using the specified options
+  public async renderBackToCanvas(
+    canvas: HTMLCanvasElement,
+    options: TemplateOptions,
+  ): Promise<RenderResponse> {
+    this.userSpecifiedOptions = options
+    canvas.height = this.proportionalizedHeight
+    canvas.width = this.proportionalizedWidth
+    await this._renderBack(canvas, options)
+    return {
+      isComplete: this.isComplete,
+    }
   }
+
+  // Renders both the front and back of the cards each to a separate data URL string
+  public async renderBothSidesToDataUrls(
+    options: TemplateOptions,
+  ): Promise<{ front: string; back: string }> {
+    const frontCanvas = document.createElement('canvas')
+    const backCanvas = document.createElement('canvas')
+    await this.renderFrontToCanvas(frontCanvas, options)
+    await this.renderBackToCanvas(backCanvas, options)
+
+    return {
+      front: frontCanvas.toDataURL('image/png'),
+      back: backCanvas.toDataURL('image/png'),
+    }
+  }
+
+  /**
+   * Template customizable field massagers
+   *
+   * For various use cases, the customizable options that are defined for each template need to
+   * be massaged into different shapes for use with other tools like Storybook or Card Builder.
+   * These data transformations should be done here to avoid leaking this abstraction.
+   */
 
   // Converts the template's customization options into an object that can be provided
   // to Storybook's argTypes property for rendering UI controls
   // See https://storybook.js.org/docs/react/essentials/controls
-  get storybookArgTypes() {
-    return this.customizableFieldNames.reduce<any>(
+  public get storybookArgTypes() {
+    return this.customizableOptionNames.reduce<any>(
       (acc, customizableFieldName) => {
         acc[customizableFieldName] = {}
 
@@ -149,11 +199,49 @@ export default class CardTemplate<T> {
     )
   }
 
-  clearCanvas(canvas: HTMLCanvasElement) {
-    canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
+  // The Card Builder form values for templates *generally* map 1:1 to
+  // the options we feed into the template renderer but in a few cases
+  // we need to do some light massaging along the way. This function
+  // lets us handle any such data transformations.
+  public createOptionsFromFormFields(formFields: Record<string, any>) {
+    return this.customizableOptionNames.reduce((acc, customizationKey) => {
+      const customizationDetails = this.customizableOptions[customizationKey]
+      switch (customizationDetails.type) {
+        // For images, the form values use a FileItem which has a `file.url` property
+        // The template only needs the url so we extract that out.
+        case 'image':
+          if (formFields.hasOwnProperty(customizationKey)) {
+            acc[customizationKey] =
+              formFields[customizationKey as string]?.url ?? undefined
+          }
+          break
+        default:
+          if (formFields.hasOwnProperty(customizationKey)) {
+            acc[customizationKey] = formFields[customizationKey as string]
+          }
+      }
+      return acc
+    }, {} as TemplateOptions)
   }
 
-  waitForImageToLoad(img: HTMLImageElement): Promise<void> {
+  /**
+   * Canvas drawing helpers
+   *
+   * These should ~all be marked as 'protected' since they'll only need to be used
+   * by the renderFront/renderBack methods of templates that instatiate this class
+   */
+
+  protected get bleed(): { x: number; y: number } {
+    const { cardWidth, cardHeight, xBleed, yBleed } = specMeasurements
+    const xBleedPct = xBleed / cardWidth
+    const yBleedPct = yBleed / cardHeight
+
+    const actualXBleed = this.proportionalizedWidth * xBleedPct
+    const actualYBleed = this.proportionalizedHeight * yBleedPct
+    return { x: actualXBleed, y: actualYBleed }
+  }
+
+  protected waitForImageToLoad(img: HTMLImageElement): Promise<void> {
     return new Promise((res) => {
       img.addEventListener('load', () => {
         res()
@@ -161,49 +249,32 @@ export default class CardTemplate<T> {
     })
   }
 
-  async renderFront(
-    canvas: HTMLCanvasElement,
-    options: T,
-  ): Promise<RenderResponse> {
-    this.userSpecifiedOptions = options
-    canvas.height = this.usableHeight
-    canvas.width = this.usableWidth
-    await this._renderFront(canvas, options)
-    return {
-      isComplete: this.isComplete,
-    }
-  }
-
-  async renderBack(
-    canvas: HTMLCanvasElement,
-    options: T,
-  ): Promise<RenderResponse> {
-    this.userSpecifiedOptions = options
-    canvas.height = this.usableHeight
-    canvas.width = this.usableWidth
-    await this._renderBack(canvas, options)
-    return {
-      isComplete: this.isComplete,
-    }
-  }
-
   // Proportionalizes a canvas coordinate value to match the resolution factor
-  proportionalize(val: number) {
+  protected proportionalize(val: number) {
     return val * RESOLUTION_FACTOR
   }
 
-  // Draws a 2px black border around the entire card
-  drawBorder(ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = 'black'
-    ctx.lineWidth = 2
-    ctx.strokeRect(0, 0, this.usableWidth, this.usableHeight)
+  protected clearCanvas(canvas: HTMLCanvasElement) {
+    canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
   }
 
-  drawInnerBleed(ctx: CanvasRenderingContext2D) {
+  // Draws a 2px black border around the entire card
+  public drawBorder(ctx: CanvasRenderingContext2D) {
+    ctx.strokeStyle = 'black'
+    ctx.lineWidth = 2
+    ctx.strokeRect(
+      0,
+      0,
+      this.proportionalizedWidth,
+      this.proportionalizedHeight,
+    )
+  }
+
+  public drawInnerBleed(ctx: CanvasRenderingContext2D) {
     const { x: actualXBleed, y: actualYBleed } = this.bleed
 
-    const innerBleedWidth = this.usableWidth - actualXBleed * 2
-    const innerBleedHeight = this.usableHeight - actualYBleed * 2
+    const innerBleedWidth = this.proportionalizedWidth - actualXBleed * 2
+    const innerBleedHeight = this.proportionalizedHeight - actualYBleed * 2
 
     ctx.strokeStyle = colors.brightCoral
     ctx.setLineDash([this.proportionalize(6)])
@@ -216,18 +287,18 @@ export default class CardTemplate<T> {
   }
 
   // Writes text vertically centered within the canvas with the top of the text at the specified y value
-  drawTextHorizontallyCenteredAtY(
+  protected drawTextHorizontallyCenteredAtY(
     ctx: CanvasRenderingContext2D,
     text: string,
     y: number,
   ): TextMetrics {
     const textMeasurements = ctx.measureText(text)
-    const textX = (this.usableWidth - textMeasurements.width) / 2
+    const textX = (this.proportionalizedWidth - textMeasurements.width) / 2
     ctx.fillText(text, textX, y)
     return textMeasurements
   }
 
-  async drawNomusLogo(
+  protected async drawNomusLogo(
     ctx: CanvasRenderingContext2D,
     {
       x,
@@ -243,7 +314,7 @@ export default class CardTemplate<T> {
     ctx.drawImage(img, x, y, size, size)
   }
 
-  async drawNFCTapIcon(
+  protected async drawNFCTapIcon(
     ctx: CanvasRenderingContext2D,
     {
       x,
@@ -259,7 +330,7 @@ export default class CardTemplate<T> {
     ctx.drawImage(img, x, y, size, size)
   }
 
-  async drawQRCode(
+  protected async drawQRCode(
     ctx: CanvasRenderingContext2D,
     qrUrl: string,
     {

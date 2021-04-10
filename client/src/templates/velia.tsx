@@ -113,7 +113,7 @@ const Velia = new CardTemplate<VeliaOptions>({
       this.customizableOptions.backgroundColor.defaultValue ??
       // Should never have go this far
       colors.white
-    ctx.fillRect(0, 0, this.usableWidth, this.usableHeight)
+    ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
     // Draw the bottom accent bar
     ctx.fillStyle =
@@ -124,7 +124,7 @@ const Velia = new CardTemplate<VeliaOptions>({
     ctx.fillRect(
       0,
       this.proportionalize(128),
-      this.usableWidth,
+      this.proportionalizedWidth,
       this.proportionalize(16),
     )
 
@@ -149,7 +149,8 @@ const Velia = new CardTemplate<VeliaOptions>({
     )
 
     // Render the 3 contact info lines, all 8px left from center
-    const rightEdgeForLines = this.usableWidth / 2 - this.proportionalize(8)
+    const rightEdgeForLines =
+      this.proportionalizedWidth / 2 - this.proportionalize(8)
     ctx.font = this.proportionalize(7) + 'px Rubik'
 
     ctx.fillStyle = options.line1 ? options.textColor : placeholderTextColor
@@ -246,7 +247,7 @@ const Velia = new CardTemplate<VeliaOptions>({
     ctx.fillRect(
       0,
       0,
-      this.usableWidth,
+      this.proportionalizedWidth,
       this.proportionalize(this.height - ACCENT_BAR_SIZE),
     )
 
@@ -256,7 +257,12 @@ const Velia = new CardTemplate<VeliaOptions>({
       this.customizableOptions.backgroundColor.defaultValue ??
       // Should never have go this far
       '#ffffff'
-    ctx.fillRect(0, this.usableHeight - 100, this.usableWidth, 1000)
+    ctx.fillRect(
+      0,
+      this.proportionalizedHeight - 100,
+      this.proportionalizedWidth,
+      1000,
+    )
 
     // Render user-provided logo if provided
     if (logoImg) {
@@ -269,8 +275,9 @@ const Velia = new CardTemplate<VeliaOptions>({
 
       // y + imageHeight + y + ACCENT_BAR_SIZE = this.usableHeight
       // y = (this.usableHeight - ACCENT_BAR_SIZE - imageHeight) / 2
-      const imageY = (this.usableHeight - ACCENT_BAR_SIZE - imageHeight) / 2
-      const imageX = (this.usableWidth - imageWidth) / 2
+      const imageY =
+        (this.proportionalizedHeight - ACCENT_BAR_SIZE - imageHeight) / 2
+      const imageX = (this.proportionalizedWidth - imageWidth) / 2
       ctx.drawImage(logoImg, imageX, imageY, imageWidth, imageHeight)
     }
   },
