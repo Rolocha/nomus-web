@@ -11,54 +11,19 @@ interface Props {
   cardOrientation?: 'horizontal' | 'vertical'
   renderFront: SideRenderer | null
   renderBack: SideRenderer | null
-  // // back: FileItem | null
-  // handleFrontImageFileChange: (file: FileItem | null) => void
-  // handleBackImageFileChange: (file: FileItem | null) => void
 }
 
 const CardBuilderPreview = ({
-  // front,
-  // back,
-  // handleBackImageFileChange,
-  // handleFrontImageFileChange,
   cardOrientation = 'horizontal',
   renderFront,
   renderBack,
 }: Props) => {
   const missingBothImages = renderBack == null && renderFront == null
   const missingAtLeastOneImage = renderBack == null || renderFront == null
-  // const hasBothSides = renderBack != null && renderFront != null
 
   const [showGuides, setShowGuides] = React.useState(false)
   const [showBack, setShowBack] = React.useState(false)
   const [showBothSides, setShowBothSides] = React.useState(true)
-
-  // By default, we only show the front side
-  // In order to avoid the confusion that comes from either of the two cases
-  // 1. user first supplies back
-  // const [hasAutoShownBothSides, setHasAutoShownBothSides] = React.useState(
-  //   showBothSides,
-  // )
-  // React.useEffect(() => {
-  //   // If the user just supplied both images but we're not showing both sides yet, do so
-  //   if (
-  //     !hasAutoShownBothSides &&
-  //     (
-  //       // User just finished providing both sides
-  //       (renderFront && renderBack) ||
-  //       // User just finished specifying the back but not the front
-  //       (renderBack && !renderFront))
-  //   ) {
-  //     setShowBothSides(true)
-  //     setHasAutoShownBothSides(true)
-  //   }
-  // }, [
-  //   hasAutoShownBothSides,
-  //   renderBack,
-  //   renderFront,
-  //   setShowBothSides,
-  //   setHasAutoShownBothSides,
-  // ])
 
   const backSide = renderBack ? renderBack({ showGuides }) : null
   const frontSide = renderFront ? renderFront({ showGuides }) : null
