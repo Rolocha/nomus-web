@@ -24,9 +24,9 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
         gridTemplateColumns="7fr 1fr 4fr"
         gridTemplateAreas={{
           md: `
-    "detailSummary1 . costSummary"
-    "detailSummary2 . costSummary"
-  `,
+            "detailSummary1 . costSummary"
+            "detailSummary2 . costSummary"
+          `,
         }}
       >
         <Box
