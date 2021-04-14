@@ -165,16 +165,15 @@ class UserResolver {
   }
 
   @Authorized(Role.User)
-  @Mutation((type) => String)
+  @Mutation((type) => Void, { nullable: true })
   async deleteUser(
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
-  ): Promise<string> {
-    const requestingUserId = context.user._id
+  ): Promise<void> {
+    const requestingUserId = Role.Admin in context.user.roles ? context.user._id : null
     const requestedUserId = userId ?? requestingUserId
 
-    await User.mongo.deleteOne({ _id: requestedUserId })
-    return requestedUserId.toString()
+    await User.delete(requestedUserId)
   }
 
   @Authorized(Role.User)
