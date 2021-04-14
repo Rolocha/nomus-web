@@ -37,8 +37,10 @@ export const Primary = () => {
       line2: '(555)-555-5555',
       footer: "I'm ready, I'm ready, I'm ready",
       qrUrl: 'https://google.com',
-      logoUrl:
-        'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+      logoUrl: {
+        url:
+          'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+      },
       logoSize: 0.5,
       backgroundColor: colors.offWhite,
       accentColor: colors.gold,

@@ -241,6 +241,16 @@ export default class CardTemplate<TemplateOptions extends {}> {
     return { x: actualXBleed, y: actualYBleed }
   }
 
+  protected async createImage(src: string): Promise<HTMLImageElement> {
+    const img = document.createElement('img')
+    img.src = src
+    // Needed in order to allow canvas rendering on different origins
+    // such as when rendering in Storybook
+    img.crossOrigin = 'anonymous'
+    await this.waitForImageToLoad(img)
+    return img
+  }
+
   protected waitForImageToLoad(img: HTMLImageElement): Promise<void> {
     return new Promise((res) => {
       img.addEventListener('load', () => {
@@ -308,10 +318,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
     }: { x: number; y: number; size: number; color?: string },
   ): Promise<void> {
     const svgMarkup = createNomusLogoSVG({ color })
-    const img = document.createElement('img')
-    img.crossOrigin = 'anonymous'
-    img.src = 'data:image/svg+xml,' + svgMarkup
-    await this.waitForImageToLoad(img)
+    const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(img, x, y, size, size)
   }
 
@@ -325,10 +332,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
     }: { x: number; y: number; size: number; color?: string },
   ): Promise<void> {
     const svgMarkup = createNFCTapIconSVG({ color })
-    const img = document.createElement('img')
-    img.crossOrigin = 'anonymous'
-    img.src = 'data:image/svg+xml,' + svgMarkup
-    await this.waitForImageToLoad(img)
+    const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(img, x, y, size, size)
   }
 
@@ -366,10 +370,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
           : backgroundColor,
       },
     })
-    const qrImg = document.createElement('img')
-    qrImg.crossOrigin = 'anonymous'
-    qrImg.src = qrDataUrl
-    await this.waitForImageToLoad(qrImg)
+    const qrImg = await this.createImage(qrDataUrl)
     ctx.drawImage(qrImg, x, y, width, height)
   }
 }

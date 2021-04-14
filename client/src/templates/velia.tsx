@@ -229,14 +229,6 @@ const Velia = new CardTemplate<VeliaOptions>({
       throw new Error('Got null for canvas context')
     }
 
-    let logoImg: HTMLImageElement | null = null
-    if (options.logoUrl) {
-      logoImg = document.createElement('img')
-      logoImg.crossOrigin = 'anonymous'
-      logoImg.src = options.logoUrl
-      await this.waitForImageToLoad(logoImg)
-    }
-
     const ACCENT_BAR_SIZE = 16
 
     // Draw the main background with accent color
@@ -266,7 +258,8 @@ const Velia = new CardTemplate<VeliaOptions>({
     )
 
     // Render user-provided logo if provided
-    if (logoImg) {
+    if (options.logoUrl) {
+      const logoImg = await this.createImage(options.logoUrl)
       const imageHeight =
         (options.logoSize ??
           this.customizableOptions.logoSize.defaultValue ??
