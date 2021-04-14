@@ -14,7 +14,7 @@ import {
 const RESOLUTION_FACTOR = 5
 
 export interface GenericCustomizableFieldSpec<T> {
-  type: 'text' | 'color' | 'image' | 'range'
+  type: 'text' | 'color' | 'logo' | 'logoSize' | 'qrUrl'
   label?: string
   placeholder?: string
   required?: boolean
@@ -22,9 +22,9 @@ export interface GenericCustomizableFieldSpec<T> {
   hidden?: (options: T) => boolean
 }
 
-export interface CustomizableRangeFieldSpec<T>
+export interface CustomizableLogoSizeFieldSpec<T>
   extends GenericCustomizableFieldSpec<T> {
-  type: 'range'
+  type: 'logoSize'
   range: {
     min: number
     max: number
@@ -33,7 +33,7 @@ export interface CustomizableRangeFieldSpec<T>
 }
 
 export type CustomizableFieldSpec<T> =
-  | CustomizableRangeFieldSpec<T>
+  | CustomizableLogoSizeFieldSpec<T>
   | GenericCustomizableFieldSpec<T>
 
 export interface CardTemplateDefinition<T> {
@@ -169,8 +169,8 @@ export default class CardTemplate<TemplateOptions extends {}> {
 
         const fieldDetails = this.customizableOptions[customizableFieldName]
         switch (fieldDetails.type) {
-          case 'range':
-            const rangeFieldDetails = fieldDetails as CustomizableRangeFieldSpec<any>
+          case 'logoSize':
+            const rangeFieldDetails = fieldDetails as CustomizableLogoSizeFieldSpec<any>
             acc[customizableFieldName].control = {
               type: 'range',
               min: rangeFieldDetails.range.min,
@@ -180,7 +180,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
             break
           // The storybook version we use doesn't have a file selector so
           // just show a basic url text input instead
-          case 'image':
+          case 'logo':
             acc[customizableFieldName].control = {
               type: 'text',
             }
@@ -207,9 +207,9 @@ export default class CardTemplate<TemplateOptions extends {}> {
     return this.customizableOptionNames.reduce((acc, customizationKey) => {
       const customizationDetails = this.customizableOptions[customizationKey]
       switch (customizationDetails.type) {
-        // For images, the form values use a FileItem which has a `file.url` property
+        // For logo images, the form values use a FileItem which has a `file.url` property
         // The template only needs the url so we extract that out.
-        case 'image':
+        case 'logo':
           if (formFields.hasOwnProperty(customizationKey)) {
             acc[customizationKey] =
               formFields[customizationKey as string]?.url ?? undefined
@@ -239,6 +239,16 @@ export default class CardTemplate<TemplateOptions extends {}> {
     const actualXBleed = this.proportionalizedWidth * xBleedPct
     const actualYBleed = this.proportionalizedHeight * yBleedPct
     return { x: actualXBleed, y: actualYBleed }
+  }
+
+  protected async createImage(src: string): Promise<HTMLImageElement> {
+    const img = document.createElement('img')
+    img.src = src
+    // Needed in order to allow canvas rendering on different origins
+    // such as when rendering in Storybook
+    img.crossOrigin = 'anonymous'
+    await this.waitForImageToLoad(img)
+    return img
   }
 
   protected waitForImageToLoad(img: HTMLImageElement): Promise<void> {
@@ -308,9 +318,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
     }: { x: number; y: number; size: number; color?: string },
   ): Promise<void> {
     const svgMarkup = createNomusLogoSVG({ color })
-    const img = document.createElement('img')
-    img.src = 'data:image/svg+xml,' + svgMarkup
-    await this.waitForImageToLoad(img)
+    const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(img, x, y, size, size)
   }
 
@@ -324,9 +332,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
     }: { x: number; y: number; size: number; color?: string },
   ): Promise<void> {
     const svgMarkup = createNFCTapIconSVG({ color })
-    const img = document.createElement('img')
-    img.src = 'data:image/svg+xml,' + svgMarkup
-    await this.waitForImageToLoad(img)
+    const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(img, x, y, size, size)
   }
 
@@ -364,9 +370,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
           : backgroundColor,
       },
     })
-    const qrImg = document.createElement('img')
-    qrImg.src = qrDataUrl
-    await this.waitForImageToLoad(qrImg)
+    const qrImg = await this.createImage(qrDataUrl)
     ctx.drawImage(qrImg, x, y, width, height)
   }
 }

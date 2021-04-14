@@ -10,23 +10,28 @@ import {
 } from 'src/apollo/types/SubmitCustomOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
-import templateLibrary from 'src/templates'
 import * as Text from 'src/components/Text'
 import Wizard, { WizardStep } from 'src/components/Wizard'
-import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
-import breakpoints from 'src/styles/breakpoints'
-import theme from 'src/styles/theme'
-import BaseStep from './BaseStep'
-import CustomBuildStep from './CustomBuildStep'
+import BaseStep from 'src/pages/CardBuilder/BaseStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
   initialStateOptions,
-} from './card-builder-state'
-import CheckoutStep from './CheckoutStep'
-import ReviewStep from './ReviewStep'
-import { BaseType, CardBuilderStep, CheckoutFormData } from './types'
-import SUBMIT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
+} from 'src/pages/CardBuilder/card-builder-state'
+import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
+import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
+import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
+import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
+import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
+import {
+  BaseType,
+  CardBuilderStep,
+  CheckoutFormData,
+} from 'src/pages/CardBuilder/types'
+import SUBMIT_CUSTOM_ORDER_MUTATION from 'src/pages/CardBuilder/upsertCustomOrderMutation'
+import breakpoints from 'src/styles/breakpoints'
+import theme from 'src/styles/theme'
+import templateLibrary from 'src/templates'
 
 interface ParamsType {
   buildBaseType?: string
@@ -323,7 +328,16 @@ const CardBuilder = () => {
               />
             </WizardStep>
             <WizardStep id="review" icon="checkO" label="Review">
-              <ReviewStep cardBuilderState={cardBuilderState} />
+              {
+                {
+                  custom: (
+                    <CustomReviewStep cardBuilderState={cardBuilderState} />
+                  ),
+                  template: (
+                    <TemplateReviewStep cardBuilderState={cardBuilderState} />
+                  ),
+                }[cardBuilderState.baseType]
+              }
             </WizardStep>
           </Wizard>
         </Box>
