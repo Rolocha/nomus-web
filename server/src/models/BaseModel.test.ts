@@ -25,6 +25,10 @@ describe('deleteObject', () => {
 
     expect(userRes).toBe(null)
     expect(deletedRes.id).toBe(user.id)
-    JSON.parse(deletedRes.deletedObject)
+    const { createdAt, updatedAt, ...parsed } = JSON.parse(deletedRes.deletedObject)
+    const { createdAt: userCreated, updatedAt: userUpdated, ...userParsed } = user.toJSON()
+    expect(parsed).toMatchObject(userParsed)
+    expect(new Date(createdAt)).toStrictEqual(userCreated)
+    expect(new Date(updatedAt)).toStrictEqual(userUpdated)
   })
 })

@@ -1,5 +1,4 @@
-import { modelOptions, prop, DocumentType, ReturnModelType } from '@typegoose/typegoose'
-import { throws } from 'assert'
+import { modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
 import mongoose from 'mongoose'
 import DeletedObject from 'src/models/DeletedObject'
 import { Field, ObjectType } from 'type-graphql'
