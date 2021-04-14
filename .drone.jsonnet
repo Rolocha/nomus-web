@@ -128,6 +128,7 @@ local updateDeployConfig(env, host, when) = {
 // local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${NOMUS_DEPLOY_BRANCH}" };
 
 local STAGING_DEPLOY_CONDITION = { "branch": ["master"] };
+local TEST_DEPLOY_CONDITION = { "branch": ["bibek/deploy-storybook"] };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 local STAGING_OR_PRODUCTION_DEPLOY_CONDITION = { "branch": ["master", "production"] };
 local ALWAYS_CONDITION = {};
@@ -136,6 +137,15 @@ local ALWAYS_CONDITION = {};
 // Pipelines begin here
 
 [
+  {
+    "kind": "pipeline",
+    "type": "docker",
+    "name": "storybook",
+    "steps": [
+      installNodeModules("client", TEST_DEPLOY_CONDITION),
+      runCmd("client", "yarn storybook:publish") 
+    ]
+  },
   {
     "kind": "pipeline",
     "type": "docker",
