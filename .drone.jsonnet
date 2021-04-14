@@ -52,7 +52,7 @@ local deployEC2(env, host, when) = {
   },
 };
 
-local installClientNodeModules(app, when) = {
+local installClientNodeModules(when) = {
   "name": "install client dependencies",
   "image": "node:12",
   "when": when,
