@@ -143,7 +143,7 @@ local ALWAYS_CONDITION = {};
     "name": "storybook",
     "steps": [
       installNodeModules("client", TEST_DEPLOY_CONDITION),
-      runCmd("client", "yarn storybook:publish") 
+      runCmd("client", "yarn storybook:publish", TEST_DEPLOY_CONDITION) 
     ]
   },
   {
