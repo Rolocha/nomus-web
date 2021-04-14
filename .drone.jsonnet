@@ -4,6 +4,14 @@ local STAGING_EC2_HOST = "ec2-52-20-46-100.compute-1.amazonaws.com";
 local PRODUCTION_EC2_HOST = "ec2-34-194-213-141.compute-1.amazonaws.com";
 local ECR_REGISTRY = "074552482398.dkr.ecr.us-east-1.amazonaws.com";
 
+local CLIENT_NODE_MODULES_VOLUME_NAME = "client node_modules";
+local CLIENT_NODE_MODULES_VOLUME = {
+  name: CLIENT_NODE_MODULES_VOLUME_NAME,
+  host: {
+    path: '/tmp/client/node_modules'
+  }
+};
+
 local publishServerDockerImage(env, when) = {
   "name": "publish " + env + " to ECR",
   "image": "plugins/ecr",
@@ -62,7 +70,7 @@ local installClientNodeModules(when) = {
   ],
   "volumes": [
     {
-      name: "client node modules",
+      name: CLIENT_NODE_MODULES_VOLUME_NAME,
       path: "/drone/src/client/node_modules"
     },
   ],
@@ -146,13 +154,6 @@ local TEST_DEPLOY_CONDITION = { "branch": ["bibek/deploy-storybook"] };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 local STAGING_OR_PRODUCTION_DEPLOY_CONDITION = { "branch": ["master", "production"] };
 local ALWAYS_CONDITION = {};
-
-local CLIENT_NODE_MODULES_VOLUME = {
-  name: 'client node_modules',
-  host: {
-    path: '/tmp/client/node_modules'
-  }
-};
 
 // Pipelines begin here
 
