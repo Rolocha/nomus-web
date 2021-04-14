@@ -9,6 +9,8 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
     "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx src --max-warnings 0",
     "storybook": "start-storybook",
+    "storybook:publish": "yarn build-storybook && yarn storybook:deploy",
+    "storybook:deploy": "surge storybook-static -d storybook.nomus.me",
     "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
@@ -147,6 +149,7 @@
     "pretty-quick": "^2.0.1",
     "react-test-renderer": "^16.13.1",
     "storybook-addon-emotion-theme": "^2.1.1",
+    "surge": "^0.23.0",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^8.0.14",
     "webpack-cli": "^4.5.0"
