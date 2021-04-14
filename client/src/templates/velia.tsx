@@ -57,18 +57,18 @@ const Velia = new CardTemplate<VeliaOptions>({
     },
     qrUrl: {
       label: 'QR Code URL',
-      type: 'text',
+      type: 'qrUrl',
       placeholder: 'https://nomus.me',
       hidden: () => true,
     },
     logoUrl: {
-      type: 'image',
+      type: 'logo',
       label: 'Logo',
     },
     logoSize: {
       label: 'Logo Size',
       defaultValue: 1,
-      type: 'range',
+      type: 'logoSize',
       hidden: (options: VeliaOptions) =>
         options.logoUrl == null || options.logoUrl.length === 0,
       range: {
@@ -232,6 +232,7 @@ const Velia = new CardTemplate<VeliaOptions>({
     let logoImg: HTMLImageElement | null = null
     if (options.logoUrl) {
       logoImg = document.createElement('img')
+      logoImg.crossOrigin = 'anonymous'
       logoImg.src = options.logoUrl
       await this.waitForImageToLoad(logoImg)
     }

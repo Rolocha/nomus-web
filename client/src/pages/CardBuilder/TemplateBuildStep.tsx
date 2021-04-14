@@ -5,7 +5,7 @@ import FileUploadButton from 'src/components/FileUploadButton'
 import * as Form from 'src/components/Form'
 import TemplateCard from 'src/components/TemplateCard'
 import templateLibrary from 'src/templates'
-import { CustomizableRangeFieldSpec } from 'src/templates/base'
+import { CustomizableLogoSizeFieldSpec } from 'src/templates/base'
 import * as Text from 'src/components/Text'
 import CardBuilderPreview from 'src/pages/CardBuilder/CardBuilderPreview'
 import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
@@ -96,7 +96,7 @@ const TemplateBuildStep = ({
                     {(() => {
                       switch (fieldDetails.type) {
                         case 'range':
-                          const rangeFieldDetails = fieldDetails as CustomizableRangeFieldSpec<any>
+                          const rangeFieldDetails = fieldDetails as CustomizableLogoSizeFieldSpec<any>
                           return (
                             <Form.Input
                               width="100%"
