@@ -66,6 +66,7 @@ local installClientNodeModules(when) = {
   "when": when,
   "commands": [
     "cd client",
+    "pwd",
     "yarn install --production=false",
   ],
   "volumes": [
@@ -92,6 +93,7 @@ local runCmd(app, cmd, when) = {
   "when": when,
   "commands": [
     "cd " + app,
+    "pwd",
     cmd,
   ],
 };
