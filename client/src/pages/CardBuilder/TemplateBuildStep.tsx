@@ -95,7 +95,7 @@ const TemplateBuildStep = ({
                     </Form.Label>
                     {(() => {
                       switch (fieldDetails.type) {
-                        case 'range':
+                        case 'logoSize':
                           const rangeFieldDetails = fieldDetails as CustomizableLogoSizeFieldSpec<any>
                           return (
                             <Form.Input
@@ -109,7 +109,7 @@ const TemplateBuildStep = ({
                               ref={customizationForm.register()}
                             />
                           )
-                        case 'image':
+                        case 'logo':
                           return (
                             <Controller
                               control={customizationForm.control}

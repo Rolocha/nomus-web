@@ -328,7 +328,6 @@ const CardBuilder = () => {
               />
             </WizardStep>
             <WizardStep id="review" icon="checkO" label="Review">
-              <CustomReviewStep cardBuilderState={cardBuilderState} />
               {
                 {
                   custom: (

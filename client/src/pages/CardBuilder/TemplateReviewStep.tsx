@@ -21,12 +21,18 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
   } | null>(null)
   React.useEffect(() => {
     if (cardImages == null) {
-      templateLibrary[cardBuilderState.templateId!]
+      const template = templateLibrary[cardBuilderState.templateId!]
+      template
         .renderBothSidesToDataUrls(
-          cardBuilderState.templateCustomization! as any,
+          template.createOptionsFromFormFields(
+            cardBuilderState.templateCustomization!,
+          ),
         )
         .then((response) => {
           setCardImages(response)
+        })
+        .catch((err) => {
+          console.log(err)
         })
     }
   }, [cardBuilderState, cardImages, setCardImages])
