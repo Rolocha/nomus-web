@@ -94,6 +94,7 @@ local runCmd(app, cmd, when) = {
   "commands": [
     "cd " + app,
     "pwd",
+    "ls node_modules",
     cmd,
   ],
 };
