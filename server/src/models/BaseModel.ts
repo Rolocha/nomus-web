@@ -1,5 +1,7 @@
-import { modelOptions, prop } from '@typegoose/typegoose'
+import { modelOptions, prop, DocumentType, ReturnModelType } from '@typegoose/typegoose'
+import { throws } from 'assert'
 import mongoose from 'mongoose'
+import DeletedObject from 'src/models/DeletedObject'
 import { Field, ObjectType } from 'type-graphql'
 
 const defaultId = (prefix: string) => () => {
@@ -20,6 +22,8 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
   })
   @ObjectType()
   class BaseModel {
+    static mongo: ReturnModelType<typeof BaseModel>
+
     @prop({ required: true, default: defaultId(prefix) })
     _id: string
 
@@ -33,6 +37,17 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
     set id(id: string) {
       this._id = id
     }
+
+    public static async delete(id: string) {
+      const model = await this.mongo.findById(id)
+      // check that model exists
+      await DeletedObject.mongo.create({
+        _id: id,
+        deletedObject: JSON.stringify(model.toJSON()),
+      })
+      await this.mongo.deleteOne({ _id: id })
+    }
   }
+
   return BaseModel
 }
