@@ -52,6 +52,22 @@ local deployEC2(env, host, when) = {
   },
 };
 
+local installClientNodeModules(app, when) = {
+  "name": "install client dependencies",
+  "image": "node:12",
+  "when": when,
+  "commands": [
+    "cd client",
+    "yarn install --production=false",
+  ],
+  "volumes": [
+    {
+      name: "client node modules",
+      path: "/drone/src/client/node_modules"
+    },
+  ],
+};
+
 local installNodeModules(app, when) = {
   "name": "install dependencies in " + app,
   "image": "node:12",
@@ -61,8 +77,6 @@ local installNodeModules(app, when) = {
     "yarn install --production=false",
   ],
 };
-
-
 
 local runCmd(app, cmd, when) = {
   "name": cmd,
@@ -133,6 +147,12 @@ local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 local STAGING_OR_PRODUCTION_DEPLOY_CONDITION = { "branch": ["master", "production"] };
 local ALWAYS_CONDITION = {};
 
+local CLIENT_NODE_MODULES_VOLUME = {
+  name: 'client node_modules',
+  host: {
+    path: '/tmp/client/node_modules'
+  }
+};
 
 // Pipelines begin here
 
@@ -140,18 +160,29 @@ local ALWAYS_CONDITION = {};
   {
     "kind": "pipeline",
     "type": "docker",
-    "name": "storybook",
+    "name": "install client deps",
+    "volumes": [CLIENT_NODE_MODULES_VOLUME],
     "steps": [
-      installNodeModules("client", TEST_DEPLOY_CONDITION),
+      installClientNodeModules(TEST_DEPLOY_CONDITION),
+    ],
+  },
+  {
+    "kind": "pipeline",
+    "type": "docker",
+    "name": "storybook",
+    "volumes": [CLIENT_NODE_MODULES_VOLUME],
+    "depends_on": ["install client deps"],
+    "steps": [
       runCmd("client", "yarn storybook:publish", TEST_DEPLOY_CONDITION) 
-    ]
+    ],
   },
   {
     "kind": "pipeline",
     "type": "docker",
     "name": "client",
+    "depends_on": ["install client deps"],
+    "volumes": [CLIENT_NODE_MODULES_VOLUME],
     "steps": [
-      installNodeModules("client", ALWAYS_CONDITION),
       runCmd("client", "yarn lint:ci", ALWAYS_CONDITION),
       runCmd("client", "yarn test", ALWAYS_CONDITION),
 
