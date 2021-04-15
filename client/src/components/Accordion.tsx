@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionButton,
   AccordionPanel,
-  AccordionIcon,
 } from '@chakra-ui/react'
 import Icon from './Icon'
 
