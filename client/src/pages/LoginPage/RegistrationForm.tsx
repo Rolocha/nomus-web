@@ -126,7 +126,7 @@ const RegistrationForm = () => {
   return (
     <Box display="flex" flexDirection="column" mt={4}>
       <Text.BrandHeader>
-        {formState.isSubmitted ? 'Thank you!' : 'Get started'}
+        {formState.isSubmitSuccessful ? 'Thank you!' : 'Get started'}
       </Text.BrandHeader>
       {formState.isSubmitSuccessful ? (
         <>
