@@ -19,7 +19,6 @@ import { useResetLinkValidation } from './useResetLinkValidation'
 
 interface ResetPasswordFormData {
   password: string
-  confirmPassword: string
 }
 
 const ResetPassword = () => {
@@ -34,9 +33,6 @@ const ResetPassword = () => {
     resolver: yupResolver(
       yup.object().shape({
         password: yup.string().required('Password is required.'),
-        confirmPassword: yup
-          .string()
-          .oneOf([yup.ref('password')], "Passwords don't match."),
       }),
     ),
     defaultValues: {
@@ -148,19 +144,12 @@ const ResetPassword = () => {
                     ref={register({ required: true })}
                     type={passwordVisible ? 'text' : 'password'}
                     error={errors.password}
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    autoComplete="off"
                   />
                   <PasswordStrengthIndicator password={watch('password')} />
                   <Form.FieldError fieldError={errors.password} />
-                </Form.Item>
-                <Form.Item mb="20px">
-                  <Form.Label htmlFor="email">Confirm new password</Form.Label>
-                  <Form.Input
-                    name="confirmPassword"
-                    ref={register({ required: true })}
-                    type={passwordVisible ? 'text' : 'password'}
-                    error={errors.confirmPassword}
-                  />
-                  <Form.FieldError fieldError={errors.confirmPassword} />
                 </Form.Item>
                 <Button
                   type="submit"
