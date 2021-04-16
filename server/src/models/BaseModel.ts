@@ -1,6 +1,7 @@
 import { modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
 import mongoose from 'mongoose'
 import DeletedObject from 'src/models/DeletedObject'
+import { Result } from 'src/util/error'
 import { Field, ObjectType } from 'type-graphql'
 
 const defaultId = (prefix: string) => () => {
@@ -37,14 +38,26 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
       this._id = id
     }
 
-    public static async delete(id: string) {
+    public static async delete(
+      id: string
+    ): Promise<Result<undefined, 'id-not-found' | 'save-error'>> {
       const model = await this.mongo.findById(id)
       // check that model exists
-      await DeletedObject.mongo.create({
-        _id: id,
-        deletedObject: JSON.stringify(model.toJSON()),
-      })
-      await this.mongo.deleteOne({ _id: id })
+
+      if (model == null) {
+        return Result.fail('id-not-found')
+      }
+
+      try {
+        await DeletedObject.mongo.create({
+          _id: id,
+          deletedObject: JSON.stringify(model.toJSON()),
+        })
+        await this.mongo.deleteOne({ _id: id })
+        return Result.ok()
+      } catch (e) {
+        return Result.fail('save-error')
+      }
     }
   }
 

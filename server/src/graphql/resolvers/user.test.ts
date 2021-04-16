@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import User, { UserModel } from 'src/models/User'
+import { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'

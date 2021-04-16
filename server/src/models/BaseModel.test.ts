@@ -1,3 +1,4 @@
+import { userInfo } from 'os'
 import { User } from 'src/models'
 import DeletedObject from 'src/models/DeletedObject'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
@@ -29,5 +30,11 @@ describe('deleteObject', () => {
     expect(parsed).toMatchObject(userParsed)
     expect(new Date(createdAt)).toStrictEqual(userCreated)
     expect(new Date(updatedAt)).toStrictEqual(userUpdated)
+  })
+
+  it('throws an error if the id does not exist', async () => {
+    const res = await User.delete('user_6019de0946d7d600243071ed')
+    expect(res.isSuccess).toBeFalsy()
+    expect(res.error.name).toBe('id-not-found')
   })
 })

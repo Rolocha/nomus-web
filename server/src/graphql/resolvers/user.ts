@@ -31,6 +31,7 @@ import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Connection } from 'src/models'
+import { Result } from 'src/util/error'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -181,9 +182,16 @@ class UserResolver {
     const connectionDeletionPromises = connections.map(async (connection) => {
       return await Connection.delete(connection.id)
     })
-    await Promise.all(connectionDeletionPromises)
+    const res: Result<undefined, 'id-not-found' | 'save-error'>[] = await Promise.all(
+      connectionDeletionPromises
+    )
+    res.push(await User.delete(requestedUserId))
 
-    await User.delete(requestedUserId)
+    await res.forEach((result) => {
+      if (result.isSuccess !== true) {
+        throw new Error('Failed to delete user')
+      }
+    })
   }
 
   @Authorized(Role.User)
