@@ -18,7 +18,6 @@ describe('deleteObject', () => {
 
   it('deletes an object and creates a DeletedObject record', async () => {
     const user = await createMockUser()
-    // deleteObject(user)
     await User.delete(user.id)
     const userRes = await User.mongo.findById(user.id)
     const deletedRes = await DeletedObject.mongo.findById(user.id)

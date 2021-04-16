@@ -30,6 +30,7 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { Connection } from 'src/models'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -170,8 +171,17 @@ class UserResolver {
     @Arg('userId', { nullable: true }) userId: string | null,
     @Ctx() context: IApolloContext
   ): Promise<void> {
-    const requestingUserId = Role.Admin in context.user.roles ? context.user._id : null
-    const requestedUserId = userId ?? requestingUserId
+    const requestingUserId = Role.Admin in context.user.roles ? userId : null
+    const requestedUserId = requestingUserId ?? context.user._id
+
+    const connections = await Connection.mongo.find({
+      $or: [{ from: requestedUserId }, { to: requestedUserId }],
+    })
+
+    const connectionDeletionPromises = connections.map(async (connection) => {
+      return await Connection.delete(connection.id)
+    })
+    await Promise.all(connectionDeletionPromises)
 
     await User.delete(requestedUserId)
   }

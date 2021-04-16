@@ -1,10 +1,13 @@
 import bcrypt from 'bcryptjs'
-import { UserModel } from 'src/models/User'
+import User, { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPasswordToken'
+import { createMockConnection } from 'src/__mocks__/models/Connection'
+import { Connection } from 'src/models'
+import DeletedObject from 'src/models/DeletedObject'
 
 jest.mock('src/util/sendgrid')
 
@@ -311,7 +314,11 @@ describe('UserResolver', () => {
   describe('deleteAccount', () => {
     it("deletes the context user's account", async () => {
       const user = await createMockUser()
-      const response = await execQuery({
+      const otherUser = await createMockUser()
+      const connection1 = await createMockConnection({ from: user, to: otherUser })
+      const connection2 = await createMockConnection({ to: user, from: otherUser })
+
+      await execQuery({
         source: `
           mutation DeleteUserTestQuery {
             deleteUser
@@ -320,9 +327,17 @@ describe('UserResolver', () => {
         contextUser: user,
       })
 
-      expect(response.data.deleteUser).toBe(user.id)
-      const deletedUser = await UserModel.findById(user.id)
-      expect(deletedUser).toBeNull()
+      const findUser = await UserModel.findById(user.id)
+      expect(findUser).toBeNull()
+      const connections = await Connection.mongo.find()
+      expect(connections.length).toBe(0)
+
+      const deletedUser = await DeletedObject.mongo.findById(user.id)
+      expect(deletedUser).not.toBeNull()
+      const deletedConnection1 = await DeletedObject.mongo.findById(connection1.id)
+      expect(deletedConnection1).not.toBeNull()
+      const deletedConnection2 = await DeletedObject.mongo.findById(connection2.id)
+      expect(deletedConnection2).not.toBeNull()
     })
   })
 
