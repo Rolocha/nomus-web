@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { DoesEmailExistQuery } from 'src/apollo/types/DoesEmailExistQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
@@ -88,9 +88,8 @@ const RegistrationForm = () => {
     },
   )
 
-  const { loggedIn, signUp } = useAuth()
+  const { signUp } = useAuth()
 
-  const history = useHistory()
   const location = useLocation<{ from: Location }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
@@ -130,20 +129,6 @@ const RegistrationForm = () => {
     setResentEmailSuccessfully(result.ok)
   }
 
-  // Redirect to the redirect_uri once the user is logged in
-  if (loggedIn) {
-    const redirectUrl = searchParams.get('redirect_url')
-    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
-    if (nextUrl.startsWith('/')) {
-      history.replace(nextUrl)
-    } else {
-      // If the URL doesn't start with /, it's probably a different domain
-      // in which case we have to use window.location's .replace() instead of history's
-      window.location.replace(nextUrl)
-    }
-    return null
-  }
-
   return (
     <Box display="flex" flexDirection="column" mt={4}>
       <Text.BrandHeader>
@@ -161,9 +146,7 @@ const RegistrationForm = () => {
             {resentEmailSuccessfully === null && (
               <Text.Body2>
                 Didn’t get an email?{' '}
-                <Button cursor="pointer" onClick={handleResendEmail}>
-                  Resend the magic link.
-                </Button>{' '}
+                <Link onClick={handleResendEmail}>Resend the magic link.</Link>{' '}
                 Oooh.
               </Text.Body2>
             )}
