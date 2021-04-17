@@ -67,6 +67,12 @@ class UserResolver {
     }
   }
 
+  @Query((type) => Boolean)
+  async emailExists(@Arg('email', { nullable: false }) email: string): Promise<Boolean> {
+    const user = await User.mongo.findOne({ email })
+    return user ? true : false
+  }
+
   @Authorized(Role.User)
   @AdminOnlyArgs('userId')
   @Query(() => User)
