@@ -67,7 +67,7 @@ class UserResolver {
     }
   }
 
-  @Query((type) => Boolean)
+  @Mutation((type) => Boolean)
   async emailExists(@Arg('email', { nullable: false }) email: string): Promise<Boolean> {
     const user = await User.mongo.findOne({ email })
     return user ? true : false

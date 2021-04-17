@@ -83,7 +83,7 @@ describe('UserResolver', () => {
 
       const responseTrue = await execQuery({
         source: `
-          query CheckEmailTestQuery($email: String!) {
+          mutation CheckEmailTestQuery($email: String!) {
             emailExists(email: $email)
           }
         `,
@@ -93,25 +93,12 @@ describe('UserResolver', () => {
       })
 
       expect(responseTrue.data?.emailExists).toBe(true)
-
-      const responseFalse = await execQuery({
-        source: `
-          query CheckEmailTestQuery($email: String!) {
-            emailExists(email: $email)
-          }
-        `,
-        variableValues: {
-          email: 'fake-email21@hotmail.com',
-        },
-      })
-
-      expect(responseFalse.data?.emailExists).toBe(false)
     })
 
     it('returns false if an email does not exist', async () => {
       const responseFalse = await execQuery({
         source: `
-          query CheckEmailTestQuery($email: String!) {
+          mutation CheckEmailTestQuery($email: String!) {
             emailExists(email: $email)
           }
         `,

@@ -1,7 +1,9 @@
+import { gql, useMutation } from '@apollo/client'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory, useLocation } from 'react-router-dom'
+import { DoesEmailExistQuery } from 'src/apollo/types/DoesEmailExistQuery'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -21,7 +23,7 @@ interface RegistrationFormData {
   lastName: string
 }
 
-type SubmissionErrorType = 'invalid-email' | 'account-already-exists'
+type SubmissionErrorType = 'invalid-email'
 
 const renderSubmissionError = (type: SubmissionErrorType) => {
   return (
@@ -31,8 +33,6 @@ const renderSubmissionError = (type: SubmissionErrorType) => {
           // This case should pretty much never be reached since we do client-side regex email validation too.
           'invalid-email':
             'The email address you entered is invalid. Please use a valid email address.',
-          'account-already-exists':
-            'An account with that email address already exists.',
         }[type]
       }
     </Text.Body3>
@@ -50,6 +50,7 @@ const RegistrationForm = () => {
     formState,
     errors,
     watch,
+    setError,
   } = useForm<RegistrationFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
@@ -75,6 +76,18 @@ const RegistrationForm = () => {
       password: '',
     },
   })
+
+  const [doesEmailExist] = useMutation<DoesEmailExistQuery>(
+    gql`
+      mutation DoesEmailExistQuery($email: String!) {
+        emailExists(email: $email)
+      }
+    `,
+    {
+      fetchPolicy: 'no-cache',
+    },
+  )
+
   const { loggedIn, signUp } = useAuth()
 
   const history = useHistory()
@@ -95,9 +108,17 @@ const RegistrationForm = () => {
     setSubmissionError(null)
     setSubmittingForm(true)
     try {
-      const authResponse = await signUp(formData)
-      if (authResponse.error) {
-        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+      const res = await doesEmailExist({ variables: { email: formData.email } })
+      if (res.data?.emailExists) {
+        setError('email', {
+          type: 'manual',
+          message: 'An account with that email address already exists.',
+        })
+      } else {
+        const authResponse = await signUp(formData)
+        if (authResponse.error) {
+          setSubmissionError(authResponse.error.code as SubmissionErrorType)
+        }
       }
     } finally {
       setSubmittingForm(false)
