@@ -77,38 +77,6 @@ describe('UserResolver', () => {
       expect(response.data?.user?.id).toBe(user.id)
       expect(response.data?.user?.email).toBe(user.email)
     })
-
-    it('returns true if an email does exist', async () => {
-      const user = await createMockUser()
-
-      const responseTrue = await execQuery({
-        source: `
-          mutation CheckEmailTestQuery($email: String!) {
-            emailExists(email: $email)
-          }
-        `,
-        variableValues: {
-          email: user.email,
-        },
-      })
-
-      expect(responseTrue.data?.emailExists).toBe(true)
-    })
-
-    it('returns false if an email does not exist', async () => {
-      const responseFalse = await execQuery({
-        source: `
-          mutation CheckEmailTestQuery($email: String!) {
-            emailExists(email: $email)
-          }
-        `,
-        variableValues: {
-          email: 'fake-email21@hotmail.com',
-        },
-      })
-
-      expect(responseFalse.data?.emailExists).toBe(false)
-    })
   })
 
   describe('changePassword', () => {
