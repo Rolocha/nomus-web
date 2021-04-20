@@ -174,19 +174,14 @@ class UserResolver {
       $or: [{ from: context.user._id }, { to: context.user._id }],
     })
 
-    const connectionDeletionPromises = connections.map((connection) =>
-      Connection.delete(connection.id)
+    const connectionDeletionResult = await Connection.batchDelete(
+      connections.map((connection) => connection.id)
     )
-    const bulkDeletionResult: Result<
-      undefined,
-      ErrorsOf<DeletedObjectResult>
-    >[] = await Promise.all([User.delete(context.user._id), ...connectionDeletionPromises])
+    const userDeletionResult = await User.delete(context.user._id)
 
-    await bulkDeletionResult.forEach((result) => {
-      if (result.isSuccess !== true) {
-        throw new Error('Failed to delete user')
-      }
-    })
+    if (userDeletionResult.isSuccess && connectionDeletionResult.isSuccess === false) {
+      throw new Error('Failed to delete user')
+    }
   }
 
   @Authorized(Role.User)

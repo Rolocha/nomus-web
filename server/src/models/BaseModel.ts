@@ -58,6 +58,33 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
         return Result.fail('delete-error')
       }
     }
+
+    public static async batchDelete(ids: string[]): Promise<DeletedObjectResult> {
+      // The ids have to be for the same model, mixed array behavior is undefined
+      const models = await this.mongo.find({ _id: { $in: ids } })
+
+      if (models.length !== ids.length) {
+        return Result.fail('id-not-found')
+      }
+
+      const session = await mongoose.startSession()
+      session.startTransaction()
+      try {
+        const batchDeletionPromises = models.map(async (model) => {
+          await DeletedObject.mongo.create({
+            _id: model.id,
+            deletedObject: JSON.stringify(model.toJSON()),
+          })
+          await this.mongo.deleteOne({ _id: model.id })
+        })
+        await Promise.all(batchDeletionPromises)
+      } catch (e) {
+        return Result.fail('delete-error')
+      } finally {
+        session.endSession()
+        return Result.ok()
+      }
+    }
   }
 
   return BaseModel
