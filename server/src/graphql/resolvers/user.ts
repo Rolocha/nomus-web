@@ -31,8 +31,6 @@ import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Connection } from 'src/models'
-import { ErrorsOf, Result } from 'src/util/error'
-import { DeletedObjectResult } from 'src/models/BaseModel'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
