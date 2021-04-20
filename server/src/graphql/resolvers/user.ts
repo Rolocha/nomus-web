@@ -31,7 +31,8 @@ import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Connection } from 'src/models'
-import { Result } from 'src/util/error'
+import { ErrorsOf, Result } from 'src/util/error'
+import { DeletedObjectResult } from 'src/models/BaseModel'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -168,26 +169,20 @@ class UserResolver {
 
   @Authorized(Role.User)
   @Mutation((type) => Void, { nullable: true })
-  async deleteUser(
-    @Arg('userId', { nullable: true }) userId: string | null,
-    @Ctx() context: IApolloContext
-  ): Promise<void> {
-    const requestingUserId = Role.Admin in context.user.roles ? userId : null
-    const requestedUserId = requestingUserId ?? context.user._id
-
+  async deleteUser(@Ctx() context: IApolloContext): Promise<void> {
     const connections = await Connection.mongo.find({
-      $or: [{ from: requestedUserId }, { to: requestedUserId }],
+      $or: [{ from: context.user._id }, { to: context.user._id }],
     })
 
-    const connectionDeletionPromises = connections.map(async (connection) => {
-      return await Connection.delete(connection.id)
-    })
-    const res: Result<undefined, 'id-not-found' | 'save-error'>[] = await Promise.all(
-      connectionDeletionPromises
+    const connectionDeletionPromises = connections.map((connection) =>
+      Connection.delete(connection.id)
     )
-    res.push(await User.delete(requestedUserId))
+    const bulkDeletionResult: Result<
+      undefined,
+      ErrorsOf<DeletedObjectResult>
+    >[] = await Promise.all([User.delete(context.user._id), ...connectionDeletionPromises])
 
-    await res.forEach((result) => {
+    await bulkDeletionResult.forEach((result) => {
       if (result.isSuccess !== true) {
         throw new Error('Failed to delete user')
       }

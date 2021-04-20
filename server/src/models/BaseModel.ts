@@ -13,6 +13,8 @@ export interface BaseModelArgs {
   prefix: string
 }
 
+export type DeletedObjectResult = Result<undefined, 'id-not-found' | 'delete-error'>
+
 export const BaseModel = ({ prefix }: BaseModelArgs) => {
   @modelOptions({
     schemaOptions: {
@@ -38,11 +40,8 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
       this._id = id
     }
 
-    public static async delete(
-      id: string
-    ): Promise<Result<undefined, 'id-not-found' | 'save-error'>> {
+    public static async delete(id: string): Promise<DeletedObjectResult> {
       const model = await this.mongo.findById(id)
-      // check that model exists
 
       if (model == null) {
         return Result.fail('id-not-found')
@@ -56,7 +55,7 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
         await this.mongo.deleteOne({ _id: id })
         return Result.ok()
       } catch (e) {
-        return Result.fail('save-error')
+        return Result.fail('delete-error')
       }
     }
   }
