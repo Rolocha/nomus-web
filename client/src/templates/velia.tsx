@@ -1,102 +1,116 @@
 import { lighten } from 'polished'
-import CardTemplate from 'src/templates/base'
 import { colors } from 'src/styles'
+import CardTemplate, { UserSpecifiedOptions } from 'src/templates/base'
+import { CustomizableFieldType } from 'src/templates/customization'
 
-export interface VeliaOptions {
-  name: string
-  headline: string
-  line1?: string
-  line2?: string
-  line3?: string
-  footer?: string
-  qrUrl: string
-  backgroundColor?: string
-  accentColor?: string
-  textColor: string
-  logoUrl?: string
-  logoSize?: number
-}
+// export interface VeliaOptions {
+//   colorScheme:
 
-const Velia = new CardTemplate<VeliaOptions>({
+//   name: CustomizableField.ContactInfo
+//   headline: CustomizableField.ContactInfo
+//   line1?: CustomizableField.ContactInfo
+//   line2?: CustomizableField.ContactInfo
+//   line3?: CustomizableField.ContactInfo
+//   footer?: CustomizableField.ContactInfo
+//   qrUrl: CustomizableField.QRCode
+//   backgroundColor?: CustomizableField.Color
+//   accentColor?: CustomizableField.Color
+//   textColor: CustomizableField.Color
+//   logo: CustomizableField.Logo
+// }
+
+export type VeliaContactFields =
+  | 'name'
+  | 'line1'
+  | 'line2'
+  | 'line3'
+  | 'headline'
+  | 'footer'
+export type VeliaExtendedColors = never
+
+const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
   name: 'Velia',
   width: 252,
   height: 144,
   demoImageUrl:
     'https://user-images.githubusercontent.com/8083680/112780178-25e20780-8ffd-11eb-96ec-f1eecbe102de.png',
-  customizableOptions: {
+  colorScheme: {
+    background: {
+      defaultValue: '#ffffff',
+    },
+    accent: {
+      defaultValue: colors.nomusBlue,
+    },
+    text: {
+      defaultValue: colors.midnightGray,
+    },
+  },
+  contactInfo: {
     name: {
-      type: 'text',
+      type: CustomizableFieldType.ContactInfo,
       label: 'Name',
       required: true,
       placeholder: 'John Appleseed',
     },
     headline: {
-      type: 'text',
+      type: CustomizableFieldType.ContactInfo,
       label: 'Headline',
       required: true,
       placeholder: 'Businessperson',
     },
     line1: {
+      type: CustomizableFieldType.ContactInfo,
       label: 'Line 1',
-      type: 'text',
       placeholder: '(555)-555-5555',
     },
     line2: {
       label: 'Line 2',
-      type: 'text',
+      type: CustomizableFieldType.ContactInfo,
       placeholder: 'john@appleseed.com',
     },
     line3: {
       label: 'Line 3',
-      type: 'text',
+      type: CustomizableFieldType.ContactInfo,
     },
     footer: {
       label: 'Footer',
-      type: 'text',
+      type: CustomizableFieldType.ContactInfo,
       placeholder: 'An apple a day keeps the doctor away',
     },
-    qrUrl: {
-      label: 'QR Code URL',
-      type: 'qrUrl',
-      placeholder: 'https://nomus.me',
-      hidden: () => true,
-    },
-    logoUrl: {
-      type: 'logo',
-      label: 'Logo',
-    },
-    logoSize: {
-      label: 'Logo Size',
-      defaultValue: 1,
-      type: 'logoSize',
-      hidden: (options: VeliaOptions) =>
-        options.logoUrl == null || options.logoUrl.length === 0,
-      range: {
-        min: 0.1,
-        max: 1,
-        step: 0.05,
-      },
-    },
-    backgroundColor: {
-      label: 'Background color',
-      type: 'color',
-      defaultValue: colors.white,
-    },
-    accentColor: {
-      label: 'Accent color',
-      type: 'color',
-      defaultValue: colors.nomusBlue,
-    },
-    textColor: {
-      label: 'Text color',
-      type: 'color',
-      defaultValue: colors.midnightGray,
-    },
-  },
+    // qrUrl: {
+    //   type: CustomizableFieldType.QRCode,
+    //   label: 'QR Code URL',
+    //   placeholder: 'https://nomus.me',
+    // },
+    // logo: {
+    //   type: CustomizableFieldType.Logo,
+    //   size: {
+    //     min: 0.1,
+    //     max: 1,
+    //     step: 0.05,
+    //     defaultValue: 0.8,
+    //   },
+    // },
+    // backgroundColor: {
+    //   type: CustomizableFieldType.Color,
+    //   label: 'Background color',
+    //   defaultValue: colors.white,
+    // },
+    // accentColor: {
+    //   type: CustomizableFieldType.Color,
+    //   label: 'Accent color',
+    //   defaultValue: colors.nomusBlue,
+    // },
+    // textColor: {
+    //   type: CustomizableFieldType.Color,
+    //   label: 'Text color',
+    //   defaultValue: colors.midnightGray,
+    // },
+  } as const,
   async renderFront(
-    this: CardTemplate<VeliaOptions>,
+    this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
     canvas: HTMLCanvasElement,
-    options: VeliaOptions,
+    options: UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors>,
   ) {
     this.clearCanvas(canvas)
 
@@ -105,20 +119,20 @@ const Velia = new CardTemplate<VeliaOptions>({
       throw new Error('Got null for canvas context')
     }
 
-    const placeholderTextColor = lighten(0.4)(options.textColor)
+    const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
 
     // Draw the background
     ctx.fillStyle =
-      options.backgroundColor ??
-      this.customizableOptions.backgroundColor.defaultValue ??
+      options.colorScheme.background ??
+      this.colorScheme.background.defaultValue ??
       // Should never have go this far
       colors.white
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
     // Draw the bottom accent bar
     ctx.fillStyle =
-      options.accentColor ??
-      this.customizableOptions.accentColor.defaultValue ??
+      options.colorScheme.accent ??
+      this.colorScheme.accent.defaultValue ??
       // Should never have go this far
       '#000000'
     ctx.fillRect(
@@ -130,20 +144,24 @@ const Velia = new CardTemplate<VeliaOptions>({
 
     // Render the name
     ctx.font = this.proportionalize(14) + 'px Rubik'
-    ctx.fillStyle = options.name ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.name
+      ? options.colorScheme.text
+      : placeholderTextColor
     this.drawTextHorizontallyCenteredAtY(
       ctx,
-      options.name || this.customizableOptions.name.placeholder || '[name]',
+      options.contactInfo.name || this.contactInfo.name.placeholder || '[name]',
       this.proportionalize(20 + 14),
     )
 
     // Render the headline
     ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.headline ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.headline
+      ? options.colorScheme.text
+      : placeholderTextColor
     this.drawTextHorizontallyCenteredAtY(
       ctx,
-      options.headline ||
-        this.customizableOptions.headline.placeholder ||
+      options.contactInfo.headline ||
+        this.contactInfo.headline.placeholder ||
         '[headline]',
       this.proportionalize(40 + 8),
     )
@@ -153,32 +171,40 @@ const Velia = new CardTemplate<VeliaOptions>({
       this.proportionalizedWidth / 2 - this.proportionalize(8)
     ctx.font = this.proportionalize(7) + 'px Rubik'
 
-    ctx.fillStyle = options.line1 ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.line1
+      ? options.colorScheme.text
+      : placeholderTextColor
     const line1Text =
-      options.line1 || this.customizableOptions.line1.placeholder || ''
+      options.contactInfo.line1 || this.contactInfo.line1.placeholder || ''
     const line1TextMetrics = ctx.measureText(line1Text)
     const line1TextX = rightEdgeForLines - line1TextMetrics.width
     ctx.fillText(line1Text, line1TextX, this.proportionalize(65 + 7))
 
-    ctx.fillStyle = options.line2 ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.line2
+      ? options.colorScheme.text
+      : placeholderTextColor
     const line2Text =
-      options.line2 || this.customizableOptions.line2.placeholder || ''
+      options.contactInfo.line2 || this.contactInfo.line2.placeholder || ''
     const line2TextMetrics = ctx.measureText(line2Text)
     const line2TextX = rightEdgeForLines - line2TextMetrics.width
     ctx.fillText(line2Text, line2TextX, this.proportionalize(77 + 7))
 
-    ctx.fillStyle = options.line3 ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.line3
+      ? options.colorScheme.text
+      : placeholderTextColor
     const line3Text =
-      options.line3 || this.customizableOptions.line3.placeholder || ''
+      options.contactInfo.line3 || this.contactInfo.line3.placeholder || ''
     const line3TextMetrics = ctx.measureText(line3Text)
     const line3TextX = rightEdgeForLines - line3TextMetrics.width
     ctx.fillText(line3Text, line3TextX, this.proportionalize(89 + 7))
 
     // Render the footer
     const footerText =
-      options.footer || this.customizableOptions.footer.placeholder || ''
+      options.contactInfo.footer || this.contactInfo.footer.placeholder || ''
     ctx.font = this.proportionalize(7) + 'px Rubik'
-    ctx.fillStyle = options.footer ? options.textColor : placeholderTextColor
+    ctx.fillStyle = options.contactInfo.footer
+      ? options.colorScheme.text
+      : placeholderTextColor
     this.drawTextHorizontallyCenteredAtY(
       ctx,
       footerText,
@@ -188,16 +214,16 @@ const Velia = new CardTemplate<VeliaOptions>({
     // Render QR code
     await this.drawQRCode(
       ctx,
-      options.qrUrl ||
-        this.customizableOptions.qrUrl.placeholder ||
-        'https://nomus.me',
+      // TODO: Figure out how to wire QR code URL through without it being a user-specified option
+      // options.qrUrl ||
+      this.contactInfo.name.placeholder || 'https://nomus.me',
       {
         x: this.proportionalize(134),
         y: this.proportionalize(65),
         width: this.proportionalize(32),
         height: this.proportionalize(32),
-        backgroundColor: options.backgroundColor,
-        foregroundColor: options.accentColor,
+        backgroundColor: options.colorScheme.background,
+        foregroundColor: options.colorScheme.accent,
       },
     )
 
@@ -206,7 +232,7 @@ const Velia = new CardTemplate<VeliaOptions>({
       x: this.proportionalize(170),
       y: this.proportionalize(70),
       size: this.proportionalize(11),
-      color: options.accentColor,
+      color: options.colorScheme.accent,
     })
 
     // Render NFC tap icon
@@ -214,13 +240,13 @@ const Velia = new CardTemplate<VeliaOptions>({
       x: this.proportionalize(170),
       y: this.proportionalize(85),
       size: this.proportionalize(11),
-      color: options.accentColor,
+      color: options.colorScheme.accent,
     })
   },
   async renderBack(
-    this: CardTemplate<VeliaOptions>,
+    this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
     canvas: HTMLCanvasElement,
-    options: VeliaOptions,
+    options: UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors>,
   ) {
     this.clearCanvas(canvas)
 
@@ -233,8 +259,8 @@ const Velia = new CardTemplate<VeliaOptions>({
 
     // Draw the main background with accent color
     ctx.fillStyle =
-      options.accentColor ??
-      this.customizableOptions.accentColor.defaultValue ??
+      options.colorScheme.accent ??
+      this.colorScheme.accent.defaultValue ??
       // Should never have go this far
       '#000000'
     ctx.fillRect(
@@ -246,8 +272,8 @@ const Velia = new CardTemplate<VeliaOptions>({
 
     // Draw the bottom bar with background color
     ctx.fillStyle =
-      options.backgroundColor ??
-      this.customizableOptions.backgroundColor.defaultValue ??
+      options.colorScheme.background ??
+      this.contactInfo.name.defaultValue ??
       // Should never have go this far
       '#ffffff'
     ctx.fillRect(
@@ -258,12 +284,10 @@ const Velia = new CardTemplate<VeliaOptions>({
     )
 
     // Render user-provided logo if provided
-    if (options.logoUrl) {
-      const logoImg = await this.createImage(options.logoUrl)
+    if (options.graphic?.url) {
+      const logoImg = await this.createImage(options.graphic.url)
       const imageHeight =
-        (options.logoSize ??
-          this.customizableOptions.logoSize.defaultValue ??
-          1) * this.proportionalize(100)
+        (options.graphic.size ?? 1) * this.proportionalize(100)
       const imageWidth =
         (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
 

@@ -49,26 +49,15 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
     const options = template.createOptionsFromFormFields(
       cardBuilderState.templateCustomization!,
     )
-    return template.customizableOptionNames.reduce<
-      { field: string; value: React.ReactNode }[]
-    >((acc, field) => {
-      const { label, type } = template.customizableOptions[field]
-      if (label != null) {
-        switch (type) {
-          case 'text':
-            if (options[field]) {
-              acc.push({
-                field: label,
-                value: String(options[field]),
-              })
-            }
-            break
-          default:
-            break
-        }
-      }
-      return acc
+    const info = []
+    template.contactInfoFieldNames.forEach((field) => {
+      const { label } = template.contactInfo[field]
+      info.push({
+        field: label,
+        value: String(options.contactInfo[field]),
+      })
     }, [])
+    return info
   }, [cardBuilderState.templateId, cardBuilderState.templateCustomization])
 
   return (
