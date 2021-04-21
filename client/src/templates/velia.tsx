@@ -1,7 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { UserSpecifiedOptions } from 'src/templates/base'
-import { CustomizableFieldType } from 'src/templates/customization'
 
 // export interface VeliaOptions {
 //   colorScheme:
@@ -47,34 +46,28 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
   },
   contactInfo: {
     name: {
-      type: CustomizableFieldType.ContactInfo,
       label: 'Name',
       required: true,
       placeholder: 'John Appleseed',
     },
     headline: {
-      type: CustomizableFieldType.ContactInfo,
       label: 'Headline',
       required: true,
       placeholder: 'Businessperson',
     },
     line1: {
-      type: CustomizableFieldType.ContactInfo,
       label: 'Line 1',
       placeholder: '(555)-555-5555',
     },
     line2: {
       label: 'Line 2',
-      type: CustomizableFieldType.ContactInfo,
       placeholder: 'john@appleseed.com',
     },
     line3: {
       label: 'Line 3',
-      type: CustomizableFieldType.ContactInfo,
     },
     footer: {
       label: 'Footer',
-      type: CustomizableFieldType.ContactInfo,
       placeholder: 'An apple a day keeps the doctor away',
     },
     // qrUrl: {

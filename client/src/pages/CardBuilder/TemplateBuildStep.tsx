@@ -31,8 +31,6 @@ const TemplateBuildStep = ({
   const selectedTemplate = templateLibrary[templateId]
 
   const {
-    name: templateName,
-    colorScheme,
     colorKeys,
     contactInfo,
     contactInfoFieldNames,

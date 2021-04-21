@@ -1,11 +1,7 @@
 import QRCode from 'qrcode'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import {
-  CustomizableField,
-  CustomizableFieldSpec,
-  CustomizableFieldType,
-} from './customization'
+import { CustomizableField, CustomizableFieldSpec } from './customization'
 import {
   createNFCTapIconSVG,
   createNomusLogoSVG,

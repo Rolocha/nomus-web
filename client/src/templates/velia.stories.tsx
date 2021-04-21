@@ -4,8 +4,7 @@ import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
 import { UserSpecifiedOptions } from 'src/templates/base'
-
-import veliaTemplate, { VeliaContactFields, VeliaExtendedColors } from './velia'
+import { VeliaContactFields, VeliaExtendedColors } from './velia'
 
 export default {
   title: 'Card Templates/Velia',
