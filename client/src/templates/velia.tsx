@@ -1,22 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
-import CardTemplate, { UserSpecifiedOptions } from 'src/templates/base'
-
-// export interface VeliaOptions {
-//   colorScheme:
-
-//   name: CustomizableField.ContactInfo
-//   headline: CustomizableField.ContactInfo
-//   line1?: CustomizableField.ContactInfo
-//   line2?: CustomizableField.ContactInfo
-//   line3?: CustomizableField.ContactInfo
-//   footer?: CustomizableField.ContactInfo
-//   qrUrl: CustomizableField.QRCode
-//   backgroundColor?: CustomizableField.Color
-//   accentColor?: CustomizableField.Color
-//   textColor: CustomizableField.Color
-//   logo: CustomizableField.Logo
-// }
+import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 export type VeliaContactFields =
   | 'name'
@@ -70,40 +54,11 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       label: 'Footer',
       placeholder: 'An apple a day keeps the doctor away',
     },
-    // qrUrl: {
-    //   type: CustomizableFieldType.QRCode,
-    //   label: 'QR Code URL',
-    //   placeholder: 'https://nomus.me',
-    // },
-    // logo: {
-    //   type: CustomizableFieldType.Logo,
-    //   size: {
-    //     min: 0.1,
-    //     max: 1,
-    //     step: 0.05,
-    //     defaultValue: 0.8,
-    //   },
-    // },
-    // backgroundColor: {
-    //   type: CustomizableFieldType.Color,
-    //   label: 'Background color',
-    //   defaultValue: colors.white,
-    // },
-    // accentColor: {
-    //   type: CustomizableFieldType.Color,
-    //   label: 'Accent color',
-    //   defaultValue: colors.nomusBlue,
-    // },
-    // textColor: {
-    //   type: CustomizableFieldType.Color,
-    //   label: 'Text color',
-    //   defaultValue: colors.midnightGray,
-    // },
   } as const,
   async renderFront(
     this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors>,
+    options: CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>,
   ) {
     this.clearCanvas(canvas)
 
@@ -207,9 +162,9 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     // Render QR code
     await this.drawQRCode(
       ctx,
-      // TODO: Figure out how to wire QR code URL through without it being a user-specified option
-      // options.qrUrl ||
-      this.contactInfo.name.placeholder || 'https://nomus.me',
+      options.qrCodeUrl ||
+        this.contactInfo.name.placeholder ||
+        'https://nomus.me',
       {
         x: this.proportionalize(134),
         y: this.proportionalize(65),
@@ -239,7 +194,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
   async renderBack(
     this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors>,
+    options: CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>,
   ) {
     this.clearCanvas(canvas)
 

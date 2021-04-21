@@ -154,6 +154,13 @@ const TemplateBuildStep = ({
             )
           })}
         </Box>
+        <Form.Input
+          hidden
+          name="qrCodeUrl"
+          ref={customizationForm.register({})}
+          // TODO: Wire the CardVersion url into here
+          value="https://google.com"
+        />
       </Box>
       <Box
         overflow="visible"

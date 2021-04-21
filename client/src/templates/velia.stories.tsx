@@ -3,13 +3,12 @@ import { Story } from '@storybook/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
-import { UserSpecifiedOptions } from 'src/templates/base'
+import { CardTemplateRenderOptions } from 'src/templates/base'
 import { VeliaContactFields, VeliaExtendedColors } from './velia'
 
 export default {
   title: 'Card Templates/Velia',
   excludeStories: /.*Data$/,
-  // argTypes: veliaTemplate.storybookArgTypes,
 }
 
 export const actionsData = {
@@ -18,7 +17,7 @@ export const actionsData = {
 
 //👇 We create a “template” of how args map to rendering
 const VeliaTemplateTemplate: Story<
-  UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors>
+  CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>
 > = ({ ...options }) => {
   return (
     <Box display="flex">
@@ -46,7 +45,10 @@ const VeliaTemplateTemplate: Story<
 
 export const Velia = VeliaTemplateTemplate.bind({})
 
-const args: UserSpecifiedOptions<VeliaContactFields, VeliaExtendedColors> = {
+const args: CardTemplateRenderOptions<
+  VeliaContactFields,
+  VeliaExtendedColors
+> = {
   contactInfo: {
     name: 'Spongebob Squarepants',
     headline: 'Fry Cook at the Krusty Krab',

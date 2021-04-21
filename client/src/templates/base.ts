@@ -1,7 +1,11 @@
 import QRCode from 'qrcode'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import { CustomizableField, CustomizableFieldSpec } from './customization'
+import {
+  ColorScheme,
+  BaseColorScheme,
+  CustomizableFieldSpec,
+} from './customization'
 import {
   createNFCTapIconSVG,
   createNomusLogoSVG,
@@ -14,28 +18,14 @@ import {
 // move this to TemplateCard
 const RESOLUTION_FACTOR = 5
 
-type BaseColorScheme = {
-  // All templates must specify some base colors
-  background: CustomizableField.Color
-  accent: CustomizableField.Color
-  text: CustomizableField.Color
-  // Each template can optionally add more colors to its scheme if needed
-}
-
-type ColorScheme<ExtendedColors extends string> = BaseColorScheme &
-  Record<ExtendedColors, CustomizableField.Color>
-
-export type UserSpecifiedOptions<
+export type CardTemplateRenderOptions<
   ContactInfoFields extends string,
   ExtendedColors extends string
 > = {
-  colorScheme: Record<
-    ExtendedColors | keyof BaseColorScheme,
-    CustomizableField.Color
-  >
-  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
-  // useQR: boolean
-  graphic: CustomizableField.Graphic
+  colorScheme: Record<ExtendedColors | keyof BaseColorScheme, string>
+  contactInfo: Record<ContactInfoFields, string>
+  graphic: { url?: string | null; size?: number }
+  qrCodeUrl: string
 }
 
 export interface CardTemplateDefinition<
@@ -54,11 +44,11 @@ export interface CardTemplateDefinition<
   // customizableOptions: Record<keyof T, CustomizableFieldSpec.Any>
   renderFront: (
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ) => void | Promise<void>
   renderBack: (
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ) => void | Promise<void>
 }
 
@@ -97,7 +87,7 @@ export default class CardTemplate<
     ContactInfoFields,
     ExtendedColors
   >['renderBack']
-  private userSpecifiedOptions: UserSpecifiedOptions<
+  private userSpecifiedOptions: CardTemplateRenderOptions<
     ContactInfoFields,
     ExtendedColors
   > | null = null
@@ -152,7 +142,7 @@ export default class CardTemplate<
     )
   }
 
-  public get defaultOptions(): UserSpecifiedOptions<
+  public get defaultOptions(): CardTemplateRenderOptions<
     ContactInfoFields,
     ExtendedColors
   > {
@@ -168,11 +158,12 @@ export default class CardTemplate<
           acc[fieldName] = this.colorScheme[fieldName].defaultValue
         }
         return acc
-      }, {} as Record<string, any>),
+      }, {} as Record<string, string>),
       graphic: {
         url: null,
         size: 1,
       },
+      qrCodeUrl: 'https://nomus.me',
     }
   }
 
@@ -187,7 +178,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderFrontToCanvas(
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -202,7 +193,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderBackToCanvas(
     canvas: HTMLCanvasElement,
-    options: UserSpecifiedOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -215,7 +206,7 @@ export default class CardTemplate<
 
   // Renders both the front and back of the cards each to a separate data URL string
   public async renderBothSidesToDataUrls(
-    options: UserSpecifiedOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<{ front: string; back: string }> {
     const frontCanvas = document.createElement('canvas')
     const backCanvas = document.createElement('canvas')
@@ -255,7 +246,7 @@ export default class CardTemplate<
   // lets us handle any such data transformations.
   public createOptionsFromFormFields(
     formFields: Record<string, any>,
-  ): UserSpecifiedOptions<ContactInfoFields, ExtendedColors> {
+  ): CardTemplateRenderOptions<ContactInfoFields, ExtendedColors> {
     const { graphic, ...otherFormFields } = formFields
     const result: any = {
       ...otherFormFields,

@@ -33,6 +33,13 @@ export declare namespace CustomizableField {
   export type QRCode = string // the URL
 }
 
-// export type CustomizableFieldToSpec = {
-//   [CustomizableField.Graphic]
-// }
+export type BaseColorScheme = {
+  // All templates must specify some base colors
+  background: string
+  accent: string
+  text: string
+  // Each template can optionally add more colors to its scheme if needed
+}
+
+export type ColorScheme<ExtendedColors extends string> = BaseColorScheme &
+  Record<ExtendedColors, string>
