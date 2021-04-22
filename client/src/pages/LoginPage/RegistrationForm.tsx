@@ -23,13 +23,19 @@ interface RegistrationFormData {
 
 type SubmissionErrorType = 'invalid-email' | 'non-unique-email'
 
-const renderSubmissionError = (type: SubmissionErrorType) => {
-  return {
-    // This case should pretty much never be reached since we do client-side regex email validation too.
-    'invalid-email': 'The email entered is invalid. Please use a valid email.',
-    'non-unique-email':
-      'An account with that email already exists. Try another?',
-  }[type]
+// const renderSubmissionError = (type: SubmissionErrorType) => {
+//   return {
+//     // This case should pretty much never be reached since we do client-side regex email validation too.
+//     'invalid-email': 'The email entered is invalid. Please use a valid email.',
+//     'non-unique-email':
+//       'An account with that email already exists. Try another?',
+//   }[type]
+// }
+
+const SUBMISSION_ERROR_MESSAGES: Record<SubmissionErrorType, string> = {
+  // This case should pretty much never be reached since we do client-side regex email validation too.
+  'invalid-email': 'The email entered is invalid. Please use a valid email.',
+  'non-unique-email': 'An account with that email already exists. Try another?',
 }
 
 const RegistrationForm = () => {
@@ -86,12 +92,17 @@ const RegistrationForm = () => {
     try {
       const authResponse = await signUp(formData)
       if (authResponse.error) {
-        setError('email', {
-          type: 'manual',
-          message: renderSubmissionError(
-            authResponse.error.code as SubmissionErrorType,
-          ),
-        })
+        switch (authResponse.error.code) {
+          case 'invalid-email':
+          case 'non-unique-email':
+            setError('email', {
+              type: 'manual',
+              message:
+                SUBMISSION_ERROR_MESSAGES[
+                  authResponse.error.code as SubmissionErrorType
+                ],
+            })
+        }
       }
     } finally {
       setSubmittingForm(false)
