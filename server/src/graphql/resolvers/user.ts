@@ -1,4 +1,4 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { DocumentType, mongoose } from '@typegoose/typegoose'
 import {
   ApolloError,
   AuthenticationError,
@@ -169,16 +169,22 @@ class UserResolver {
   @Mutation((type) => Void, { nullable: true })
   async deleteUser(@Ctx() context: IApolloContext): Promise<void> {
     const connections = await Connection.mongo.find({
-      $or: [{ from: context.user._id }, { to: context.user._id }],
+      $or: [{ from: context.user.id }, { to: context.user.id }],
     })
 
-    const connectionDeletionResult = await Connection.batchDelete(
-      connections.map((connection) => connection.id)
-    )
-    const userDeletionResult = await User.delete(context.user._id)
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+      const connectionBatchDeletionResult = await Connection.batchDelete(
+        connections.map((connection) => connection.id)
+      )
+      const userDeletionResult = await User.delete(context.user.id)
 
-    if (userDeletionResult.isSuccess && connectionDeletionResult.isSuccess === false) {
-      throw new Error('Failed to delete user')
+      if (userDeletionResult.isSuccess && connectionBatchDeletionResult.isSuccess === false) {
+        throw new Error('Failed to delete user')
+      }
+    } finally {
+      session.endSession()
     }
   }
 

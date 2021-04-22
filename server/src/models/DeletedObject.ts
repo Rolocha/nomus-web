@@ -4,7 +4,7 @@ import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoos
 class DeletedObject {
   static mongo: ReturnModelType<typeof DeletedObject>
 
-  @prop({ required: true, unique: true })
+  @prop({ required: true })
   _id: string
 
   get id(): string {

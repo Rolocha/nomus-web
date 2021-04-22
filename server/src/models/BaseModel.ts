@@ -67,8 +67,6 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
         return Result.fail('id-not-found')
       }
 
-      const session = await mongoose.startSession()
-      session.startTransaction()
       try {
         const batchDeletionPromises = models.map(async (model) => {
           await DeletedObject.mongo.create({
@@ -80,10 +78,8 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
         await Promise.all(batchDeletionPromises)
       } catch (e) {
         return Result.fail('delete-error')
-      } finally {
-        session.endSession()
-        return Result.ok()
       }
+      return Result.ok()
     }
   }
 
