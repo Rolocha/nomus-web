@@ -23,15 +23,6 @@ interface RegistrationFormData {
 
 type SubmissionErrorType = 'invalid-email' | 'non-unique-email'
 
-// const renderSubmissionError = (type: SubmissionErrorType) => {
-//   return {
-//     // This case should pretty much never be reached since we do client-side regex email validation too.
-//     'invalid-email': 'The email entered is invalid. Please use a valid email.',
-//     'non-unique-email':
-//       'An account with that email already exists. Try another?',
-//   }[type]
-// }
-
 const SUBMISSION_ERROR_MESSAGES: Record<SubmissionErrorType, string> = {
   // This case should pretty much never be reached since we do client-side regex email validation too.
   'invalid-email': 'The email entered is invalid. Please use a valid email.',
