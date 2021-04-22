@@ -245,66 +245,6 @@ describe('Contact Info Page', () => {
   })
 
   describe('Save to Nomus button', () => {
-    const contactSaveUrl = '/dashboard/contacts/save'
-
-    // TODO(bibek): we'll probably remove this scenario when we introduce auto-saving and change the save button for logged-in state
-    it.skip('if logged in, links to the /dashboard/contact/save with appropriate URL params', async () => {
-      const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
-        logIn: jest.fn(),
-        logOut: jest.fn(),
-        signUp: jest.fn(),
-        refreshToken: jest.fn(),
-        loggedIn: true,
-        id: 'some_id',
-        userRoles: [Auth.Role.User],
-      }))
-
-      const contact = createMockContact()
-      const userEnteredNotes = {
-        meetingDate: '2021-01-01',
-        meetingPlace: 'a new place',
-        tags: ['some', 'new', 'tags'],
-        notes: 'some new notes',
-      }
-      const { renderResult } = renderComponent({
-        partialContact: contact,
-        mocks: [createSaveContactMutationMock(contact, userEnteredNotes)],
-      })
-
-      // Wait for first render
-      await new Promise((resolve) => setTimeout(resolve, 0))
-
-      ui.openNotesModal(renderResult)
-
-      ui.setNotesModalFormValues({
-        ...userEnteredNotes,
-        tags: userEnteredNotes.tags.join(','),
-        meetingDate: userEnteredNotes.meetingDate,
-      })
-
-      ui.saveNotesModal(renderResult)
-
-      // Wait for modal to close
-      waitForElementToBeRemoved(renderResult.getByTestId('modal'))
-      // and for mutation to complete
-      await new Promise((resolve) => setTimeout(resolve, 0))
-
-      const saveContactCardLink = renderResult
-        .getByText('Save to Nomus')
-        .closest('a')
-        ?.getAttribute('href')!
-
-      expect(saveContactCardLink).toStartWith(contactSaveUrl)
-      const urlParams = new URLSearchParams(saveContactCardLink.split('?')[1])
-      expect(urlParams.get('username')).toBe(contact.username)
-      expect(urlParams.get('meetingDate')).toBe(userEnteredNotes.meetingDate)
-      expect(urlParams.get('meetingPlace')).toBe(userEnteredNotes.meetingPlace)
-      expect(urlParams.get('tags')).toBe(userEnteredNotes.tags.join(','))
-      expect(urlParams.get('notes')).toBe(userEnteredNotes.notes)
-
-      useAuthSpy.mockRestore()
-    })
-
     it('if logged in and contact already saved, the button says "View in dashboard" instead', async () => {
       const useAuthSpy = jest.spyOn(Auth, 'useAuth').mockImplementation(() => ({
         logIn: jest.fn(),
