@@ -30,7 +30,7 @@ interface FormData {
 const bp = 'lg'
 
 const AboutPage = () => {
-  const { register, handleSubmit, errors, formState } = useForm<FormData>({
+  const { register, handleSubmit, errors } = useForm<FormData>({
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({
