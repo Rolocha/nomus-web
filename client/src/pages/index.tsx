@@ -22,6 +22,13 @@ import ResetPassword from 'src/pages/ResetPassword'
 import ShopFront from 'src/pages/ShopFront'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
+<<<<<<< HEAD
+=======
+import FaqPage from 'src/pages/FaqPage'
+import CardBuilder from 'src/pages/CardBuilder'
+import ShopFront from 'src/pages/ShopFront'
+import AboutPage from 'src/pages/AboutPage'
+>>>>>>> first about page commit
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -94,6 +101,11 @@ export const routes: Array<RouteType> = [
     path: '/faq',
     exact: true,
     Component: FaqPage,
+  },
+  {
+    path: '/about',
+    exact: true,
+    Component: AboutPage,
   },
   {
     path: '/about',
