@@ -36,16 +36,19 @@ describe('Order model', () => {
       }
     )
 
-    it.each([OrderState.Creating, OrderState.Created, OrderState.Enroute, OrderState.Fulfilled])(
-      `fails to cancel the order if it's in the %s state`,
-      async (initialState) => {
-        const order = await createMockOrder({ state: initialState })
-        expect(order.state).toBe(initialState)
-        const result = await order.transition(OrderState.Canceled)
-        expect(result.error.name).toBe('invalid-transition')
-        expect(order.state).toBe(initialState)
-      }
-    )
+    it.each([
+      OrderState.Reviewed,
+      OrderState.Creating,
+      OrderState.Created,
+      OrderState.Enroute,
+      OrderState.Fulfilled,
+    ])(`fails to cancel the order if it's in the %s state`, async (initialState) => {
+      const order = await createMockOrder({ state: initialState })
+      expect(order.state).toBe(initialState)
+      const result = await order.transition(OrderState.Canceled)
+      expect(result.error.name).toBe('invalid-transition')
+      expect(order.state).toBe(initialState)
+    })
   })
 
   describe('transitionState', () => {
@@ -55,6 +58,9 @@ describe('Order model', () => {
 
       await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
       expect(order.state).toBe(OrderState.Paid)
+
+      await order.transition(OrderState.Reviewed, OrderEventTrigger.Internal)
+      expect(order.state).toBe(OrderState.Reviewed)
 
       await order.transition(OrderState.Creating)
       expect(order.state).toBe(OrderState.Creating)
@@ -78,6 +84,10 @@ describe('Order model', () => {
         expect.objectContaining({
           state: OrderState.Paid,
           trigger: OrderEventTrigger.Payment,
+        }),
+        expect.objectContaining({
+          state: OrderState.Reviewed,
+          trigger: OrderEventTrigger.Internal,
         }),
         expect.objectContaining({
           state: OrderState.Creating,

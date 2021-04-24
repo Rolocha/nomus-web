@@ -21,7 +21,8 @@ import OrderEvent from './OrderEvent'
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
   [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
-  [OrderState.Paid]: [OrderState.Creating, OrderState.Canceled],
+  [OrderState.Paid]: [OrderState.Reviewed, OrderState.Canceled],
+  [OrderState.Reviewed]: [OrderState.Creating],
   [OrderState.Creating]: [OrderState.Created],
   [OrderState.Created]: [OrderState.Enroute],
   [OrderState.Enroute]: [OrderState.Fulfilled],
