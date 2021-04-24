@@ -107,10 +107,12 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ base: 'block', [bp]: 'none' }}>
                 <Text.Label>Tracking #</Text.Label>
               </Box>
-              {/* TODO: Figure out where to actually link this */}
-
               <Text.Body2>
-                <Link to="#">{order.trackingNumber}</Link>
+                <Link
+                  to={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${order.trackingNumber}`}
+                >
+                  {order.trackingNumber}
+                </Link>
               </Text.Body2>
             </Box>
             <Box gridArea="price">
