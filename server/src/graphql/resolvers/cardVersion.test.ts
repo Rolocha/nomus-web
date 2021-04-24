@@ -89,6 +89,7 @@ describe('CardVersionResolver', () => {
             updateCardVersion(payload: $payload) {
               id,
               frontImageUrl,
+              backImageUrl,
             }
           }
         `,
@@ -96,6 +97,7 @@ describe('CardVersionResolver', () => {
           payload: {
             id: cardVersion.id,
             frontImageUrl: testUrl,
+            backImageUrl: testUrl,
           },
         },
       })
@@ -103,6 +105,7 @@ describe('CardVersionResolver', () => {
       expect(response.data?.updateCardVersion).toMatchObject({
         id: cardVersion.id,
         frontImageUrl: testUrl,
+        backImageUrl: testUrl,
       })
     })
   })
