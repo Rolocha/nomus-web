@@ -9,14 +9,18 @@ import {
   Int,
   FieldResolver,
   Root,
+  InputType,
+  Mutation,
+  UnauthorizedError,
 } from 'type-graphql'
-
+import { DocumentType } from '@typegoose/typegoose'
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
 import { Role } from 'src/util/enums'
 import { Card, CardInteraction } from 'src/models'
+import { Address, PersonName } from 'src/models/subschemas'
 
 @ObjectType()
 class CardVersionStats {
@@ -28,6 +32,39 @@ class CardVersionStats {
 
   @Field((type) => Int)
   numTaps: number
+}
+
+@InputType({ description: 'Input to update fields on an existing CardVersion' })
+class CardVersionQueryInput {
+  @Field({ nullable: false, description: 'specify a single cardVersion ID to query/update' })
+  id: string
+
+  @Field((type) => PersonName, {
+    nullable: true,
+    description: 'person name as appears on the card',
+  })
+  name: PersonName
+
+  @Field({ nullable: true, description: "user's email as it appears on the card" })
+  email: string
+
+  @Field({ nullable: true, description: "user's title as it appears on the card" })
+  title: string
+
+  @Field({ nullable: true, description: "user's company as it appears on the card" })
+  company: string
+
+  @Field((type) => Address, {
+    nullable: true,
+    description: "user's address as it appears on the card",
+  })
+  address: Address
+
+  @Field({ nullable: true, description: 'url image for front of card' })
+  frontImageUrl: string
+
+  @Field({ nullable: true, description: 'url image for back of card' })
+  backImageUrl: string
 }
 
 @Resolver((of) => CardVersion)
@@ -74,6 +111,33 @@ class CardVersionResolver {
       user: requestedUserId,
     })
     return cardVersionsBelongingToUser
+  }
+
+  //update a single cardVersion with a payload
+  @Authorized(Role.User)
+  @Mutation((type) => CardVersion)
+  async updateCardVersion(
+    @Arg('payload', { nullable: false }) payload: CardVersionQueryInput,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<CardVersion>> {
+    if (!context.user) {
+      throw new UnauthorizedError()
+    }
+    const cardVersion = await CardVersion.mongo.findById(payload.id)
+    if (!cardVersion) {
+      throw new Error('no-matching-cardVersion')
+    }
+
+    cardVersion.name = payload.name ?? cardVersion.name
+    cardVersion.email = payload.email ?? cardVersion.email
+    cardVersion.title = payload.title ?? cardVersion.title
+    cardVersion.company = payload.company ?? cardVersion.company
+    cardVersion.address = payload.address ?? cardVersion.address
+    cardVersion.frontImageUrl = payload.frontImageUrl ?? cardVersion.frontImageUrl
+    cardVersion.backImageUrl = payload.backImageUrl ?? cardVersion.backImageUrl
+
+    await cardVersion.save()
+    return cardVersion
   }
 
   // Return a list of all card versions belonging to the specified user,
