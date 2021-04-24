@@ -18,6 +18,7 @@ export enum OrderState {
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
   Paid = 'Paid',
+  Reviewed = 'Reviewed',
 }
 
 export interface AddressInput {
