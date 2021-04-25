@@ -51,7 +51,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
     )
     const info: Array<{ label: string; value: string }> = []
     template.contactInfoFieldNames.forEach((fieldName) => {
-      const { label } = template.contactInfo[fieldName]
+      const { label } = template.contactInfoSpec[fieldName]
       const value = options.contactInfo[fieldName]
       if (label && value) {
         info.push({

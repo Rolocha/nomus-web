@@ -41,17 +41,22 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     },
     line1: {
       label: 'Line 1',
+      required: false,
       placeholder: '(555)-555-5555',
     },
     line2: {
       label: 'Line 2',
+      required: false,
       placeholder: 'john@appleseed.com',
     },
     line3: {
       label: 'Line 3',
+      required: false,
+      placeholder: 'Apple Seed, LLC',
     },
     footer: {
       label: 'Footer',
+      required: false,
       placeholder: 'An apple a day keeps the doctor away',
     },
   } as const,
@@ -72,7 +77,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     // Draw the background
     ctx.fillStyle =
       options.colorScheme.background ??
-      this.colorScheme.background.defaultValue ??
+      this.colorSchemeSpec.background.defaultValue ??
       // Should never have go this far
       colors.white
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
@@ -80,7 +85,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     // Draw the bottom accent bar
     ctx.fillStyle =
       options.colorScheme.accent ??
-      this.colorScheme.accent.defaultValue ??
+      this.colorSchemeSpec.accent.defaultValue ??
       // Should never have go this far
       '#000000'
     ctx.fillRect(
@@ -97,7 +102,9 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       : placeholderTextColor
     this.drawTextHorizontallyCenteredAtY(
       ctx,
-      options.contactInfo.name || this.contactInfo.name.placeholder || '[name]',
+      options.contactInfo.name ||
+        this.contactInfoSpec.name.placeholder ||
+        '[name]',
       this.proportionalize(20 + 14),
     )
 
@@ -109,7 +116,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     this.drawTextHorizontallyCenteredAtY(
       ctx,
       options.contactInfo.headline ||
-        this.contactInfo.headline.placeholder ||
+        this.contactInfoSpec.headline.placeholder ||
         '[headline]',
       this.proportionalize(40 + 8),
     )
@@ -123,7 +130,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       ? options.colorScheme.text
       : placeholderTextColor
     const line1Text =
-      options.contactInfo.line1 || this.contactInfo.line1.placeholder || ''
+      options.contactInfo.line1 || this.contactInfoSpec.line1.placeholder || ''
     const line1TextMetrics = ctx.measureText(line1Text)
     const line1TextX = rightEdgeForLines - line1TextMetrics.width
     ctx.fillText(line1Text, line1TextX, this.proportionalize(65 + 7))
@@ -132,7 +139,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       ? options.colorScheme.text
       : placeholderTextColor
     const line2Text =
-      options.contactInfo.line2 || this.contactInfo.line2.placeholder || ''
+      options.contactInfo.line2 || this.contactInfoSpec.line2.placeholder || ''
     const line2TextMetrics = ctx.measureText(line2Text)
     const line2TextX = rightEdgeForLines - line2TextMetrics.width
     ctx.fillText(line2Text, line2TextX, this.proportionalize(77 + 7))
@@ -141,14 +148,16 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       ? options.colorScheme.text
       : placeholderTextColor
     const line3Text =
-      options.contactInfo.line3 || this.contactInfo.line3.placeholder || ''
+      options.contactInfo.line3 || this.contactInfoSpec.line3.placeholder || ''
     const line3TextMetrics = ctx.measureText(line3Text)
     const line3TextX = rightEdgeForLines - line3TextMetrics.width
     ctx.fillText(line3Text, line3TextX, this.proportionalize(89 + 7))
 
     // Render the footer
     const footerText =
-      options.contactInfo.footer || this.contactInfo.footer.placeholder || ''
+      options.contactInfo.footer ||
+      this.contactInfoSpec.footer.placeholder ||
+      ''
     ctx.font = this.proportionalize(7) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.footer
       ? options.colorScheme.text
@@ -163,7 +172,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     await this.drawQRCode(
       ctx,
       options.qrCodeUrl ||
-        this.contactInfo.name.placeholder ||
+        this.contactInfoSpec.name.placeholder ||
         'https://nomus.me',
       {
         x: this.proportionalize(134),
@@ -208,7 +217,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     // Draw the main background with accent color
     ctx.fillStyle =
       options.colorScheme.accent ??
-      this.colorScheme.accent.defaultValue ??
+      this.colorSchemeSpec.accent.defaultValue ??
       // Should never have go this far
       '#000000'
     ctx.fillRect(
@@ -221,7 +230,7 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     // Draw the bottom bar with background color
     ctx.fillStyle =
       options.colorScheme.background ??
-      this.contactInfo.name.defaultValue ??
+      this.contactInfoSpec.name.defaultValue ??
       // Should never have go this far
       '#ffffff'
     ctx.fillRect(

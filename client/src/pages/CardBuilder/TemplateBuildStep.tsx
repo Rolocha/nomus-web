@@ -32,7 +32,7 @@ const TemplateBuildStep = ({
 
   const {
     colorKeys,
-    contactInfo,
+    contactInfoSpec: contactInfo,
     contactInfoFieldNames,
     defaultOptions,
   } = selectedTemplate

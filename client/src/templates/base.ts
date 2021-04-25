@@ -29,7 +29,7 @@ export type CardTemplateRenderOptions<
   >
   contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
   graphic: CustomizableField.Graphic
-  qrCode: CustomizableField.QRCode
+  qrCodeUrl: CustomizableField.QRCode
 }
 
 export interface CardTemplateDefinition<
@@ -45,7 +45,7 @@ export interface CardTemplateDefinition<
     CustomizableFieldSpec.Color
   >
   contactInfo: Record<ContactInfoFields, CustomizableFieldSpec.ContactInfo>
-  // customizableOptions: Record<keyof T, CustomizableFieldSpec.Any>
+
   renderFront: (
     canvas: HTMLCanvasElement,
     options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
@@ -74,11 +74,11 @@ export default class CardTemplate<
   public width: number
   public height: number
   public demoImageUrl: string
-  public contactInfo: CardTemplateDefinition<
+  public contactInfoSpec: CardTemplateDefinition<
     ContactInfoFields,
     ExtendedColors
   >['contactInfo']
-  public colorScheme: CardTemplateDefinition<
+  public colorSchemeSpec: CardTemplateDefinition<
     ContactInfoFields,
     ExtendedColors
   >['colorScheme']
@@ -106,8 +106,8 @@ export default class CardTemplate<
     this.width = templateDefinition.width
     this.height = templateDefinition.height
     this.demoImageUrl = templateDefinition.demoImageUrl
-    this.colorScheme = templateDefinition.colorScheme
-    this.contactInfo = templateDefinition.contactInfo
+    this.colorSchemeSpec = templateDefinition.colorScheme
+    this.contactInfoSpec = templateDefinition.contactInfo
     this._renderFront = templateDefinition.renderFront
     this._renderBack = templateDefinition.renderBack
   }
@@ -126,21 +126,21 @@ export default class CardTemplate<
     ContactInfoFields,
     ExtendedColors
   >['contactInfo'])[] {
-    return Object.keys(this.contactInfo) as any[]
+    return Object.keys(this.contactInfoSpec) as any[]
   }
   public get colorKeys(): (keyof CardTemplateDefinition<
     ContactInfoFields,
     ExtendedColors
   >['colorScheme'])[] {
-    return Object.keys(this.colorScheme) as any[]
+    return Object.keys(this.colorSchemeSpec) as any[]
   }
 
   public get isComplete(): boolean {
     return this.contactInfoFieldNames.every(
       (field) =>
-        !('required' in this.contactInfo[field]) ||
-        // @ts-expect-errodrd
-        !this.contactInfo[field].required ||
+        // Either the spec says this field is not required
+        !this.contactInfoSpec[field].required ||
+        // or the field is present in the user-specified options
         (this.userSpecifiedOptions &&
           this.userSpecifiedOptions.contactInfo[field]),
     )
@@ -152,14 +152,14 @@ export default class CardTemplate<
   > {
     return {
       contactInfo: this.contactInfoFieldNames.reduce((acc, fieldName) => {
-        if (this.contactInfo[fieldName].defaultValue) {
-          acc[fieldName] = this.contactInfo[fieldName].defaultValue
+        if (this.contactInfoSpec[fieldName].defaultValue) {
+          acc[fieldName] = this.contactInfoSpec[fieldName].defaultValue
         }
         return acc
       }, {} as Record<string, any>),
       colorScheme: this.colorKeys.reduce((acc, fieldName) => {
-        if (this.colorScheme[fieldName].defaultValue) {
-          acc[fieldName] = this.colorScheme[fieldName].defaultValue
+        if (this.colorSchemeSpec[fieldName].defaultValue) {
+          acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue
         }
         return acc
       }, {} as Record<string, string>),
@@ -167,7 +167,7 @@ export default class CardTemplate<
         url: null,
         size: 1,
       },
-      qrCode: 'https://nomus.me',
+      qrCodeUrl: 'https://nomus.me',
     }
   }
 

@@ -3,10 +3,10 @@
 // The STATIC part is key -- these are NOT fields meant to be customized by the user.
 export declare namespace CustomizableFieldSpec {
   export interface ContactInfo {
-    label?: string
-    placeholder?: string
-    required?: boolean
-    defaultValue?: any
+    label: string
+    placeholder: string
+    required: boolean
+    defaultValue?: string
   }
 
   export interface Color {
