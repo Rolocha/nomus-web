@@ -42,33 +42,25 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
       !cardBuilderState.templateCustomization ||
       !cardBuilderState.templateId
     ) {
-      return [{ field: 'Unknown', value: 'Unknown' }]
+      return [{ label: 'Unknown', value: 'Unknown' }]
     }
 
     const template = templateLibrary[cardBuilderState.templateId]
     const options = template.createOptionsFromFormFields(
       cardBuilderState.templateCustomization!,
     )
-    return template.customizableOptionNames.reduce<
-      { field: string; value: React.ReactNode }[]
-    >((acc, field) => {
-      const { label, type } = template.customizableOptions[field]
-      if (label != null) {
-        switch (type) {
-          case 'text':
-            if (options[field]) {
-              acc.push({
-                field: label,
-                value: String(options[field]),
-              })
-            }
-            break
-          default:
-            break
-        }
+    const info: Array<{ label: string; value: string }> = []
+    template.contactInfoFieldNames.forEach((fieldName) => {
+      const { label } = template.contactInfoSpec[fieldName]
+      const value = options.contactInfo[fieldName]
+      if (label && value) {
+        info.push({
+          label,
+          value,
+        })
       }
-      return acc
     }, [])
+    return info
   }, [cardBuilderState.templateId, cardBuilderState.templateCustomization])
 
   return (
@@ -89,7 +81,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
           <Text.SectionSubheader>Associated information</Text.SectionSubheader>
           <Box display="grid" gridTemplateColumns="2fr 2fr" gridRowGap={2}>
             {associatedInfo.map((item, index) => [
-              <Text.Body2 key={index + '0'}>{item.field}</Text.Body2>,
+              <Text.Body2 key={index + '0'}>{item.label}</Text.Body2>,
               <Text.Body2 key={index + '1'}>{item.value}</Text.Body2>,
             ])}
           </Box>

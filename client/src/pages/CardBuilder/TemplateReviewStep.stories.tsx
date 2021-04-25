@@ -27,24 +27,29 @@ export const actionsData = {
 
 export const Primary = () => {
   const cardBuilderState: CardBuilderState = {
-    ...initialStateOptions['template'],
+    ...initialStateOptions.template,
     baseType: 'template',
     templateId: 'velia',
     templateCustomization: {
-      name: 'Spongebob Squarepants',
-      headline: 'Fry Cook at the Krusty Krab',
-      line1: 'The Krusty Krab',
-      line2: '(555)-555-5555',
-      footer: "I'm ready, I'm ready, I'm ready",
-      qrUrl: 'https://google.com',
-      logoUrl: {
-        url:
-          'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+      contactInfo: {
+        name: 'Spongebob Squarepants',
+        headline: 'Fry Cook at the Krusty Krab',
+        line1: 'The Krusty Krab',
+        line2: '(555)-555-5555',
+        footer: "I'm ready, I'm ready, I'm ready",
       },
-      logoSize: 0.5,
-      backgroundColor: colors.offWhite,
-      accentColor: colors.gold,
-      textColor: colors.midnightGray,
+      graphic: {
+        file: {
+          url:
+            'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+        },
+        size: 1,
+      },
+      colorScheme: {
+        background: colors.offWhite,
+        accent: colors.gold,
+        text: colors.midnightGray,
+      },
     },
     quantity: 50,
     formData: {

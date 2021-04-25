@@ -2,6 +2,12 @@ import QRCode from 'qrcode'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
 import {
+  ColorScheme,
+  BaseColorScheme,
+  CustomizableFieldSpec,
+  CustomizableField,
+} from './customization'
+import {
   createNFCTapIconSVG,
   createNomusLogoSVG,
   rgb2hex,
@@ -13,37 +19,41 @@ import {
 // move this to TemplateCard
 const RESOLUTION_FACTOR = 5
 
-export interface GenericCustomizableFieldSpec<T> {
-  type: 'text' | 'color' | 'logo' | 'logoSize' | 'qrUrl'
-  label?: string
-  placeholder?: string
-  required?: boolean
-  defaultValue?: any
-  hidden?: (options: T) => boolean
+export type CardTemplateRenderOptions<
+  ContactInfoFields extends string,
+  ExtendedColors extends string
+> = {
+  colorScheme: Record<
+    ExtendedColors | keyof BaseColorScheme,
+    CustomizableField.Color
+  >
+  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
+  graphic: CustomizableField.Graphic
+  qrCodeUrl: CustomizableField.QRCode
 }
 
-export interface CustomizableLogoSizeFieldSpec<T>
-  extends GenericCustomizableFieldSpec<T> {
-  type: 'logoSize'
-  range: {
-    min: number
-    max: number
-    step: number
-  }
-}
-
-export type CustomizableFieldSpec<T> =
-  | CustomizableLogoSizeFieldSpec<T>
-  | GenericCustomizableFieldSpec<T>
-
-export interface CardTemplateDefinition<T> {
+export interface CardTemplateDefinition<
+  ContactInfoFields extends string,
+  ExtendedColors extends string
+> {
   name: string
   width: number
   height: number
   demoImageUrl: string
-  customizableOptions: Record<keyof T, CustomizableFieldSpec<T>>
-  renderFront: (canvas: HTMLCanvasElement, options: T) => void | Promise<void>
-  renderBack: (canvas: HTMLCanvasElement, options: T) => void | Promise<void>
+  colorScheme: Record<
+    keyof ColorScheme<ExtendedColors>,
+    CustomizableFieldSpec.Color
+  >
+  contactInfo: Record<ContactInfoFields, CustomizableFieldSpec.ContactInfo>
+
+  renderFront: (
+    canvas: HTMLCanvasElement,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+  ) => void | Promise<void>
+  renderBack: (
+    canvas: HTMLCanvasElement,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+  ) => void | Promise<void>
 }
 
 interface RenderResponse {
@@ -56,25 +66,50 @@ interface RenderResponse {
 //
 // Using this instance also gives the template definition's render functions
 // access to useful utility methods such as drawNomusLogo, drawQRCode, etc.
-export default class CardTemplate<TemplateOptions extends {}> {
-  public name: CardTemplateDefinition<TemplateOptions>['name']
-  public width: CardTemplateDefinition<TemplateOptions>['width']
-  public height: CardTemplateDefinition<TemplateOptions>['height']
-  public demoImageUrl: CardTemplateDefinition<TemplateOptions>['demoImageUrl']
-  public customizableOptions: CardTemplateDefinition<TemplateOptions>['customizableOptions']
+export default class CardTemplate<
+  ContactInfoFields extends string,
+  ExtendedColors extends string
+> {
+  public name: string
+  public width: number
+  public height: number
+  public demoImageUrl: string
+  public contactInfoSpec: CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['contactInfo']
+  public colorSchemeSpec: CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['colorScheme']
 
-  private _renderFront: CardTemplateDefinition<TemplateOptions>['renderFront']
-  private _renderBack: CardTemplateDefinition<TemplateOptions>['renderBack']
-  private userSpecifiedOptions: TemplateOptions | null = null
+  private _renderFront: CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['renderFront']
+  private _renderBack: CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['renderBack']
+  private userSpecifiedOptions: CardTemplateRenderOptions<
+    ContactInfoFields,
+    ExtendedColors
+  > | null = null
 
-  constructor(definition: CardTemplateDefinition<TemplateOptions>) {
-    this.name = definition.name
-    this.width = definition.width
-    this.height = definition.height
-    this.demoImageUrl = definition.demoImageUrl
-    this.customizableOptions = definition.customizableOptions
-    this._renderFront = definition.renderFront
-    this._renderBack = definition.renderBack
+  constructor(
+    templateDefinition: CardTemplateDefinition<
+      ContactInfoFields,
+      ExtendedColors
+    >,
+  ) {
+    this.name = templateDefinition.name
+    this.width = templateDefinition.width
+    this.height = templateDefinition.height
+    this.demoImageUrl = templateDefinition.demoImageUrl
+    this.colorSchemeSpec = templateDefinition.colorScheme
+    this.contactInfoSpec = templateDefinition.contactInfo
+    this._renderFront = templateDefinition.renderFront
+    this._renderBack = templateDefinition.renderBack
   }
 
   /**
@@ -87,16 +122,53 @@ export default class CardTemplate<TemplateOptions extends {}> {
   public get proportionalizedHeight() {
     return this.proportionalize(this.height)
   }
-  public get customizableOptionNames(): (keyof CardTemplateDefinition<TemplateOptions>['customizableOptions'])[] {
-    return Object.keys(this.customizableOptions) as any[]
+  public get contactInfoFieldNames(): (keyof CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['contactInfo'])[] {
+    return Object.keys(this.contactInfoSpec) as any[]
+  }
+  public get colorKeys(): (keyof CardTemplateDefinition<
+    ContactInfoFields,
+    ExtendedColors
+  >['colorScheme'])[] {
+    return Object.keys(this.colorSchemeSpec) as any[]
   }
 
   public get isComplete(): boolean {
-    return this.customizableOptionNames.every(
+    return this.contactInfoFieldNames.every(
       (field) =>
-        !this.customizableOptions[field].required ||
-        (this.userSpecifiedOptions && this.userSpecifiedOptions[field]),
+        // Either the spec says this field is not required
+        !this.contactInfoSpec[field].required ||
+        // or the field is present in the user-specified options
+        (this.userSpecifiedOptions &&
+          this.userSpecifiedOptions.contactInfo[field]),
     )
+  }
+
+  public get defaultOptions(): CardTemplateRenderOptions<
+    ContactInfoFields,
+    ExtendedColors
+  > {
+    return {
+      contactInfo: this.contactInfoFieldNames.reduce((acc, fieldName) => {
+        if (this.contactInfoSpec[fieldName].defaultValue) {
+          acc[fieldName] = this.contactInfoSpec[fieldName].defaultValue
+        }
+        return acc
+      }, {} as Record<string, any>),
+      colorScheme: this.colorKeys.reduce((acc, fieldName) => {
+        if (this.colorSchemeSpec[fieldName].defaultValue) {
+          acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue
+        }
+        return acc
+      }, {} as Record<string, string>),
+      graphic: {
+        url: null,
+        size: 1,
+      },
+      qrCodeUrl: 'https://nomus.me',
+    }
   }
 
   /**
@@ -110,7 +182,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
   // using the specified options
   public async renderFrontToCanvas(
     canvas: HTMLCanvasElement,
-    options: TemplateOptions,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -125,7 +197,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
   // using the specified options
   public async renderBackToCanvas(
     canvas: HTMLCanvasElement,
-    options: TemplateOptions,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -138,7 +210,7 @@ export default class CardTemplate<TemplateOptions extends {}> {
 
   // Renders both the front and back of the cards each to a separate data URL string
   public async renderBothSidesToDataUrls(
-    options: TemplateOptions,
+    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
   ): Promise<{ front: string; back: string }> {
     const frontCanvas = document.createElement('canvas')
     const backCanvas = document.createElement('canvas')
@@ -163,65 +235,35 @@ export default class CardTemplate<TemplateOptions extends {}> {
   // to Storybook's argTypes property for rendering UI controls
   // See https://storybook.js.org/docs/react/essentials/controls
   public get storybookArgTypes() {
-    return this.customizableOptionNames.reduce<any>(
-      (acc, customizableFieldName) => {
-        acc[customizableFieldName] = {}
-
-        const fieldDetails = this.customizableOptions[customizableFieldName]
-        switch (fieldDetails.type) {
-          case 'logoSize':
-            const rangeFieldDetails = fieldDetails as CustomizableLogoSizeFieldSpec<any>
-            acc[customizableFieldName].control = {
-              type: 'range',
-              min: rangeFieldDetails.range.min,
-              max: rangeFieldDetails.range.max,
-              step: rangeFieldDetails.range.step,
-            }
-            break
-          // The storybook version we use doesn't have a file selector so
-          // just show a basic url text input instead
-          case 'logo':
-            acc[customizableFieldName].control = {
-              type: 'text',
-            }
-            break
-          default:
-            acc[customizableFieldName] = {
-              control: {
-                type: fieldDetails.type,
-              },
-            }
-            break
-        }
-        return acc
-      },
-      {},
-    )
+    const args: Record<string, any> = {}
+    this.contactInfoFieldNames.forEach((contactInfoFieldName) => {
+      args[contactInfoFieldName] = {
+        type: 'text',
+      }
+    })
+    return args
   }
 
   // The Card Builder form values for templates *generally* map 1:1 to
   // the options we feed into the template renderer but in a few cases
   // we need to do some light massaging along the way. This function
   // lets us handle any such data transformations.
-  public createOptionsFromFormFields(formFields: Record<string, any>) {
-    return this.customizableOptionNames.reduce((acc, customizationKey) => {
-      const customizationDetails = this.customizableOptions[customizationKey]
-      switch (customizationDetails.type) {
-        // For logo images, the form values use a FileItem which has a `file.url` property
-        // The template only needs the url so we extract that out.
-        case 'logo':
-          if (formFields.hasOwnProperty(customizationKey)) {
-            acc[customizationKey] =
-              formFields[customizationKey as string]?.url ?? undefined
-          }
-          break
-        default:
-          if (formFields.hasOwnProperty(customizationKey)) {
-            acc[customizationKey] = formFields[customizationKey as string]
-          }
-      }
-      return acc
-    }, {} as TemplateOptions)
+  public createOptionsFromFormFields(
+    formFields: Record<string, any>,
+  ): CardTemplateRenderOptions<ContactInfoFields, ExtendedColors> {
+    const { graphic, ...otherFormFields } = formFields
+    const result: any = {
+      ...otherFormFields,
+      graphic:
+        graphic && graphic.file
+          ? {
+              url: graphic.file.url,
+              size: graphic.size,
+            }
+          : null,
+    }
+    console.log({ result })
+    return result
   }
 
   /**

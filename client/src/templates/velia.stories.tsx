@@ -3,13 +3,12 @@ import { Story } from '@storybook/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
-
-import veliaTemplate, { VeliaOptions } from './velia'
+import { CardTemplateRenderOptions } from 'src/templates/base'
+import { VeliaContactFields, VeliaExtendedColors } from './velia'
 
 export default {
   title: 'Card Templates/Velia',
   excludeStories: /.*Data$/,
-  argTypes: veliaTemplate.storybookArgTypes,
 }
 
 export const actionsData = {
@@ -17,7 +16,9 @@ export const actionsData = {
 }
 
 //👇 We create a “template” of how args map to rendering
-const VeliaTemplateTemplate: Story<VeliaOptions> = ({ ...options }) => {
+const VeliaTemplateTemplate: Story<
+  CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>
+> = ({ ...options }) => {
   return (
     <Box display="flex">
       <Box mr={3}>
@@ -44,18 +45,29 @@ const VeliaTemplateTemplate: Story<VeliaOptions> = ({ ...options }) => {
 
 export const Velia = VeliaTemplateTemplate.bind({})
 
-Velia.args = {
-  name: 'Spongebob Squarepants',
-  headline: 'Fry Cook at the Krusty Krab',
-  line1: 'The Krusty Krab',
-  line2: '(555)-555-5555',
-  line3: 'spongebob@krustykrab.com',
-  footer: "I'm ready, I'm ready, I'm ready",
-  qrUrl: 'https://google.com',
-  logoUrl:
-    'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
-  logoSize: 0.5,
-  backgroundColor: colors.offWhite,
-  accentColor: colors.gold,
-  textColor: colors.midnightGray,
+const args: CardTemplateRenderOptions<
+  VeliaContactFields,
+  VeliaExtendedColors
+> = {
+  contactInfo: {
+    name: 'Spongebob Squarepants',
+    headline: 'Fry Cook at the Krusty Krab',
+    line1: 'The Krusty Krab',
+    line2: '(555)-555-5555',
+    line3: 'spongebob@krustykrab.com',
+    footer: "I'm ready, I'm ready, I'm ready",
+  },
+  graphic: {
+    url:
+      'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+    size: 0.5,
+  },
+  colorScheme: {
+    background: colors.offWhite,
+    accent: colors.gold,
+    text: colors.midnightGray,
+  },
+  qrCodeUrl: 'https://nomus.me',
 }
+
+Velia.args = args
