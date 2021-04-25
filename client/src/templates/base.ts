@@ -5,6 +5,7 @@ import {
   ColorScheme,
   BaseColorScheme,
   CustomizableFieldSpec,
+  CustomizableField,
 } from './customization'
 import {
   createNFCTapIconSVG,
@@ -22,10 +23,13 @@ export type CardTemplateRenderOptions<
   ContactInfoFields extends string,
   ExtendedColors extends string
 > = {
-  colorScheme: Record<ExtendedColors | keyof BaseColorScheme, string>
-  contactInfo: Record<ContactInfoFields, string>
-  graphic: { url?: string | null; size?: number }
-  qrCodeUrl: string
+  colorScheme: Record<
+    ExtendedColors | keyof BaseColorScheme,
+    CustomizableField.Color
+  >
+  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
+  graphic: CustomizableField.Graphic
+  qrCode: CustomizableField.QRCode
 }
 
 export interface CardTemplateDefinition<
@@ -163,7 +167,7 @@ export default class CardTemplate<
         url: null,
         size: 1,
       },
-      qrCodeUrl: 'https://nomus.me',
+      qrCode: 'https://nomus.me',
     }
   }
 
