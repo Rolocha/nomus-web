@@ -38,7 +38,12 @@ const TemplateBuildStep = ({
   } = selectedTemplate
 
   const customizationForm = useForm<Record<string, any>>({
-    defaultValues: templateCustomization ?? defaultOptions,
+    defaultValues: {
+      ...(templateCustomization ?? defaultOptions),
+      qrCodeUrl: cardBuilderState.cardVersionId
+        ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
+        : 'https://nomus.me',
+    },
   })
 
   const fields = customizationForm.watch()
@@ -157,9 +162,12 @@ const TemplateBuildStep = ({
         <Form.Input
           hidden
           name="qrCodeUrl"
-          ref={customizationForm.register({})}
-          // TODO: Wire the CardVersion url into here
-          value="https://google.com"
+          ref={customizationForm.register()}
+          value={
+            cardBuilderState.cardVersionId
+              ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
+              : 'https://nomus.me'
+          }
         />
       </Box>
       <Box
