@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -21,12 +21,13 @@ interface RegistrationFormData {
   lastName: string
 }
 
-type SubmissionErrorType = 'invalid-email' | 'non-unique-email'
+type SubmissionErrorType = 'invalid-email' | 'non-unique-email' | 'unknown'
 
 const SUBMISSION_ERROR_MESSAGES: Record<SubmissionErrorType, string> = {
   // This case should pretty much never be reached since we do client-side regex email validation too.
   'invalid-email': 'The email entered is invalid. Please use a valid email.',
   'non-unique-email': 'An account with that email already exists. Try another?',
+  unknown: 'Uh oh, something went wrong. Refresh the page and try again?',
 }
 
 const RegistrationForm = () => {
@@ -67,7 +68,8 @@ const RegistrationForm = () => {
     },
   })
 
-  const { signUp } = useAuth()
+  const { loggedIn, signUp } = useAuth()
+  const history = useHistory()
 
   const location = useLocation<{ from: Location }>()
   const searchParams = React.useMemo(
@@ -93,6 +95,12 @@ const RegistrationForm = () => {
                   authResponse.error.code as SubmissionErrorType
                 ],
             })
+            break
+          default:
+            setError('password', {
+              type: 'manual',
+              message: SUBMISSION_ERROR_MESSAGES['unknown'],
+            })
         }
       }
     } finally {
@@ -103,6 +111,26 @@ const RegistrationForm = () => {
   const handleResendEmail = async () => {
     const result = await fetch('/auth/resend-verification-email')
     setResentEmailSuccessfully(result.ok)
+  }
+
+  const redirectUrl = React.useMemo(
+    () =>
+      searchParams.get('redirect_url') ??
+      location.state?.from.pathname ??
+      '/dashboard',
+    [searchParams, location],
+  )
+
+  // Redirect if the user is logged in when landing on the page
+  if (loggedIn && !formState.isSubmitted) {
+    if (redirectUrl.startsWith('/')) {
+      history.replace(redirectUrl)
+    } else {
+      // If the URL doesn't start with /, it's probably a different domain
+      // in which case we have to use window.location's .replace() instead of history's
+      window.location.replace(redirectUrl)
+    }
+    return null
   }
 
   return (
@@ -141,8 +169,9 @@ const RegistrationForm = () => {
               </Text.Body2>
             )}
           </Box>
-          <Link mt={3} to="/dashboard" buttonStyle="primary" buttonSize="big">
-            Continue to your dashboard
+          <Link mt={3} to={redirectUrl} buttonStyle="primary" buttonSize="big">
+            Continue{' '}
+            {redirectUrl.startsWith('/dashboard/') ? 'to your dashboard' : ''}
           </Link>
         </>
       ) : (
