@@ -525,7 +525,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           orderIds: [orderJohn.id, orderJeff.id],
-          futureState: OrderState.Creating,
+          futureState: OrderState.Reviewed,
           trigger: OrderEventTrigger.Internal,
         },
         asAdmin: true,
@@ -536,22 +536,22 @@ describe('OrderResolver', () => {
       expect(orders).toEqual([
         expect.objectContaining({
           id: orderJohn.id,
-          state: OrderState.Creating,
+          state: OrderState.Reviewed,
         }),
         expect.objectContaining({
           id: orderJeff.id,
-          state: OrderState.Creating,
+          state: OrderState.Reviewed,
         }),
       ])
 
       expect(response.data?.batchTransitionOrderState).toEqual([
         expect.objectContaining({
           id: orderJohn.id,
-          state: OrderState.Creating,
+          state: OrderState.Reviewed,
         }),
         expect.objectContaining({
           id: orderJeff.id,
-          state: OrderState.Creating,
+          state: OrderState.Reviewed,
         }),
       ])
     })
