@@ -1,13 +1,10 @@
-import { useMutation, gql } from 'src/apollo'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { Redirect, useHistory, useParams } from 'react-router-dom'
-import {
-  SubmitCustomOrderMutation,
-  SubmitCustomOrderMutationVariables,
-} from 'src/apollo/types/SubmitCustomOrderMutation'
+import { gql, useMutation } from 'src/apollo'
+import { SubmitCustomOrderMutationVariables } from 'src/apollo/types/SubmitCustomOrderMutation'
+import { SubmitTemplateOrderMutationVariables } from 'src/apollo/types/SubmitTemplateOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
@@ -21,6 +18,10 @@ import {
 import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
 import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
+import {
+  SUBMIT_CUSTOM_ORDER_MUTATION,
+  SUBMIT_TEMPLATE_ORDER_MUTATION,
+} from 'src/pages/CardBuilder/mutations'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
 import {
@@ -28,7 +29,6 @@ import {
   CardBuilderStep,
   CheckoutFormData,
 } from 'src/pages/CardBuilder/types'
-import SUBMIT_CUSTOM_ORDER_MUTATION from 'src/pages/CardBuilder/upsertCustomOrderMutation'
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
@@ -101,6 +101,7 @@ const CardBuilder = () => {
   const stripe = useStripe()
   const elements = useElements()
   const [submitCustomOrder] = useMutation(SUBMIT_CUSTOM_ORDER_MUTATION)
+  const [submitTemplateOrder] = useMutation(SUBMIT_TEMPLATE_ORDER_MUTATION)
 
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
@@ -146,7 +147,7 @@ const CardBuilder = () => {
     [cardBuilderState, stripe],
   )
 
-  const createOrder = React.useCallback(async () => {
+  const submitOrder = React.useCallback(async () => {
     const { formData, stripeToken } = cardBuilderState
 
     if (
@@ -162,9 +163,10 @@ const CardBuilder = () => {
       return
     }
 
-    const basePayload: Partial<
-      SubmitCustomOrderMutationVariables['payload']
-    > = {
+    // The parameters needed for both custom and template-based orders
+    const basePayload:
+      | Partial<SubmitCustomOrderMutationVariables['payload']>
+      | Partial<SubmitTemplateOrderMutationVariables['payload']> = {
       shippingAddress: {
         line1: formData?.addressLine1,
         line2: formData?.addressLine2,
@@ -176,34 +178,62 @@ const CardBuilder = () => {
       stripeToken: stripeToken?.id,
     }
 
-    let orderCreateResult: ExecutionResult<SubmitCustomOrderMutation> | null = null
-    if (cardBuilderState.baseType === 'custom') {
-      orderCreateResult = await submitCustomOrder({
-        variables: {
-          payload: {
-            ...basePayload,
-            cardSpec: {
+    switch (cardBuilderState.baseType) {
+      case 'custom':
+        return await submitCustomOrder({
+          variables: {
+            payload: {
+              ...basePayload,
               frontImageDataUrl: cardBuilderState.frontDesignFile?.file,
               backImageDataUrl: cardBuilderState.backDesignFile?.file,
             },
           },
-        },
-      })
-    } else if (cardBuilderState.baseType === 'template') {
-      // TODO: Implement template
+        })
+      case 'template':
+        const template = templateLibrary[cardBuilderState.templateId!]
+        const cardImageDataUrls = await template.renderBothSidesToDataUrls(
+          template.createOptionsFromFormFields(
+            cardBuilderState.templateCustomization!,
+          ),
+        )
+
+        return await submitTemplateOrder({
+          variables: {
+            payload: {
+              ...basePayload,
+              // TODO: Validate all these fields are defined before trying to extract them and error if they aren't
+              templateId: cardBuilderState.templateId,
+              cardVersionId: cardBuilderState.cardVersionId,
+              colorScheme: cardBuilderState.templateCustomization?.colorScheme,
+              contactInfo: cardBuilderState.templateCustomization?.contactInfo,
+              graphic: cardBuilderState.templateCustomization?.graphic?.file,
+              qrCodeUrl: cardBuilderState.templateCustomization?.qrCodeUrl,
+              frontImageDataUrl: cardImageDataUrls.front,
+              backImageDataUrl: cardImageDataUrls.back,
+            },
+          },
+        })
+      default:
+        throw new Error('Submitted Card Builder with invalid base type')
     }
-    return orderCreateResult
-  }, [cardBuilderState, submitCustomOrder])
+  }, [cardBuilderState, submitCustomOrder, submitTemplateOrder])
 
   const handleWizardSubmit = React.useCallback(async () => {
-    const createOrderResult = await createOrder()
-    if (createOrderResult?.data?.submitCustomOrder.clientSecret == null) {
-      console.log(createOrderResult?.errors)
+    const submitOrderResult = await submitOrder()
+
+    // The mutation result will be returned on a field named specific to the base type
+    const submitOrderResultData =
+      cardBuilderState.baseType === 'custom'
+        ? submitOrderResult?.data?.submitCustomOrder
+        : submitOrderResult?.data?.submitTemplateOrder
+
+    if (submitOrderResultData == null) {
+      console.log(submitOrderResult?.errors)
       throw new Error('Failed to create order: ')
     }
 
     const cardConfirmationResult = await confirmCardPayment(
-      createOrderResult.data.submitCustomOrder?.clientSecret,
+      submitOrderResultData.clientSecret,
     )
 
     if (cardConfirmationResult.error) {
@@ -216,10 +246,8 @@ const CardBuilder = () => {
     })
 
     // All done, redirect to the dashboard for this order
-    history.push(
-      `/dashboard/orders/${createOrderResult.data.submitCustomOrder.orderId}`,
-    )
-  }, [confirmCardPayment, createOrder, history])
+    history.push(`/dashboard/orders/${submitOrderResultData.orderId}`)
+  }, [confirmCardPayment, submitOrder, history, cardBuilderState])
 
   const isValidBaseType = (type?: string): type is BaseType =>
     type != null && ['custom', 'template'].includes(type)

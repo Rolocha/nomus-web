@@ -17,9 +17,6 @@ export class CardVersion extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof CardVersion>
 
-  @Field()
-  createdAt: Date
-
   @prop()
   @Field({ nullable: true })
   cardSlug: string
@@ -33,37 +30,13 @@ export class CardVersion extends BaseModel({
   @Field((type) => CardSpecBaseType, { nullable: false })
   baseType: CardSpecBaseType
 
-  @prop({ _id: false, required: false })
-  @Field(() => PersonName, { nullable: true })
-  name: PersonName
+  @prop({ required: true, ref: 'User', type: String })
+  @Field(() => User, { nullable: false })
+  user: Ref<User>
 
-  @prop({ match: /^\d{10,11}$/ })
-  @Field()
-  phoneNumber: string
-
-  @prop({
-    trim: true,
-    lowercase: true,
-    validate: validateEmail,
-  })
-  @Field()
-  email: string
-
-  @prop()
-  @Field()
-  title: string
-
-  @prop()
-  @Field()
-  company: string
-
-  @prop()
-  @Field({ nullable: true })
-  vcfNotes: string
-
-  @prop({ _id: false })
-  @Field(() => Address, { nullable: false })
-  address: Address
+  /**
+   * Fields specific to custom-designed card versions
+   */
 
   @prop({ required: false })
   @Field({ nullable: true })
@@ -73,17 +46,27 @@ export class CardVersion extends BaseModel({
   @Field({ nullable: true })
   backImageUrl: string
 
-  @prop({ required: false })
-  @Field({ nullable: true })
-  vcfUrl: string
-
-  @prop({ required: true, ref: 'User', type: String })
-  @Field(() => User, { nullable: false })
-  user: Ref<User>
+  /**
+   * Fields specific to template-based card versions
+   */
 
   @prop({ required: false })
   @Field({ nullable: true })
   templateId: string
+
+  @Field(() => Object, {
+    nullable: true,
+    description: 'User-specified contact info, only present for template-based card versions',
+  })
+  contactInfo: Record<string, string> | null
+
+  @Field((type) => Object, { nullable: false })
+  colorScheme: Record<string, string>
+
+  @Field({ nullable: false })
+  qrCodeUrl: string
+
+  // TODO: Maybe also upload the user's graphic to S3 and store a ref to it on a property here?
 
   static async findBySlugOrId(
     this: ReturnModelType<typeof CardVersion>,

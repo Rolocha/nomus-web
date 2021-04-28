@@ -19,7 +19,6 @@ export type CardBuilderState = {
   // Template details
   cardVersionId: string | null
   templateId: TemplateID | null
-  graphicElementFile: FileItem | null
   templateCustomization: Record<string, any> | null
 
   // Custom details
@@ -46,7 +45,6 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
   } as const)[baseType],
   frontDesignFile: null,
   backDesignFile: null,
-  graphicElementFile: null,
   formData: {
     name: '',
     addressLine1: '',
