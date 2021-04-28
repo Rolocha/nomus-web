@@ -35,31 +35,7 @@ class CardVersionStats {
 }
 
 @InputType({ description: 'Input to update fields on an existing CardVersion' })
-class CardVersionQueryInput {
-  @Field({ nullable: false, description: 'specify a single cardVersion ID to query/update' })
-  id: string
-
-  @Field((type) => PersonName, {
-    nullable: true,
-    description: 'person name as appears on the card',
-  })
-  name: PersonName
-
-  @Field({ nullable: true, description: "user's email as it appears on the card" })
-  email: string
-
-  @Field({ nullable: true, description: "user's title as it appears on the card" })
-  title: string
-
-  @Field({ nullable: true, description: "user's company as it appears on the card" })
-  company: string
-
-  @Field((type) => Address, {
-    nullable: true,
-    description: "user's address as it appears on the card",
-  })
-  address: Address
-
+class CardVersionUpdateInput {
   @Field({ nullable: true, description: 'url image for front of card' })
   frontImageUrl: string
 
@@ -114,25 +90,21 @@ class CardVersionResolver {
   }
 
   //update a single cardVersion with a payload
-  @Authorized(Role.User)
+  @Authorized(Role.Admin)
   @Mutation((type) => CardVersion)
   async updateCardVersion(
-    @Arg('payload', { nullable: false }) payload: CardVersionQueryInput,
+    @Arg('id', { nullable: false }) id: string,
+    @Arg('payload', { nullable: false }) payload: CardVersionUpdateInput,
     @Ctx() context: IApolloContext
   ): Promise<DocumentType<CardVersion>> {
     if (!context.user) {
       throw new UnauthorizedError()
     }
-    const cardVersion = await CardVersion.mongo.findById(payload.id)
+    const cardVersion = await CardVersion.mongo.findById(id)
     if (!cardVersion) {
       throw new Error('no-matching-cardVersion')
     }
 
-    cardVersion.name = payload.name ?? cardVersion.name
-    cardVersion.email = payload.email ?? cardVersion.email
-    cardVersion.title = payload.title ?? cardVersion.title
-    cardVersion.company = payload.company ?? cardVersion.company
-    cardVersion.address = payload.address ?? cardVersion.address
     cardVersion.frontImageUrl = payload.frontImageUrl ?? cardVersion.frontImageUrl
     cardVersion.backImageUrl = payload.backImageUrl ?? cardVersion.backImageUrl
 

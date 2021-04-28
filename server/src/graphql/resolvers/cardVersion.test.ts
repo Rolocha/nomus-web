@@ -79,14 +79,14 @@ describe('CardVersionResolver', () => {
   })
 
   describe('updateCardVersion', () => {
-    it('updates a cardVersion frontImageUrl', async () => {
+    it('updates a cardVersion ImageUrls', async () => {
       const cardVersion = await createMockCardVersion()
       const testUrl = 'https://good-url'
 
       const response = await execQuery({
         source: `
-          mutation UpdateCardVersionTestQuery($payload: CardVersionQueryInput!) {
-            updateCardVersion(payload: $payload) {
+          mutation UpdateCardVersionTestQuery($id: String!, $payload: CardVersionUpdateInput!) {
+            updateCardVersion(id: $id, payload: $payload) {
               id,
               frontImageUrl,
               backImageUrl,
@@ -94,12 +94,13 @@ describe('CardVersionResolver', () => {
           }
         `,
         variableValues: {
+          id: cardVersion.id,
           payload: {
-            id: cardVersion.id,
             frontImageUrl: testUrl,
             backImageUrl: testUrl,
           },
         },
+        asAdmin: true,
       })
 
       expect(response.data?.updateCardVersion).toMatchObject({
