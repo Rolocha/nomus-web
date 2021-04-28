@@ -26,7 +26,7 @@ describe('Order model', () => {
   })
 
   describe('cancelOrder', () => {
-    it.each([OrderState.Captured, OrderState.Paid])(
+    it.each([OrderState.Captured, OrderState.Paid, OrderState.Reviewed])(
       `successfully cancels the order if it's in the %s state`,
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
@@ -36,19 +36,16 @@ describe('Order model', () => {
       }
     )
 
-    it.each([
-      OrderState.Reviewed,
-      OrderState.Creating,
-      OrderState.Created,
-      OrderState.Enroute,
-      OrderState.Fulfilled,
-    ])(`fails to cancel the order if it's in the %s state`, async (initialState) => {
-      const order = await createMockOrder({ state: initialState })
-      expect(order.state).toBe(initialState)
-      const result = await order.transition(OrderState.Canceled)
-      expect(result.error.name).toBe('invalid-transition')
-      expect(order.state).toBe(initialState)
-    })
+    it.each([OrderState.Creating, OrderState.Created, OrderState.Enroute, OrderState.Fulfilled])(
+      `fails to cancel the order if it's in the %s state`,
+      async (initialState) => {
+        const order = await createMockOrder({ state: initialState })
+        expect(order.state).toBe(initialState)
+        const result = await order.transition(OrderState.Canceled)
+        expect(result.error.name).toBe('invalid-transition')
+        expect(order.state).toBe(initialState)
+      }
+    )
   })
 
   describe('transitionState', () => {

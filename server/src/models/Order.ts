@@ -22,7 +22,7 @@ import OrderEvent from './OrderEvent'
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
   [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
   [OrderState.Paid]: [OrderState.Reviewed, OrderState.Canceled],
-  [OrderState.Reviewed]: [OrderState.Creating],
+  [OrderState.Reviewed]: [OrderState.Creating, OrderState.Canceled],
   [OrderState.Creating]: [OrderState.Created],
   [OrderState.Created]: [OrderState.Enroute],
   [OrderState.Enroute]: [OrderState.Fulfilled],
