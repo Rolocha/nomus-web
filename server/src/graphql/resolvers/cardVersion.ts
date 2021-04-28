@@ -9,13 +9,14 @@ import {
   Int,
   FieldResolver,
   Root,
+  Mutation,
 } from 'type-graphql'
 
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
-import { Role } from 'src/util/enums'
+import { CardSpecBaseType, Role } from 'src/util/enums'
 import { Card, CardInteraction } from 'src/models'
 
 @ObjectType()
@@ -112,6 +113,21 @@ class CardVersionResolver {
       numCardsOrdered: numCardsOrdered[index],
       numTaps: interactions[index],
     }))
+  }
+
+  @Authorized(Role.User)
+  @Mutation(() => CardVersion, {
+    description: 'Initializes a bare card version for use in the Card Builder UI',
+  })
+  async createEmptyCardVersion(
+    @Arg('baseType', () => CardSpecBaseType, { nullable: true }) baseType: CardSpecBaseType,
+    @Ctx() context: IApolloContext
+  ) {
+    const cv = new CardVersion.mongo()
+    cv.user = context.user?.id
+    cv.baseType = baseType
+    await cv.save()
+    return cv
   }
 }
 export default CardVersionResolver
