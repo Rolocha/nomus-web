@@ -31,7 +31,7 @@ const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
   [OrderState.Canceled]: [],
 }
 
-const ORDER_STATE_EMAIL_NOTIF_TEMPLATES: Record<string, string> = {
+export const ORDER_STATE_EMAIL_NOTIF_TEMPLATES: Record<string, string> = {
   [OrderState.Paid]: SendgridTemplate.OrderPaid,
   [OrderState.Enroute]: SendgridTemplate.OrderEnroute,
   [OrderState.Fulfilled]: SendgridTemplate.OrderFulfilled,
@@ -164,6 +164,7 @@ class Order extends BaseModel({
               trackingNumber: this.trackingNumber,
             },
           })
+          console.log('stop')
         }
 
         return Result.ok(this)
