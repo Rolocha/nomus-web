@@ -144,7 +144,7 @@ describe('Order model', () => {
       await order.transition(transitionState)
 
       const user = await User.mongo.findById((order.user as User).id)
-      expect(sgMailSendSpy).toHaveBeenCalledWith(
+      expect(sgMail.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: user.email,
           from: 'hi@nomus.me',
