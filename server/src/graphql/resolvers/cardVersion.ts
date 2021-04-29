@@ -20,7 +20,6 @@ import { CardVersion } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
 import { Role } from 'src/util/enums'
 import { Card, CardInteraction } from 'src/models'
-import { Address, PersonName } from 'src/models/subschemas'
 
 @ObjectType()
 class CardVersionStats {
