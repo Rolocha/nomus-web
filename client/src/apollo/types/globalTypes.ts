@@ -18,6 +18,7 @@ export enum OrderState {
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
   Paid = 'Paid',
+  Reviewed = 'Reviewed',
 }
 
 export interface AddressInput {
@@ -44,8 +45,8 @@ export interface ContactInfoInput {
 export interface CustomCardSpecInput {
   cardSlug?: string | null
   vcfNotes?: string | null
-  frontImageDataUrl: string
-  backImageDataUrl?: string | null
+  frontImageDataUrl: any
+  backImageDataUrl?: any | null
 }
 
 /**
@@ -63,7 +64,7 @@ export interface ProfileUpdateInput {
 }
 
 /**
- * Payload for submitting an order
+ * Payload for submitting a custom order
  */
 export interface SubmitCustomOrderInput {
   orderId?: string | null

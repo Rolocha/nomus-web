@@ -1,4 +1,6 @@
-export type TemplateID = 'velia'
+import { TemplateID } from 'src/templates'
+
+export type { TemplateID }
 
 export type BaseType = 'custom' | 'template'
 

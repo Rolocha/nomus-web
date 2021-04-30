@@ -116,6 +116,8 @@ const LoginForm = () => {
             type={passwordVisible ? 'text' : 'password'}
             autoComplete="current-password"
             error={errors.password}
+            autoCorrect="off"
+            autoCapitalize="off"
           />
           <Text.Body3>
             <Link to="/forgot-password">Forgot your password?</Link>

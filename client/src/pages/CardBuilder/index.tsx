@@ -12,19 +12,26 @@ import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
 import Wizard, { WizardStep } from 'src/components/Wizard'
-import breakpoints from 'src/styles/breakpoints'
-import theme from 'src/styles/theme'
-import BaseStep from './BaseStep'
-import BuildStep from './BuildStep'
+import BaseStep from 'src/pages/CardBuilder/BaseStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
-  initialState,
-} from './card-builder-state'
-import CheckoutStep from './CheckoutStep'
-import ReviewStep from './ReviewStep'
-import { BaseType, CardBuilderStep, CheckoutFormData } from './types'
-import SUBMIT_CUSTOM_ORDER_MUTATION from './upsertCustomOrderMutation'
+  initialStateOptions,
+} from 'src/pages/CardBuilder/card-builder-state'
+import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
+import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
+import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
+import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
+import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
+import {
+  BaseType,
+  CardBuilderStep,
+  CheckoutFormData,
+} from 'src/pages/CardBuilder/types'
+import SUBMIT_CUSTOM_ORDER_MUTATION from 'src/pages/CardBuilder/upsertCustomOrderMutation'
+import breakpoints from 'src/styles/breakpoints'
+import theme from 'src/styles/theme'
+import templateLibrary from 'src/templates'
 
 interface ParamsType {
   buildBaseType?: string
@@ -38,7 +45,9 @@ const CardBuilder = () => {
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
-    initialState,
+    buildBaseType === 'custom' || buildBaseType === 'template'
+      ? initialStateOptions[buildBaseType]
+      : initialStateOptions.custom,
   )
 
   const checkoutFormMethods = useForm<CheckoutFormData>({
@@ -250,17 +259,18 @@ const CardBuilder = () => {
                 id="base"
                 icon="stack"
                 label="Base"
-                isReadyForNextStep={[
-                  ...{
-                    custom: [],
+                isReadyForNextStep={
+                  {
+                    custom: true,
                     // For template base type, the template must have been chosen
-                    template: [cardBuilderState.templateId != null],
-                  }[cardBuilderState.baseType],
-                ].every(Boolean)}
+                    template: cardBuilderState.templateId != null,
+                  }[cardBuilderState.baseType]
+                }
               >
                 <BaseStep
                   selectedBaseType={buildBaseType}
                   cardBuilderState={cardBuilderState}
+                  updateCardBuilderState={updateCardBuilderState}
                 />
               </WizardStep>
             )}
@@ -268,20 +278,34 @@ const CardBuilder = () => {
               id="build"
               icon="formatText"
               label="Build"
-              isReadyForNextStep={[
-                ...{
+              isReadyForNextStep={
+                {
                   // For custom base type, at least the front design file must have been provided
-                  custom: [cardBuilderState.frontDesignFile != null],
+                  custom: cardBuilderState.frontDesignFile != null,
                   // TBD requirements for template
-                  template: [],
-                }[cardBuilderState.baseType],
-              ].every(Boolean)}
+                  template:
+                    cardBuilderState.templateId != null &&
+                    templateLibrary[cardBuilderState.templateId].isComplete,
+                }[cardBuilderState.baseType]
+              }
             >
-              <BuildStep
-                selectedBaseType={buildBaseType}
-                cardBuilderState={cardBuilderState}
-                updateCardBuilderState={updateCardBuilderState}
-              />
+              {
+                {
+                  custom: (
+                    <CustomBuildStep
+                      selectedBaseType={buildBaseType}
+                      cardBuilderState={cardBuilderState}
+                      updateCardBuilderState={updateCardBuilderState}
+                    />
+                  ),
+                  template: (
+                    <TemplateBuildStep
+                      cardBuilderState={cardBuilderState}
+                      updateCardBuilderState={updateCardBuilderState}
+                    />
+                  ),
+                }[cardBuilderState.baseType]
+              }
             </WizardStep>
             <WizardStep
               id="checkout"
@@ -304,7 +328,16 @@ const CardBuilder = () => {
               />
             </WizardStep>
             <WizardStep id="review" icon="checkO" label="Review">
-              <ReviewStep cardBuilderState={cardBuilderState} />
+              {
+                {
+                  custom: (
+                    <CustomReviewStep cardBuilderState={cardBuilderState} />
+                  ),
+                  template: (
+                    <TemplateReviewStep cardBuilderState={cardBuilderState} />
+                  ),
+                }[cardBuilderState.baseType]
+              }
             </WizardStep>
           </Wizard>
         </Box>

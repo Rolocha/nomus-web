@@ -1,12 +1,13 @@
 import { PaymentIntent, Token } from '@stripe/stripe-js'
+import { templateNames } from 'src/templates'
+import { FileItem } from 'src/types/files'
 import {
-  CardBuilderStep,
   BaseType,
-  OrderQuantityOption,
+  CardBuilderStep,
   CheckoutFormData,
+  OrderQuantityOption,
   TemplateID,
 } from './types'
-import { FileItem } from 'src/types/files'
 
 export type CardBuilderState = {
   currentStep: CardBuilderStep
@@ -18,6 +19,7 @@ export type CardBuilderState = {
   // Template details
   templateId: TemplateID | null
   graphicElementFile: FileItem | null
+  templateCustomization: Record<string, any> | null
 
   // Custom details
   frontDesignFile: FileItem | null
@@ -29,11 +31,17 @@ export type CardBuilderState = {
   paymentIntent: PaymentIntent | null
 }
 
-export const initialState: CardBuilderState = {
-  currentStep: 'build',
-  baseType: 'custom',
+const createInitialState = (baseType: BaseType): CardBuilderState => ({
+  currentStep: ({
+    custom: 'build',
+    template: 'base',
+  } as const)[baseType],
+  baseType,
   quantity: 50,
-  templateId: null,
+  templateId: ({
+    custom: null,
+    template: templateNames[0],
+  } as const)[baseType],
   frontDesignFile: null,
   backDesignFile: null,
   graphicElementFile: null,
@@ -45,9 +53,15 @@ export const initialState: CardBuilderState = {
     state: '',
     postalCode: '',
   },
+  templateCustomization: null,
   stripeToken: null,
   paymentIntent: null,
   cardEntryComplete: false,
+})
+
+export const initialStateOptions: Record<BaseType, CardBuilderState> = {
+  custom: createInitialState('custom'),
+  template: createInitialState('template'),
 }
 
 export type CardBuilderAction = Partial<CardBuilderState>

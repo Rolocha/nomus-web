@@ -79,7 +79,6 @@ export default () => {
             <Text.SectionHeader mb="16px">
               Frequently asked questions
             </Text.SectionHeader>
-
             {faqItems.map(({ question, answer }) => (
               <Accordion key={question} title={question}>
                 <Text.Body2>{answer}</Text.Body2>
@@ -87,7 +86,7 @@ export default () => {
             ))}
           </Box>
           <Box
-            gridColumn={{ base: '1/12', [bp]: '9/12' }}
+            gridColumn={{ base: 'span 12', [bp]: '9/12' }}
             boxShadow="workingWindow"
             borderRadius="16px"
             px="24px"
@@ -95,7 +94,7 @@ export default () => {
             marginLeft="24px"
             alignSelf="start"
             mt={{ base: '32px', [bp]: '24px' }}
-            width="150%"
+            width={{ base: '', [bp]: '150%' }}
             justifySelf="center"
           >
             <Text.SectionHeader mb="16px">
@@ -118,7 +117,9 @@ export default () => {
                 <Form.FieldError fieldError={errors.name} />
               </Form.Item>
               <Form.Item mb="16px">
-                <Form.Label htmlFor="email">EMAIL</Form.Label>
+                <Form.Label htmlFor="email" required>
+                  EMAIL
+                </Form.Label>
                 <Form.Input
                   name="email"
                   ref={register({ required: true })}
@@ -129,7 +130,7 @@ export default () => {
                 <Form.FieldError fieldError={errors.email} />
               </Form.Item>
               <Form.Item mb="16px">
-                <Form.Label htmlFor="entry">
+                <Form.Label htmlFor="entry" required>
                   WHAT DO YOU WANT TO KNOW?
                 </Form.Label>
                 <Form.TextArea
