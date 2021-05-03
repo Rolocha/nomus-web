@@ -9,8 +9,11 @@ import {
   Int,
   FieldResolver,
   Root,
+  InputType,
+  Mutation,
+  UnauthorizedError,
 } from 'type-graphql'
-
+import { DocumentType } from '@typegoose/typegoose'
 import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
@@ -28,6 +31,15 @@ class CardVersionStats {
 
   @Field((type) => Int)
   numTaps: number
+}
+
+@InputType({ description: 'Input to update fields on an existing CardVersion' })
+class CardVersionUpdateInput {
+  @Field({ nullable: true, description: 'url image for front of card' })
+  frontImageUrl: string
+
+  @Field({ nullable: true, description: 'url image for back of card' })
+  backImageUrl: string
 }
 
 @Resolver((of) => CardVersion)
@@ -74,6 +86,29 @@ class CardVersionResolver {
       user: requestedUserId,
     })
     return cardVersionsBelongingToUser
+  }
+
+  //update a single cardVersion with a payload
+  @Authorized(Role.Admin)
+  @Mutation((type) => CardVersion)
+  async updateCardVersion(
+    @Arg('id', { nullable: false }) id: string,
+    @Arg('payload', { nullable: false }) payload: CardVersionUpdateInput,
+    @Ctx() context: IApolloContext
+  ): Promise<DocumentType<CardVersion>> {
+    if (!context.user) {
+      throw new UnauthorizedError()
+    }
+    const cardVersion = await CardVersion.mongo.findById(id)
+    if (!cardVersion) {
+      throw new Error('no-matching-cardVersion')
+    }
+
+    cardVersion.frontImageUrl = payload.frontImageUrl ?? cardVersion.frontImageUrl
+    cardVersion.backImageUrl = payload.backImageUrl ?? cardVersion.backImageUrl
+
+    await cardVersion.save()
+    return cardVersion
   }
 
   // Return a list of all card versions belonging to the specified user,
