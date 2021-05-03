@@ -21,22 +21,13 @@ interface RegistrationFormData {
   lastName: string
 }
 
-type SubmissionErrorType = 'invalid-email' | 'account-already-exists'
+type SubmissionErrorType = 'invalid-email' | 'non-unique-email' | 'unknown'
 
-const renderSubmissionError = (type: SubmissionErrorType) => {
-  return (
-    <Text.Body3 color="brightCoral">
-      {
-        {
-          // This case should pretty much never be reached since we do client-side regex email validation too.
-          'invalid-email':
-            'The email address you entered is invalid. Please use a valid email address.',
-          'account-already-exists':
-            'An account with that email address already exists.',
-        }[type]
-      }
-    </Text.Body3>
-  )
+const SUBMISSION_ERROR_MESSAGES: Record<SubmissionErrorType, string> = {
+  // This case should pretty much never be reached since we do client-side regex email validation too.
+  'invalid-email': 'The email entered is invalid. Please use a valid email.',
+  'non-unique-email': 'An account with that email already exists. Try another?',
+  unknown: 'Uh oh, something went wrong. Refresh the page and try again?',
 }
 
 const RegistrationForm = () => {
@@ -50,6 +41,7 @@ const RegistrationForm = () => {
     formState,
     errors,
     watch,
+    setError,
   } = useForm<RegistrationFormData>({
     mode: 'onBlur',
     resolver: yupResolver(
@@ -75,9 +67,10 @@ const RegistrationForm = () => {
       password: '',
     },
   })
-  const { loggedIn, signUp } = useAuth()
 
+  const { loggedIn, signUp } = useAuth()
   const history = useHistory()
+
   const location = useLocation<{ from: Location }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
@@ -86,18 +79,29 @@ const RegistrationForm = () => {
 
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [submittingForm, setSubmittingForm] = React.useState(false)
-  const [
-    submissionError,
-    setSubmissionError,
-  ] = React.useState<SubmissionErrorType | null>(null)
 
   const onSubmit = async (formData: RegistrationFormData) => {
-    setSubmissionError(null)
     setSubmittingForm(true)
     try {
       const authResponse = await signUp(formData)
       if (authResponse.error) {
-        setSubmissionError(authResponse.error.code as SubmissionErrorType)
+        switch (authResponse.error.code) {
+          case 'invalid-email':
+          case 'non-unique-email':
+            setError('email', {
+              type: 'manual',
+              message:
+                SUBMISSION_ERROR_MESSAGES[
+                  authResponse.error.code as SubmissionErrorType
+                ],
+            })
+            break
+          default:
+            setError('password', {
+              type: 'manual',
+              message: SUBMISSION_ERROR_MESSAGES['unknown'],
+            })
+        }
       }
     } finally {
       setSubmittingForm(false)
@@ -109,16 +113,22 @@ const RegistrationForm = () => {
     setResentEmailSuccessfully(result.ok)
   }
 
-  // Redirect to the redirect_uri once the user is logged in
-  if (loggedIn) {
-    const redirectUrl = searchParams.get('redirect_url')
-    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
-    if (nextUrl.startsWith('/')) {
-      history.replace(nextUrl)
+  const redirectUrl = React.useMemo(
+    () =>
+      searchParams.get('redirect_url') ??
+      location.state?.from.pathname ??
+      '/dashboard',
+    [searchParams, location],
+  )
+
+  // Redirect if the user is logged in when landing on the page
+  if (loggedIn && !formState.isSubmitted) {
+    if (redirectUrl.startsWith('/')) {
+      history.replace(redirectUrl)
     } else {
       // If the URL doesn't start with /, it's probably a different domain
       // in which case we have to use window.location's .replace() instead of history's
-      window.location.replace(nextUrl)
+      window.location.replace(redirectUrl)
     }
     return null
   }
@@ -126,7 +136,7 @@ const RegistrationForm = () => {
   return (
     <Box display="flex" flexDirection="column" mt={4}>
       <Text.BrandHeader>
-        {formState.isSubmitted ? 'Thank you!' : 'Get started'}
+        {formState.isSubmitSuccessful ? 'Thank you!' : 'Get started'}
       </Text.BrandHeader>
       {formState.isSubmitSuccessful ? (
         <>
@@ -140,9 +150,7 @@ const RegistrationForm = () => {
             {resentEmailSuccessfully === null && (
               <Text.Body2>
                 Didn’t get an email?{' '}
-                <Button cursor="pointer" onClick={handleResendEmail}>
-                  Resend the magic link.
-                </Button>{' '}
+                <Link onClick={handleResendEmail}>Resend the magic link.</Link>{' '}
                 Oooh.
               </Text.Body2>
             )}
@@ -161,8 +169,9 @@ const RegistrationForm = () => {
               </Text.Body2>
             )}
           </Box>
-          <Link mt={3} to="/dashboard" buttonStyle="primary" buttonSize="big">
-            Continue to your dashboard
+          <Link mt={3} to={redirectUrl} buttonStyle="primary" buttonSize="big">
+            Continue{' '}
+            {redirectUrl.startsWith('/dashboard/') ? 'to your dashboard' : ''}
           </Link>
         </>
       ) : (
@@ -239,9 +248,6 @@ const RegistrationForm = () => {
             >
               Create free account
             </Button>
-            {submissionError && (
-              <Box my={2}>{renderSubmissionError(submissionError)}</Box>
-            )}
           </Form.Form>
           <Text.Body2 textAlign="center" mt={2}>
             By clicking Create free account, you agree to our{' '}
