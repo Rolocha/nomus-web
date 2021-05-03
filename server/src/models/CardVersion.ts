@@ -3,9 +3,8 @@ import { CardSpecBaseType } from 'src/util/enums'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
-import { Address, PersonName } from './subschemas'
+import { TemplateColorScheme, TemplateContactInfoFields } from './subschemas'
 import { User } from './User'
-import validateEmail from './validation/validateEmail'
 
 // @ts-ignore
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
@@ -16,6 +15,9 @@ export class CardVersion extends BaseModel({
   prefix: 'cardv',
 }) {
   static mongo: ReturnModelType<typeof CardVersion>
+
+  @Field()
+  createdAt: Date
 
   @prop()
   @Field({ nullable: true })
@@ -54,14 +56,17 @@ export class CardVersion extends BaseModel({
   @Field({ nullable: true })
   templateId: string
 
-  @Field(() => Object, {
+  @Field(() => TemplateContactInfoFields, {
     nullable: true,
     description: 'User-specified contact info, only present for template-based card versions',
   })
-  contactInfo: Record<string, string> | null
+  contactInfo: TemplateContactInfoFields | null
 
-  @Field((type) => Object, { nullable: false })
-  colorScheme: Record<string, string>
+  @Field((type) => TemplateColorScheme, {
+    nullable: true,
+    description: 'User-specified color scheme, only present for template-based card versions',
+  })
+  colorScheme: TemplateColorScheme | null
 
   @Field({ nullable: false })
   qrCodeUrl: string

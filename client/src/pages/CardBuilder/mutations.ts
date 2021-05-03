@@ -17,3 +17,11 @@ export const SUBMIT_TEMPLATE_ORDER_MUTATION = gql`
     }
   }
 `
+
+export const INITIALIZE_CARD_BUILDER_MUTATION = gql`
+  mutation InitializeCardBuilder($baseType: CardSpecBaseType!) {
+    createEmptyCardVersion(baseType: $baseType) {
+      id
+    }
+  }
+`

@@ -2,9 +2,15 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { Redirect, useHistory, useParams } from 'react-router-dom'
-import { gql, useMutation } from 'src/apollo'
-import { SubmitCustomOrderMutationVariables } from 'src/apollo/types/SubmitCustomOrderMutation'
-import { SubmitTemplateOrderMutationVariables } from 'src/apollo/types/SubmitTemplateOrderMutation'
+import { useMutation } from 'src/apollo'
+import {
+  SubmitCustomOrderMutation,
+  SubmitCustomOrderMutationVariables,
+} from 'src/apollo/types/SubmitCustomOrderMutation'
+import {
+  SubmitTemplateOrderMutation,
+  SubmitTemplateOrderMutationVariables,
+} from 'src/apollo/types/SubmitTemplateOrderMutation'
 import Box from 'src/components/Box'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
@@ -19,6 +25,7 @@ import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
 import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
 import {
+  INITIALIZE_CARD_BUILDER_MUTATION,
   SUBMIT_CUSTOM_ORDER_MUTATION,
   SUBMIT_TEMPLATE_ORDER_MUTATION,
 } from 'src/pages/CardBuilder/mutations'
@@ -32,22 +39,32 @@ import {
 import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
+import { dataURItoBlob } from 'src/utils/image'
 
 interface ParamsType {
-  buildBaseType?: string
+  buildBaseType?: 'custom' | 'template' | string
 }
 
 const bp = 'md'
 
 const CardBuilder = () => {
-  const { buildBaseType } = useParams<ParamsType>()
+  const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
+
+  const baseType =
+    baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
+      ? {
+          custom: BaseType.Custom,
+          template: BaseType.Template,
+        }[baseTypeQueryParam]
+      : null
+
   const history = useHistory()
 
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
-    buildBaseType === 'custom' || buildBaseType === 'template'
-      ? initialStateOptions[buildBaseType]
-      : initialStateOptions.custom,
+    baseType
+      ? initialStateOptions[baseType]
+      : initialStateOptions[BaseType.Custom],
   )
 
   const [
@@ -100,8 +117,12 @@ const CardBuilder = () => {
 
   const stripe = useStripe()
   const elements = useElements()
-  const [submitCustomOrder] = useMutation(SUBMIT_CUSTOM_ORDER_MUTATION)
-  const [submitTemplateOrder] = useMutation(SUBMIT_TEMPLATE_ORDER_MUTATION)
+  const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
+    SUBMIT_CUSTOM_ORDER_MUTATION,
+  )
+  const [submitTemplateOrder] = useMutation<SubmitTemplateOrderMutation>(
+    SUBMIT_TEMPLATE_ORDER_MUTATION,
+  )
 
   const handleCardSubmit = React.useCallback(async () => {
     if (stripe == null || elements == null) {
@@ -178,9 +199,10 @@ const CardBuilder = () => {
       stripeToken: stripeToken?.id,
     }
 
+    let result = null
     switch (cardBuilderState.baseType) {
-      case 'custom':
-        return await submitCustomOrder({
+      case BaseType.Custom:
+        const customResult = await submitCustomOrder({
           variables: {
             payload: {
               ...basePayload,
@@ -189,7 +211,9 @@ const CardBuilder = () => {
             },
           },
         })
-      case 'template':
+        result = customResult.data?.submitCustomOrder
+        break
+      case BaseType.Template:
         const template = templateLibrary[cardBuilderState.templateId!]
         const cardImageDataUrls = await template.renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(
@@ -197,7 +221,7 @@ const CardBuilder = () => {
           ),
         )
 
-        return await submitTemplateOrder({
+        const templateResult = await submitTemplateOrder({
           variables: {
             payload: {
               ...basePayload,
@@ -208,32 +232,28 @@ const CardBuilder = () => {
               contactInfo: cardBuilderState.templateCustomization?.contactInfo,
               graphic: cardBuilderState.templateCustomization?.graphic?.file,
               qrCodeUrl: cardBuilderState.templateCustomization?.qrCodeUrl,
-              frontImageDataUrl: cardImageDataUrls.front,
-              backImageDataUrl: cardImageDataUrls.back,
+              frontImageDataUrl: dataURItoBlob(cardImageDataUrls.front),
+              backImageDataUrl: dataURItoBlob(cardImageDataUrls.back),
             },
           },
         })
+        result = templateResult.data?.submitTemplateOrder
+        break
       default:
         throw new Error('Submitted Card Builder with invalid base type')
     }
+    return result
   }, [cardBuilderState, submitCustomOrder, submitTemplateOrder])
 
   const handleWizardSubmit = React.useCallback(async () => {
     const submitOrderResult = await submitOrder()
 
-    // The mutation result will be returned on a field named specific to the base type
-    const submitOrderResultData =
-      cardBuilderState.baseType === 'custom'
-        ? submitOrderResult?.data?.submitCustomOrder
-        : submitOrderResult?.data?.submitTemplateOrder
-
-    if (submitOrderResultData == null) {
-      console.log(submitOrderResult?.errors)
-      throw new Error('Failed to create order: ')
+    if (submitOrderResult == null) {
+      throw new Error('Failed to create order, submitOrderResult was null')
     }
 
     const cardConfirmationResult = await confirmCardPayment(
-      submitOrderResultData.clientSecret,
+      submitOrderResult.clientSecret,
     )
 
     if (cardConfirmationResult.error) {
@@ -246,13 +266,10 @@ const CardBuilder = () => {
     })
 
     // All done, redirect to the dashboard for this order
-    history.push(`/dashboard/orders/${submitOrderResultData.orderId}`)
-  }, [confirmCardPayment, submitOrder, history, cardBuilderState])
+    history.push(`/dashboard/orders/${submitOrderResult.orderId}`)
+  }, [confirmCardPayment, submitOrder, history])
 
-  const isValidBaseType = (type?: string): type is BaseType =>
-    type != null && ['custom', 'template'].includes(type)
-
-  if (!isValidBaseType(buildBaseType)) {
+  if (!baseType) {
     // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
     return <Redirect to="/shop" />
   }
@@ -324,21 +341,21 @@ const CardBuilder = () => {
             handleStepTransition={handleWizardStepTransition}
             handleSubmit={handleWizardSubmit}
           >
-            {isValidBaseType(buildBaseType) && buildBaseType === 'template' && (
+            {baseType === BaseType.Template && (
               <WizardStep
                 id="base"
                 icon="stack"
                 label="Base"
                 isReadyForNextStep={
                   {
-                    custom: true,
+                    [BaseType.Custom]: true,
                     // For template base type, the template must have been chosen
-                    template: cardBuilderState.templateId != null,
+                    [BaseType.Template]: cardBuilderState.templateId != null,
                   }[cardBuilderState.baseType]
                 }
               >
                 <BaseStep
-                  selectedBaseType={buildBaseType}
+                  selectedBaseType={baseTypeQueryParam}
                   cardBuilderState={cardBuilderState}
                   updateCardBuilderState={updateCardBuilderState}
                 />
@@ -351,9 +368,9 @@ const CardBuilder = () => {
               isReadyForNextStep={
                 {
                   // For custom base type, at least the front design file must have been provided
-                  custom: cardBuilderState.frontDesignFile != null,
+                  [BaseType.Custom]: cardBuilderState.frontDesignFile != null,
                   // TBD requirements for template
-                  template:
+                  [BaseType.Template]:
                     cardBuilderState.templateId != null &&
                     templateLibrary[cardBuilderState.templateId].isComplete,
                 }[cardBuilderState.baseType]
@@ -361,14 +378,14 @@ const CardBuilder = () => {
             >
               {
                 {
-                  custom: (
+                  [BaseType.Custom]: (
                     <CustomBuildStep
-                      selectedBaseType={buildBaseType}
+                      selectedBaseType={baseTypeQueryParam}
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}
                     />
                   ),
-                  template: (
+                  [BaseType.Template]: (
                     <TemplateBuildStep
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}
@@ -400,10 +417,10 @@ const CardBuilder = () => {
             <WizardStep id="review" icon="checkO" label="Review">
               {
                 {
-                  custom: (
+                  [BaseType.Custom]: (
                     <CustomReviewStep cardBuilderState={cardBuilderState} />
                   ),
-                  template: (
+                  [BaseType.Template]: (
                     <TemplateReviewStep cardBuilderState={cardBuilderState} />
                   ),
                 }[cardBuilderState.baseType]

@@ -2,7 +2,10 @@ import { TemplateID } from 'src/templates'
 
 export type { TemplateID }
 
-export type BaseType = 'custom' | 'template'
+export enum BaseType {
+  Custom = 'Custom',
+  Template = 'Template',
+}
 
 export type CardBuilderStep =
   | 'base'

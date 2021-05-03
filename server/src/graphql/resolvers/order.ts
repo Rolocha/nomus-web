@@ -4,7 +4,12 @@ import { FileUpload } from 'graphql-upload'
 import { GraphQLUpload } from 'apollo-server-express'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
-import { Address, OrderPrice } from 'src/models/subschemas'
+import {
+  Address,
+  OrderPrice,
+  TemplateColorScheme,
+  TemplateContactInfoFields,
+} from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
 import { calculateCost } from 'src/util/pricing'
@@ -108,11 +113,11 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   @Field({ nullable: false })
   cardVersionId: string
 
-  @Field((type) => Object, { nullable: false })
-  colorScheme: Record<string, string>
+  @Field((type) => TemplateColorScheme, { nullable: false })
+  colorScheme: TemplateColorScheme
 
-  @Field((type) => Object, { nullable: false })
-  contactInfo: Record<string, string>
+  @Field((type) => TemplateContactInfoFields, { nullable: false })
+  contactInfo: TemplateContactInfoFields
 
   @Field((type) => GraphQLUpload, { nullable: true })
   graphic: Promise<FileUpload> | null
@@ -421,7 +426,7 @@ class OrderResolver {
     )
 
     if (!frontImageUploadResult.isSuccess) {
-      throw new Error('Failed to upload front card image')
+      throw new Error(`Failed to upload front card image: ${frontImageUploadResult.error}`)
     }
 
     let backImageUploadResult = null
@@ -464,6 +469,7 @@ class OrderResolver {
       cardVersion: cardVersion.id,
       state: OrderState.Captured,
       paymentIntent: paymentIntent.id,
+      quantity,
       price: {
         subtotal: totalCost,
         shipping: 0,
