@@ -1,6 +1,7 @@
 import { ObjectType, Field, InputType } from 'type-graphql'
 import { prop } from '@typegoose/typegoose'
 
+@InputType('PersonNameInput')
 @ObjectType()
 export class PersonName {
   @prop({ validate: (v: string) => v.length > 0 })

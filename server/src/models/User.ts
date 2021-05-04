@@ -148,7 +148,14 @@ export class User extends BaseModel({
   public static async createNewUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
-  ): EventualResult<DocumentType<User>, ErrorsOf<ValidateUsernameResult>> {
+  ): EventualResult<DocumentType<User>, ErrorsOf<ValidateUsernameResult> | 'non-unique-email'> {
+    if (userInfo.email) {
+      const lookupUser = await User.mongo.findOne({ email: userInfo.email })
+      if (lookupUser) {
+        return Result.fail('non-unique-email')
+      }
+    }
+
     if (userInfo.username) {
       const usernameValidationResult = await validateUsername(userInfo.username)
       if (usernameValidationResult.error) {
