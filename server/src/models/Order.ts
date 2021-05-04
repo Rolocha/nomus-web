@@ -31,7 +31,7 @@ const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
   [OrderState.Canceled]: [],
 }
 
-export const ORDER_STATE_EMAIL_NOTIF_TEMPLATES: Record<string, string> = {
+export const ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES: Partial<Record<OrderState, string>> = {
   [OrderState.Paid]: SendgridTemplate.OrderPaid,
   [OrderState.Enroute]: SendgridTemplate.OrderEnroute,
   [OrderState.Fulfilled]: SendgridTemplate.OrderFulfilled,
@@ -150,12 +150,12 @@ class Order extends BaseModel({
         this.state = futureState
         await this.save()
 
-        if (this.state in ORDER_STATE_EMAIL_NOTIF_TEMPLATES) {
+        if (this.state in ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES) {
           const user = await User.mongo.findById(this.user)
           await sgMail.send({
             to: user.email,
             from: 'hi@nomus.me',
-            templateId: ORDER_STATE_EMAIL_NOTIF_TEMPLATES[this.state],
+            templateId: ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES[this.state],
             dynamicTemplateData: {
               id: this.id,
               quantity: this.quantity,

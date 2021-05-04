@@ -1,5 +1,5 @@
 import { User } from 'src/models'
-import { ORDER_STATE_EMAIL_NOTIF_TEMPLATES } from 'src/models/Order'
+import { ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES } from 'src/models/Order'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { sgMail } from 'src/util/sendgrid'
@@ -148,7 +148,7 @@ describe('Order model', () => {
         expect.objectContaining({
           to: user.email,
           from: 'hi@nomus.me',
-          templateId: ORDER_STATE_EMAIL_NOTIF_TEMPLATES[transitionState],
+          templateId: ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES[transitionState],
           dynamicTemplateData: {
             id: order.id,
             quantity: order.quantity,
