@@ -1,5 +1,8 @@
+import { User } from 'src/models'
+import { ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES } from 'src/models/Order'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { sgMail } from 'src/util/sendgrid'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import OrderEvent from './OrderEvent'
 
@@ -26,7 +29,7 @@ describe('Order model', () => {
   })
 
   describe('cancelOrder', () => {
-    it.each([OrderState.Captured, OrderState.Paid])(
+    it.each([OrderState.Captured, OrderState.Paid, OrderState.Reviewed])(
       `successfully cancels the order if it's in the %s state`,
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
@@ -56,6 +59,9 @@ describe('Order model', () => {
       await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
       expect(order.state).toBe(OrderState.Paid)
 
+      await order.transition(OrderState.Reviewed, OrderEventTrigger.Internal)
+      expect(order.state).toBe(OrderState.Reviewed)
+
       await order.transition(OrderState.Creating)
       expect(order.state).toBe(OrderState.Creating)
 
@@ -78,6 +84,10 @@ describe('Order model', () => {
         expect.objectContaining({
           state: OrderState.Paid,
           trigger: OrderEventTrigger.Payment,
+        }),
+        expect.objectContaining({
+          state: OrderState.Reviewed,
+          trigger: OrderEventTrigger.Internal,
         }),
         expect.objectContaining({
           state: OrderState.Creating,
@@ -111,6 +121,43 @@ describe('Order model', () => {
           trigger: OrderEventTrigger.Nomus,
         }),
       ])
+    })
+  })
+
+  describe('Send Email', () => {
+    let sgMailSendSpy = null
+    beforeEach(() => {
+      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+    })
+
+    it.only.each([
+      [OrderState.Captured, OrderState.Paid],
+      [OrderState.Created, OrderState.Enroute],
+      [OrderState.Enroute, OrderState.Fulfilled],
+    ])('Sends an email on specified state transitions', async (initialState, transitionState) => {
+      const order = await createMockOrder({ state: initialState })
+      expect(order.state).toBe(initialState)
+      await order.transition(transitionState)
+
+      const user = await User.mongo.findById((order.user as User).id)
+      expect(sgMail.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: user.email,
+          from: 'hi@nomus.me',
+          templateId: ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES[transitionState],
+          dynamicTemplateData: {
+            id: order.id,
+            quantity: order.quantity,
+            price: order.price,
+            state: order.state,
+            trackingNumber: order.trackingNumber,
+          },
+        })
+      )
     })
   })
 })
