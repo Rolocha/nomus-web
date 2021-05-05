@@ -64,34 +64,33 @@ const CardBuilder = () => {
   // Request an initialized CardVersion from the API
   // when the card builder loads so we can use its id
   // things like the QR code URL
-  React.useEffect(() => {
+  const initialize = React.useCallback(async () => {
     if (initializeCardBuilderMutationResult.called) {
       return
     }
 
-    initializeCardBuilder({
+    const result = await initializeCardBuilder({
       variables: {
         baseType: cardBuilderState.baseType,
       },
     })
-      .then((result) => {
-        if (result.errors) {
-          console.log(result.errors)
-          throw new Error('oh no!')
-        }
-        updateCardBuilderState({
-          cardVersionId: result.data.createEmptyCardVersion.id,
-        })
-      })
-      .catch((err) => {
-        throw err
-      })
+    if (result.errors) {
+      console.log(result.errors)
+      throw new Error('oh no!')
+    }
+    updateCardBuilderState({
+      cardVersionId: result.data.createEmptyCardVersion.id,
+    })
   }, [
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
     cardBuilderState,
     updateCardBuilderState,
   ])
+
+  React.useEffect(() => {
+    initialize()
+  }, [initialize])
 
   const checkoutFormMethods = useForm<CheckoutFormData>({
     defaultValues: cardBuilderState.formData ?? undefined,
