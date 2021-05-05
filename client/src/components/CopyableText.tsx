@@ -29,7 +29,6 @@ const CopyableText = ({ copyText, children }: Props) => {
       document.body.removeChild(dummy)
 
       setDidCopy(true)
-      // console.log(didCopy)
     }
   }, [copyText, textRef])
 
