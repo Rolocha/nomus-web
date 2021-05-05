@@ -29,6 +29,7 @@ const CopyableText = ({ copyText, children }: Props) => {
       document.body.removeChild(dummy)
 
       setDidCopy(true)
+      // console.log(didCopy)
     }
   }, [copyText, textRef])
 
@@ -43,7 +44,7 @@ const CopyableText = ({ copyText, children }: Props) => {
             display: 'block',
           },
           '> :nth-child(2)': {
-            backgroundColor: colors.hoverBlue,
+            backgroundColor: colors.outlineBlue,
           },
         },
       }}
@@ -56,7 +57,7 @@ const CopyableText = ({ copyText, children }: Props) => {
         left="50%"
         transform="translateX(-50%)"
         borderRadius="base"
-        bg="hoverBlue"
+        bg="outlineBlue"
         py={1}
         px={2}
         as="span"
