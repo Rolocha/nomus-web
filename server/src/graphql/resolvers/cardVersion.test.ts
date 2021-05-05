@@ -78,6 +78,39 @@ describe('CardVersionResolver', () => {
     })
   })
 
+  describe('updateCardVersion', () => {
+    it('updates a cardVersion ImageUrls', async () => {
+      const cardVersion = await createMockCardVersion()
+      const testUrl = 'https://good-url'
+
+      const response = await execQuery({
+        source: `
+          mutation UpdateCardVersionTestQuery($id: String!, $payload: CardVersionUpdateInput!) {
+            updateCardVersion(id: $id, payload: $payload) {
+              id,
+              frontImageUrl,
+              backImageUrl,
+            }
+          }
+        `,
+        variableValues: {
+          id: cardVersion.id,
+          payload: {
+            frontImageUrl: testUrl,
+            backImageUrl: testUrl,
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.updateCardVersion).toMatchObject({
+        id: cardVersion.id,
+        frontImageUrl: testUrl,
+        backImageUrl: testUrl,
+      })
+    })
+  })
+
   describe('cardVersionsStats', () => {
     it('when neither user nor card versions specified, resolves with stats for all card versions belonging to the context user', async () => {
       const user = await createMockUser()

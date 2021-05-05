@@ -5,6 +5,7 @@ import { registerEnumType } from 'type-graphql'
 export enum OrderState {
   Captured = 'Captured',
   Paid = 'Paid',
+  Reviewed = 'Reviewed',
   Creating = 'Creating',
   Created = 'Created',
   Enroute = 'Enroute',

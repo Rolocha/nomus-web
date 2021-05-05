@@ -167,6 +167,24 @@ describe('POST /signup', () => {
       })
     )
   })
+
+  it('fails on a non-unique email', async () => {
+    await createMockUser({ email: 'someone@personman.com' })
+
+    const response = await request(app)
+      .post('/auth/signup')
+      .set('Cookie', [`${ACCESS_TOKEN_COOKIE_NAME}=blahWhatever`])
+      .send(signupPayload)
+
+    expect(response.status).toBe(400)
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        error: {
+          code: 'non-unique-email',
+        },
+      })
+    )
+  })
 })
 
 describe('GET /verify', () => {

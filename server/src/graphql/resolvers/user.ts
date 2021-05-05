@@ -1,4 +1,4 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { DocumentType, mongoose } from '@typegoose/typegoose'
 import {
   ApolloError,
   AuthenticationError,
@@ -30,6 +30,7 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { Connection } from 'src/models'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -165,16 +166,26 @@ class UserResolver {
   }
 
   @Authorized(Role.User)
-  @Mutation((type) => String)
-  async deleteUser(
-    @Arg('userId', { nullable: true }) userId: string | null,
-    @Ctx() context: IApolloContext
-  ): Promise<string> {
-    const requestingUserId = context.user._id
-    const requestedUserId = userId ?? requestingUserId
+  @Mutation((type) => Void, { nullable: true })
+  async deleteUser(@Ctx() context: IApolloContext): Promise<void> {
+    const connections = await Connection.mongo.find({
+      $or: [{ from: context.user.id }, { to: context.user.id }],
+    })
 
-    await User.mongo.deleteOne({ _id: requestedUserId })
-    return requestedUserId.toString()
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+      const connectionBatchDeletionResult = await Connection.batchDelete(
+        connections.map((connection) => connection.id)
+      )
+      const userDeletionResult = await User.delete(context.user.id)
+
+      if (userDeletionResult.isSuccess && connectionBatchDeletionResult.isSuccess === false) {
+        throw new Error('Failed to delete user')
+      }
+    } finally {
+      session.endSession()
+    }
   }
 
   @Authorized(Role.User)

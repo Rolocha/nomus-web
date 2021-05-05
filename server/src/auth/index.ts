@@ -105,6 +105,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
       switch (createUserResult.error.name) {
         case 'empty-username':
         case 'non-unique-username':
+        case 'non-unique-email':
         case 'reserved-route':
           return res.status(400).json({ error: { code: createUserResult.error.name } })
         case 'unknown-error':
