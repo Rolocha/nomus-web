@@ -400,7 +400,7 @@ export default class CardTemplate<
       console.warn('qrUrl was empty')
       return
     }
-    console.log({ qrUrl })
+
     const qrDataUrl = await QRCode.toDataURL(qrUrl, {
       margin: 0,
       color: {
