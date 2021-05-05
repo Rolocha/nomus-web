@@ -85,7 +85,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
       display="grid"
       gridTemplateColumns={{
         base: '8fr 4fr',
-        [bp]: '4fr 2fr 6fr',
+        [bp]: '4fr 3fr 5fr',
       }}
       gridTemplateAreas={{
         base: `
@@ -123,7 +123,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
         )}
       </Box>
 
-      <Box gridArea="editEmail" placeSelf={{ base: 'end', [bp]: 'end center' }}>
+      <Box gridArea="editEmail" placeSelf={'center'}>
         {active ? (
           <Box
             height="100%"
@@ -135,17 +135,28 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
           >
             <Box gridArea="save">
               <Button
-                variant="success"
+                size="sm"
+                colorScheme="green"
+                variant="outline"
                 rightIcon={<Icon of="check" color={colors.validGreen} />}
                 onClick={handleSubmit(onSubmitEmail)}
-              />
+              >
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
+                  Save
+                </Box>
+              </Button>
             </Box>
             <Box gridArea="cancel">
               <Button
+                size="sm"
                 variant="dangerSecondary"
                 rightIcon={<Icon of="close" color={colors.invalidRed} />}
                 onClick={closeForm}
-              />
+              >
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
+                  Cancel
+                </Box>
+              </Button>
             </Box>
           </Box>
         ) : (
