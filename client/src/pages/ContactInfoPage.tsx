@@ -217,7 +217,7 @@ const ContactInfoPage = () => {
             {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
               <Box
                 gridArea="businessCard"
-                width={{ base: '37%', [bp]: '100%' }}
+                width={{ base: '25%', [bp]: '75%' }}
                 mb={{ base: 0, [bp]: 2 }}
                 mr={{ base: 2, [bp]: 0 }}
               >
