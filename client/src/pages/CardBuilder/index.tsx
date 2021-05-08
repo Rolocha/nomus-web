@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation, gql } from 'src/apollo'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { ExecutionResult } from 'apollo-link'
 import * as React from 'react'
@@ -49,6 +49,48 @@ const CardBuilder = () => {
       ? initialStateOptions[buildBaseType]
       : initialStateOptions.custom,
   )
+
+  const [
+    initializeCardBuilder,
+    initializeCardBuilderMutationResult,
+  ] = useMutation(gql`
+    mutation InitializeCardBuilder() {
+      createEmptyCardVersion {
+        id
+      }
+    }
+  `)
+
+  // Request an initialized CardVersion from the API
+  // when the card builder loads so we can use its id
+  // things like the QR code URL
+  const initialize = React.useCallback(async () => {
+    if (initializeCardBuilderMutationResult.called) {
+      return
+    }
+
+    const result = await initializeCardBuilder({
+      variables: {
+        baseType: cardBuilderState.baseType,
+      },
+    })
+    if (result.errors) {
+      console.log(result.errors)
+      throw new Error('oh no!')
+    }
+    updateCardBuilderState({
+      cardVersionId: result.data.createEmptyCardVersion.id,
+    })
+  }, [
+    initializeCardBuilder,
+    initializeCardBuilderMutationResult,
+    cardBuilderState,
+    updateCardBuilderState,
+  ])
+
+  React.useEffect(() => {
+    initialize()
+  }, [initialize])
 
   const checkoutFormMethods = useForm<CheckoutFormData>({
     defaultValues: cardBuilderState.formData ?? undefined,
