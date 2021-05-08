@@ -70,13 +70,7 @@ const CardBuilder = () => {
   const [
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
-  ] = useMutation(gql`
-    mutation InitializeCardBuilder() {
-      createEmptyCardVersion {
-        id
-      }
-    }
-  `)
+  ] = useMutation(INITIALIZE_CARD_BUILDER_MUTATION)
 
   // Request an initialized CardVersion from the API
   // when the card builder loads so we can use its id
