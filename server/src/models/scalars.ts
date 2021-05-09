@@ -20,10 +20,3 @@ export const Void = new GraphQLScalarType({
     return null
   },
 })
-
-export const StringMap = new GraphQLScalarType({
-  name: 'StringMap',
-  description: 'Represents a map of string to strings',
-
-  serialize(value: unknown) {},
-})
