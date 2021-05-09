@@ -215,19 +215,34 @@ const CardBuilder = () => {
           ),
         )
 
+        const templateSpecificRequiredPayload = {
+          templateId: cardBuilderState.templateId,
+          cardVersionId: cardBuilderState.cardVersionId,
+          colorScheme: cardBuilderState.templateCustomization?.colorScheme,
+          contactInfo: cardBuilderState.templateCustomization?.contactInfo,
+          qrCodeUrl: cardBuilderState.templateCustomization?.qrCodeUrl,
+          frontImageDataUrl: dataURItoBlob(cardImageDataUrls.front),
+          backImageDataUrl: dataURItoBlob(cardImageDataUrls.back),
+        }
+
+        const templateSpecificOptionalPayload = {
+          graphic: cardBuilderState.templateCustomization?.graphic?.file,
+        }
+
+        const templateSpecificPayload = {
+          ...templateSpecificRequiredPayload,
+          ...templateSpecificOptionalPayload,
+        }
+
+        if (!Object.values(templateSpecificRequiredPayload).every(Boolean)) {
+          throw new Error('Missing required fields')
+        }
+
         const templateResult = await submitTemplateOrder({
           variables: {
             payload: {
               ...basePayload,
-              // TODO: Validate all these fields are defined before trying to extract them and error if they aren't
-              templateId: cardBuilderState.templateId,
-              cardVersionId: cardBuilderState.cardVersionId,
-              colorScheme: cardBuilderState.templateCustomization?.colorScheme,
-              contactInfo: cardBuilderState.templateCustomization?.contactInfo,
-              graphic: cardBuilderState.templateCustomization?.graphic?.file,
-              qrCodeUrl: cardBuilderState.templateCustomization?.qrCodeUrl,
-              frontImageDataUrl: dataURItoBlob(cardImageDataUrls.front),
-              backImageDataUrl: dataURItoBlob(cardImageDataUrls.back),
+              ...templateSpecificPayload,
             },
           },
         })
