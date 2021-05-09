@@ -339,6 +339,10 @@ class OrderResolver {
       quantity: payload.quantity,
     })
 
+    // Update the user's default card version to the newly created one
+    user.defaultCardVersion = cardVersion.id
+    await user.save()
+
     return {
       orderId: createdOrder.id,
       clientSecret: paymentIntent.client_secret,
@@ -396,6 +400,10 @@ class OrderResolver {
       cardVersion,
       quantity: payload.quantity,
     })
+
+    // Update the user's default card version to the newly created one
+    user.defaultCardVersion = cardVersion.id
+    await user.save()
 
     return {
       orderId: createdOrder.id,

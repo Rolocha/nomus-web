@@ -259,8 +259,8 @@ const CardBuilder = () => {
       paymentIntent: cardConfirmationResult.paymentIntent,
     })
 
-    // All done, redirect to the dashboard for this order
-    history.push(`/dashboard/orders/${submitOrderResult.orderId}`)
+    // All done, redirect to the dashboard cards page so they can see their newly active card
+    history.push(`/dashboard/cards`)
   }, [confirmCardPayment, submitOrder, history])
 
   if (!baseType) {
