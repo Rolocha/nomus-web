@@ -90,6 +90,9 @@ class OrdersQueryInput {
 
   @Field({ nullable: true, description: 'print spec to print on empty sheets stored in S3' })
   printSpecUrl: string
+
+  @Field({ nullable: true, description: 'Notes about the order' })
+  notes: string
 }
 
 @InputType({ description: 'Input to find orders' })
@@ -188,6 +191,7 @@ class OrderResolver {
     order.shippingLabelUrl = payload.shippingLabelUrl ?? order.shippingLabelUrl
     order.printSpecUrl = payload.printSpecUrl ?? order.printSpecUrl
     order.shippingAddress = payload.shippingAddress ?? order.shippingAddress
+    order.notes = payload.notes ?? order.notes
 
     await order.save()
     return order

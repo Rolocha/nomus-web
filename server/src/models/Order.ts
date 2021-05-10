@@ -125,6 +125,10 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
+  @prop({ required: false, description: 'Notes about the order' })
+  @Field({ nullable: true })
+  notes: string
+
   // Checks if a proposed transition can be accomplished in our state machine
   private isTransitionAllowed(futureState: OrderState): boolean {
     try {

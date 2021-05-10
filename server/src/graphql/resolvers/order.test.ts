@@ -475,6 +475,7 @@ describe('OrderResolver', () => {
               shippingLabelUrl,
               trackingNumber,
               printSpecUrl,
+              notes,
               price {
                 subtotal,
                 tax,
@@ -490,6 +491,7 @@ describe('OrderResolver', () => {
             shippingLabelUrl: shippingLabelTestUrl,
             trackingNumber: trackingNumberTest,
             price: priceTest,
+            notes: 'test_notes',
           },
         },
         asAdmin: true,
@@ -501,6 +503,7 @@ describe('OrderResolver', () => {
         trackingNumber: trackingNumberTest,
         price: priceTest,
         printSpecUrl: 'printTest',
+        notes: 'test_notes',
       })
     })
   })
