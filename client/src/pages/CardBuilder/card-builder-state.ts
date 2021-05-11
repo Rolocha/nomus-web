@@ -20,6 +20,7 @@ export type CardBuilderState = {
   cardVersionId: string | null
   templateId: TemplateID | null
   templateCustomization: Record<string, any> | null
+  omittedOptionalFields: Array<string>
 
   // Custom details
   frontDesignFile: FileItem | null
@@ -54,6 +55,7 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
     postalCode: '',
   },
   templateCustomization: null,
+  omittedOptionalFields: [],
   stripeToken: null,
   paymentIntent: null,
   cardEntryComplete: false,

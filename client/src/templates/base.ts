@@ -27,9 +27,10 @@ export type CardTemplateRenderOptions<
     ExtendedColors | keyof BaseColorScheme,
     CustomizableField.Color
   >
-  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
+  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo | null>
   graphic: CustomizableField.Graphic
   qrCodeUrl: CustomizableField.QRCode
+  omittedContactInfoFields: Array<ContactInfoFields>
 }
 
 export interface CardTemplateDefinition<
@@ -152,8 +153,10 @@ export default class CardTemplate<
   > {
     return {
       contactInfo: this.contactInfoFieldNames.reduce((acc, fieldName) => {
-        if (this.contactInfoSpec[fieldName].defaultValue) {
-          acc[fieldName] = this.contactInfoSpec[fieldName].defaultValue
+        if (this.contactInfoSpec[fieldName].required) {
+          acc[fieldName] = ''
+        } else {
+          acc[fieldName] = null
         }
         return acc
       }, {} as Record<string, any>),
@@ -168,6 +171,7 @@ export default class CardTemplate<
         size: 1,
       },
       qrCodeUrl: 'https://nomus.me',
+      omittedContactInfoFields: [],
     }
   }
 
@@ -250,6 +254,7 @@ export default class CardTemplate<
   // lets us handle any such data transformations.
   public createOptionsFromFormFields(
     formFields: Record<string, any>,
+    omittedFields: Array<ContactInfoFields>,
   ): CardTemplateRenderOptions<ContactInfoFields, ExtendedColors> {
     const { graphic, ...otherFormFields } = formFields
     const result: any = {
@@ -261,6 +266,9 @@ export default class CardTemplate<
               size: graphic.size,
             }
           : null,
+      omittedContactInfoFields: omittedFields
+        ? omittedFields.map((field) => field.replace('contactInfo.', ''))
+        : [],
     }
     return result
   }

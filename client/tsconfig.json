@@ -19,5 +19,5 @@
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*"],
-  "exclude": ["src/apollo/types/globalTypes.ts", "src/**/*.stories.tsx"]
+  "exclude": ["src/apollo/types/globalTypes.ts"]
 }

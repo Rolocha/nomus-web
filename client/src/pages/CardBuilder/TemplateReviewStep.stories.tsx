@@ -52,6 +52,7 @@ export const Primary = () => {
         text: colors.midnightGray,
       },
     },
+    omittedOptionalFields: ['contactInfo.line3'],
     quantity: 50,
     formData: {
       name: 'Spongebob',
