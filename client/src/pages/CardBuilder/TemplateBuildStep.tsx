@@ -199,7 +199,7 @@ const TemplateBuildStep = ({
                     />
                   </Box>
                 )}
-                (
+
                 <Box
                   // We need to set this onClick handler on a box wrapping the Form.Input
                   // because inputs that are disabled won't pick up (or bubble up) click
@@ -222,7 +222,6 @@ const TemplateBuildStep = ({
                     sx={{ pointerEvents: inputDisabled ? 'none' : undefined }}
                   />
                 </Box>
-                )
               </Box>
             )
           })}
