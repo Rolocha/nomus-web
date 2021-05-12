@@ -169,20 +169,14 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     )
 
     // Render QR code
-    await this.drawQRCode(
-      ctx,
-      options.qrCodeUrl ||
-        this.contactInfoSpec.name.placeholder ||
-        'https://nomus.me',
-      {
-        x: this.proportionalize(134),
-        y: this.proportionalize(65),
-        width: this.proportionalize(32),
-        height: this.proportionalize(32),
-        backgroundColor: options.colorScheme.background,
-        foregroundColor: options.colorScheme.accent,
-      },
-    )
+    await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {
+      x: this.proportionalize(134),
+      y: this.proportionalize(65),
+      width: this.proportionalize(32),
+      height: this.proportionalize(32),
+      backgroundColor: options.colorScheme.background,
+      foregroundColor: options.colorScheme.accent,
+    })
 
     // Render Nomus logo
     await this.drawNomusLogo(ctx, {

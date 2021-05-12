@@ -3,6 +3,7 @@ import { OrderPrice } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 
@@ -140,6 +141,56 @@ describe('OrderResolver', () => {
   })
 
   describe('orders', () => {
+    it('fetches data for the design review page', async () => {
+      const user = await createMockUser()
+      const cardVersion = await createMockCardVersion()
+      const order = await createMockOrder({
+        user: user,
+        cardVersion: cardVersion,
+        state: OrderState.Paid,
+      })
+
+      const response = await execQuery({
+        source: `
+          query DesignReviewTestQuery($params: OrdersInput) {
+            orders(params: $params) {
+              id,
+              state, 
+              user {
+                name {
+                  first
+                }
+              },
+              cardVersion {
+                frontImageUrl
+              }
+            }
+          }
+        `,
+        variableValues: {
+          params: {
+            states: [OrderState.Paid],
+          },
+        },
+        asAdmin: true,
+      })
+
+      expect(response.data?.orders.length).toBe(1)
+      expect(response.data?.orders).toEqual([
+        expect.objectContaining({
+          id: order.id,
+          state: OrderState.Paid,
+          user: {
+            name: {
+              first: user.name.first,
+            },
+          },
+          cardVersion: {
+            frontImageUrl: cardVersion.frontImageUrl,
+          },
+        }),
+      ])
+    })
     it('fetches orders from a list of order ids', async () => {
       const user = await createMockUser()
       const order1 = await createMockOrder({ user: user })
@@ -475,6 +526,7 @@ describe('OrderResolver', () => {
               shippingLabelUrl,
               trackingNumber,
               printSpecUrl,
+              notes,
               price {
                 subtotal,
                 tax,
@@ -490,6 +542,7 @@ describe('OrderResolver', () => {
             shippingLabelUrl: shippingLabelTestUrl,
             trackingNumber: trackingNumberTest,
             price: priceTest,
+            notes: 'test_notes',
           },
         },
         asAdmin: true,
@@ -501,6 +554,7 @@ describe('OrderResolver', () => {
         trackingNumber: trackingNumberTest,
         price: priceTest,
         printSpecUrl: 'printTest',
+        notes: 'test_notes',
       })
     })
   })

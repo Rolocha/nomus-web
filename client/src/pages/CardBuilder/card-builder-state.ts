@@ -17,6 +17,7 @@ export type CardBuilderState = {
   formData: CheckoutFormData
 
   // Template details
+  cardVersionId: string | null
   templateId: TemplateID | null
   graphicElementFile: FileItem | null
   templateCustomization: Record<string, any> | null
@@ -38,6 +39,7 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
   } as const)[baseType],
   baseType,
   quantity: 50,
+  cardVersionId: null,
   templateId: ({
     custom: null,
     template: templateNames[0],

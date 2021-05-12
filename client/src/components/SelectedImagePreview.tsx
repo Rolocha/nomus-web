@@ -27,26 +27,30 @@ const SelectedImagePreview = ({
     >
       <Box position="relative">
         <Image w="100%" border="1px solid #ccc" src={selectedFileItem.url} />
-        <Box
-          position="absolute"
-          px={2}
-          py={1}
-          bg={colors.cyanProcess}
-          borderRadius="lg"
-          right="-5%"
-          bottom="-5%"
-        >
-          <Text.Plain color="white" fontSize="10px">
-            {selectedFileItem.file.type.split('/')[1].toUpperCase()}
-          </Text.Plain>
+        {selectedFileItem.file && (
+          <Box
+            position="absolute"
+            px={2}
+            py={1}
+            bg={colors.cyanProcess}
+            borderRadius="lg"
+            right="-5%"
+            bottom="-5%"
+          >
+            <Text.Plain color="white" fontSize="10px">
+              {selectedFileItem.file.type.split('/')[1].toUpperCase()}
+            </Text.Plain>
+          </Box>
+        )}
+      </Box>
+      {selectedFileItem.file && (
+        <Box>
+          <Text.Body2>{selectedFileItem.file.name}</Text.Body2>
+          <Text.Body3 color="africanElephant">
+            {Math.round(selectedFileItem.file.size / 10) / 10}kb
+          </Text.Body3>
         </Box>
-      </Box>
-      <Box>
-        <Text.Body2>{selectedFileItem.file.name}</Text.Body2>
-        <Text.Body3 color="africanElephant">
-          {Math.round(selectedFileItem.file.size / 10) / 10}kb
-        </Text.Body3>
-      </Box>
+      )}
       {handleDiscardFile && (
         <Button variant="tertiary" p="0 !imporant" onClick={handleDiscardFile}>
           <Icon of="close" color={colors.nomusBlue} />
