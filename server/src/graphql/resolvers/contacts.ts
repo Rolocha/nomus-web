@@ -227,10 +227,18 @@ class ContactsResolver {
     })
 
     if (existingConnection) {
-      existingConnection.meetingDate = contactInfo.meetingDate
-      existingConnection.meetingPlace = contactInfo.meetingPlace
-      existingConnection.tags = contactInfo.tags
-      existingConnection.notes = contactInfo.notes
+      if (contactInfo.meetingDate != null) {
+        existingConnection.meetingDate = contactInfo.meetingDate
+      }
+      if (contactInfo.meetingPlace != null) {
+        existingConnection.meetingPlace = contactInfo.meetingPlace
+      }
+      if (contactInfo.tags != null) {
+        existingConnection.tags = contactInfo.tags
+      }
+      if (contactInfo.notes != null) {
+        existingConnection.notes = contactInfo.notes
+      }
       await existingConnection.save()
       return await connectionToContact(existingConnection)
     } else {
