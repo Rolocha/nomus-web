@@ -131,6 +131,10 @@ class OrderResolver {
   async user(@Root() order: Order) {
     return User.mongo.findById(order.user)
   }
+  @FieldResolver()
+  async cardVersion(@Root() order: Order) {
+    return CardVersion.mongo.findById(order.cardVersion)
+  }
 
   //Get a single order
   @Authorized(Role.User)
