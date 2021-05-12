@@ -152,7 +152,7 @@ describe('OrderResolver', () => {
 
       const response = await execQuery({
         source: `
-          query OrdersListTestQuery($params: OrdersInput) {
+          query DesignReviewTestQuery($params: OrdersInput) {
             orders(params: $params) {
               id,
               state, 
