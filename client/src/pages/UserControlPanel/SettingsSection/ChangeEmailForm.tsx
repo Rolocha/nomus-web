@@ -136,8 +136,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
             <Box gridArea="save">
               <Button
                 size="sm"
-                colorScheme="green"
-                variant="outline"
+                variant="successSecondary"
                 rightIcon={<Icon of="check" color={colors.validGreen} />}
                 onClick={handleSubmit(onSubmitEmail)}
               >
