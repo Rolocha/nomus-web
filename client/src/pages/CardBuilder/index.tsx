@@ -212,6 +212,7 @@ const CardBuilder = () => {
         const cardImageDataUrls = await template.renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(
             cardBuilderState.templateCustomization!,
+            cardBuilderState.omittedOptionalFields as any[],
           ),
         )
 
