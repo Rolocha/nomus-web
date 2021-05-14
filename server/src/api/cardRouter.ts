@@ -88,10 +88,7 @@ cardRouter.get(
     const cardDataResult = await getCardDataForInteractionString(interactionString)
     if (!cardDataResult.isSuccess) {
       // Failed result indicates the URL parse failed
-      res.status(404).json({
-        message: cardDataResult.error.name,
-      })
-      return
+      res.redirect(307, '/404')
     }
 
     const { cardVersion, card, interactionType, cardUser } = cardDataResult.value
