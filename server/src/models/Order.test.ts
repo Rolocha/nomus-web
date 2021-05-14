@@ -1,8 +1,5 @@
-import { User } from 'src/models'
-import { ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES } from 'src/models/Order'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
-import { sgMail } from 'src/util/sendgrid'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import OrderEvent from './OrderEvent'
 
