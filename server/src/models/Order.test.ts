@@ -123,41 +123,4 @@ describe('Order model', () => {
       ])
     })
   })
-
-  describe('Send Email', () => {
-    let sgMailSendSpy = null
-    beforeEach(() => {
-      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
-    })
-
-    afterEach(() => {
-      sgMailSendSpy.mockClear()
-    })
-
-    it.only.each([
-      [OrderState.Captured, OrderState.Paid],
-      [OrderState.Created, OrderState.Enroute],
-      [OrderState.Enroute, OrderState.Fulfilled],
-    ])('Sends an email on specified state transitions', async (initialState, transitionState) => {
-      const order = await createMockOrder({ state: initialState })
-      expect(order.state).toBe(initialState)
-      await order.transition(transitionState)
-
-      const user = await User.mongo.findById((order.user as User).id)
-      expect(sgMail.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-          to: user.email,
-          from: 'hi@nomus.me',
-          templateId: ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES[transitionState],
-          dynamicTemplateData: {
-            id: order.id,
-            quantity: order.quantity,
-            price: order.price,
-            state: order.state,
-            trackingNumber: order.trackingNumber,
-          },
-        })
-      )
-    })
-  })
 })
