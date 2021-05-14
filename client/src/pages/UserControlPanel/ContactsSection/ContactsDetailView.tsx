@@ -11,7 +11,7 @@ import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 import { Contact } from 'src/types/contact'
-import { getFormattedFullDate } from 'src/utils/date'
+import { getFormattedFullDateFromDateInputString } from 'src/utils/date'
 import { formatName } from 'src/utils/name'
 import ContactCardsList from './ContactCardsList'
 import ContactsEmptyState from './ContactsEmptyState'
@@ -203,7 +203,9 @@ const ContactsDetailView = ({
               <Text.Label>Meeting Date</Text.Label>
               <Text.Body2>
                 {selectedContact.meetingDate
-                  ? getFormattedFullDate(selectedContact.meetingDate)
+                  ? getFormattedFullDateFromDateInputString(
+                      selectedContact.meetingDate,
+                    )
                   : ''}
               </Text.Body2>
             </Box>

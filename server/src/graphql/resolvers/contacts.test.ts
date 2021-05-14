@@ -219,7 +219,7 @@ describe('ContactsResolver', () => {
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
       })
-      const meetingDate = new Date().toISOString()
+      const meetingDate = new Date().toISOString().substr(0, 10)
       const connection = await createMockConnection({
         from: userFrom._id,
         to: userTo._id,
@@ -323,6 +323,7 @@ describe('ContactsResolver', () => {
         cardFrontImageUrl: null,
         cardBackImageUrl: null,
         vcfUrl: userTo.vcfUrl ?? null,
+        meetingDate: getCurrentDateForDateInput(),
         connected: true,
       })
       expect(await Connection.mongo.findOne({ from: userFrom.id, to: userTo.id })).not.toBeNull()
