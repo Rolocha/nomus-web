@@ -68,6 +68,7 @@ const args: CardTemplateRenderOptions<
     text: colors.midnightGray,
   },
   qrCodeUrl: 'https://nomus.me',
+  omittedContactInfoFields: [],
 }
 
 Velia.args = args
