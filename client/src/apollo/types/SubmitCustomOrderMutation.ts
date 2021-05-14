@@ -10,12 +10,15 @@ import { SubmitCustomOrderInput } from './globalTypes'
 // ====================================================
 
 export interface SubmitCustomOrderMutation_submitCustomOrder {
-  __typename: 'SubmitCustomOrderResponse'
+  __typename: 'SubmitOrderResponse'
   clientSecret: string
   orderId: string
 }
 
 export interface SubmitCustomOrderMutation {
+  /**
+   * Handles submission of an order created via the Card Builder UI for a custom user design
+   */
   submitCustomOrder: SubmitCustomOrderMutation_submitCustomOrder
 }
 

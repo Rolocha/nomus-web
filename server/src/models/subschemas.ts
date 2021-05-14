@@ -81,3 +81,45 @@ export class OrderPrice {
   @Field({ nullable: false })
   total: number
 }
+
+@InputType('TemplateContactInfoFieldsInput', {
+  description: 'Contact info fields potentially specified when customizing a template card',
+})
+@ObjectType()
+export class TemplateContactInfoFields {
+  @Field({ nullable: true })
+  name: string | null
+
+  @Field({ nullable: true })
+  line1: string | null
+
+  @Field({ nullable: true })
+  line2: string | null
+
+  @Field({ nullable: true })
+  line3: string | null
+
+  @Field({ nullable: true })
+  headline: string | null
+
+  @Field({ nullable: true })
+  footer: string | null
+}
+
+@InputType('TemplateColorSchemeInput', {
+  description: 'Colors defined when customizing a template card',
+})
+@ObjectType()
+export class TemplateColorScheme {
+  // Mandatory base colors
+  @Field({ nullable: false })
+  background: string
+
+  @Field({ nullable: false })
+  accent: string
+
+  @Field({ nullable: false })
+  text: string
+
+  // Define additional template-specific colors below
+}

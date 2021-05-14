@@ -19,7 +19,6 @@ export type CardBuilderState = {
   // Template details
   cardVersionId: string | null
   templateId: TemplateID | null
-  graphicElementFile: FileItem | null
   templateCustomization: Record<string, any> | null
 
   // Custom details
@@ -34,19 +33,18 @@ export type CardBuilderState = {
 
 const createInitialState = (baseType: BaseType): CardBuilderState => ({
   currentStep: ({
-    custom: 'build',
-    template: 'base',
+    [BaseType.Custom]: 'build',
+    [BaseType.Template]: 'base',
   } as const)[baseType],
   baseType,
   quantity: 50,
   cardVersionId: null,
   templateId: ({
-    custom: null,
-    template: templateNames[0],
+    [BaseType.Custom]: null,
+    [BaseType.Template]: templateNames[0],
   } as const)[baseType],
   frontDesignFile: null,
   backDesignFile: null,
-  graphicElementFile: null,
   formData: {
     name: '',
     addressLine1: '',
@@ -62,8 +60,8 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
 })
 
 export const initialStateOptions: Record<BaseType, CardBuilderState> = {
-  custom: createInitialState('custom'),
-  template: createInitialState('template'),
+  [BaseType.Custom]: createInitialState(BaseType.Custom),
+  [BaseType.Template]: createInitialState(BaseType.Template),
 }
 
 export type CardBuilderAction = Partial<CardBuilderState>

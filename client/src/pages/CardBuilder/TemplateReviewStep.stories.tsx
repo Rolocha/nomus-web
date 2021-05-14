@@ -6,6 +6,7 @@ import {
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
+import { BaseType } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 
 export default {
@@ -27,8 +28,8 @@ export const actionsData = {
 
 export const Primary = () => {
   const cardBuilderState: CardBuilderState = {
-    ...initialStateOptions.template,
-    baseType: 'template',
+    ...initialStateOptions[BaseType.Template],
+    baseType: BaseType.Template,
     templateId: 'velia',
     templateCustomization: {
       contactInfo: {
