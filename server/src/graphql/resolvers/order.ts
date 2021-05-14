@@ -120,7 +120,7 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   contactInfo: TemplateContactInfoFields
 
   @Field((type) => GraphQLUpload, { nullable: true })
-  graphic: Promise<FileUpload> | null
+  graphic?: Promise<FileUpload> | null
 
   @Field({ nullable: false })
   qrCodeUrl: string
@@ -129,7 +129,7 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   frontImageDataUrl: Promise<FileUpload>
 
   @Field((type) => GraphQLUpload, { nullable: true })
-  backImageDataUrl?: Promise<FileUpload>
+  backImageDataUrl?: Promise<FileUpload> | null
 }
 
 @ObjectType()
