@@ -43,7 +43,26 @@ interface RedirectRouteType extends RouteCommon {
 
 type RouteType = ComponentRouteType | RedirectRouteType
 
-const inProduction = process.env.NODE_ENV === 'production'
+enum DeployEnvironment {
+  Development,
+  Staging,
+  Production,
+  Unknown,
+}
+const deployEnvironment = (() => {
+  const { host } = window.location
+  if (host === 'nomus.me') {
+    return DeployEnvironment.Production
+  } else if (host === 'stage.nomus.me') {
+    return DeployEnvironment.Staging
+  } else if (host.startsWith('localhost:')) {
+    return DeployEnvironment.Development
+  } else {
+    return DeployEnvironment.Unknown
+  }
+})()
+
+const inProduction = deployEnvironment === DeployEnvironment.Production
 
 export const routes: Array<RouteType> = [
   {
