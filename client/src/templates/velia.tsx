@@ -126,47 +126,61 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
       this.proportionalizedWidth / 2 - this.proportionalize(8)
     ctx.font = this.proportionalize(7) + 'px Rubik'
 
-    ctx.fillStyle = options.contactInfo.line1
-      ? options.colorScheme.text
-      : placeholderTextColor
-    const line1Text =
-      options.contactInfo.line1 || this.contactInfoSpec.line1.placeholder || ''
-    const line1TextMetrics = ctx.measureText(line1Text)
-    const line1TextX = rightEdgeForLines - line1TextMetrics.width
-    ctx.fillText(line1Text, line1TextX, this.proportionalize(65 + 7))
+    if (!options.omittedContactInfoFields.includes('line1')) {
+      ctx.fillStyle = options.contactInfo.line1
+        ? options.colorScheme.text
+        : placeholderTextColor
+      const line1Text =
+        options.contactInfo.line1 ||
+        this.contactInfoSpec.line1.placeholder ||
+        ''
+      const line1TextMetrics = ctx.measureText(line1Text)
+      const line1TextX = rightEdgeForLines - line1TextMetrics.width
+      ctx.fillText(line1Text, line1TextX, this.proportionalize(65 + 7))
+    }
 
-    ctx.fillStyle = options.contactInfo.line2
-      ? options.colorScheme.text
-      : placeholderTextColor
-    const line2Text =
-      options.contactInfo.line2 || this.contactInfoSpec.line2.placeholder || ''
-    const line2TextMetrics = ctx.measureText(line2Text)
-    const line2TextX = rightEdgeForLines - line2TextMetrics.width
-    ctx.fillText(line2Text, line2TextX, this.proportionalize(77 + 7))
+    if (!options.omittedContactInfoFields.includes('line2')) {
+      ctx.fillStyle = options.contactInfo.line2
+        ? options.colorScheme.text
+        : placeholderTextColor
+      const line2Text =
+        options.contactInfo.line2 ||
+        this.contactInfoSpec.line2.placeholder ||
+        ''
+      const line2TextMetrics = ctx.measureText(line2Text)
+      const line2TextX = rightEdgeForLines - line2TextMetrics.width
+      ctx.fillText(line2Text, line2TextX, this.proportionalize(77 + 7))
+    }
 
-    ctx.fillStyle = options.contactInfo.line3
-      ? options.colorScheme.text
-      : placeholderTextColor
-    const line3Text =
-      options.contactInfo.line3 || this.contactInfoSpec.line3.placeholder || ''
-    const line3TextMetrics = ctx.measureText(line3Text)
-    const line3TextX = rightEdgeForLines - line3TextMetrics.width
-    ctx.fillText(line3Text, line3TextX, this.proportionalize(89 + 7))
+    if (!options.omittedContactInfoFields.includes('line3')) {
+      ctx.fillStyle = options.contactInfo.line3
+        ? options.colorScheme.text
+        : placeholderTextColor
+      const line3Text =
+        options.contactInfo.line3 ||
+        this.contactInfoSpec.line3.placeholder ||
+        ''
+      const line3TextMetrics = ctx.measureText(line3Text)
+      const line3TextX = rightEdgeForLines - line3TextMetrics.width
+      ctx.fillText(line3Text, line3TextX, this.proportionalize(89 + 7))
+    }
 
-    // Render the footer
-    const footerText =
-      options.contactInfo.footer ||
-      this.contactInfoSpec.footer.placeholder ||
-      ''
-    ctx.font = this.proportionalize(7) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.footer
-      ? options.colorScheme.text
-      : placeholderTextColor
-    this.drawTextHorizontallyCenteredAtY(
-      ctx,
-      footerText,
-      this.proportionalize(108),
-    )
+    if (!options.omittedContactInfoFields.includes('footer')) {
+      // Render the footer
+      const footerText =
+        options.contactInfo.footer ||
+        this.contactInfoSpec.footer.placeholder ||
+        ''
+      ctx.font = this.proportionalize(7) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.footer
+        ? options.colorScheme.text
+        : placeholderTextColor
+      this.drawTextHorizontallyCenteredAtY(
+        ctx,
+        footerText,
+        this.proportionalize(108),
+      )
+    }
 
     // Render QR code
     await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {

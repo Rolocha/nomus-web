@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Switch } from '@chakra-ui/react'
 import { Controller, useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import FileUploadButton from 'src/components/FileUploadButton'
@@ -48,6 +49,26 @@ const TemplateBuildStep = ({
 
   const fields = customizationForm.watch()
 
+  const setOptionalFieldOmission = React.useCallback(
+    (fieldFormKey, shouldOmit) => {
+      if (shouldOmit) {
+        updateCardBuilderState({
+          omittedOptionalFields: [
+            ...cardBuilderState.omittedOptionalFields,
+            fieldFormKey,
+          ],
+        })
+      } else {
+        updateCardBuilderState({
+          omittedOptionalFields: cardBuilderState.omittedOptionalFields.filter(
+            (key) => key !== fieldFormKey,
+          ),
+        })
+      }
+    },
+    [updateCardBuilderState, cardBuilderState],
+  )
+
   React.useEffect(() => {
     if (!areObjectsDeepEqual(fields, cardBuilderState.templateCustomization)) {
       updateCardBuilderState({
@@ -57,7 +78,8 @@ const TemplateBuildStep = ({
   }, [fields, updateCardBuilderState, cardBuilderState])
 
   const templateCardOptions = selectedTemplate.createOptionsFromFormFields(
-    customizationForm.watch(),
+    fields,
+    cardBuilderState.omittedOptionalFields as Array<any>,
   )
 
   return (
@@ -143,18 +165,63 @@ const TemplateBuildStep = ({
           </Text.SectionSubheader>
           {contactInfoFieldNames.map((fieldName) => {
             const fieldDetails = contactInfo[fieldName]
+            const fieldFormKey = `contactInfo.${fieldName}`
+            const fieldRequired = fieldDetails.required
+            const userWantsToOmitThisField = cardBuilderState.omittedOptionalFields.includes(
+              fieldFormKey,
+            )
+            const inputDisabled = !fieldRequired && userWantsToOmitThisField
+
+            const label = (
+              <Form.Label required={fieldDetails.required}>
+                {fieldDetails.label}
+              </Form.Label>
+            )
+
             return (
               <Box key={fieldName} mb={4}>
-                <Form.Label required={fieldDetails.required}>
-                  {fieldDetails.label}
-                </Form.Label>
+                {fieldDetails.required ? (
+                  label
+                ) : (
+                  <Box
+                    display="grid"
+                    gridTemplateColumns="1fr auto"
+                    gridColumnGap={2}
+                  >
+                    {label}
+                    <Switch
+                      colorScheme="blue"
+                      isChecked={!fieldRequired && !userWantsToOmitThisField}
+                      onChange={(event) => {
+                        const shouldOmit = !event.target.checked
+                        setOptionalFieldOmission(fieldFormKey, shouldOmit)
+                      }}
+                    />
+                  </Box>
+                )}
 
-                <Form.Input
-                  width="100%"
-                  name={'contactInfo.' + fieldName}
-                  placeholder={fieldDetails.placeholder}
-                  ref={customizationForm.register()}
-                />
+                <Box
+                  // We need to set this onClick handler on a box wrapping the Form.Input
+                  // because inputs that are disabled won't pick up (or bubble up) click
+                  // events so the only option is to have the input ignore pointerEvents altogher
+                  // and handle the click event on a wrapper component
+                  onClick={() => {
+                    // If user clicks on the field that's disabled, they probably want to include it
+                    // so automatically remove it from the omitted fields list
+                    if (inputDisabled) {
+                      setOptionalFieldOmission(fieldFormKey, false)
+                    }
+                  }}
+                >
+                  <Form.Input
+                    width="100%"
+                    name={fieldFormKey}
+                    placeholder={fieldDetails.placeholder}
+                    ref={customizationForm.register()}
+                    disabled={inputDisabled}
+                    sx={{ pointerEvents: inputDisabled ? 'none' : undefined }}
+                  />
+                </Box>
               </Box>
             )
           })}

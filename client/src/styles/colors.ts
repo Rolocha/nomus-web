@@ -5,6 +5,18 @@ const colors = {
   primaryBlue: '#295689',
   gold: '#EEB941',
 
+  blue: {
+    50: '#E5EEF7',
+    100: '#E5EEF7',
+    200: '#E5EEF7',
+    300: '#CCDDF0',
+    400: '#99BAE0',
+    500: '#6698D1',
+    600: '#3876BC',
+    700: '#295689', // nomusBlue
+    800: '#21456e',
+    900: '#193452',
+  },
   // Secondary
   twilight: '#14355A',
   secondaryBlue: '#14355A',

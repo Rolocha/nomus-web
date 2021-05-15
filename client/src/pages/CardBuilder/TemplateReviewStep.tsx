@@ -26,6 +26,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
         .renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(
             cardBuilderState.templateCustomization!,
+            cardBuilderState.omittedOptionalFields as Array<any>,
           ),
         )
         .then((response) => {
@@ -48,6 +49,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
     const template = templateLibrary[cardBuilderState.templateId]
     const options = template.createOptionsFromFormFields(
       cardBuilderState.templateCustomization!,
+      cardBuilderState.omittedOptionalFields as Array<any>,
     )
     const info: Array<{ label: string; value: string }> = []
     template.contactInfoFieldNames.forEach((fieldName) => {
@@ -61,7 +63,11 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
       }
     }, [])
     return info
-  }, [cardBuilderState.templateId, cardBuilderState.templateCustomization])
+  }, [
+    cardBuilderState.templateId,
+    cardBuilderState.templateCustomization,
+    cardBuilderState.omittedOptionalFields,
+  ])
 
   return (
     <Box height="100%">

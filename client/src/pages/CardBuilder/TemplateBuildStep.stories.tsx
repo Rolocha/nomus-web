@@ -6,6 +6,7 @@ import {
   cardBuilderReducer,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
+import { BaseType } from 'src/pages/CardBuilder/types'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import { colors } from 'src/styles'
 
@@ -30,9 +31,9 @@ export const Primary = () => {
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
     {
-      ...initialStateOptions.template,
+      ...initialStateOptions[BaseType.Template],
       cardVersionId: 'cardv_1234',
-      baseType: 'template',
+      baseType: BaseType.Template,
       templateId: 'velia',
       templateCustomization: {
         contactInfo: {
