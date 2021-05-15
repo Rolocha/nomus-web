@@ -48,7 +48,7 @@ export default () => {
       display="grid"
       gridTemplateColumns={{
         base: '8fr 4fr',
-        [bp]: '4fr 2fr 6fr',
+        [bp]: '4fr 3fr 5fr',
       }}
       gridTemplateAreas={{
         base: `
