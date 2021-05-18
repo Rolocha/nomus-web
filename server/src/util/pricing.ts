@@ -1,4 +1,4 @@
-// Sync with server/src/util/pricing.ts
+// Sync with client/src/util/pricing.ts
 export const QUANTITY_TO_PRICE = {
   25: 2999,
   50: 5499,
@@ -9,12 +9,15 @@ export const isValidQuantity = (quantity: number) => {
   return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))
 }
 
-export const calculateEstimatedTaxes = (subtotal: number) => {
+export const calculateEstimatedTaxes = (subtotal: number, state?: string) => {
   // TODO: Figure out how to actually estimate taxes based on user's zip
-  return Math.round(subtotal * 0.085)
+  if (state && (state.toUpperCase() === 'CA' || state.toUpperCase() === 'CALIFORNIA')) {
+    return Math.round(subtotal * 0.085)
+  }
+  return 0
 }
 
-export const getCostSummary = (quantity: number) => {
+export const getCostSummary = (quantity: number, state?: string) => {
   if (quantity == null) {
     return null
   }
@@ -28,7 +31,7 @@ export const getCostSummary = (quantity: number) => {
     return null
   }
 
-  const estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal) : null
+  const estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state) : null
   if (estimatedTaxes == null) {
     return null
   }
@@ -41,8 +44,4 @@ export const getCostSummary = (quantity: number) => {
     shipping,
     total: subtotal + estimatedTaxes + shipping,
   }
-}
-
-export const calculateCost = (quantity: number): number | null => {
-  return QUANTITY_TO_PRICE[quantity] || null
 }
