@@ -7,7 +7,7 @@ export const QUANTITY_TO_PRICE = {
 
 export const calculateEstimatedTaxes = (subtotal: number) => {
   // TODO: Figure out how to actually estimate taxes based on user's zip
-  return Math.round(subtotal * 0.095)
+  return Math.round(subtotal * 0.085)
 }
 
 export const getCostSummary = (
