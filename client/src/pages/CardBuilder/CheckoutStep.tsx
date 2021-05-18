@@ -42,7 +42,10 @@ const CheckoutStep = ({
     // TODO: Handle errors from event.error
   }
 
-  const costSummary = getCostSummary(cardBuilderState.quantity)
+  const costSummary = getCostSummary(
+    cardBuilderState.quantity,
+    checkoutFormMethods.getValues('state'),
+  )
 
   const quantityOptions = ([
     {
@@ -231,7 +234,11 @@ const CheckoutStep = ({
 
             <Text.Body2>Shipping</Text.Body2>
             <Box></Box>
-            <Text.Body2>{formatDollarAmount(500)}</Text.Body2>
+            <Text.Body2>
+              {costSummary?.shipping
+                ? formatDollarAmount(costSummary?.shipping)
+                : '...'}
+            </Text.Body2>
 
             <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
             <Box></Box>
