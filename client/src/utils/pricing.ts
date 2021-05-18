@@ -5,6 +5,10 @@ export const QUANTITY_TO_PRICE = {
   100: 9999,
 }
 
+export const isValidQuantity = (quantity: number) => {
+  return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))
+}
+
 export const calculateEstimatedTaxes = (subtotal: number) => {
   // TODO: Figure out how to actually estimate taxes based on user's zip
   return Math.round(subtotal * 0.085)
@@ -14,6 +18,10 @@ export const getCostSummary = (
   quantity: keyof typeof QUANTITY_TO_PRICE | null,
 ) => {
   if (quantity == null) {
+    return null
+  }
+
+  if (!isValidQuantity(quantity)) {
     return null
   }
 

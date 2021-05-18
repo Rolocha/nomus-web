@@ -12,7 +12,7 @@ import {
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { calculateCost } from 'src/util/pricing'
+import { calculateCost, getCostSummary, isValidQuantity } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
 import {
@@ -475,14 +475,14 @@ class OrderResolver {
     cardVersion: DocumentType<CardVersion>
     quantity: number
   }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
-    const totalCost = calculateCost(quantity)
-    if (totalCost == null) {
+    const costSummary = getCostSummary(quantity)
+    if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
       )
     }
 
-    const paymentIntent = await this.createPaymentIntent(totalCost, user)
+    const paymentIntent = await this.createPaymentIntent(costSummary.total, user)
     const createdOrder = await Order.mongo.create({
       user: user.id,
       cardVersion: cardVersion.id,
@@ -490,10 +490,10 @@ class OrderResolver {
       paymentIntent: paymentIntent.id,
       quantity,
       price: {
-        subtotal: totalCost,
-        shipping: 0,
-        tax: 0,
-        total: totalCost,
+        subtotal: costSummary.subtotal,
+        shipping: costSummary.shipping,
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
       },
     })
     return { createdOrder, paymentIntent }
