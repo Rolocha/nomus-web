@@ -1,4 +1,4 @@
-// Sync with client/src/util/pricing.ts
+// Sync with client/src/utils/pricing.ts
 export const QUANTITY_TO_PRICE = {
   25: 2999,
   50: 5499,
