@@ -345,6 +345,7 @@ class OrderResolver {
       user,
       cardVersion,
       quantity: payload.quantity,
+      state: payload.shippingAddress.state,
     })
 
     // Update the user's default card version to the newly created one
@@ -407,6 +408,7 @@ class OrderResolver {
       user,
       cardVersion,
       quantity: payload.quantity,
+      state: payload.shippingAddress.state,
     })
 
     // Update the user's default card version to the newly created one
@@ -470,12 +472,14 @@ class OrderResolver {
     user,
     cardVersion,
     quantity,
+    state,
   }: {
     user: DocumentType<User>
     cardVersion: DocumentType<CardVersion>
     quantity: number
+    state: string
   }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
-    const costSummary = getCostSummary(quantity)
+    const costSummary = getCostSummary(quantity, state)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
