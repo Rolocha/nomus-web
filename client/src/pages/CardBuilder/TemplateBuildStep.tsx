@@ -42,8 +42,8 @@ const TemplateBuildStep = ({
     defaultValues: {
       ...(templateCustomization ?? defaultOptions),
       qrCodeUrl: cardBuilderState.cardVersionId
-        ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
-        : 'https://nomus.me',
+        ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
+        : `${window.location.host}`,
     },
   })
 
