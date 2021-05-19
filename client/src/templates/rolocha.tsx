@@ -10,7 +10,7 @@ export type RolochaContactFields =
   | 'line3'
   | 'line4'
   | 'footer'
-export type RolochaExtendedColors = 'accentColor2' | 'accentColor3'
+export type RolochaExtendedColors = 'accent2' | 'accent3'
 
 const primarySquiggleFrontSVG = ({
   color = colors.nomusBlue,
@@ -72,10 +72,10 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     accent: {
       defaultValue: colors.nomusBlue,
     },
-    accentColor2: {
+    accent2: {
       defaultValue: colors.gold,
     },
-    accentColor3: {
+    accent3: {
       defaultValue: colors.brightCoral,
     },
     text: {
@@ -116,7 +116,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     footer: {
       label: 'Footer',
       required: false,
-      placeholder: 'An apple a day keeps the doctor away',
+      placeholder: 'Apple a day!',
     },
   } as const,
   async renderFront(
@@ -147,7 +147,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     // Render Secondary Squiggle
     // Has to be rendered first be underneath primary squiggle
     const svgMarkup2 = secondarySquiggleFrontSVG({
-      color: options.colorScheme.accentColor2,
+      color: options.colorScheme.accent2,
     })
     const img2 = await this.createImage('data:image/svg+xml,' + svgMarkup2)
     ctx.drawImage(
@@ -230,69 +230,75 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     )
 
     // Render line1
-    ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.line1
-      ? options.colorScheme.text
-      : placeholderTextColor
-    ctx.fillText(
-      options.contactInfo.line1 ||
-        this.contactInfoSpec.line1.placeholder ||
-        '[line 1]',
-      this.proportionalize(21),
-      this.proportionalize(95),
-    )
-
+    if (!options.omittedContactInfoFields.includes('line1')) {
+      ctx.font = this.proportionalize(8) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.line1
+        ? options.colorScheme.text
+        : placeholderTextColor
+      ctx.fillText(
+        options.contactInfo.line1 ||
+          this.contactInfoSpec.line1.placeholder ||
+          '[line 1]',
+        this.proportionalize(21),
+        this.proportionalize(95),
+      )
+    }
     // Render line2
-    ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.line2
-      ? options.colorScheme.text
-      : placeholderTextColor
-    ctx.fillText(
-      options.contactInfo.line2 ||
-        this.contactInfoSpec.line2.placeholder ||
-        '[line 2]',
-      this.proportionalize(21),
-      this.proportionalize(108),
-    )
-
+    if (!options.omittedContactInfoFields.includes('line2')) {
+      ctx.font = this.proportionalize(8) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.line2
+        ? options.colorScheme.text
+        : placeholderTextColor
+      ctx.fillText(
+        options.contactInfo.line2 ||
+          this.contactInfoSpec.line2.placeholder ||
+          '[line 2]',
+        this.proportionalize(21),
+        this.proportionalize(108),
+      )
+    }
     // Render line3
-    ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.line3
-      ? options.colorScheme.text
-      : placeholderTextColor
-    ctx.fillText(
-      options.contactInfo.line3 ||
-        this.contactInfoSpec.line3.placeholder ||
-        '[line 3]',
-      this.proportionalize(21),
-      this.proportionalize(121),
-    )
-
+    if (!options.omittedContactInfoFields.includes('line3')) {
+      ctx.font = this.proportionalize(8) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.line3
+        ? options.colorScheme.text
+        : placeholderTextColor
+      ctx.fillText(
+        options.contactInfo.line3 ||
+          this.contactInfoSpec.line3.placeholder ||
+          '[line 3]',
+        this.proportionalize(21),
+        this.proportionalize(121),
+      )
+    }
     // Render line4
-    ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.line4
-      ? options.colorScheme.text
-      : placeholderTextColor
-    ctx.fillText(
-      options.contactInfo.line4 ||
-        this.contactInfoSpec.line4.placeholder ||
-        '[line 4]',
-      this.proportionalize(21),
-      this.proportionalize(134),
-    )
-
+    if (!options.omittedContactInfoFields.includes('line4')) {
+      ctx.font = this.proportionalize(8) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.line4
+        ? options.colorScheme.text
+        : placeholderTextColor
+      ctx.fillText(
+        options.contactInfo.line4 ||
+          this.contactInfoSpec.line4.placeholder ||
+          '[line 4]',
+        this.proportionalize(21),
+        this.proportionalize(134),
+      )
+    }
     // Render footer
-    ctx.font = this.proportionalize(8) + 'px Rubik'
-    ctx.fillStyle = options.contactInfo.footer
-      ? options.colorScheme.text
-      : placeholderTextColor
-    ctx.fillText(
-      options.contactInfo.footer ||
-        this.contactInfoSpec.footer.placeholder ||
-        '[footer]',
-      this.proportionalize(21),
-      this.proportionalize(147),
-    )
+    if (!options.omittedContactInfoFields.includes('footer')) {
+      ctx.font = this.proportionalize(8) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.footer
+        ? options.colorScheme.text
+        : placeholderTextColor
+      ctx.fillText(
+        options.contactInfo.footer ||
+          this.contactInfoSpec.footer.placeholder ||
+          '[footer]',
+        this.proportionalize(21),
+        this.proportionalize(147),
+      )
+    }
   },
   async renderBack(
     this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
@@ -310,7 +316,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     }
 
     ctx.fillStyle =
-      options.colorScheme.accentColor3 ??
+      options.colorScheme.accent3 ??
       this.colorSchemeSpec.background.defaultValue ??
       // Should never have go this far
       colors.white
@@ -318,7 +324,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
 
     // Render Secondary Squiggle
     const svgMarkup = secondarySquiggleBackSVG({
-      color: options.colorScheme.accentColor2,
+      color: options.colorScheme.accent2,
     })
     const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(

@@ -66,8 +66,8 @@ const args: CardTemplateRenderOptions<
   colorScheme: {
     background: colors.white,
     accent: colors.nomusBlue,
-    accentColor2: colors.gold,
-    accentColor3: colors.brightCoral,
+    accent2: colors.gold,
+    accent3: colors.brightCoral,
     text: colors.midnightGray,
   },
   qrCodeUrl: 'https://nomus.me',
