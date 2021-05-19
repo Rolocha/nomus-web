@@ -364,6 +364,22 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       backgroundColor: options.colorScheme.accent,
       foregroundColor: options.colorScheme.background,
     })
+
+    // Render user-provided logo if provided
+    if (options.graphic?.url) {
+      const logoImg = await this.createImage(options.graphic.url)
+      const imageHeight =
+        (options.graphic.size ?? 1) * this.proportionalize(100)
+      const imageWidth =
+        (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
+      ctx.drawImage(
+        logoImg,
+        this.proportionalize(45),
+        this.proportionalize(172),
+        imageWidth,
+        imageHeight,
+      )
+    }
   },
 })
 
