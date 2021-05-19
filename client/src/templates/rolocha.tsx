@@ -173,7 +173,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
         this.contactInfoSpec.name.placeholder ||
         '[name]',
       this.proportionalize(21),
-      this.proportionalize(49),
+      this.proportionalize(48),
       this.proportionalize(112),
       this.proportionalize(14),
     )
@@ -183,12 +183,15 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     ctx.fillStyle = options.contactInfo.headline
       ? options.colorScheme.text
       : placeholderTextColor
-    ctx.fillText(
+    this.wrapTextAnchorTopLeft(
+      ctx,
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
       this.proportionalize(21),
       this.proportionalize(60),
+      this.proportionalize(112),
+      this.proportionalize(9),
     )
   },
   async renderBack(

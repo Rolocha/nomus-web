@@ -51,7 +51,7 @@ const args: CardTemplateRenderOptions<
 > = {
   contactInfo: {
     name: 'Spongebob Squarepants',
-    headline: 'Fry Cook at the Krusty Krab',
+    headline: 'Fry Cook at Krusty Krab',
     line1: 'The Krusty Krab',
     line2: '(555)-555-5555',
     line3: 'spongebob@krustykrab.com',
