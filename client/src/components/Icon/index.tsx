@@ -1,5 +1,6 @@
 import { IconProps } from '@chakra-ui/icons'
 import * as React from 'react'
+import ArrowRightIcon from './ArrowRightIcon'
 import ArrowRightOIcon from './ArrowRightOIcon'
 import CardsIcon from './CardsIcon'
 import CaretIcon from './CaretIcon'
@@ -37,6 +38,7 @@ import TwitterIcon from './TwitterIcon'
 import UploadIcon from './UploadIcon'
 
 const iconLibrary = {
+  arrowRight: ArrowRightIcon,
   arrowRightO: ArrowRightOIcon,
   cards: CardsIcon,
   caret: CaretIcon,
