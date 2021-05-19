@@ -1,10 +1,10 @@
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
-import Rolocha from 'src/templates/rolocha'
+// import Rolocha from 'src/templates/rolocha'
 import Velia from 'src/templates/velia'
 
 export const templateLibrary = {
   velia: Velia,
-  // rolocha: Rolocha
+  // rolocha: Rolocha,
 } as const
 
 export type TemplateID = keyof typeof templateLibrary

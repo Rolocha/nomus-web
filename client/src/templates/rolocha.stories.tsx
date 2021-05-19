@@ -1,9 +1,8 @@
-import { action } from "@storybook/addon-actions"
-import { Story } from "@storybook/react"
+import { action } from '@storybook/addon-actions'
+import { Story } from '@storybook/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
-import { rotate360 } from "src/styles/animations"
 import { CardTemplateRenderOptions } from 'src/templates/base'
 import { RolochaContactFields, RolochaExtendedColors } from './rolocha'
 
