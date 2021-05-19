@@ -1,6 +1,5 @@
-import { removeConnectionDirectiveFromDocument } from "@apollo/client/utilities"
-import { colors } from "src/styles"
-import CardTemplate, { CardTemplateRenderOptions } from "src/templates/base"
+import { colors } from 'src/styles'
+import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 export type RolochaContactFields =
   | 'name'
@@ -16,17 +15,18 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
   name: 'Rolocha',
   width: 154,
   height: 264,
-  demoImageUrl: 'https://user-images.githubusercontent.com/10100874/118752012-30f42f80-b817-11eb-986f-1fefcbfd8044.png',
+  demoImageUrl:
+    'https://user-images.githubusercontent.com/10100874/118752012-30f42f80-b817-11eb-986f-1fefcbfd8044.png',
   colorScheme: {
     background: {
-      defaultValue: colors.white,
+      defaultValue: colors.nomusBlue, //MAKE THIS BACK TO WHITE JUST TESTING
     },
     accent: {
       defaultValue: colors.nomusBlue,
     },
     text: {
       defaultValue: colors.midnightGray,
-    }
+    },
   },
   contactInfo: {
     name: {
@@ -68,7 +68,10 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
   async renderFront(
     this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<RolochaContactFields, RolochaExtendedColors>,
+    options: CardTemplateRenderOptions<
+      RolochaContactFields,
+      RolochaExtendedColors
+    >,
   ) {
     this.clearCanvas(canvas)
 
@@ -77,9 +80,37 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       throw new Error('Got null for canvas context')
     }
 
-    
+    // const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
+
+    ctx.fillStyle =
+      options.colorScheme.background ??
+      this.colorSchemeSpec.background.defaultValue ??
+      // Should never have go this far
+      colors.white
+    ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
   },
-  async renderBack() {}
+  async renderBack(
+    this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
+    canvas: HTMLCanvasElement,
+    options: CardTemplateRenderOptions<
+      RolochaContactFields,
+      RolochaExtendedColors
+    >,
+  ) {
+    this.clearCanvas(canvas)
+
+    const ctx = canvas.getContext('2d')
+    if (ctx == null) {
+      throw new Error('Got null for canvas context')
+    }
+
+    ctx.fillStyle =
+      options.colorScheme.background ??
+      this.colorSchemeSpec.background.defaultValue ??
+      // Should never have go this far
+      colors.white
+    ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
+  },
 })
 
 export default Rolocha

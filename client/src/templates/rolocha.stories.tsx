@@ -3,6 +3,7 @@ import { Story } from "@storybook/react"
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
+import { rotate360 } from "src/styles/animations"
 import { CardTemplateRenderOptions } from 'src/templates/base'
 import { RolochaContactFields, RolochaExtendedColors } from './rolocha'
 
@@ -44,3 +45,32 @@ const RolochaTemplateTemplate: Story<
 }
 
 export const Rolocha = RolochaTemplateTemplate.bind({})
+
+const args: CardTemplateRenderOptions<
+  RolochaContactFields,
+  RolochaExtendedColors
+> = {
+  contactInfo: {
+    name: 'Spongebob Squarepants',
+    headline: 'Fry Cook at the Krusty Krab',
+    line1: 'The Krusty Krab',
+    line2: '(555)-555-5555',
+    line3: 'spongebob@krustykrab.com',
+    line4: '1 Apple Park Road',
+    footer: "I'm ready, I'm ready, I'm ready",
+  },
+  graphic: {
+    url:
+      'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
+    size: 0.5,
+  },
+  colorScheme: {
+    background: colors.offWhite,
+    accent: colors.gold,
+    text: colors.midnightGray,
+  },
+  qrCodeUrl: 'https://nomus.me',
+  omittedContactInfoFields: [],
+}
+
+Rolocha.args = args
