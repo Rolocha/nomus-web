@@ -1,3 +1,4 @@
+import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
@@ -100,7 +101,7 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       throw new Error('Got null for canvas context')
     }
 
-    // const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
+    const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
 
     // Background color fill
     ctx.fillStyle =
@@ -160,6 +161,35 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       size: this.proportionalize(12),
       color: options.colorScheme.background,
     })
+
+    // Render the name
+    ctx.font = this.proportionalize(14) + 'px Rubik'
+    ctx.fillStyle = options.contactInfo.name
+      ? options.colorScheme.accent
+      : placeholderTextColor
+    this.wrapTextAnchorBottomLeft(
+      ctx,
+      options.contactInfo.name ||
+        this.contactInfoSpec.name.placeholder ||
+        '[name]',
+      this.proportionalize(21),
+      this.proportionalize(49),
+      this.proportionalize(112),
+      this.proportionalize(14),
+    )
+
+    // Render the headline
+    ctx.font = this.proportionalize(9) + 'px Rubik'
+    ctx.fillStyle = options.contactInfo.headline
+      ? options.colorScheme.text
+      : placeholderTextColor
+    ctx.fillText(
+      options.contactInfo.headline ||
+        this.contactInfoSpec.headline.placeholder ||
+        '[headline]',
+      this.proportionalize(21),
+      this.proportionalize(60),
+    )
   },
   async renderBack(
     this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,

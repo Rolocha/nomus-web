@@ -345,6 +345,58 @@ export default class CardTemplate<
     )
   }
 
+  protected wrapTextAnchorTopLeft(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ) {
+    const words = text.split(' ')
+    let line = ''
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' '
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && n > 0) {
+        ctx.fillText(line, x, y)
+        line = words[n] + ' '
+        y += lineHeight
+      } else {
+        line = testLine
+      }
+    }
+    ctx.fillText(line, x, y)
+  }
+
+  protected wrapTextAnchorBottomLeft(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ) {
+    const words = text.split(' ')
+    let line = ''
+
+    for (let n = words.length - 1; n >= 0; n--) {
+      const testLine = words[n] + ' ' + line
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && n < words.length - 1) {
+        ctx.fillText(line, x, y)
+        line = words[n] + ' '
+        y -= lineHeight
+      } else {
+        line = testLine
+      }
+    }
+    ctx.fillText(line, x, y)
+  }
+
   // Writes text vertically centered within the canvas with the top of the text at the specified y value
   protected drawTextHorizontallyCenteredAtY(
     ctx: CanvasRenderingContext2D,
