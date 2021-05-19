@@ -18,6 +18,13 @@ const primarySquiggleSVG = ({ color = colors.nomusBlue }: { color: string }) =>
 </svg>
   `)
 
+const secondarySquiggleSVG = ({ color = colors.gold }: { color: string }) =>
+  encodeURIComponent(`
+<svg width="144" height="108" viewBox="0 0 144 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M24.095 27.6822C17.123 24.0585 13.35 15.3998 8.623 8.39464C6.35803 5.03807 3.30625 1.89946 0 0V108H144V89.4386C136.029 80.3495 125.161 74.3551 114.301 73.591C109.809 73.2745 105.244 73.7748 100.847 72.6567C80.838 67.5673 74.149 33.1141 54.03 28.6537C44.126 26.4576 33.307 32.4702 24.095 27.6822Z" fill="${color}"/>
+</svg>  
+  `)
+
 const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
   name: 'Rolocha',
   width: 154,
@@ -103,7 +110,21 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       colors.white
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
-    // Render Primary Squiggl
+    // Render Secondary Squiggle
+    // Has to be rendered first be underneath primary squiggle
+    const svgMarkup2 = secondarySquiggleSVG({
+      color: options.colorScheme.accentColor2,
+    })
+    const img2 = await this.createImage('data:image/svg+xml,' + svgMarkup2)
+    ctx.drawImage(
+      img2,
+      this.proportionalize(0),
+      this.proportionalize(149),
+      this.proportionalize(154),
+      this.proportionalize(115),
+    )
+
+    // Render Primary Squiggle
     const svgMarkup = primarySquiggleSVG({ color: options.colorScheme.accent })
     const img = await this.createImage('data:image/svg+xml,' + svgMarkup)
     ctx.drawImage(
@@ -113,6 +134,32 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
       this.proportionalize(154),
       this.proportionalize(97),
     )
+
+    // Render QR code
+    await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {
+      x: this.proportionalize(89),
+      y: this.proportionalize(214),
+      width: this.proportionalize(32),
+      height: this.proportionalize(32),
+      backgroundColor: options.colorScheme.background,
+      foregroundColor: options.colorScheme.accent,
+    })
+
+    // Render Nomus logo
+    await this.drawNomusLogo(ctx, {
+      x: this.proportionalize(125),
+      y: this.proportionalize(218),
+      size: this.proportionalize(12),
+      color: options.colorScheme.background,
+    })
+
+    // Render NFC tap icon
+    await this.drawNFCTapIcon(ctx, {
+      x: this.proportionalize(125),
+      y: this.proportionalize(234),
+      size: this.proportionalize(12),
+      color: options.colorScheme.background,
+    })
   },
   async renderBack(
     this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
