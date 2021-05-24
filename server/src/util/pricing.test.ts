@@ -10,9 +10,6 @@ describe('pricing', () => {
       expect(calculateEstimatedTaxes(QUANTITY_TO_PRICE[25], 'CA')).toBe(
         Math.round(QUANTITY_TO_PRICE[25] * 0.085)
       )
-      expect(calculateEstimatedTaxes(QUANTITY_TO_PRICE[25], 'California')).toBe(
-        Math.round(2999 * 0.085)
-      )
     })
   })
   describe('getCostSummary', () => {
@@ -23,15 +20,23 @@ describe('pricing', () => {
     it('returns a price object if successful', async () => {
       expect(getCostSummary(25)).toMatchObject({
         subtotal: QUANTITY_TO_PRICE[25],
-        estimatedTaxes: 0,
-        shipping: 500,
-        total: QUANTITY_TO_PRICE[25] + 0 + 500,
+        estimatedTaxes: null,
+        shipping: 0,
+        total: QUANTITY_TO_PRICE[25] + 0 + 0,
       })
       expect(getCostSummary(25, 'CA')).toMatchObject({
         subtotal: QUANTITY_TO_PRICE[25],
         estimatedTaxes: Math.round(QUANTITY_TO_PRICE[25] * 0.085),
-        shipping: 500,
-        total: QUANTITY_TO_PRICE[25] + Math.round(QUANTITY_TO_PRICE[25] * 0.085) + 500,
+        shipping: 0,
+        total: QUANTITY_TO_PRICE[25] + Math.round(QUANTITY_TO_PRICE[25] * 0.085) + 0,
+      })
+    })
+    it('calculates tax null for improper state', async () => {
+      expect(getCostSummary(25, 'OP')).toMatchObject({
+        subtotal: QUANTITY_TO_PRICE[25],
+        estimatedTaxes: null,
+        shipping: 0,
+        total: QUANTITY_TO_PRICE[25] + 0 + 0,
       })
     })
   })
