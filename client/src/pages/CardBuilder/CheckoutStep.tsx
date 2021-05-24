@@ -239,7 +239,7 @@ const CheckoutStep = ({
             <Text.Body2>
               {costSummary?.shipping
                 ? formatDollarAmount(costSummary?.shipping)
-                : '...'}
+                : formatDollarAmount(0)}
             </Text.Body2>
 
             <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
