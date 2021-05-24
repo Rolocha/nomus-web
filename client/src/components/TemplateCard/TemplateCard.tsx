@@ -33,8 +33,12 @@ function TemplateCard<T extends TemplateID>({
 
       isRenderingRef.current = true
       if (side === 'front') {
+        // TOFIX: This error is a result of a very hairy ts bug
+        // https://github.com/Rolocha/nomus-web/pull/194
+        // @ts-expect-error
         await template.renderFrontToCanvas(canvas, options)
       } else if (side === 'back') {
+        // @ts-expect-error
         await template.renderBackToCanvas(canvas, options)
       }
       isRenderingRef.current = false
