@@ -171,8 +171,10 @@ const CheckoutStep = ({
                 <Form.Label>State</Form.Label>
                 <Form.Input
                   name="state"
+                  type="text"
                   ref={checkoutFormMethods.register}
                   width="100%"
+                  maxLength={2}
                 />
               </Box>
               <Box gridColumn="5/7" gridRow="4/4">

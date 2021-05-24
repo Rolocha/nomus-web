@@ -10,8 +10,9 @@ export const isValidQuantity = (quantity: number) => {
 }
 
 export const calculateEstimatedTaxes = (subtotal: number, state?: string) => {
-  // TODO: Figure out how to actually estimate taxes based on user's zip
-  if (state && (state.toUpperCase() === 'CA' || state.toUpperCase() === 'CALIFORNIA')) {
+  // At current stage, we only need to collect sales tax from California residents
+  // https://www.notion.so/nomus/Research-sales-tax-obligations-8b54707c20334fad83fb53b60d2c2f10
+  if (state && state.toUpperCase() === 'CA') {
     return Math.round(subtotal * 0.085)
   }
   return 0
