@@ -37,7 +37,7 @@ export const getCostSummary = (quantity: number, state?: string) => {
     return null
   }
 
-  const shipping = 500
+  const shipping = 0
 
   return {
     subtotal,
