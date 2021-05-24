@@ -35,10 +35,10 @@ function TemplateCard<T extends TemplateID>({
       if (side === 'front') {
         // TOFIX: This error is a result of a very hairy ts bug
         // https://www.notion.so/nomus/Fix-TS-error-on-card-template-extractGeneric-Union-Types-68c023b182a84873a84d0d1f3421cdea
-        // @ts-expect-error
+        // @ts-ignore
         await template.renderFrontToCanvas(canvas, options)
       } else if (side === 'back') {
-        // @ts-expect-error
+        // @ts-ignore
         await template.renderBackToCanvas(canvas, options)
       }
       isRenderingRef.current = false
