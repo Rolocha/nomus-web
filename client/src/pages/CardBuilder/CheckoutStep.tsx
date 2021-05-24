@@ -46,7 +46,6 @@ const CheckoutStep = ({
     cardBuilderState.quantity,
     checkoutFormMethods.getValues('state'),
   )
-  console.log(costSummary)
 
   const quantityOptions = ([
     {
@@ -172,7 +171,6 @@ const CheckoutStep = ({
                 <Form.Label>State</Form.Label>
                 <Form.Input
                   name="state"
-                  type="text"
                   ref={checkoutFormMethods.register}
                   width="100%"
                   maxLength={2}
