@@ -98,7 +98,7 @@ const CheckoutStep = ({
   })
 
   return (
-    <Box height="100%" overflowY="scroll">
+    <Box height="100%">
       <Text.SectionHeader mb="24px">Order details</Text.SectionHeader>
       <Text.SectionSubheader mb={2}>
         How many cards do you want?
