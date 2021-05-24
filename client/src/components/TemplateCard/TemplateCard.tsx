@@ -34,7 +34,7 @@ function TemplateCard<T extends TemplateID>({
       isRenderingRef.current = true
       if (side === 'front') {
         // TOFIX: This error is a result of a very hairy ts bug
-        // https://github.com/Rolocha/nomus-web/pull/194
+        // https://www.notion.so/nomus/Fix-TS-error-on-card-template-extractGeneric-Union-Types-68c023b182a84873a84d0d1f3421cdea
         // @ts-expect-error
         await template.renderFrontToCanvas(canvas, options)
       } else if (side === 'back') {
