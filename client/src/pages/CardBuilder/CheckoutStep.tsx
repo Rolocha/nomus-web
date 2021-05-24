@@ -46,6 +46,7 @@ const CheckoutStep = ({
     cardBuilderState.quantity,
     checkoutFormMethods.getValues('state'),
   )
+  console.log(costSummary)
 
   const quantityOptions = ([
     {
@@ -175,6 +176,7 @@ const CheckoutStep = ({
                   ref={checkoutFormMethods.register}
                   width="100%"
                   maxLength={2}
+                  sx={{ textTransform: 'uppercase' }}
                 />
               </Box>
               <Box gridColumn="5/7" gridRow="4/4">
@@ -229,7 +231,7 @@ const CheckoutStep = ({
             <Text.Body2>Estimated Taxes</Text.Body2>
             <Box></Box>
             <Text.Body2>
-              {costSummary?.estimatedTaxes
+              {costSummary?.estimatedTaxes != null
                 ? formatDollarAmount(costSummary.estimatedTaxes)
                 : '...'}
             </Text.Body2>

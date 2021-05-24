@@ -186,7 +186,7 @@ const CardBuilder = () => {
         line1: formData?.addressLine1,
         line2: formData?.addressLine2,
         city: formData?.city,
-        state: formData?.state,
+        state: formData?.state.toUpperCase(),
         postalCode: formData?.postalCode,
       },
       quantity: 50,
