@@ -33,32 +33,38 @@ const buttonTransition = [
   .map((prop) => `0.3s ease ${prop}`)
   .join(', ')
 
-export const styleVariants = {
-  primary: {
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    backgroundColor: colors.nomusBlue,
-    borderColor: colors.nomusBlue,
-    color: colors.ivory,
-    transition: buttonTransition,
-    '&:hover': {
-      backgroundColor: '#224B79',
-      borderColor: '#224B79',
-    },
-    '&:active': {
-      backgroundColor: colors.twilight,
-      borderColor: colors.twilight,
-    },
-    '&:focus': {
-      boxShadow: `0 0 4px 0 ${colors.outlineBlue}`,
-      outline: 'none',
-    },
-    '&:disabled': {
-      backgroundColor: '#DFE5EC',
-      color: colors.disabledBlue,
-      borderColor: '#DFE5EC',
-    },
+const makePrimaryVariant = (
+  colorScheme: Record<number, string>,
+  textColor: 'light' | 'dark',
+) => ({
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  backgroundColor: colorScheme[700],
+  borderColor: colorScheme[700],
+  color: textColor === 'light' ? colors.ivory : colors.midnightGray,
+  transition: buttonTransition,
+  '&:hover': {
+    backgroundColor: colorScheme[800],
+    borderColor: colorScheme[800],
   },
+  '&:active': {
+    backgroundColor: colorScheme[900],
+    borderColor: colorScheme[900],
+  },
+  '&:focus': {
+    boxShadow: `0 0 4px 0 ${colorScheme[500]}`,
+    outline: 'none',
+  },
+  '&:disabled': {
+    backgroundColor: '#DFE5EC',
+    color: colors.disabledBlue,
+    borderColor: '#DFE5EC',
+  },
+})
+
+export const styleVariants = {
+  primary: makePrimaryVariant(colors.blue, 'light'),
+  golden: makePrimaryVariant(colors.golden, 'dark'),
 
   secondary: {
     borderWidth: '1px',

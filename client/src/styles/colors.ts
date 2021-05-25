@@ -5,6 +5,19 @@ const colors = {
   primaryBlue: '#295689',
   gold: '#EEB941',
 
+  golden: {
+    50: '#FFFCF5',
+    100: '#FEF8EB',
+    200: '#FDF1D8',
+    300: '#FDEBC4',
+    400: '#FBDD9D',
+    500: '#FACF76',
+    600: '#F8C24F',
+    700: '#F7BB3B',
+    800: '#C6962F',
+    900: '#947023',
+  },
+
   blue: {
     50: '#E5EEF7',
     100: '#E5EEF7',
