@@ -1,7 +1,7 @@
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useHistory, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
 import {
   SubmitCustomOrderMutation,
@@ -49,6 +49,8 @@ const bp = 'md'
 
 const CardBuilder = () => {
   const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
+  const location = useLocation()
+  const history = useHistory()
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
@@ -58,13 +60,24 @@ const CardBuilder = () => {
         }[baseTypeQueryParam]
       : null
 
-  const history = useHistory()
-
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
-    baseType
-      ? initialStateOptions[baseType]
-      : initialStateOptions[BaseType.Custom],
+    (() => {
+      const initialState = baseType
+        ? initialStateOptions[baseType]
+        : initialStateOptions[BaseType.Custom]
+
+      const queryParams = new URLSearchParams(location.search)
+      const prefillName = queryParams.get('prefillName')
+      if (prefillName) {
+        initialState.templateCustomization = {
+          contactInfo: { name: prefillName },
+        }
+        initialState.formData.name = prefillName
+      }
+
+      return initialState
+    })(),
   )
 
   const [
@@ -186,7 +199,7 @@ const CardBuilder = () => {
         line1: formData?.addressLine1,
         line2: formData?.addressLine2,
         city: formData?.city,
-        state: formData?.state,
+        state: formData?.state.toUpperCase(),
         postalCode: formData?.postalCode,
       },
       quantity: 50,

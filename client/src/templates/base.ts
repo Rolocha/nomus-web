@@ -110,7 +110,7 @@ export default class CardTemplate {
           acc[fieldName] = null
         }
         return acc
-      }, {} as Record<string, any>),
+      }, {} as Partial<Record<ContactInfoFields, any>>),
       colorScheme: this.colorKeys.reduce((acc, fieldName) => {
         if (this.colorSchemeSpec[fieldName].defaultValue) {
           acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue

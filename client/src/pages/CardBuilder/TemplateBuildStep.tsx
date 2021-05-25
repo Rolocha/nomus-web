@@ -9,7 +9,7 @@ import * as Text from 'src/components/Text'
 import CardBuilderPreview from 'src/pages/CardBuilder/CardBuilderPreview'
 import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
 import templateLibrary from 'src/templates'
-import { areObjectsDeepEqual } from 'src/utils/object'
+import { areObjectsDeepEqual, deepMergeObjects } from 'src/utils/object'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -40,10 +40,10 @@ const TemplateBuildStep = ({
 
   const customizationForm = useForm<Record<string, any>>({
     defaultValues: {
-      ...(templateCustomization ?? defaultOptions),
+      ...deepMergeObjects({ ...defaultOptions }, templateCustomization),
       qrCodeUrl: cardBuilderState.cardVersionId
-        ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
-        : 'https://nomus.me',
+        ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
+        : `${window.location.host}`,
     },
   })
 
@@ -90,12 +90,7 @@ const TemplateBuildStep = ({
       gridColumnGap={3}
     >
       {/* Left-hand side: customizable fields */}
-      <Box
-        overflowY="scroll"
-        display="grid"
-        gridTemplateColumns="1fr"
-        gridRowGap={4}
-      >
+      <Box display="grid" gridTemplateColumns="1fr" gridRowGap={4}>
         {/* Color scheme */}
         <Box>
           <Text.SectionSubheader mb={3}>Color scheme</Text.SectionSubheader>

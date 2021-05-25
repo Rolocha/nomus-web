@@ -21,7 +21,7 @@ const BaseStep = ({
   updateCardBuilderState,
 }: Props) => {
   return (
-    <Box overflowY="scroll" height="100%">
+    <Box height="100%">
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
         ? {
             custom: (
