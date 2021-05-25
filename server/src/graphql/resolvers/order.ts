@@ -233,7 +233,12 @@ class OrderResolver {
     if (!context.user) {
       throw new Error('no-user-specified')
     }
-    const order = await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+    let order = null
+    if (context.user.roles.includes(Role.Admin)) {
+      order = await Order.mongo.findOne({ _id: orderId })
+    } else {
+      order = await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+    }
     if (!order) {
       throw new Error('no-matching-order')
     }
