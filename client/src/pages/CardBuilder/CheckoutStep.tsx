@@ -237,7 +237,7 @@ const CheckoutStep = ({
             <Text.Body2>Shipping</Text.Body2>
             <Box></Box>
             <Text.Body2>
-              {costSummary?.shipping
+              {costSummary
                 ? formatDollarAmount(costSummary?.shipping)
                 : formatDollarAmount(0)}
             </Text.Body2>

@@ -56,6 +56,6 @@ export const getCostSummary = (
     subtotal,
     estimatedTaxes,
     shipping,
-    total: subtotal + (estimatedTaxes ? estimatedTaxes : 0) + shipping,
+    total: subtotal + (estimatedTaxes ?? 0) + shipping,
   }
 }
