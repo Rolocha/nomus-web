@@ -9,10 +9,12 @@ interface PromiseItemProps {
 }
 
 const PromiseItem = ({ title, description, imageSrc }: PromiseItemProps) => (
-  <Box>
-    <Image src={imageSrc} />
-    <Text.Body fontWeight="bold">{title}</Text.Body>
-    <Text.Body>{description}</Text.Body>
+  <Box display="flex" flexDirection="column" alignItems="center">
+    <Image src={imageSrc} px="16px" pb="8px" />
+    <Text.Body textAlign="center" fontWeight="bold">
+      {title}
+    </Text.Body>
+    <Text.Body textAlign="center">{description}</Text.Body>
   </Box>
 )
 

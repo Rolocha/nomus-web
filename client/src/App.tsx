@@ -8,6 +8,10 @@ import React from 'react'
 import { ApolloProvider, client as apolloClient } from 'src/apollo'
 import { PageRouter } from 'src/pages'
 import theme from 'src/styles/theme'
+import smoothscroll from 'smoothscroll-polyfill'
+
+// kick off the polyfill!
+smoothscroll.polyfill()
 
 AOS.init()
 const stripePromise = loadStripe('pk_test_BHZBEPSq17NwCwSopGfQIfTs00pTG0HM75')

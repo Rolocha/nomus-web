@@ -4,11 +4,10 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
-import Spinner from 'src/components/Spinner'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import Icon from './Icon'
 
 interface FormData {
@@ -22,6 +21,7 @@ interface Props {
 const bp = 'lg'
 
 const Footer = ({ colorScheme = 'dark' }: Props) => {
+  const isBp = useBreakpoint(bp)
   const { register, handleSubmit } = useForm<FormData>()
 
   const onSubmit = async (data: FormData) => {
@@ -62,8 +62,9 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
       <Box container>
         <Box
           display="flex"
-          alignItems="center"
           flexDirection={{ base: 'column', [bp]: 'row' }}
+          alignItems={{ base: 'flex-start', [bp]: 'center' }}
+          justifyContent={{ base: 'flex-start', [bp]: 'space-between' }}
         >
           <SVG.LogoWithText color={colorPalette.accent} />
           <Text.Body
@@ -84,7 +85,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
         >
           <Box display="grid" gridTemplateColumns="1fr 1fr 1fr">
             <Box>
-              <Text.Label color={colorPalette.accent}>MAIN</Text.Label>
+              <Text.Label color={colors.africanElephant}>MAIN</Text.Label>
               <Link to="/">
                 <Text.Body2 color={colorPalette.accent}>Home</Text.Body2>
               </Link>
@@ -93,6 +94,20 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
               </Link>
               <Link to="/faq">
                 <Text.Body2 color={colorPalette.accent}>FAQ</Text.Body2>
+              </Link>
+            </Box>
+            <Box>
+              <Text.Label color={colors.africanElephant}>CARDS</Text.Label>
+              <Link to="/shop">
+                <Text.Body2 color={colorPalette.accent}>Shop</Text.Body2>
+              </Link>
+              <Link to="/card-studio/template">
+                <Text.Body2 color={colorPalette.accent}>Nomus cards</Text.Body2>
+              </Link>
+              <Link to="/card-studio/custom">
+                <Text.Body2 color={colorPalette.accent}>
+                  Custom cards
+                </Text.Body2>
               </Link>
             </Box>
           </Box>
@@ -111,42 +126,31 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
                   <Form.Input
                     name="email"
                     placeholder="hi@nomus.me"
-                    mb={{ base: 2, [bp]: 0 }}
                     ref={register}
                     disabled={submitState === 'submitting'}
                     flexGrow={1}
                     sx={{
                       [mq[bp]]: {
                         borderTopRightRadius: 0,
-                        borderBottomRightadius: 0,
+                        borderBottomRightRadius: 0,
                         borderRight: 'none',
                       },
                     }}
                   />
                   <Button
+                    mt={{ base: 2, [bp]: 0 }}
                     sx={{
                       [mq[bp]]: {
-                        borderTopRightRadius: 0,
-                        borderBottomRightadius: 0,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
                       },
                     }}
                     variant="primary"
                     type="submit"
                     disabled={submitState === 'submitting'}
+                    isLoading={submitState === 'submitting'}
                   >
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      {submitState === 'submitting' && (
-                        <Box mr={2}>
-                          <Spinner size="20px" />
-                        </Box>
-                      )}
-                      <Text.Plain>Sign me up</Text.Plain>
-                    </Box>
+                    Sign me up
                   </Button>
                 </Box>
               </Form.Form>
@@ -176,7 +180,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
           display="flex"
           flexDirection={{ base: 'column', [bp]: 'row' }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-start"
         >
           <Link to="mailto:support@nomus.me">
             <Text.Body2 color={colorPalette.accent}>
@@ -217,13 +221,15 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
         <Box
           display="flex"
           flexDirection={{ base: 'column', [bp]: 'row' }}
-          alignItems="center"
+          alignItems={{ base: 'flex-start', [bp]: 'center' }}
           justifyContent="space-between"
-          textAlign={{ base: 'center', [bp]: 'left' }}
+          textAlign={{ base: 'left', [bp]: 'left' }}
         >
-          <Text.Body2
-            color={colorPalette.basicText}
-          >{`© ${new Date().getFullYear()} Nomus, Inc.  /  Registered in the United States of America`}</Text.Body2>
+          <Text.Body2 color={colorPalette.basicText}>
+            {`© ${new Date().getFullYear()} Nomus, Inc.`}{' '}
+            {isBp ? ' / ' : <br />}{' '}
+            {`Registered in the United States of America`}
+          </Text.Body2>
 
           <Box
             display="flex"
