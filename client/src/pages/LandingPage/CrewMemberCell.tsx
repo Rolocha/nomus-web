@@ -1,7 +1,7 @@
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
 import * as Text from 'src/components/Text'
-import crewImageOverlay from './images/crew-image-overlay.svg'
+import crewImageOverlay from 'src/images/crew-image-overlay.svg'
 
 interface Props {
   name: string
