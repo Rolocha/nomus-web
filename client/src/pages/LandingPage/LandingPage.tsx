@@ -31,7 +31,7 @@ import yourDashboardDesktop from 'src/images/your-dashboard-desktop.png'
 import yourDashboardMobile from 'src/images/your-dashboard-mobile.png'
 import { colors } from 'src/styles'
 import { useBreakpoint } from 'src/styles/breakpoints'
-import { TemplateOptionsType } from 'src/templates'
+import { CardTemplateRenderOptions } from 'src/templates/base'
 // Landing-page specific imports
 import CrewMemberCell from './CrewMemberCell'
 import MiniCardBuilder from './MiniCardBuilder'
@@ -45,7 +45,7 @@ const LandingPage = () => {
   const [userEnteredName, setUserEnteredName] = React.useState('')
   const isDesktop = useBreakpoint('lg')
 
-  const sampleCardOptions: TemplateOptionsType<'velia'> = React.useMemo(
+  const sampleCardOptions: CardTemplateRenderOptions = React.useMemo(
     () => ({
       colorScheme: {
         background: colors.white,

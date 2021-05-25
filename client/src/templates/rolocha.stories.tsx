@@ -6,7 +6,7 @@ import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 
 export default {
-  title: 'Card Templates/Velia',
+  title: 'Card Templates/Rolocha',
   excludeStories: /.*Data$/,
 }
 
@@ -15,7 +15,7 @@ export const actionsData = {
 }
 
 //👇 We create a “template” of how args map to rendering
-const VeliaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
+const RolochaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
   ...options
 }) => {
   return (
@@ -24,7 +24,7 @@ const VeliaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
         <TemplateCard
           shadow
           width="400px"
-          templateId="velia"
+          templateId="rolocha"
           side="front"
           options={options}
         />
@@ -33,7 +33,7 @@ const VeliaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
         <TemplateCard
           shadow
           width="400px"
-          templateId="velia"
+          templateId="rolocha"
           side="back"
           options={options}
         />
@@ -42,15 +42,16 @@ const VeliaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
   )
 }
 
-export const Velia = VeliaTemplateTemplate.bind({})
+export const Rolocha = RolochaTemplateTemplate.bind({})
 
 const args: CardTemplateRenderOptions = {
   contactInfo: {
     name: 'Spongebob Squarepants',
-    headline: 'Fry Cook at the Krusty Krab',
+    headline: 'Fry Cook at Krusty Krab',
     line1: 'The Krusty Krab',
     line2: '(555)-555-5555',
     line3: 'spongebob@krustykrab.com',
+    line4: '1 Apple Park Road',
     footer: "I'm ready, I'm ready, I'm ready",
   },
   graphic: {
@@ -59,12 +60,14 @@ const args: CardTemplateRenderOptions = {
     size: 0.5,
   },
   colorScheme: {
-    background: colors.offWhite,
-    accent: colors.gold,
+    background: colors.white,
+    accent: colors.nomusBlue,
+    accent2: colors.gold,
+    accent3: colors.brightCoral,
     text: colors.midnightGray,
   },
   qrCodeUrl: 'https://nomus.me',
   omittedContactInfoFields: [],
 }
 
-Velia.args = args
+Rolocha.args = args

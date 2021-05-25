@@ -2,16 +2,7 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-export type VeliaContactFields =
-  | 'name'
-  | 'line1'
-  | 'line2'
-  | 'line3'
-  | 'headline'
-  | 'footer'
-export type VeliaExtendedColors = never
-
-const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
+const Velia = new CardTemplate({
   name: 'Velia',
   width: 252,
   height: 144,
@@ -61,9 +52,9 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     },
   } as const,
   async renderFront(
-    this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
+    this: CardTemplate,
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) {
     this.clearCanvas(canvas)
 
@@ -209,9 +200,9 @@ const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
     })
   },
   async renderBack(
-    this: CardTemplate<VeliaContactFields, VeliaExtendedColors>,
+    this: CardTemplate,
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) {
     this.clearCanvas(canvas)
 

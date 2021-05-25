@@ -221,6 +221,7 @@ const CardBuilder = () => {
         result = customResult.data?.submitCustomOrder
         break
       case BaseType.Template:
+        // Use <any, any> to appease TS for now. See TemplateCard.tsx for more details on why this is necessary.
         const template = templateLibrary[cardBuilderState.templateId!]
         const cardImageDataUrls = await template.renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(

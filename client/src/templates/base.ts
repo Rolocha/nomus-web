@@ -1,12 +1,7 @@
 import QRCode from 'qrcode'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import {
-  ColorScheme,
-  BaseColorScheme,
-  CustomizableFieldSpec,
-  CustomizableField,
-} from './customization'
+import { CustomizableField, CustomizableFieldSpec } from './customization'
 import {
   createNFCTapIconSVG,
   createNomusLogoSVG,
@@ -19,43 +14,29 @@ import {
 // move this to TemplateCard
 const RESOLUTION_FACTOR = 5
 
-export type CardTemplateRenderOptions<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> = {
-  colorScheme: Record<
-    ExtendedColors | keyof BaseColorScheme,
-    CustomizableField.Color
-  >
-  contactInfo: Partial<
-    Record<ContactInfoFields, CustomizableField.ContactInfo | null>
-  >
+export type CardTemplateRenderOptions = {
+  colorScheme: Record<string, CustomizableField.Color>
+  contactInfo: Record<string, CustomizableField.ContactInfo | null>
   graphic: CustomizableField.Graphic
   qrCodeUrl: CustomizableField.QRCode
-  omittedContactInfoFields: Array<ContactInfoFields>
+  omittedContactInfoFields: Array<string>
 }
 
-export interface CardTemplateDefinition<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> {
+export interface CardTemplateDefinition {
   name: string
   width: number
   height: number
   demoImageUrl: string
-  colorScheme: Record<
-    keyof ColorScheme<ExtendedColors>,
-    CustomizableFieldSpec.Color
-  >
-  contactInfo: Record<ContactInfoFields, CustomizableFieldSpec.ContactInfo>
+  colorScheme: Record<string, CustomizableFieldSpec.Color>
+  contactInfo: Record<string, CustomizableFieldSpec.ContactInfo>
 
   renderFront: (
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) => void | Promise<void>
   renderBack: (
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) => void | Promise<void>
 }
 
@@ -69,42 +50,19 @@ interface RenderResponse {
 //
 // Using this instance also gives the template definition's render functions
 // access to useful utility methods such as drawNomusLogo, drawQRCode, etc.
-export default class CardTemplate<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> {
+export default class CardTemplate {
   public name: string
   public width: number
   public height: number
   public demoImageUrl: string
-  public contactInfoSpec: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['contactInfo']
-  public colorSchemeSpec: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['colorScheme']
+  public contactInfoSpec: CardTemplateDefinition['contactInfo']
+  public colorSchemeSpec: CardTemplateDefinition['colorScheme']
 
-  private _renderFront: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['renderFront']
-  private _renderBack: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['renderBack']
-  private userSpecifiedOptions: CardTemplateRenderOptions<
-    ContactInfoFields,
-    ExtendedColors
-  > | null = null
+  private _renderFront: CardTemplateDefinition['renderFront']
+  private _renderBack: CardTemplateDefinition['renderBack']
+  private userSpecifiedOptions: CardTemplateRenderOptions | null = null
 
-  constructor(
-    templateDefinition: CardTemplateDefinition<
-      ContactInfoFields,
-      ExtendedColors
-    >,
-  ) {
+  constructor(templateDefinition: CardTemplateDefinition) {
     this.name = templateDefinition.name
     this.width = templateDefinition.width
     this.height = templateDefinition.height
@@ -125,16 +83,10 @@ export default class CardTemplate<
   public get proportionalizedHeight() {
     return this.proportionalize(this.height)
   }
-  public get contactInfoFieldNames(): (keyof CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['contactInfo'])[] {
+  public get contactInfoFieldNames(): (keyof CardTemplateDefinition['contactInfo'])[] {
     return Object.keys(this.contactInfoSpec) as any[]
   }
-  public get colorKeys(): (keyof CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['colorScheme'])[] {
+  public get colorKeys(): (keyof CardTemplateDefinition['colorScheme'])[] {
     return Object.keys(this.colorSchemeSpec) as any[]
   }
 
@@ -149,10 +101,7 @@ export default class CardTemplate<
     )
   }
 
-  public get defaultOptions(): CardTemplateRenderOptions<
-    ContactInfoFields,
-    ExtendedColors
-  > {
+  public get defaultOptions(): CardTemplateRenderOptions {
     return {
       contactInfo: this.contactInfoFieldNames.reduce((acc, fieldName) => {
         if (this.contactInfoSpec[fieldName].required) {
@@ -161,7 +110,7 @@ export default class CardTemplate<
           acc[fieldName] = null
         }
         return acc
-      }, {} as Partial<Record<ContactInfoFields, any>>),
+      }, {} as Partial<Record<string, any>>),
       colorScheme: this.colorKeys.reduce((acc, fieldName) => {
         if (this.colorSchemeSpec[fieldName].defaultValue) {
           acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue
@@ -188,7 +137,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderFrontToCanvas(
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -203,7 +152,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderBackToCanvas(
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -216,7 +165,7 @@ export default class CardTemplate<
 
   // Renders both the front and back of the cards each to a separate data URL string
   public async renderBothSidesToDataUrls(
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<{ front: string; back: string }> {
     const frontCanvas = document.createElement('canvas')
     const backCanvas = document.createElement('canvas')
@@ -256,8 +205,8 @@ export default class CardTemplate<
   // lets us handle any such data transformations.
   public createOptionsFromFormFields(
     formFields: Record<string, any>,
-    omittedFields: Array<ContactInfoFields>,
-  ): CardTemplateRenderOptions<ContactInfoFields, ExtendedColors> {
+    omittedFields: Array<string>,
+  ): CardTemplateRenderOptions {
     const { graphic, ...otherFormFields } = formFields
     const result: any = {
       ...otherFormFields,
@@ -345,6 +294,58 @@ export default class CardTemplate<
       innerBleedWidth,
       innerBleedHeight,
     )
+  }
+
+  protected wrapTextAnchorTopLeft(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ) {
+    const words = text.split(' ')
+    let line = ''
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' '
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && n > 0) {
+        ctx.fillText(line, x, y)
+        line = words[n] + ' '
+        y += lineHeight
+      } else {
+        line = testLine
+      }
+    }
+    ctx.fillText(line, x, y)
+  }
+
+  protected wrapTextAnchorBottomLeft(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ) {
+    const words = text.split(' ')
+    let line = ''
+
+    for (let n = words.length - 1; n >= 0; n--) {
+      const testLine = words[n] + ' ' + line
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && n < words.length - 1) {
+        ctx.fillText(line, x, y)
+        line = words[n] + ' '
+        y -= lineHeight
+      } else {
+        line = testLine
+      }
+    }
+    ctx.fillText(line, x, y)
   }
 
   // Writes text vertically centered within the canvas with the top of the text at the specified y value

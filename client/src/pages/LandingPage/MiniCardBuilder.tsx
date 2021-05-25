@@ -1,11 +1,12 @@
 import { css } from '@emotion/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
-import { TemplateID, TemplateOptionsType } from 'src/templates'
+import { TemplateID } from 'src/templates'
+import { CardTemplateRenderOptions } from 'src/templates/base'
 
 interface Props {
   templateId: TemplateID
-  options: TemplateOptionsType<TemplateID>
+  options: CardTemplateRenderOptions
 }
 
 const MiniCardBuilder = ({ templateId, options }: Props) => {
