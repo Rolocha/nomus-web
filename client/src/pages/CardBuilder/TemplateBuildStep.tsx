@@ -104,7 +104,6 @@ const TemplateBuildStep = ({
             gridTemplateColumns={`repeat(${colorKeys.length}, 1fr)`}
             gridColumnGap={3}
           >
-            // @ts-ignore
             {colorKeys.map((colorKey: string) => (
               <Box display="flex" flexDirection="column" alignItems="center">
                 <Form.Input
