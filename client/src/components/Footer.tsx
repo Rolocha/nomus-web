@@ -4,20 +4,24 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
-import Spinner from 'src/components/Spinner'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import Icon from './Icon'
 
 interface FormData {
   email: string
 }
 
+interface Props {
+  colorScheme?: 'light' | 'dark'
+}
+
 const bp = 'lg'
 
-const Footer = () => {
+const Footer = ({ colorScheme = 'dark' }: Props) => {
+  const isBp = useBreakpoint(bp)
   const { register, handleSubmit } = useForm<FormData>()
 
   const onSubmit = async (data: FormData) => {
@@ -37,22 +41,36 @@ const Footer = () => {
     }
   }
 
+  const colorPalette = {
+    light: {
+      background: colors.white,
+      accent: colors.nomusBlue,
+      basicText: colors.midnightGray,
+    },
+    dark: {
+      background: colors.nomusBlue,
+      accent: colors.white,
+      basicText: colors.white,
+    },
+  }[colorScheme]
+
   const [submitState, setSubmitState] = React.useState<
     'unsubmitted' | 'submitting' | 'success' | 'failure'
   >('unsubmitted')
   return (
-    <Box bg={colors.nomusBlue} py={{ base: '40px', [bp]: '70px' }}>
+    <Box bg={colorPalette.background} py={{ base: '40px', [bp]: '70px' }}>
       <Box container>
         <Box
           display="flex"
-          alignItems="center"
           flexDirection={{ base: 'column', [bp]: 'row' }}
+          alignItems={{ base: 'flex-start', [bp]: 'center' }}
+          justifyContent={{ base: 'flex-start', [bp]: 'space-between' }}
         >
-          <SVG.LogoWithText color={colors.white} />
+          <SVG.LogoWithText color={colorPalette.accent} />
           <Text.Body
             ml={{ base: 0, [bp]: 3 }}
             mt={{ base: 3, [bp]: 0 }}
-            color={colors.white}
+            color={colorPalette.accent}
           >
             Tap. Connect. Network with a purpose.
           </Text.Body>
@@ -67,20 +85,34 @@ const Footer = () => {
         >
           <Box display="grid" gridTemplateColumns="1fr 1fr 1fr">
             <Box>
-              <Text.Label color={colors.white}>MAIN</Text.Label>
+              <Text.Label color={colors.africanElephant}>MAIN</Text.Label>
               <Link to="/">
-                <Text.Body2 color={colors.white}>Home</Text.Body2>
+                <Text.Body2 color={colorPalette.accent}>Home</Text.Body2>
               </Link>
               <Link to="/about">
-                <Text.Body2 color={colors.white}>About</Text.Body2>
+                <Text.Body2 color={colorPalette.accent}>About</Text.Body2>
               </Link>
               <Link to="/faq">
-                <Text.Body2 color={colors.white}>FAQ</Text.Body2>
+                <Text.Body2 color={colorPalette.accent}>FAQ</Text.Body2>
+              </Link>
+            </Box>
+            <Box>
+              <Text.Label color={colors.africanElephant}>CARDS</Text.Label>
+              <Link to="/shop">
+                <Text.Body2 color={colorPalette.accent}>Shop</Text.Body2>
+              </Link>
+              <Link to="/card-studio/template">
+                <Text.Body2 color={colorPalette.accent}>Nomus cards</Text.Body2>
+              </Link>
+              <Link to="/card-studio/custom">
+                <Text.Body2 color={colorPalette.accent}>
+                  Custom cards
+                </Text.Body2>
               </Link>
             </Box>
           </Box>
           <Box placeSelf="end stretch">
-            <Text.Body2 color={colors.white} mb={2}>
+            <Text.Body2 color={colorPalette.basicText} mb={2}>
               Get updates about all things Nomus right to your inbox.
             </Text.Body2>
             {submitState === 'unsubmitted' || submitState === 'submitting' ? (
@@ -94,42 +126,31 @@ const Footer = () => {
                   <Form.Input
                     name="email"
                     placeholder="hi@nomus.me"
-                    mb={{ base: 2, [bp]: 0 }}
                     ref={register}
                     disabled={submitState === 'submitting'}
                     flexGrow={1}
                     sx={{
                       [mq[bp]]: {
                         borderTopRightRadius: 0,
-                        borderBottomRightadius: 0,
+                        borderBottomRightRadius: 0,
                         borderRight: 'none',
                       },
                     }}
                   />
                   <Button
+                    mt={{ base: 2, [bp]: 0 }}
                     sx={{
                       [mq[bp]]: {
-                        borderTopRightRadius: 0,
-                        borderBottomRightadius: 0,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
                       },
                     }}
                     variant="primary"
                     type="submit"
                     disabled={submitState === 'submitting'}
+                    isLoading={submitState === 'submitting'}
                   >
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      {submitState === 'submitting' && (
-                        <Box mr={2}>
-                          <Spinner size="20px" />
-                        </Box>
-                      )}
-                      <Text.Plain>Sign me up</Text.Plain>
-                    </Box>
+                    Sign me up
                   </Button>
                 </Box>
               </Form.Form>
@@ -159,10 +180,12 @@ const Footer = () => {
           display="flex"
           flexDirection={{ base: 'column', [bp]: 'row' }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-start"
         >
           <Link to="mailto:support@nomus.me">
-            <Text.Body2 color={colors.white}>support@nomus.me</Text.Body2>
+            <Text.Body2 color={colorPalette.accent}>
+              support@nomus.me
+            </Text.Body2>
           </Link>
           <Box display="flex" px={-1} mt={{ base: 2, [bp]: 0 }}>
             {([
@@ -177,14 +200,14 @@ const Footer = () => {
                 <Box
                   mx={1}
                   borderRadius="100%"
-                  bg="white"
+                  bg={colorPalette.accent}
                   width="40px"
                   height="40px"
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Icon of={iconName} color={colors.nomusBlue} />
+                  <Icon of={iconName} color={colorPalette.background} />
                 </Box>
               </Link>
             ))}
@@ -198,13 +221,15 @@ const Footer = () => {
         <Box
           display="flex"
           flexDirection={{ base: 'column', [bp]: 'row' }}
-          alignItems="center"
+          alignItems={{ base: 'flex-start', [bp]: 'center' }}
           justifyContent="space-between"
-          textAlign={{ base: 'center', [bp]: 'left' }}
+          textAlign={{ base: 'left', [bp]: 'left' }}
         >
-          <Text.Body2
-            color={colors.white}
-          >{`© ${new Date().getFullYear()} Nomus, Inc.  /  Registered in the United States of America`}</Text.Body2>
+          <Text.Body2 color={colorPalette.basicText}>
+            {`© ${new Date().getFullYear()} Nomus, Inc.`}{' '}
+            {isBp ? ' / ' : <br />}{' '}
+            {`Registered in the United States of America`}
+          </Text.Body2>
 
           <Box
             display="flex"
@@ -212,12 +237,14 @@ const Footer = () => {
             mt={{ base: 4, [bp]: 'unset' }}
           >
             <Link to="/terms-of-service">
-              <Text.Body2 color="white" mr={3}>
+              <Text.Body2 color={colorPalette.accent} mr={3}>
                 Terms of service
               </Text.Body2>
             </Link>
             <Link to="/privacy-policy">
-              <Text.Body2 color="white">Privacy policy</Text.Body2>
+              <Text.Body2 color={colorPalette.accent}>
+                Privacy policy
+              </Text.Body2>
             </Link>
           </Box>
         </Box>

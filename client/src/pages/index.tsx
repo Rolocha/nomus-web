@@ -8,9 +8,10 @@ import {
 import ProtectedRoute from 'src/components/ProtectedRoute'
 import { AuthLevel } from 'src/config'
 import AdminPanel from 'src/pages/AdminPanel'
-import ComingSoonPage from 'src/pages/ComingSoonPage'
+import CardBuilder from 'src/pages/CardBuilder'
 import ContactInfoPage from 'src/pages/ContactInfoPage'
 import ContactSaver from 'src/pages/ContactSaver'
+import FaqPage from 'src/pages/FaqPage'
 import ForgotPassword from 'src/pages/ForgotPassword'
 import FourOhFourPage from 'src/pages/FourOhFourPage'
 import LandingPage from 'src/pages/LandingPage'
@@ -18,11 +19,9 @@ import LinkerPage from 'src/pages/LinkerPage'
 import LoadingPage from 'src/pages/LoadingPage'
 import LoginPage from 'src/pages/LoginPage'
 import ResetPassword from 'src/pages/ResetPassword'
+import ShopFront from 'src/pages/ShopFront'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
-import FaqPage from 'src/pages/FaqPage'
-import CardBuilder from 'src/pages/CardBuilder'
-import ShopFront from 'src/pages/ShopFront'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -68,12 +67,7 @@ export const routes: Array<RouteType> = [
   {
     exact: true,
     path: '/',
-    Component:
-      // Show the ComingSoonPage unless we're looking at dev/staging and the showInProgress query param is provided
-      process.env.NODE_ENV !== 'production' &&
-      new URLSearchParams(window.location.search).get('showInProgress') != null
-        ? LandingPage
-        : ComingSoonPage,
+    Component: LandingPage,
     noLoginRequired: true,
   },
   {

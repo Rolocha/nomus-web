@@ -42,7 +42,10 @@ const CheckoutStep = ({
     // TODO: Handle errors from event.error
   }
 
-  const costSummary = getCostSummary(cardBuilderState.quantity)
+  const costSummary = getCostSummary(
+    cardBuilderState.quantity,
+    checkoutFormMethods.getValues('state'),
+  )
 
   const quantityOptions = ([
     {
@@ -95,7 +98,7 @@ const CheckoutStep = ({
   })
 
   return (
-    <Box height="100%" overflowY="scroll">
+    <Box height="100%">
       <Text.SectionHeader mb="24px">Order details</Text.SectionHeader>
       <Text.SectionSubheader mb={2}>
         How many cards do you want?
@@ -170,6 +173,8 @@ const CheckoutStep = ({
                   name="state"
                   ref={checkoutFormMethods.register}
                   width="100%"
+                  maxLength={2}
+                  sx={{ textTransform: 'uppercase' }}
                 />
               </Box>
               <Box gridColumn="5/7" gridRow="4/4">
@@ -224,14 +229,18 @@ const CheckoutStep = ({
             <Text.Body2>Estimated Taxes</Text.Body2>
             <Box></Box>
             <Text.Body2>
-              {costSummary?.estimatedTaxes
+              {costSummary?.estimatedTaxes != null
                 ? formatDollarAmount(costSummary.estimatedTaxes)
                 : '...'}
             </Text.Body2>
 
             <Text.Body2>Shipping</Text.Body2>
             <Box></Box>
-            <Text.Body2>{formatDollarAmount(500)}</Text.Body2>
+            <Text.Body2>
+              {costSummary
+                ? formatDollarAmount(costSummary?.shipping)
+                : formatDollarAmount(0)}
+            </Text.Body2>
 
             <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
             <Box></Box>

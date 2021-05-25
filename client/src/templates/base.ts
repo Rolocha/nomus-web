@@ -17,6 +17,7 @@ const RESOLUTION_FACTOR = 5
 export type CardTemplateRenderOptions = {
   colorScheme: Record<string, CustomizableField.Color>
   contactInfo: Record<string, CustomizableField.ContactInfo | null>
+
   graphic: CustomizableField.Graphic
   qrCodeUrl: CustomizableField.QRCode
   omittedContactInfoFields: Array<string>
@@ -110,7 +111,7 @@ export default class CardTemplate {
           acc[fieldName] = null
         }
         return acc
-      }, {} as Record<string, any>),
+      }, {} as Partial<Record<ContactInfoFields, any>>),
       colorScheme: this.colorKeys.reduce((acc, fieldName) => {
         if (this.colorSchemeSpec[fieldName].defaultValue) {
           acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue
