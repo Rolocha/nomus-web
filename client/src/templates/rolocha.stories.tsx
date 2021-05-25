@@ -4,7 +4,6 @@ import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
-import { RolochaContactFields, RolochaExtendedColors } from './rolocha'
 
 export default {
   title: 'Card Templates/Rolocha',
@@ -16,9 +15,9 @@ export const actionsData = {
 }
 
 //👇 We create a “template” of how args map to rendering
-const RolochaTemplateTemplate: Story<
-  CardTemplateRenderOptions<RolochaContactFields, RolochaExtendedColors>
-> = ({ ...options }) => {
+const RolochaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
+  ...options
+}) => {
   return (
     <Box display="flex">
       <Box mr={3}>
@@ -45,10 +44,7 @@ const RolochaTemplateTemplate: Story<
 
 export const Rolocha = RolochaTemplateTemplate.bind({})
 
-const args: CardTemplateRenderOptions<
-  RolochaContactFields,
-  RolochaExtendedColors
-> = {
+const args: CardTemplateRenderOptions = {
   contactInfo: {
     name: 'Spongebob Squarepants',
     headline: 'Fry Cook at Krusty Krab',

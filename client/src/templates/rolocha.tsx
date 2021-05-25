@@ -2,16 +2,6 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-export type RolochaContactFields =
-  | 'name'
-  | 'headline'
-  | 'line1'
-  | 'line2'
-  | 'line3'
-  | 'line4'
-  | 'footer'
-export type RolochaExtendedColors = 'accent2' | 'accent3'
-
 const primarySquiggleFrontSVG = ({
   color = colors.nomusBlue,
 }: {
@@ -59,7 +49,7 @@ const rectangleBackSVG = ({ color = colors.nomusBlue }: { color: string }) =>
 </svg>
   `)
 
-const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
+const Rolocha = new CardTemplate({
   name: 'Rolocha',
   width: 154,
   height: 264,
@@ -120,12 +110,9 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     },
   } as const,
   async renderFront(
-    this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
+    this: CardTemplate,
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<
-      RolochaContactFields,
-      RolochaExtendedColors
-    >,
+    options: CardTemplateRenderOptions,
   ) {
     this.clearCanvas(canvas)
 
@@ -301,12 +288,9 @@ const Rolocha = new CardTemplate<RolochaContactFields, RolochaExtendedColors>({
     }
   },
   async renderBack(
-    this: CardTemplate<RolochaContactFields, RolochaExtendedColors>,
+    this: CardTemplate,
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<
-      RolochaContactFields,
-      RolochaExtendedColors
-    >,
+    options: CardTemplateRenderOptions,
   ) {
     this.clearCanvas(canvas)
 

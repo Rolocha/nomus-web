@@ -1,7 +1,8 @@
 import * as React from 'react'
 import templates from 'src/templates'
-import { TemplateID, TemplateOptionsType } from 'src/templates'
+import { TemplateID } from 'src/templates'
 import shadows from 'src/styles/shadows'
+import { CardTemplateRenderOptions } from 'src/templates/base'
 
 interface Props<T extends TemplateID> {
   templateId: T
@@ -10,7 +11,7 @@ interface Props<T extends TemplateID> {
   maxWidth?: string
   shadow?: boolean
   showGuides?: boolean
-  options: TemplateOptionsType<T>
+  options: CardTemplateRenderOptions
 }
 
 function TemplateCard<T extends TemplateID>({
