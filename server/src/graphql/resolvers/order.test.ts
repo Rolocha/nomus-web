@@ -112,7 +112,7 @@ describe('OrderResolver', () => {
       expect(updatedOrder.state).toBe(OrderState.Canceled)
     })
 
-    it('cancels the specified order by an admin', async () => {
+    it('cancels the specified order by an admin who is not the orders user', async () => {
       const user = await createMockUser()
       const order = await createMockOrder({ user: user.id })
 
