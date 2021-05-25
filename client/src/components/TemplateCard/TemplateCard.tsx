@@ -48,8 +48,20 @@ function TemplateCard<T extends TemplateID>({
 
   React.useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
-    updateCard(canvas)
+    if (!canvas) {
+      return
+    }
+
+    // We shouldn't render the card until all fonts have loaded or else it'll
+    // likely render with the wrong (system fallback) fonts.
+    // In the future, this might be a good place/moment to show some sort of loading
+    // indicator and/or animation since waiting for fonts to load may take a non-trivial
+    // amount of time depending on the user's network conditions.
+    // @ts-expect-error TS doesn't seem to have types for this API yet
+    const documentFontFaceSet = document.fonts as any
+    documentFontFaceSet.ready.then(() => {
+      updateCard(canvas)
+    })
   }, [updateCard])
 
   return (
