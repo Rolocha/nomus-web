@@ -2,15 +2,16 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-export type RolochaContactFields =
-  | 'name'
-  | 'headline'
-  | 'line1'
-  | 'line2'
-  | 'line3'
-  | 'line4'
-  | 'footer'
-export type RolochaExtendedColors = 'accent2' | 'accent3'
+export type RolochaContactFields = string
+// | 'name'
+// | 'headline'
+// | 'line1'
+// | 'line2'
+// | 'line3'
+// | 'line4'
+// | 'footer'
+export type RolochaExtendedColors = string
+// 'accent2' | 'accent3'
 
 const primarySquiggleFrontSVG = ({
   color = colors.nomusBlue,

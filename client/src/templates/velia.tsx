@@ -2,13 +2,13 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-export type VeliaContactFields =
-  | 'name'
-  | 'line1'
-  | 'line2'
-  | 'line3'
-  | 'headline'
-  | 'footer'
+export type VeliaContactFields = string
+// | 'name'
+// | 'line1'
+// | 'line2'
+// | 'line3'
+// | 'headline'
+// | 'footer'
 export type VeliaExtendedColors = never
 
 const Velia = new CardTemplate<VeliaContactFields, VeliaExtendedColors>({
