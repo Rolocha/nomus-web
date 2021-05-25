@@ -76,7 +76,8 @@ const ContactCardsList = ({
           ? getFormattedFullDate(contact.meetingDate)
           : 'Unknown Date',
         [ContactsSortOption.Alphabetical]: contact.name.first[0],
-        [ContactsSortOption.MeetingPlace]: contact.meetingPlace ?? '',
+        [ContactsSortOption.MeetingPlace]:
+          contact.meetingPlace || 'Uncategorized',
       }[selectedContactSortOption]
 
       if (groupKey in acc) {
