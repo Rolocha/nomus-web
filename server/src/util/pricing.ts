@@ -1,4 +1,4 @@
-import { States } from 'src/util/states'
+import { isValidStateAbr, StateCode } from 'src/util/states'
 
 // Sync with client/src/utils/pricing.ts
 export const QUANTITY_TO_PRICE = {
@@ -11,7 +11,7 @@ export const isValidQuantity = (quantity: number) => {
   return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))
 }
 
-export const calculateEstimatedTaxes = (subtotal: number, state?: States.Code) => {
+export const calculateEstimatedTaxes = (subtotal: number, state?: StateCode) => {
   // At current stage, we only need to collect sales tax from California residents
   // https://www.notion.so/nomus/Research-sales-tax-obligations-8b54707c20334fad83fb53b60d2c2f10
   if (state && state === 'CA') {
@@ -35,8 +35,8 @@ export const getCostSummary = (quantity: number, state?: string) => {
   }
 
   let estimatedTaxes = null
-  if (state && States.isValidStateAbr(state)) {
-    estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state as States.Code) : null
+  if (state && isValidStateAbr(state)) {
+    estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state as StateCode) : null
     if (estimatedTaxes == null) {
       return null
     }
