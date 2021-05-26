@@ -20,13 +20,6 @@ const backTriangleSVG = ({ color = colors.viridianGreen }: { color: string }) =>
   </svg>
     `)
 
-// const rectangleBackSVG = ({ color = colors.nomusBlue }: { color: string }) =>
-//   encodeURIComponent(`
-// <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <rect y="6.10352e-05" width="80" height="80" rx="8" fill="${color}"/>
-// </svg>
-//   `)
-
 const Jim = new CardTemplate({
   name: 'Jim',
   width: 264,
@@ -142,15 +135,15 @@ const Jim = new CardTemplate({
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.accent
       : placeholderTextColor
-    this.wrapTextAnchorBottomLeft(
+    this.wrapTextAnchorTopRight(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
       this.proportionalize(103),
-      this.proportionalize(48),
+      this.proportionalize(45),
       this.proportionalize(85),
-      this.proportionalize(10),
+      this.proportionalize(12),
     )
 
     // Render the headline
@@ -166,9 +159,10 @@ const Jim = new CardTemplate({
       this.proportionalize(111),
       this.proportionalize(44),
       this.proportionalize(112),
-      this.proportionalize(8),
+      this.proportionalize(10),
     )
 
+    ctx.textAlign = 'left'
     // Render line1
     if (!options.omittedContactInfoFields.includes('line1')) {
       ctx.font = this.proportionalize(8) + 'px Rubik'
@@ -211,20 +205,6 @@ const Jim = new CardTemplate({
         this.proportionalize(88),
       )
     }
-    // // Render line4
-    // if (!options.omittedContactInfoFields.includes('line4')) {
-    //   ctx.font = this.proportionalize(8) + 'px Rubik'
-    //   ctx.fillStyle = options.contactInfo.line4
-    //     ? options.colorScheme.text
-    //     : placeholderTextColor
-    //   ctx.fillText(
-    //     options.contactInfo.line4 ||
-    //       this.contactInfoSpec.line4.placeholder ||
-    //       '[line 4]',
-    //     this.proportionalize(21),
-    //     this.proportionalize(134),
-    //   )
-    // }
 
     // Render footer
     if (!options.omittedContactInfoFields.includes('footer')) {
@@ -280,13 +260,10 @@ const Jim = new CardTemplate({
         (options.graphic.size ?? 1) * this.proportionalize(100)
       const imageWidth =
         (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
-      ctx.drawImage(
-        logoImg,
-        this.proportionalize(192),
-        this.proportionalize(98),
-        imageWidth,
-        imageHeight,
-      )
+
+      const imageY = (this.proportionalizedHeight - imageHeight) / 2
+      const imageX = (this.proportionalizedWidth - imageWidth) / 2
+      ctx.drawImage(logoImg, imageX, imageY, imageWidth, imageHeight)
     }
   },
 })

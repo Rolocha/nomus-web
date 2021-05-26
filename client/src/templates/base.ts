@@ -304,6 +304,8 @@ export default class CardTemplate {
     maxWidth: number,
     lineHeight: number,
   ): { width: number; height: number } {
+    const oldTextAlign = ctx.textAlign
+    ctx.textAlign = 'left'
     const words = text.split(' ')
     let line = ''
     let width = 0
@@ -328,6 +330,7 @@ export default class CardTemplate {
     width += lineWidth
     height += lineHeight
 
+    ctx.textAlign = oldTextAlign
     return { width, height }
   }
 
@@ -339,6 +342,8 @@ export default class CardTemplate {
     maxWidth: number,
     lineHeight: number,
   ) {
+    const oldTextAlign = ctx.textAlign
+    ctx.textAlign = 'left'
     const words = text.split(' ')
     let line = ''
 
@@ -354,7 +359,46 @@ export default class CardTemplate {
         line = testLine
       }
     }
+    ctx.textAlign = oldTextAlign
     ctx.fillText(line, x, y)
+  }
+
+  protected wrapTextAnchorTopRight(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ): { width: number; height: number } {
+    const oldTextAlign = ctx.textAlign
+    ctx.textAlign = 'right'
+    const words = text.split(' ')
+    let line = ''
+    let width = 0
+    let height = 0
+
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' '
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && n > 0) {
+        ctx.fillText(line, x, y)
+        line = words[n] + ' '
+        y += lineHeight
+        width += metrics.width
+        height += lineHeight
+      } else {
+        line = testLine
+      }
+    }
+    const lineWidth = ctx.measureText(line).width
+    ctx.fillText(line, x, y)
+    width += lineWidth
+    height += lineHeight
+
+    ctx.textAlign = oldTextAlign
+    return { width, height }
   }
 
   // Writes text vertically centered within the canvas with the top of the text at the specified y value
@@ -363,9 +407,12 @@ export default class CardTemplate {
     text: string,
     y: number,
   ): TextMetrics {
+    const oldTextAlign = ctx.textAlign
+    ctx.textAlign = 'left'
     const textMeasurements = ctx.measureText(text)
     const textX = (this.proportionalizedWidth - textMeasurements.width) / 2
     ctx.fillText(text, textX, y)
+    ctx.textAlign = oldTextAlign
     return textMeasurements
   }
 
