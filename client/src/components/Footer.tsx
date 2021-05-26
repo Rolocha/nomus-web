@@ -182,10 +182,8 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
           justifyContent="space-between"
           alignItems="flex-start"
         >
-          <Link to="mailto:support@nomus.me">
-            <Text.Body2 color={colorPalette.accent}>
-              support@nomus.me
-            </Text.Body2>
+          <Link to="mailto:hi@nomus.me">
+            <Text.Body2 color={colorPalette.accent}>hi@nomus.me</Text.Body2>
           </Link>
           <Box display="flex" px={-1} mt={{ base: 2, [bp]: 0 }}>
             {([

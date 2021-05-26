@@ -30,7 +30,7 @@ export const faqItems = [
   {
     question: 'How many can I order?',
     answer:
-      "Nomus offers 2 tiers: 100 cards and 250 cards. The more cards you buy in one order, the more you save. If you'd like to buy more than 250 cards at once, no worries. Just contact us at support@nomus.me, and we'll sort it out for you.",
+      "Nomus offers 2 tiers: 100 cards and 250 cards. The more cards you buy in one order, the more you save. If you'd like to buy more than 250 cards at once, no worries. Just contact us at hi@nomus.me, and we'll sort it out for you.",
   },
   {
     question: 'What size and material are the business cards?',
@@ -49,12 +49,12 @@ export const faqItems = [
   {
     question: 'How long will my cards take to get to me?',
     answer:
-      "Your Nomus order should get out to you within two weeks. If not, reach out to us at support@nomus.me and we'll do what we can to make your experience better.",
+      "Your Nomus order should get out to you within two weeks. If not, reach out to us at hi@nomus.me and we'll do what we can to make your experience better.",
   },
   {
     question: 'Can I return the cards?',
     answer:
-      "Since these cards are going to be printed with your personal information, we can't take any returns. If there's anything you're dissatisfied with, however, please get in contact with us at support@nomus.me.",
+      "Since these cards are going to be printed with your personal information, we can't take any returns. If there's anything you're dissatisfied with, however, please get in contact with us at hi@nomus.me.",
   },
   {
     question: 'Does Nomus have anything to do with food?',
