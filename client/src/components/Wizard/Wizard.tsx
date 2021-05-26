@@ -22,7 +22,7 @@ interface Props<ValidStepType extends string> {
   handleSubmit?: () => Promise<void>
 }
 
-const bp = 'md'
+const bp = 'lg'
 
 const POINTY_TAB_INDICATOR = {
   [mq[bp]]: {
@@ -153,9 +153,11 @@ function Wizard<ValidStepType extends string>({
           const { id, icon, label } = stepDetails
 
           const isCurrentSection = currentStep === id
-          const isStepAccessible = isReadyToMoveForwardFromStepAtIndex(
-            index - 1,
-          )
+          const isStepAccessible =
+            isReadyToMoveForwardFromStepAtIndex(index - 1) &&
+            !processingPreviousTransition &&
+            !processingNextTransition
+
           return (
             <Box
               cursor={!isStepAccessible ? 'not-allowed' : 'pointer'}
@@ -169,11 +171,9 @@ function Wizard<ValidStepType extends string>({
                 [bp]: index === allStepDetails.length - 1 ? 'xl' : 'none',
               }}
               bg={
-                isStepAccessible
-                  ? isCurrentSection
-                    ? colors.nomusBlue
-                    : colors.secondaryBlue
-                  : colors.disabledBlue
+                isStepAccessible && isCurrentSection
+                  ? colors.nomusBlue
+                  : colors.secondaryBlue
               }
               flexBasis={{
                 base: `${100 / allStepDetails.length}%`,
@@ -184,7 +184,7 @@ function Wizard<ValidStepType extends string>({
               role="button"
               onClick={() => {
                 if (isStepAccessible) {
-                  handleStepTransition(id)
+                  handleTransitionToStepAtIndex(index)()
                 }
               }}
             >
@@ -198,13 +198,13 @@ function Wizard<ValidStepType extends string>({
               >
                 <Icon
                   of={icon}
-                  color="white"
-                  mb={{ base: '0.5em', md: 0 }}
-                  mr={{ base: 0, md: '24px' }}
+                  color={isStepAccessible ? colors.white : colors.disabledBlue}
+                  mb={{ base: '0.5em', [bp]: 0 }}
+                  mr={{ base: 0, [bp]: '24px' }}
                 />
                 <Text.Plain
                   m={0}
-                  color="white"
+                  color={isStepAccessible ? colors.white : colors.disabledBlue}
                   fontSize={{ base: 10, [bp]: 'unset' }}
                   fontWeight={isCurrentSection ? 500 : 'undefined'}
                 >
@@ -238,15 +238,19 @@ function Wizard<ValidStepType extends string>({
       >
         {/* <Box height="100%"> */}
         {/* Content for selected section */}
-        <Box overflow="visible" height="100%" p={{ base: '24px', md: '48px' }}>
+        <Box
+          overflow="visible"
+          height="100%"
+          p={{ base: '24px', [bp]: '48px' }}
+        >
           {currentStepDetails.children}
         </Box>
 
         {/* Previous/next buttons */}
         <Box
           position="relative"
-          p={{ base: '24px', md: 0 }}
-          bg={{ base: colors.white, md: undefined }}
+          p={{ base: '24px', [bp]: 0 }}
+          bg={{ base: colors.white, [bp]: undefined }}
           display="flex"
           alignItems="center"
           justifyContent="space-between"

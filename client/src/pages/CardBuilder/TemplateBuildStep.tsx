@@ -40,10 +40,15 @@ const TemplateBuildStep = ({
 
   const customizationForm = useForm<Record<string, any>>({
     defaultValues: {
-      ...deepMergeObjects({ ...defaultOptions }, templateCustomization),
-      qrCodeUrl: cardBuilderState.cardVersionId
-        ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
-        : `${window.location.host}`,
+      ...deepMergeObjects(
+        { ...defaultOptions },
+        {
+          ...templateCustomization,
+          qrCodeUrl: cardBuilderState.cardVersionId
+            ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
+            : `${window.location.host}`,
+        },
+      ),
     },
   })
 
@@ -177,7 +182,7 @@ const TemplateBuildStep = ({
             const fieldFormKey = `contactInfo.${fieldName}`
             const fieldRequired = fieldDetails.required
             const userWantsToOmitThisField = cardBuilderState.omittedOptionalFields.includes(
-              fieldFormKey,
+              fieldName,
             )
             const inputDisabled = !fieldRequired && userWantsToOmitThisField
 
