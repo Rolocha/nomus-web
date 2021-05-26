@@ -89,7 +89,7 @@ const BaseStep = ({
                           updateCardBuilderState({ templateId })
                         }}
                         cursor="pointer"
-                        borderRadius={16}
+                        borderRadius="16px"
                         position="relative"
                         border={
                           cardBuilderState.templateId === templateId
