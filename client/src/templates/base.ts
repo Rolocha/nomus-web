@@ -402,7 +402,7 @@ export default class CardTemplate {
   }
 
   // Writes text vertically centered within the canvas with the top of the text at the specified y value
-  protected drawTextHorizontallyCenteredAtY(
+  protected wrapTextCenteredAnchoredTop(
     ctx: CanvasRenderingContext2D,
     text: string,
     y: number,
@@ -414,6 +414,42 @@ export default class CardTemplate {
     ctx.fillText(text, textX, y)
     ctx.textAlign = oldTextAlign
     return textMeasurements
+  }
+
+  protected wrapTextCenteredAnchoredBottom(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ) {
+    const oldTextAlign = ctx.textAlign
+    ctx.textAlign = 'center'
+
+    const words = text.split(' ')
+    let line = ''
+    let currentY = y
+
+    for (let n = words.length - 1; n >= 0; n--) {
+      const testLine = line ? words[n] + ' ' + line : words[n]
+      const metrics = ctx.measureText(testLine)
+      const testWidth = metrics.width
+
+      // We've grown too wide, need to draw what we have and
+      // move up to the previous line
+      if (testWidth > maxWidth && n < words.length - 1) {
+        ctx.fillText(line, this.proportionalizedWidth / 2, currentY)
+        line = words[n] + ' '
+        currentY -= lineHeight
+      } else {
+        // We can fit more words on this line
+        line = testLine
+      }
+    }
+
+    // Draw in the final top line
+    ctx.fillText(line, this.proportionalizedWidth / 2, currentY)
+    ctx.textAlign = oldTextAlign
   }
 
   protected async drawNomusLogo(

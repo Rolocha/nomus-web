@@ -34,13 +34,15 @@ export const Primary = () => {
       ...initialStateOptions[BaseType.Template],
       cardVersionId: 'cardv_1234',
       baseType: BaseType.Template,
-      templateId: 'velia',
+      templateId: 'nicole',
       templateCustomization: {
         contactInfo: {
           name: 'Spongebob Squarepants',
           headline: 'Fry Cook at the Krusty Krab',
           line1: 'The Krusty Krab',
           line2: '(555)-555-5555',
+          line3: '(555)-555-5555',
+          line4: '(555)-555-5555',
           footer: "I'm ready, I'm ready, I'm ready",
         },
         graphic: {
@@ -53,6 +55,7 @@ export const Primary = () => {
         colorScheme: {
           background: colors.offWhite,
           accent: colors.gold,
+          accent2: colors.nomusBlue,
           text: colors.midnightGray,
         },
       },

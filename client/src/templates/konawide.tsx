@@ -67,22 +67,20 @@ const KonaWide = new CardTemplate({
     )
 
     // Render the headline
-    if (!options.omittedContactInfoFields.includes('headline')) {
-      ctx.font = this.proportionalize(10) + 'px Rubik'
-      ctx.fillStyle = options.contactInfo.headline
-        ? options.colorScheme.text
-        : placeholderTextColor
-      this.wrapTextAnchorTopLeft(
-        ctx,
-        options.contactInfo.headline ||
-          this.contactInfoSpec.headline.placeholder ||
-          '[headline]',
-        this.proportionalize(18),
-        nameHeight + this.proportionalize(30),
-        this.proportionalize(228),
-        this.proportionalize(10),
-      )
-    }
+    ctx.font = this.proportionalize(10) + 'px Rubik'
+    ctx.fillStyle = options.contactInfo.headline
+      ? options.colorScheme.text
+      : placeholderTextColor
+    this.wrapTextAnchorTopLeft(
+      ctx,
+      options.contactInfo.headline ||
+        this.contactInfoSpec.headline.placeholder ||
+        '[headline]',
+      this.proportionalize(18),
+      nameHeight + this.proportionalize(30),
+      this.proportionalize(228),
+      this.proportionalize(10),
+    )
 
     // Render QR code
     await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {
