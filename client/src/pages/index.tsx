@@ -101,19 +101,13 @@ export const routes: Array<RouteType> = [
     path: '/faq',
     exact: true,
     Component: FaqPage,
+    noLoginRequired: true,
   },
   {
     path: '/about',
     exact: true,
     Component: AboutPage,
-  },
-  {
-    path: '/about',
-    exact: true,
-    redirect: {
-      to: 'https://www.notion.so/About-Us-34bb756e6b10412786a720cd9a081d1f',
-      type: 'external',
-    },
+    noLoginRequired: true,
   },
   {
     path: '/terms-of-service',
