@@ -2,8 +2,8 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-const Kona = new CardTemplate({
-  name: 'Kona',
+const KonaWide = new CardTemplate({
+  name: 'Kona Wide',
   width: 264,
   height: 154,
   demoImageUrl:
@@ -145,4 +145,4 @@ const Kona = new CardTemplate({
   },
 })
 
-export default Kona
+export default KonaWide
