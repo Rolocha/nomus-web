@@ -51,11 +51,11 @@ const Kona = new CardTemplate({
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
     // Render the name
-    ctx.font = this.proportionalize(24) + 'px Rubik'
+    ctx.font = 'bold ' + this.proportionalize(24) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.text
       : placeholderTextColor
-    this.wrapTextAnchorTopLeft(
+    const { height: nameHeight } = this.wrapTextAnchorTopLeft(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
@@ -63,7 +63,7 @@ const Kona = new CardTemplate({
       this.proportionalize(18),
       this.proportionalize(41),
       this.proportionalize(228),
-      this.proportionalize(24),
+      this.proportionalize(28),
     )
 
     // Render the headline
@@ -78,7 +78,7 @@ const Kona = new CardTemplate({
           this.contactInfoSpec.headline.placeholder ||
           '[headline]',
         this.proportionalize(18),
-        this.proportionalize(85),
+        nameHeight + this.proportionalize(30),
         this.proportionalize(228),
         this.proportionalize(10),
       )
