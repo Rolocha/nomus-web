@@ -23,10 +23,10 @@ const MiniCardBuilder = ({ templateId, options }: Props) => {
       // where
       //   - θ = 8º
       //   - sin(θ) = 0.139...
-      //   - verticalOffset = 25% of card height = (25% of card width) * (h:144/w:252)
-      //     because the 25% we use in the y-translation is height-based so we need to
+      //   - verticalOffset = 34% of card height = (34% of card width) * (h:144/w:252)
+      //     because the 34% we use in the y-translation is height-based so we need to
       //     convert it to be width-based
-      mt="calc(calc(calc(100% * 0.13917310096)) + calc(25% * calc(144/252)))"
+      mt="calc(calc(calc(100% * 0.13917310096)) + calc(34% * calc(144/252)))"
       ml="10%"
       position="relative"
     >
@@ -44,7 +44,7 @@ const MiniCardBuilder = ({ templateId, options }: Props) => {
         left={0}
         zIndex={0}
         transformOrigin="top left"
-        transform="translate(-10%, -25%) rotateZ(-8deg)"
+        transform="translate(-17%, -34%) rotateZ(-8deg)"
       >
         <TemplateCard
           side="back"
