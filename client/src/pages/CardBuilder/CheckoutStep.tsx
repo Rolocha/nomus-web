@@ -135,7 +135,7 @@ const CheckoutStep = ({
               gridRowGap={3}
               justifyItems="stretch"
             >
-              <Box gridColumn="1/5">
+              <Box gridColumn="1/7">
                 <Form.Label>Name</Form.Label>
                 <Form.Input
                   name="name"
@@ -167,17 +167,21 @@ const CheckoutStep = ({
                   width="100%"
                 />
               </Box>
-              <Box gridColumn="4/5" gridRow="4/4">
+              <Box gridColumn="4/6" gridRow="4/4">
                 <Form.Label>State</Form.Label>
                 <Form.Input
                   name="state"
                   ref={checkoutFormMethods.register}
                   width="100%"
+                  error={checkoutFormMethods.errors.state}
                   maxLength={2}
                   sx={{ textTransform: 'uppercase' }}
                 />
+                <Form.FieldError
+                  fieldError={checkoutFormMethods.errors.state}
+                />
               </Box>
-              <Box gridColumn="5/7" gridRow="4/4">
+              <Box gridColumn="6/7" gridRow="4/4">
                 <Form.Label>Zip Code</Form.Label>
                 <Form.Input
                   name="postalCode"

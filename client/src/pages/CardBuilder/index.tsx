@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
@@ -40,6 +41,8 @@ import breakpoints from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
+import { isValidStateAbr } from 'src/utils/states'
+import * as yup from 'yup'
 
 interface ParamsType {
   buildBaseType?: 'custom' | 'template' | string
@@ -118,6 +121,15 @@ const CardBuilder = () => {
 
   const checkoutFormMethods = useForm<CheckoutFormData>({
     defaultValues: cardBuilderState.formData ?? undefined,
+    mode: 'onBlur',
+    resolver: yupResolver(
+      yup.object().shape({
+        state: yup
+          .string()
+          .required('Required')
+          .test('is-state', 'Not valid', isValidStateAbr),
+      }),
+    ),
   })
 
   const watchedFields = checkoutFormMethods.watch()
