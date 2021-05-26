@@ -3,6 +3,7 @@ import * as React from 'react'
 import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
 import FileUploadButton from 'src/components/FileUploadButton'
+import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import { FileItem } from 'src/types/files'
@@ -62,8 +63,7 @@ const CardContainer = ({
   )
 }
 
-const BuildStep = ({
-  selectedBaseType,
+const CustomBuildStep = ({
   cardBuilderState,
   updateCardBuilderState,
 }: Props) => {
@@ -117,25 +117,34 @@ const BuildStep = ({
       )}
 
       <Box overflowY="scroll" pt={4}>
-        <Box mb={3}>
+        <Box>
           <Text.SectionSubheader mb={2}>
             Upload front design
           </Text.SectionSubheader>
           <Text.Body2 mb={2}>
-            This side should include an N-mark to indicate NFC compatibility.{' '}
-            <Link to="#">Download N-mark .png file</Link>
+            This side should include an <strong>N-mark</strong>{' '}
+            <Icon of="nfc" /> to indicate NFC compatibility. Download N-mark
+            icon (
+            <Link download="n-mark.svg" type="external" href="/n-mark.svg">
+              svg
+            </Link>
+            ,{' '}
+            <Link download="n-mark.png" type="external" href="/n-mark.png">
+              png
+            </Link>
+            ).
           </Text.Body2>
           <FileUploadButton
             name="frontImage"
             width="100%"
-            accept={acceptableImageFileTypes.join(' ')}
+            accept={acceptableImageFileTypes.join(',')}
             selectedFileItem={frontDesignFile}
             handleFileItemChange={setFrontDesignFile}
             showImagePreview
           />
         </Box>
 
-        <Box mb={3}>
+        <Box mt="24px">
           <Text.SectionSubheader mb={2}>
             Upload back design
           </Text.SectionSubheader>
@@ -152,13 +161,13 @@ const BuildStep = ({
           />
         </Box>
 
-        <Box mb={3}>
+        <Box mt="24px">
           <Text.SectionSubheader mb={2}>
             Design specifications
           </Text.SectionSubheader>
           <Box
             display="grid"
-            gridTemplateColumns="1fr 2fr"
+            gridTemplateColumns="auto 1fr"
             gridColumnGap={2}
             gridRowGap={2}
           >
@@ -214,4 +223,4 @@ const BuildStep = ({
   )
 }
 
-export default BuildStep
+export default CustomBuildStep

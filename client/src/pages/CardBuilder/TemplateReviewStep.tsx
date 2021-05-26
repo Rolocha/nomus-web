@@ -74,8 +74,9 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
       <Text.SectionHeader mb="24px">Your card design</Text.SectionHeader>
       <Box
         display="grid"
-        gridTemplateColumns="repeat(3, 4fr)"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(3, 4fr)' }}
         gridColumnGap={3}
+        gridRowGap="16px"
       >
         {cardImages?.front && (
           <BusinessCardImage width="100%" frontImageUrl={cardImages.front} />
