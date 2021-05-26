@@ -91,11 +91,12 @@ const Velia = new CardTemplate({
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.text
       : placeholderTextColor
-    this.drawTextHorizontallyCenteredAtY(
-      ctx,
+    ctx.textAlign = 'center'
+    ctx.fillText(
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
+      this.proportionalizedWidth / 2,
       this.proportionalize(25 + 14),
     )
 
@@ -104,14 +105,16 @@ const Velia = new CardTemplate({
     ctx.fillStyle = options.contactInfo.headline
       ? options.colorScheme.text
       : placeholderTextColor
-    this.drawTextHorizontallyCenteredAtY(
-      ctx,
+    ctx.textAlign = 'center'
+    ctx.fillText(
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
+      this.proportionalizedWidth / 2,
       this.proportionalize(45 + 8),
     )
 
+    ctx.textAlign = 'left'
     // Render the 3 contact info lines, all 8px left from center
     const rightEdgeForLines =
       this.proportionalizedWidth / 2 - this.proportionalize(8)
@@ -166,9 +169,10 @@ const Velia = new CardTemplate({
       ctx.fillStyle = options.contactInfo.footer
         ? options.colorScheme.text
         : placeholderTextColor
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.textAlign = 'center'
+      ctx.fillText(
         footerText,
+        this.proportionalizedWidth / 2,
         this.proportionalize(113),
       )
     }

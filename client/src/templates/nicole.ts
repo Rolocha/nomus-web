@@ -100,19 +100,26 @@ const Nicole = new CardTemplate({
       this.proportionalize(22),
     )
 
+    ctx.textAlign = 'center'
+
     // Render the name
     ctx.font = this.proportionalize(14) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.name
       ? palette.accent2
       : lighten(0.4)(palette.accent2)
-    this.wrapTextCenteredAnchoredBottom(
+    ctx.textAlign = 'center'
+    this.wrapText(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
-      this.proportionalize(60),
-      this.proportionalize(120),
-      this.proportionalize(17),
+      {
+        anchorTo: 'bottom',
+        x: this.proportionalizedWidth / 2,
+        y: this.proportionalize(60),
+        maxWidth: this.proportionalize(120),
+        lineHeight: this.proportionalize(17),
+      },
     )
 
     // Render the headline
@@ -120,11 +127,11 @@ const Nicole = new CardTemplate({
     ctx.fillStyle = options.contactInfo.headline
       ? palette.text
       : placeholderTextColor
-    this.drawTextHorizontallyCenteredAtY(
-      ctx,
+    ctx.fillText(
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
+      this.proportionalizedWidth / 2,
       this.proportionalize(68 + 8),
     )
 
@@ -138,9 +145,9 @@ const Nicole = new CardTemplate({
         options.contactInfo.line1 ||
         this.contactInfoSpec.line1.placeholder ||
         ''
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.fillText(
         line1Text,
+        this.proportionalizedWidth / 2,
         this.proportionalize(93 + 7),
       )
     }
@@ -153,9 +160,9 @@ const Nicole = new CardTemplate({
         options.contactInfo.line2 ||
         this.contactInfoSpec.line2.placeholder ||
         ''
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.fillText(
         line2Text,
+        this.proportionalizedWidth / 2,
         this.proportionalize(105 + 7),
       )
     }
@@ -168,9 +175,9 @@ const Nicole = new CardTemplate({
         options.contactInfo.line3 ||
         this.contactInfoSpec.line3.placeholder ||
         ''
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.fillText(
         line3Text,
+        this.proportionalizedWidth / 2,
         this.proportionalize(117 + 7),
       )
     }
@@ -183,9 +190,9 @@ const Nicole = new CardTemplate({
         options.contactInfo.line4 ||
         this.contactInfoSpec.line4.placeholder ||
         ''
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.fillText(
         line4Text,
+        this.proportionalizedWidth / 2,
         this.proportionalize(129 + 7),
       )
     }
@@ -201,9 +208,9 @@ const Nicole = new CardTemplate({
         options.contactInfo.footer ||
         this.contactInfoSpec.footer.placeholder ||
         ''
-      this.drawTextHorizontallyCenteredAtY(
-        ctx,
+      ctx.fillText(
         footerText,
+        this.proportionalizedWidth / 2,
         this.proportionalize(141 + 7),
       )
     }
