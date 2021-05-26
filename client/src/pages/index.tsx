@@ -22,6 +22,7 @@ import ResetPassword from 'src/pages/ResetPassword'
 import ShopFront from 'src/pages/ShopFront'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
+import AboutPage from 'src/pages/AboutPage'
 
 interface RouteCommon {
   path: string | null // null to handle 404
@@ -94,14 +95,13 @@ export const routes: Array<RouteType> = [
     path: '/faq',
     exact: true,
     Component: FaqPage,
+    noLoginRequired: true,
   },
   {
     path: '/about',
     exact: true,
-    redirect: {
-      to: 'https://www.notion.so/About-Us-34bb756e6b10412786a720cd9a081d1f',
-      type: 'external',
-    },
+    Component: AboutPage,
+    noLoginRequired: true,
   },
   {
     path: '/terms-of-service',

@@ -35,6 +35,7 @@ const Card = ({
   return (
     <Box
       className={className}
+      width="100%"
       borderRadius="lg"
       boxShadow={boxShadow ?? 'workingWindow'}
       onClick={onClick}
