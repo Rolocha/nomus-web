@@ -117,7 +117,7 @@ const CustomBuildStep = ({
       )}
 
       <Box overflowY="scroll" pt={4}>
-        <Box mb={3}>
+        <Box>
           <Text.SectionSubheader mb={2}>
             Upload front design
           </Text.SectionSubheader>
@@ -144,7 +144,7 @@ const CustomBuildStep = ({
           />
         </Box>
 
-        <Box mb={3}>
+        <Box mt="24px">
           <Text.SectionSubheader mb={2}>
             Upload back design
           </Text.SectionSubheader>
@@ -161,13 +161,13 @@ const CustomBuildStep = ({
           />
         </Box>
 
-        <Box mb={3}>
+        <Box mt="24px">
           <Text.SectionSubheader mb={2}>
             Design specifications
           </Text.SectionSubheader>
           <Box
             display="grid"
-            gridTemplateColumns="1fr 2fr"
+            gridTemplateColumns="auto 1fr"
             gridColumnGap={2}
             gridRowGap={2}
           >
