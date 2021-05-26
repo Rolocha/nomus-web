@@ -11,6 +11,7 @@ interface Props<T extends TemplateID> {
   maxWidth?: string
   shadow?: boolean
   showGuides?: boolean
+  showBorder?: boolean
   options: CardTemplateRenderOptions
 }
 
@@ -22,6 +23,7 @@ function TemplateCard<T extends TemplateID>({
   maxWidth,
   options,
   showGuides,
+  showBorder,
 }: Props<T>) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const isRenderingRef = React.useRef<boolean>(false)
@@ -39,12 +41,14 @@ function TemplateCard<T extends TemplateID>({
         await template.renderBackToCanvas(canvas, options)
       }
       isRenderingRef.current = false
-      template.drawBorder(canvas.getContext('2d')!)
+      if (showBorder) {
+        template.drawBorder(canvas.getContext('2d')!)
+      }
       if (showGuides) {
         template.drawInnerBleed(canvas.getContext('2d')!)
       }
     },
-    [options, side, templateId, showGuides, isRenderingRef],
+    [options, side, templateId, showGuides, showBorder, isRenderingRef],
   )
 
   React.useEffect(() => {
