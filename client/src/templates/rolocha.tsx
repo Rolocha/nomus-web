@@ -54,7 +54,7 @@ const Rolocha = new CardTemplate({
   width: 154,
   height: 264,
   demoImageUrl:
-    'https://user-images.githubusercontent.com/10100874/118752012-30f42f80-b817-11eb-986f-1fefcbfd8044.png',
+    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/rolocha.svg',
   colorScheme: {
     background: {
       defaultValue: colors.white,

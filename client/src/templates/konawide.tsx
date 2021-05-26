@@ -7,7 +7,7 @@ const KonaWide = new CardTemplate({
   width: 264,
   height: 154,
   demoImageUrl:
-    'https://s3.us-west-2.amazonaws.com/secure.notion-static.com/4ffdf63f-5fa9-4c65-9958-cf76da29286b/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210526%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210526T003131Z&X-Amz-Expires=86400&X-Amz-Signature=986d93d1ab1a99ff7429d1c44866b10313becef125b4f31a11c914af044b9710&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22',
+    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/konawide.svg',
   colorScheme: {
     background: {
       defaultValue: colors.white,

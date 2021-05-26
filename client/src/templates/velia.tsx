@@ -7,7 +7,7 @@ const Velia = new CardTemplate({
   width: 252,
   height: 144,
   demoImageUrl:
-    'https://user-images.githubusercontent.com/8083680/112780178-25e20780-8ffd-11eb-96ec-f1eecbe102de.png',
+    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/velia.svg',
   colorScheme: {
     background: {
       defaultValue: '#ffffff',
