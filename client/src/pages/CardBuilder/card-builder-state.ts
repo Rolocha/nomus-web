@@ -38,7 +38,7 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
     [BaseType.Template]: 'base',
   } as const)[baseType],
   baseType,
-  quantity: 50,
+  quantity: 100,
   cardVersionId: null,
   templateId: ({
     [BaseType.Custom]: null,

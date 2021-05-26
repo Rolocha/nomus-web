@@ -56,7 +56,7 @@ export const Primary = () => {
           text: colors.midnightGray,
         },
       },
-      quantity: 50,
+      quantity: 100,
       formData: {
         name: 'Spongebob',
         addressLine1: '123 Pineapple St',

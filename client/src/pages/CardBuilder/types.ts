@@ -14,7 +14,7 @@ export type CardBuilderStep =
   | 'checkout'
   | 'complete'
 
-export type OrderQuantityOption = 25 | 50 | 100
+export type OrderQuantityOption = 25 | 100 | 250
 
 // Data from the order details form
 export interface CheckoutFormData {

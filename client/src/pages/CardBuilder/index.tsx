@@ -193,7 +193,7 @@ const CardBuilder = () => {
   )
 
   const submitOrder = React.useCallback(async () => {
-    const { formData, stripeToken } = cardBuilderState
+    const { formData, stripeToken, quantity } = cardBuilderState
 
     if (
       formData == null ||
@@ -219,7 +219,7 @@ const CardBuilder = () => {
         state: formData?.state.toUpperCase(),
         postalCode: formData?.postalCode,
       },
-      quantity: 50,
+      quantity,
       stripeToken: stripeToken?.id,
     }
 

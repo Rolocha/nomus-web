@@ -2,9 +2,9 @@ import { isValidStateAbr, StateCode } from 'src/utils/states'
 
 // Sync with server/src/util/pricing.ts
 export const QUANTITY_TO_PRICE = {
-  25: 2999,
-  50: 5499,
-  100: 9999,
+  25: 7500,
+  100: 25000,
+  250: 50000,
 }
 
 export const isValidQuantity = (quantity: number) => {
