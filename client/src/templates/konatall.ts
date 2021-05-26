@@ -7,7 +7,7 @@ const KonaTall = new CardTemplate({
   width: 154,
   height: 264,
   demoImageUrl:
-    'https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cf5e1968-c155-4c81-a259-5e78e179d684/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210526%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210526T025604Z&X-Amz-Expires=86400&X-Amz-Signature=d88eed029cbfa674b52bbaf5e667184763f9d43349cbb549d29875fdfc2c83ba&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22',
+    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/konatall.svg',
   colorScheme: {
     background: {
       defaultValue: colors.white,

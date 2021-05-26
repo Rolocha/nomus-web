@@ -89,25 +89,29 @@ const BaseStep = ({
                           updateCardBuilderState({ templateId })
                         }}
                         cursor="pointer"
-                        borderRadius={2}
+                        borderRadius="16px"
                         position="relative"
                         border={
                           cardBuilderState.templateId === templateId
-                            ? `4px solid ${colors.outlineBlue}`
+                            ? `4px solid ${colors.nomusBlue}`
                             : undefined
                         }
                       >
-                        <Image w="100%" src={templateDetails.demoImageUrl} />
+                        <Image
+                          w="100%"
+                          src={templateDetails.demoImageUrl}
+                          borderRadius="inherit"
+                        />
                         <Box
                           position="absolute"
-                          bg="rgba(0,0,0,0.5)"
+                          textAlign="center"
                           bottom={0}
                           left={0}
                           width="100%"
                           px={2}
                           py={1}
                         >
-                          <Text.Body2 color={colors.white}>
+                          <Text.Body2 color={colors.midnightGray}>
                             {templateDetails.name}
                           </Text.Body2>
                         </Box>
