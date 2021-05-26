@@ -36,7 +36,7 @@ export const getCostSummary = (quantity: number, state?: string) => {
 
   let estimatedTaxes = null
   if (state && isValidStateAbr(state)) {
-    estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state as StateCode) : null
+    estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state) : null
     if (estimatedTaxes == null) {
       return null
     }
