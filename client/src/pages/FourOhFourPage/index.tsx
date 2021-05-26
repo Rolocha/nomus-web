@@ -57,7 +57,7 @@ const FourOhFourPage = () => {
           <Link
             buttonStyle="secondary"
             buttonSize="big"
-            to="mailto:hello@nomus.me"
+            to="mailto:hi@nomus.me"
           >
             Contact support
           </Link>

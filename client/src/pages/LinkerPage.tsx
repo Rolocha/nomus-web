@@ -30,7 +30,7 @@ const LINKER_MUTATION = gql`
 
 const sendHelpEmail = (routeStr: string, errorStr: string | null): string => {
   return createMailtoURL({
-    to: 'help@nomus.me',
+    to: 'hi@nomus.me',
     subject: `Sheet Linking Failed: ${routeStr}`,
     body: `
 Sheet Linking Failed for sheet: ${routeStr}
@@ -148,7 +148,7 @@ const LinkerPage = () => {
                   <Link
                     to={sendHelpEmail(window.location.pathname, infoToEmail)}
                   >
-                    help@nomus.me
+                    hi@nomus.me
                   </Link>{' '}
                   or call <Link to={'tel:+17144958665'}>714-495-8665</Link> and
                   we'll get it sorted!
@@ -210,7 +210,7 @@ const LinkerPage = () => {
                   <Link
                     to={sendHelpEmail(window.location.pathname, infoToEmail)}
                   >
-                    help@nomus.me
+                    hi@nomus.me
                   </Link>{' '}
                   , or call us at{' '}
                   <Link to={'tel:+17144958665'}>714-495-8665</Link> and we'll
