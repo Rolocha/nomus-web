@@ -3,6 +3,7 @@ import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import * as Form from 'src/components/Form'
 import Navbar from 'src/components/Navbar'
+import Footer from 'src/components/Footer'
 import Button from 'src/components/Button'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -137,7 +138,7 @@ const AboutPage = () => {
         </Box>
       </Box>
 
-      {/* What do we care about? */}
+      {/* What do we care about?  */}
       <Box container>
         <Text.SectionHeader
           mb="16px"
@@ -146,101 +147,91 @@ const AboutPage = () => {
         >
           What do we care about?
         </Text.SectionHeader>
+
         <Box
           display="grid"
           gridTemplateAreas={{
-            base: 'repeat(12, 1fr) / repeat(12, 1fr)',
-            [bp]: '1fr 2fr 1fr / 1fr 1fr 1fr 1fr',
+            base: 'repeat(4, 1fr) / 1fr',
+            [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
           mx={{ base: '24px', [bp]: '96px' }}
           gridColumnGap={{ base: 2, [bp]: 3 }}
-          textAlign="center"
+          mb={{ base: '48px', [bp]: '80px' }}
         >
-          <Text.SectionSubheader
-            gridArea={{ base: '1 / 1 / 1 / 13', [bp]: '1 / 1 / 2 / 2' }}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gridArea={{ base: '1 / 1 / 2 / 2', [bp]: '1 / 1 / 2 / 2' }}
+            mb={{ base: '24px', [bp]: '0px' }}
           >
-            Our value
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '4 / 1 / 5 / 13', [bp]: '1 / 2 / 2 / 3' }}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          >
-            Doing good
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '7 / 1 / 8 / 13', [bp]: '1 / 3 / 2 / 4' }}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          >
-            Enabling great ideas
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '10 / 1 / 11 / 13', [bp]: '1 / 4 / 2 / 5' }}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          >
-            You
-          </Text.SectionSubheader>
-          <Image
-            gridArea={{ base: '2 / 1 / 3 / 13', [bp]: '2 / 1 / 3 / 2' }}
-            src={waterHose}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          />
-          <Image
-            gridArea={{ base: '5 / 1 / 6 / 13', [bp]: '2 / 2 / 3 / 3' }}
-            src={pointAtSky}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          />
-          <Image
-            gridArea={{ base: '8 / 1 / 9 / 13', [bp]: '2 / 3 / 3 / 4' }}
-            src={handShake}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          />
-          <Image
-            gridArea={{ base: '11 / 1 / 12 / 13', [bp]: '2 / 4 / 3 / 5' }}
-            src={raiseHand}
-            textAlign="center"
-            mb={{ base: '8px', [bp]: '17px' }}
-          />
+            <Text.SectionSubheader
+              textAlign="center"
+              mb={{ base: '8px', [bp]: '17px' }}
+            >
+              Our value
+            </Text.SectionSubheader>
+            <Image
+              src={waterHose}
+              textAlign="center"
+              mb={{ base: '8px', [bp]: '17px' }}
+            />
+            <Text.Body2>
+              We work towards a product you're proud to use and we're proud to
+              work on.
+            </Text.Body2>
+          </Box>
 
-          <Text.Body2
-            gridArea={{ base: '3 / 1 / 4 / 13', [bp]: '3 / 1 / 4 / 2' }}
-            textAlign="center"
-            mb={{ base: '24px', [bp]: '80px' }}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '1 / 2 / 2 / 3' }}
+            mb={{ base: '24px', [bp]: '0px' }}
           >
-            We work towards a product you're proud to use and we're proud to
-            work on.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '6 / 1 / 7 / 13', [bp]: '3 / 2 / 4 / 3' }}
-            textAlign="center"
-            mb={{ base: '24px', [bp]: '80px' }}
+            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+              Doing good
+            </Text.SectionSubheader>
+            <Image src={pointAtSky} mb={{ base: '8px', [bp]: '17px' }} />
+            <Text.Body2>
+              We're always asking, "what's the right thing to do here?" Our goal
+              is to do business the good way.
+            </Text.Body2>
+          </Box>
+
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '1 / 3 / 2 / 4' }}
+            mb={{ base: '24px', [bp]: '0px' }}
           >
-            We're always asking ourselves, "what's the right thing to do here?"
-            Our goal is to do business the good way.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '9 / 1 / 10 / 13', [bp]: '3 / 3 / 4 / 4' }}
-            textAlign="center"
-            mb={{ base: '24px', [bp]: '80px' }}
+            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+              Enabling great ideas
+            </Text.SectionSubheader>
+            <Image src={handShake} mb={{ base: '8px', [bp]: '17px' }} />
+            <Text.Body2>
+              Whether individuals or business, we believe that connecting people
+              with people drives innovation.
+            </Text.Body2>
+          </Box>
+
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gridArea={{ base: '4 / 1 / 5 / 2', [bp]: '1 / 4 / 2 / 5' }}
+            mb={{ base: '24px', [bp]: '0px' }}
           >
-            Whether individuals or business, we believe that connecting people
-            with people drives innovation.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '12 / 1 / 13 / 13', [bp]: '3 / 4 / 4 / 5' }}
-            textAlign="center"
-            mb={{ base: '48px', [bp]: '80px' }}
-          >
-            We want you to succeed – show us who you are. We're here to listen –
-            tell us how we can do better.
-          </Text.Body2>
+            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+              You
+            </Text.SectionSubheader>
+            <Image src={raiseHand} mb={{ base: '8px', [bp]: '17px' }} />
+            <Text.Body2>
+              We want you to succeed – show us who you are. We're here to listen
+              – tell us how we can do better.
+            </Text.Body2>
+          </Box>
         </Box>
       </Box>
 
@@ -377,7 +368,7 @@ const AboutPage = () => {
         </Box>
       </Box>
 
-      {/* Meet the crew */}
+      {/* Meet the crew  */}
       <Box container>
         <Text.SectionHeader textAlign="center">
           Meet the crew
@@ -385,112 +376,86 @@ const AboutPage = () => {
         <Box
           display="grid"
           gridTemplateAreas={{
-            base: 'repeat(16, 1fr) / 1fr',
-            [bp]: '1fr 1fr 2fr 1fr / 1fr 1fr 1fr 1fr',
+            base: 'repeat(4, 1fr) / 1fr',
+            [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
           mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           gridColumnGap={{ base: 2, [bp]: 3 }}
           mb={{ base: '54px', [bp]: '80px' }}
+          // width="270px"
         >
-          <Text.SectionSubheader
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '1 / 1 / 2 / 2', [bp]: '1 / 1 / 2 / 2' }}
-            textAlign="center"
           >
-            Anshul Aggarwal
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '5 / 1 / 6 / 2', [bp]: '1 / 2 / 2 / 3' }}
-            textAlign="center"
-          >
-            Cindy Cheung
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '9 / 1 / 10 / 2', [bp]: '1 / 3 / 2 / 4' }}
-            textAlign="center"
-          >
-            Bibek Ghimire
-          </Text.SectionSubheader>
-          <Text.SectionSubheader
-            gridArea={{ base: '13 / 1 / 14 / 2', [bp]: '1 / 4 / 2 / 5' }}
-            textAlign="center"
-          >
-            Hanad Musa
-          </Text.SectionSubheader>
-          <Text.Body
-            gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '2 / 1 / 3 / 2' }}
-            textAlign="center"
-          >
-            Chief Executive Officer
-          </Text.Body>
-          <Text.Body
-            gridArea={{ base: '6 / 1 / 7 / 2', [bp]: '2 / 2 / 3 / 3' }}
-            textAlign="center"
-          >
-            Chief Design Officer
-          </Text.Body>
-          <Text.Body
-            gridArea={{ base: '10 / 1 / 11 / 2', [bp]: '2 / 3 / 3 / 4' }}
-            textAlign="center"
-          >
-            Chief Technical Officer
-          </Text.Body>
-          <Text.Body
-            gridArea={{ base: '14 / 1 / 15 / 2', [bp]: '2 / 4 / 3 / 5' }}
-            textAlign="center"
-          >
-            Chief Operations Officer
-          </Text.Body>
+            <Text.SectionSubheader>Anshul Aggarwal</Text.SectionSubheader>
+            <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
+              Chief Executive Officer
+            </Text.Body>
+            <Image src={anshul} mb={{ base: '6px', [bp]: '8px' }} />
+            <Text.Body2>
+              A fan of overextending himself due to being passionate about
+              people among a million and one things.
+            </Text.Body2>
+          </Box>
 
-          <Image
-            gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '3 / 1 / 4 / 2' }}
-            src={anshul}
-            mb={{ base: '8px', [bp]: '6px' }}
-          />
-          <Image
-            gridArea={{ base: '7 / 1 / 8 / 2', [bp]: '3 / 2 / 4 / 3' }}
-            src={cindy}
-            mb={{ base: '8px', [bp]: '6px' }}
-          />
-          <Image
-            gridArea={{ base: '11 / 1 / 12 / 2', [bp]: '3 / 3 / 4 / 4' }}
-            src={bibek}
-            mb={{ base: '8px', [bp]: '6px' }}
-          />
-          <Image
-            gridArea={{ base: '15 / 1 / 16 / 2', [bp]: '3 / 4 / 4 / 5' }}
-            src={hanad}
-            mb={{ base: '8px', [bp]: '6px' }}
-          />
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mb={{ base: '24px', [bp]: '0px' }}
+            gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '1 / 2 / 2 / 3' }}
+          >
+            <Text.SectionSubheader>Cindy Cheung</Text.SectionSubheader>
+            <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
+              Chief Design Officer
+            </Text.Body>
+            <Image src={cindy} mb={{ base: '6px', [bp]: '8px' }} />
+            <Text.Body2>
+              Counts her senior-year high school yearbook as one of her greatest
+              achievements still.
+            </Text.Body2>
+          </Box>
 
-          <Text.Body2
-            gridArea={{ base: '4 / 1 / 5 / 2', [bp]: '4 / 1 / 5 / 2' }}
-            textAlign="center"
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mb={{ base: '24px', [bp]: '0px' }}
+            gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '1 / 3 / 2 / 4' }}
           >
-            A fan of overextending himself due to being passionate about people
-            among a million and one things.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '8 / 1 / 9 / 2', [bp]: '4 / 2 / 5 / 3' }}
-            textAlign="center"
+            <Text.SectionSubheader>Bibek Ghimire</Text.SectionSubheader>
+            <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
+              Chief Technical Officer
+            </Text.Body>
+            <Image src={bibek} mb={{ base: '6px', [bp]: '8px' }} />
+            <Text.Body2>
+              Fought through months of sickness and back pain to bring Nomus
+              into the world.
+            </Text.Body2>
+          </Box>
+
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mb={{ base: '24px', [bp]: '0px' }}
+            gridArea={{ base: '4 / 1 / 5 / 2', [bp]: '1 / 4 / 2 / 5' }}
           >
-            Counts her senior-year high school yearbook as one of her greatest
-            achievements still.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '12 / 1 / 13 / 2', [bp]: '4 / 3 / 5 / 4' }}
-            textAlign="center"
-          >
-            Fought through months of sickness and back pain to bring Nomus into
-            the world.
-          </Text.Body2>
-          <Text.Body2
-            gridArea={{ base: '16 / 1 / 17 / 2', [bp]: '4 / 4 / 5 / 5' }}
-            textAlign="center"
-          >
-            King of crosswords and planning “get-togethers” that are probably
-            too popular for their own good.
-          </Text.Body2>
+            <Text.SectionSubheader>Hanad Musa</Text.SectionSubheader>
+            <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
+              Chief Operations Officer
+            </Text.Body>
+            <Image src={hanad} mb={{ base: '6px', [bp]: '8px' }} />
+            <Text.Body2>
+              King of crosswords and planning “get-togethers” that are probably
+              too popular for their own good.
+            </Text.Body2>
+          </Box>
         </Box>
       </Box>
 
@@ -605,6 +570,8 @@ const AboutPage = () => {
           </Box>
         </Box>
       </Box>
+
+      <Footer colorScheme="light" />
     </Box>
   )
 }
