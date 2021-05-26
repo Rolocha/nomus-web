@@ -148,13 +148,11 @@ export const routes: Array<RouteType> = [
   {
     path: '/shop',
     Component: ShopFront,
-    exclude: inProduction,
   },
   {
     path: '/card-studio/:buildBaseType?',
     Component: CardBuilder,
     requiredAuthLevel: Role.User,
-    exclude: inProduction,
   },
   {
     path: '/admin/linker/:routeStr',

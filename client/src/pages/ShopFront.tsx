@@ -1,18 +1,13 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
-import Card from 'src/components/Card'
 import Footer from 'src/components/Footer'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
-import * as SVG from 'src/components/SVG'
+import PricingTiers from 'src/components/PricingTiers'
 import * as Text from 'src/components/Text'
 import cardCustomBg from 'src/images/card-custom-promo-bg.png'
 import cardTemplateBg from 'src/images/card-template-promo-bg.png'
-import { colors } from 'src/styles'
-import { formatDollarAmount } from 'src/utils/money'
-import { QUANTITY_TO_PRICE } from 'src/utils/pricing'
 
 const bp = 'lg'
 
@@ -41,10 +36,10 @@ const ShopFront = () => {
             <Text.PageHeader textAlign="center" mt={3} mb={1}>
               Design your Nomus card
             </Text.PageHeader>
-            <Text.Body2 textAlign="center" mb={2} maxWidth="80%">
+            <Text.Body textAlign="center" mb={2} maxWidth="80%">
               Whichever you choose, your cards will have a Nomus tap-to-share
               chip built in.
-            </Text.Body2>
+            </Text.Body>
 
             <Box
               my={3}
@@ -90,14 +85,14 @@ const ShopFront = () => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Button
-                    width="calc(100% * (4/6))"
-                    variant="primary"
-                    size="big"
-                    disabled
+                  <Link
+                    minWidth="calc(100% * (4/6))"
+                    buttonStyle="primary"
+                    buttonSize="big"
+                    to="/card-studio/template"
                   >
-                    Templates coming soon
-                  </Button>
+                    Kickstart with a Nomus template
+                  </Link>
                 </Box>
               </Box>
 
@@ -145,65 +140,15 @@ const ShopFront = () => {
               </Text.Body2>
             </Box>
 
-            <Text.SectionHeader mt={4} mb={2}>
-              Pricing tiers
+            <Text.SectionHeader mt="50px" mb="16px">
+              Pricing
             </Text.SectionHeader>
-            <Box
-              display="grid"
-              gridTemplateColumns={{ base: undefined, [bp]: 'repeat(3, 4fr)' }}
-              gridTemplateRows={{ base: 'repeat(3, 4fr)', [bp]: 'unset' }}
-              gridColumnGap={3}
-              gridRowGap={3}
-            >
-              {([
-                {
-                  quantity: 25,
-                  icon: <SVG.Smile1 />,
-                  description:
-                    'Just enough to get you started in the NFC business cards game.',
-                  topBarColor: colors.cyanProcess,
-                },
-                {
-                  quantity: 50,
-                  icon: <SVG.Smile2 />,
-                  description:
-                    'You’ll be perfectly stocked for your next event or conference.',
-                  topBarColor: colors.gold,
-                },
-                {
-                  quantity: 100,
-                  icon: <SVG.Smile3 />,
-                  description:
-                    'Somebody’s popular! Or planning ahead. Or both.',
-                  topBarColor: colors.brightCoral,
-                },
-              ] as const).map(
-                ({ quantity, description, icon, topBarColor }) => {
-                  const price = QUANTITY_TO_PRICE[quantity]
-                  return (
-                    <Card
-                      key={quantity}
-                      topBarColor={topBarColor}
-                      align="mix"
-                      size="small"
-                      icon={icon}
-                      header={`${quantity} cards / ${formatDollarAmount(
-                        price,
-                      )}`}
-                      subheader={`${formatDollarAmount(
-                        Math.round(price / quantity),
-                      )} per card`}
-                      bodyText={description}
-                      boxShadow="workingWindow"
-                    />
-                  )
-                },
-              )}
-            </Box>
+
+            <PricingTiers />
           </Box>
         </Box>
       </Box>
-      <Footer />
+      <Footer colorScheme="light" />
     </Box>
   )
 }

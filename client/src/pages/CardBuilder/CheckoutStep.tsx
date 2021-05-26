@@ -2,15 +2,14 @@ import * as stripeJs from '@stripe/stripe-js'
 import * as React from 'react'
 import { UseFormMethods } from 'react-hook-form'
 import Box from 'src/components/Box'
-import Card from 'src/components/Card'
 import CreditCardInput from 'src/components/CreditCardInput'
 import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
-import * as SVG from 'src/components/SVG'
+import PricingTiers from 'src/components/PricingTiers'
 import * as Text from 'src/components/Text'
 import { createMailtoURL } from 'src/utils/email'
 import { formatDollarAmount } from 'src/utils/money'
-import { getCostSummary, QUANTITY_TO_PRICE } from 'src/utils/pricing'
+import { getCostSummary } from 'src/utils/pricing'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -48,85 +47,33 @@ const CheckoutStep = ({
     checkoutFormMethods.getValues('state'),
   )
 
-  const quantityOptions = ([
-    {
-      quantity: 25,
-      icon: <SVG.Smile1 />,
-      description:
-        'Just enough to get you started in the NFC business cards game.',
-    },
-    {
-      quantity: 50,
-      icon: <SVG.Smile2 />,
-      description:
-        'You’ll be perfectly stocked for your next event or conference.',
-    },
-    {
-      quantity: 100,
-      icon: <SVG.Smile3 />,
-      description: 'Somebody’s popular! Or planning ahead. Or both.',
-    },
-  ] as const).map(({ quantity, description, icon }) => {
-    const price = QUANTITY_TO_PRICE[quantity]
-    const selected = cardBuilderState.quantity === quantity
-    return (
-      <Box
-        transition="0.3s ease transform"
-        transform={`scale(${selected ? 1.02 : 1})`}
-      >
-        <Card
-          key={quantity}
-          topBarColor={
-            cardBuilderState.quantity === quantity ? 'gold' : 'disabledBlue'
-          }
-          align="mix"
-          size="small"
-          icon={icon}
-          header={`${quantity} cards`}
-          subheader={`${formatDollarAmount(price)} (${formatDollarAmount(
-            Math.round(price / quantity),
-          )}/card)`}
-          bodyText={description}
-          boxShadow={selected ? 'prominent' : 'workingWindow'}
-          onClick={() =>
-            updateCardBuilderState({
-              quantity,
-            })
-          }
-        />
-      </Box>
-    )
-  })
-
   return (
     <Box height="100%">
       <Text.SectionHeader mb="24px">Order details</Text.SectionHeader>
       <Text.SectionSubheader mb={2}>
         How many cards do you want?
       </Text.SectionSubheader>
-      <Box
-        display="grid"
-        gridTemplateColumns={{ base: '1fr', lg: 'repeat(3, 4fr)' }}
-        gridColumnGap={3}
-        gridRowGap={2}
-      >
-        {quantityOptions}
-        <Box
-          gridColumn={{ base: '1/2', lg: '3/4' }}
-          placeSelf={{ base: 'start', lg: 'start end' }}
+      <PricingTiers
+        isSelectable
+        selectedQuantity={cardBuilderState.quantity}
+        onChangeSelectedQuantity={(quantity) =>
+          updateCardBuilderState({
+            quantity,
+          })
+        }
+      />
+      <Box display="flex" justifyContent="flex-end">
+        <Link
+          to={createMailtoURL({
+            to: 'hi@nomus.me',
+            subject: 'Large Card Order',
+            body: `I'd like to put in a large order!\n(Put Details of your order here)`.trim(),
+          })}
         >
-          <Link
-            to={createMailtoURL({
-              to: 'hi@nomus.me',
-              subject: 'Large Card Order',
-              body: `I'd like to put in a large order!\n(Put Details of your order here)`.trim(),
-            })}
-          >
-            <Text.Body2 color="inherit">
-              Need more than 100? Let us know.
-            </Text.Body2>
-          </Link>
-        </Box>
+          <Text.Body2 color="inherit">
+            Need more than 100? Let us know.
+          </Text.Body2>
+        </Link>
       </Box>
 
       <Box mt="32px">

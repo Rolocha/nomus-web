@@ -53,7 +53,7 @@ export const Primary = () => {
       },
     },
     omittedOptionalFields: ['contactInfo.line3'],
-    quantity: 50,
+    quantity: 100,
     formData: {
       name: 'Spongebob',
       addressLine1: '123 Pineapple St',
