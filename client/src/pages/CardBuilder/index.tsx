@@ -37,7 +37,7 @@ import {
   CardBuilderStep,
   CheckoutFormData,
 } from 'src/pages/CardBuilder/types'
-import breakpoints from 'src/styles/breakpoints'
+import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
@@ -48,7 +48,7 @@ interface ParamsType {
   buildBaseType?: 'custom' | 'template' | string
 }
 
-const bp = 'md'
+const bp = 'lg'
 
 export function isValidPostalCode(
   postalCode: string | null | undefined,
@@ -64,6 +64,7 @@ const CardBuilder = () => {
   const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
   const location = useLocation()
   const history = useHistory()
+  const isDesktop = useBreakpoint('lg')
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
@@ -341,6 +342,27 @@ const CardBuilder = () => {
 
     // (base) => build => checkout => review
     switch (comingFromStep) {
+      case 'build':
+        if (baseType === BaseType.Template) {
+          // If the user leaves the template build step with any contact info fields not yet explicitly omitted
+          // but also not filled in, implicitly mark the fields as omitted
+          if (!cardBuilderState.templateId) break
+          const selectedTemplate = templateLibrary[cardBuilderState.templateId]
+
+          const fieldsLeftEmptyButForgotToOmit = selectedTemplate.contactInfoFieldNames.filter(
+            (contactInfoFieldName) =>
+              !cardBuilderState.templateCustomization?.contactInfo[
+                contactInfoFieldName
+              ],
+          )
+
+          updateCardBuilderState({
+            omittedOptionalFields: fieldsLeftEmptyButForgotToOmit.map(
+              (fieldName) => `contactInfo.${fieldName}`,
+            ),
+          })
+        }
+        break
       case 'checkout':
         // Cache the current form data in cardBuilderState since react-hook-form
         // will drop it when the form fields unmount
@@ -366,16 +388,17 @@ const CardBuilder = () => {
       minWidth={{ base: '0', [bp]: `calc(1.1 * ${breakpoints.lg})` }}
       position="relative"
       display="flex"
+      width="100%"
       flexDirection="column"
       alignItems="stretch"
     >
       <Navbar />
       <Box
-        container
+        container={isDesktop}
         width="100%"
         display="flex"
         flexDirection="column"
-        alignItems="center"
+        alignItems="stretch"
       >
         <Box
           maxWidth={{ [bp]: `calc(1.5 * ${breakpoints.lg})` }}

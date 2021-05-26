@@ -3,6 +3,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import Icon from 'src/components/Icon'
 import { colors } from 'src/styles'
+import { useBreakpoint } from 'src/styles/breakpoints'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 
 type SideRenderer = (opts: { showGuides: boolean }) => React.ReactNode
@@ -27,42 +28,64 @@ const CardBuilderPreview = ({
 
   const backSide = renderBack ? renderBack({ showGuides }) : null
   const frontSide = renderFront ? renderFront({ showGuides }) : null
+  const isLgBp = useBreakpoint('lg')
 
   return (
     <Box display="grid" gridTemplateRows="auto 1fr auto">
       <Box
         display="grid"
-        gridTemplateColumns="2fr 1fr 3fr 2fr"
+        gridTemplateColumns={{ base: '1fr 1fr', lg: '2fr 1fr 3fr 2fr' }}
+        gridTemplateAreas={{
+          base: `
+            "guideToggle whichSideToggle"
+            "bothSidesToggle bothSidesToggle"
+          `,
+          lg: `
+            "guideToggle . bothSidesToggle whichSideToggle"
+          `,
+        }}
         gridTemplateRows="auto"
-        gridColumnGap={3}
+        gridGap={{ base: '8px', lg: '16px' }}
         mb={3}
       >
         <Button
+          gridArea="guideToggle"
           variant="secondary"
           disabled={missingBothImages}
           onClick={() => setShowGuides(!showGuides)}
-          leftIcon={<Icon of="ruler" color={colors.nomusBlue} />}
-        >
-          {showGuides ? 'Hide' : 'Show'} guides
-        </Button>
-        {/* Empty box to take up the space of the 2nd column */}
-        <Box />
+          leftIcon={
+            <Icon
+              of="ruler"
+              color={colors.nomusBlue}
+              mr={{ base: '-0.5rem', lg: 0 }}
+            />
+          }
+          children={
+            isLgBp ? `${showGuides ? 'Hide' : 'Show'} guides` : undefined
+          }
+        />
         <Button
+          gridArea="bothSidesToggle"
           variant="secondary"
           disabled={missingAtLeastOneImage}
           onClick={() => setShowBothSides(!showBothSides)}
           leftIcon={<Icon of="switchSides" color={colors.nomusBlue} />}
-        >
-          {showBothSides ? 'Show one side' : 'Show both sides'}
-        </Button>
+          children={`${showBothSides ? 'Show one side' : 'Show both sides'}`}
+        />
         <Button
+          gridArea="whichSideToggle"
           variant="secondary"
           disabled={missingBothImages || showBothSides}
           onClick={() => setShowBack(!showBack)}
-          leftIcon={<Icon of="sync" color={colors.nomusBlue} />}
-        >
-          Flip to {showBack ? 'front' : 'back'}
-        </Button>
+          leftIcon={
+            <Icon
+              of="sync"
+              color={colors.nomusBlue}
+              mr={{ base: '-0.5rem', lg: 0 }}
+            />
+          }
+          children={isLgBp ? `Show ${showBack ? 'front' : 'back'}` : undefined}
+        />
       </Box>
 
       <Box
@@ -95,7 +118,7 @@ const CardBuilderPreview = ({
           width="100%"
           placeSelf="end center"
         >
-          <Box gridColumn="2/3">
+          <Box gridColumn={{ base: '1/4', lg: '2/3' }}>
             <CardBuilderPreviewLegend />
           </Box>
         </Box>

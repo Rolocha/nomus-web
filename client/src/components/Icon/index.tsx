@@ -1,5 +1,6 @@
 import { IconProps } from '@chakra-ui/icons'
 import * as React from 'react'
+import NFCIcon from 'src/components/Icon/NFCIcon'
 import ArrowRightIcon from './ArrowRightIcon'
 import ArrowRightOIcon from './ArrowRightOIcon'
 import CardsIcon from './CardsIcon'
@@ -60,6 +61,7 @@ const iconLibrary = {
   list: ListIcon,
   menu: MenuIcon,
   minus: MinusIcon,
+  nfc: NFCIcon,
   options: OptionsIcon,
   orders: OrdersIcon,
   pen: PenIcon,

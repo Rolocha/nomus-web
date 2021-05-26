@@ -40,10 +40,15 @@ const TemplateBuildStep = ({
 
   const customizationForm = useForm<Record<string, any>>({
     defaultValues: {
-      ...deepMergeObjects({ ...defaultOptions }, templateCustomization),
-      qrCodeUrl: cardBuilderState.cardVersionId
-        ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
-        : `${window.location.host}`,
+      ...deepMergeObjects(
+        { ...defaultOptions },
+        {
+          ...templateCustomization,
+          qrCodeUrl: cardBuilderState.cardVersionId
+            ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
+            : `${window.location.host}`,
+        },
+      ),
     },
   })
 
@@ -53,10 +58,9 @@ const TemplateBuildStep = ({
     (fieldFormKey, shouldOmit) => {
       if (shouldOmit) {
         updateCardBuilderState({
-          omittedOptionalFields: [
-            ...cardBuilderState.omittedOptionalFields,
-            fieldFormKey,
-          ],
+          omittedOptionalFields: Array.from(
+            new Set([...cardBuilderState.omittedOptionalFields, fieldFormKey]),
+          ),
         })
       } else {
         updateCardBuilderState({
@@ -86,11 +90,25 @@ const TemplateBuildStep = ({
     <Box
       height="100%"
       display="grid"
-      gridTemplateColumns="4fr 8fr"
-      gridColumnGap={3}
+      gridTemplateColumns={{ base: '1fr', lg: '4fr 8fr' }}
+      gridTemplateAreas={{
+        base: `
+        "preview"
+        "controls"
+        `,
+        lg: `
+        "controls preview"
+        `,
+      }}
+      gridGap={3}
     >
-      {/* Left-hand side: customizable fields */}
-      <Box display="grid" gridTemplateColumns="1fr" gridRowGap={4}>
+      {/* Controls/customizable fields */}
+      <Box
+        gridArea="controls"
+        display="grid"
+        gridTemplateColumns="1fr"
+        gridRowGap={4}
+      >
         {/* Color scheme */}
         <Box>
           <Text.SectionSubheader mb={3}>Color scheme</Text.SectionSubheader>
@@ -168,14 +186,14 @@ const TemplateBuildStep = ({
             const inputDisabled = !fieldRequired && userWantsToOmitThisField
 
             const label = (
-              <Form.Label required={fieldDetails.required}>
+              <Form.Label required={fieldRequired}>
                 {fieldDetails.label}
               </Form.Label>
             )
 
             return (
               <Box key={fieldName} mb={4}>
-                {fieldDetails.required ? (
+                {fieldRequired ? (
                   label
                 ) : (
                   <Box
@@ -186,7 +204,7 @@ const TemplateBuildStep = ({
                     {label}
                     <Switch
                       colorScheme="blue"
-                      isChecked={!fieldRequired && !userWantsToOmitThisField}
+                      isChecked={!userWantsToOmitThisField}
                       onChange={(event) => {
                         const shouldOmit = !event.target.checked
                         setOptionalFieldOmission(fieldFormKey, shouldOmit)
@@ -232,7 +250,10 @@ const TemplateBuildStep = ({
           }
         />
       </Box>
+
+      {/* Card preview */}
       <Box
+        gridArea="preview"
         overflow="visible"
         sx={{
           '& > canvas': {

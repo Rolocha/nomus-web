@@ -24,40 +24,47 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
 
       <Box
         display="grid"
-        gridTemplateColumns="7fr 1fr 4fr"
+        gridTemplateColumns={{ base: '1fr', md: '7fr 1fr 4fr' }}
         gridTemplateAreas={{
+          base: `
+            "detailSummary1"
+            "detailSummary2"
+            "costSummary"
+          `,
           md: `
             "detailSummary1 . costSummary"
             "detailSummary2 . costSummary"
           `,
         }}
+        gridRowGap="16px"
       >
         <Box
           gridArea="detailSummary1"
           display="grid"
-          gridTemplateColumns="3fr 2fr 1fr 1fr"
+          gridTemplateColumns="1fr 1fr"
+          gridRowGap="8px"
           placeSelf="start stretch"
           pb={4}
           borderBottom={`1px solid ${colors.africanElephant}`}
         >
-          <Box>
-            <Text.Body2 fontWeight="500">Item</Text.Body2>
-            <Text.Body2>{cardDescription}</Text.Body2>
-          </Box>
+          {/* <Box> */}
+          <Text.Body2 fontWeight="500">Item</Text.Body2>
+          <Text.Body2>{cardDescription}</Text.Body2>
+          {/* </Box> */}
 
-          <Box>
-            <Text.Body2 fontWeight="500">Quantity</Text.Body2>
-            <Text.Body2>{cardBuilderState.quantity} cards</Text.Body2>
-          </Box>
+          {/* <Box> */}
+          <Text.Body2 fontWeight="500">Quantity</Text.Body2>
+          <Text.Body2>{cardBuilderState.quantity} cards</Text.Body2>
+          {/* </Box> */}
 
-          <Box>
-            <Text.Body2 fontWeight="500">Price</Text.Body2>
-            <Text.Body2>
-              {costSummary?.subtotal
-                ? formatDollarAmount(costSummary?.subtotal)
-                : '...'}
-            </Text.Body2>
-          </Box>
+          {/* <Box> */}
+          <Text.Body2 fontWeight="500">Price</Text.Body2>
+          <Text.Body2>
+            {costSummary?.subtotal
+              ? formatDollarAmount(costSummary?.subtotal)
+              : '...'}
+          </Text.Body2>
+          {/* </Box> */}
 
           <Box>{/* <EditButton /> */}</Box>
         </Box>
@@ -66,7 +73,7 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
           pt={4}
           gridArea="detailSummary2"
           display="grid"
-          gridTemplateColumns="3fr 3fr "
+          gridTemplateColumns="3fr 3fr"
           placeSelf="start stretch"
           justifyItems="start"
           gridRowGap={3}
@@ -83,12 +90,6 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
               .map((line, index) => (
                 <Text.Body2 key={index}>{line}</Text.Body2>
               ))}
-          </Box>
-
-          {/* next row */}
-          <Text.Body2>Delivery ETA</Text.Body2>
-          <Box>
-            <Text.Body2>TODO</Text.Body2>
           </Box>
 
           {/* next row */}

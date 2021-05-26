@@ -11,7 +11,6 @@ interface Props {
   selectedFileItem: FileItem | null
   handleFileItemChange: (file: FileItem | null) => void
   createObjectUrl: boolean
-  showImagePreview: boolean
   accept?: string
   width?: string
   height?: string
@@ -26,7 +25,6 @@ const FileUploadButton = ({
   selectedFileItem,
   handleFileItemChange,
   createObjectUrl,
-  showImagePreview,
   uploadText,
 }: Props) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null)
