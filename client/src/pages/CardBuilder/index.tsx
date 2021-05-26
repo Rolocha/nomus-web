@@ -441,6 +441,7 @@ const CardBuilder = () => {
                 formData.postalCode,
                 formData.name,
                 cardBuilderState.cardEntryComplete,
+                checkoutFormMethods.formState.isValid,
               ].every(Boolean)}
             >
               <CheckoutStep

@@ -159,7 +159,7 @@ const CheckoutStep = ({
                   width="100%"
                 />
               </Box>
-              <Box gridColumn="1/4" gridRow="4/4">
+              <Box gridColumn="1/3" gridRow="4/4">
                 <Form.Label>City</Form.Label>
                 <Form.Input
                   name="city"
@@ -167,7 +167,7 @@ const CheckoutStep = ({
                   width="100%"
                 />
               </Box>
-              <Box gridColumn="4/6" gridRow="4/4">
+              <Box gridColumn="3/5" gridRow="4/4">
                 <Form.Label>State</Form.Label>
                 <Form.Input
                   name="state"
@@ -181,7 +181,7 @@ const CheckoutStep = ({
                   fieldError={checkoutFormMethods.errors.state}
                 />
               </Box>
-              <Box gridColumn="6/7" gridRow="4/4">
+              <Box gridColumn="5/7" gridRow="4/4">
                 <Form.Label>Zip Code</Form.Label>
                 <Form.Input
                   name="postalCode"
