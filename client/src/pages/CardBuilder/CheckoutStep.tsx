@@ -158,7 +158,7 @@ const CheckoutStep = ({
                 "cardNumber cardNumber"
                 `,
                   lg: `
-                "name name ."
+                "name name name"
                 "line1 line1 line1"
                 "line2 line2 line2"
                 "city state zip"
