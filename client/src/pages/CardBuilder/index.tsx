@@ -50,6 +50,16 @@ interface ParamsType {
 
 const bp = 'md'
 
+export function isValidPostalCode(
+  postalCode: string | null | undefined,
+): boolean {
+  if (postalCode) {
+    const isnum = /^\d+$/.test(postalCode)
+    return postalCode.length === 5 && isnum
+  }
+  return false
+}
+
 const CardBuilder = () => {
   const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
   const location = useLocation()
@@ -128,6 +138,10 @@ const CardBuilder = () => {
           .string()
           .required('Required')
           .test('is-state', 'Not valid', isValidStateAbr),
+        postalCode: yup
+          .string()
+          .required('Required')
+          .test('is-postal', 'Not Valid', isValidPostalCode),
       }),
     ),
   })

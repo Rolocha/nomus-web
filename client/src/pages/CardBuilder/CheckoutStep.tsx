@@ -187,6 +187,11 @@ const CheckoutStep = ({
                   name="postalCode"
                   ref={checkoutFormMethods.register}
                   width="100%"
+                  error={checkoutFormMethods.errors.postalCode}
+                  maxLength={5}
+                />
+                <Form.FieldError
+                  fieldError={checkoutFormMethods.errors.postalCode}
                 />
               </Box>
 
