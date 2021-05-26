@@ -12,7 +12,10 @@ interface Props {
 }
 
 const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
-  const costSummary = getCostSummary(cardBuilderState.quantity)
+  const costSummary = getCostSummary(
+    cardBuilderState.quantity,
+    cardBuilderState.formData?.state,
+  )
   return (
     <Box>
       <Text.SectionHeader mt={4} mb="24px">
@@ -129,7 +132,7 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
           <Text.Body2>Estimated Taxes</Text.Body2>
           <Box />
           <Text.Body2>
-            {costSummary?.estimatedTaxes
+            {costSummary?.estimatedTaxes != null
               ? formatDollarAmount(costSummary.estimatedTaxes)
               : '...'}
           </Text.Body2>

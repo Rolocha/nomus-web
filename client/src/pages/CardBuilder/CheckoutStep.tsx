@@ -165,7 +165,7 @@ const CheckoutStep = ({
                 "cardNumber cardNumber"
                 `,
                   lg: `
-                "name name ."
+                "name name name"
                 "line1 line1 line1"
                 "line2 line2 line2"
                 "city state zip"
@@ -214,8 +214,12 @@ const CheckoutStep = ({
                     name="state"
                     ref={checkoutFormMethods.register}
                     width="100%"
+                    error={checkoutFormMethods.errors.state}
                     maxLength={2}
                     sx={{ textTransform: 'uppercase' }}
+                  />
+                  <Form.FieldError
+                    fieldError={checkoutFormMethods.errors.state}
                   />
                 </Box>
                 <Box gridArea="zip">
@@ -224,6 +228,11 @@ const CheckoutStep = ({
                     name="postalCode"
                     ref={checkoutFormMethods.register}
                     width="100%"
+                    error={checkoutFormMethods.errors.postalCode}
+                    maxLength={5}
+                  />
+                  <Form.FieldError
+                    fieldError={checkoutFormMethods.errors.postalCode}
                   />
                 </Box>
                 <Box gridArea="cardNumber">
