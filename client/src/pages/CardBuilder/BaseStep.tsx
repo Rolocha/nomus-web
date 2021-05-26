@@ -89,7 +89,7 @@ const BaseStep = ({
                           updateCardBuilderState({ templateId })
                         }}
                         cursor="pointer"
-                        borderRadius={2}
+                        borderRadius={16}
                         position="relative"
                         border={
                           cardBuilderState.templateId === templateId
@@ -97,7 +97,11 @@ const BaseStep = ({
                             : undefined
                         }
                       >
-                        <Image w="100%" src={templateDetails.demoImageUrl} />
+                        <Image
+                          w="100%"
+                          src={templateDetails.demoImageUrl}
+                          borderRadius="inherit"
+                        />
                         <Box
                           position="absolute"
                           textAlign="center"
