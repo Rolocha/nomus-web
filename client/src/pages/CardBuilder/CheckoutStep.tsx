@@ -119,8 +119,7 @@ const CheckoutStep = ({
             to={createMailtoURL({
               to: 'hi@nomus.me',
               subject: 'Large Card Order',
-              body:
-                "I'd like to put in a large order! \n(Put Details of your order here)",
+              body: `I'd like to put in a large order! CardVersion: ${cardBuilderState.cardVersionId} \n(Put Details of your order here)`.trim(),
             })}
           >
             <Text.Body2 color="inherit">
