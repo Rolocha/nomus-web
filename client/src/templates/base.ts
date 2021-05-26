@@ -303,9 +303,11 @@ export default class CardTemplate {
     y: number,
     maxWidth: number,
     lineHeight: number,
-  ) {
+  ): { width: number; height: number } {
     const words = text.split(' ')
     let line = ''
+    let width = 0
+    let height = 0
 
     for (let n = 0; n < words.length; n++) {
       const testLine = line + words[n] + ' '
@@ -315,11 +317,18 @@ export default class CardTemplate {
         ctx.fillText(line, x, y)
         line = words[n] + ' '
         y += lineHeight
+        width += metrics.width
+        height += lineHeight
       } else {
         line = testLine
       }
     }
+    const lineWidth = ctx.measureText(line).width
     ctx.fillText(line, x, y)
+    width += lineWidth
+    height += lineHeight
+
+    return { width, height }
   }
 
   protected wrapTextAnchorBottomLeft(
