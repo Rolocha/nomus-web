@@ -1,11 +1,13 @@
-import Kona from 'src/templates/kona'
+import KonaTall from 'src/templates/konatall'
+import KonaWide from 'src/templates/konawide'
 import Rolocha from 'src/templates/rolocha'
 import Velia from 'src/templates/velia'
 
 export const templateLibrary = {
   velia: Velia,
   rolocha: Rolocha,
-  kona: Kona,
+  konawide: KonaWide,
+  konatall: KonaTall,
 } as const
 
 export type TemplateID = keyof typeof templateLibrary

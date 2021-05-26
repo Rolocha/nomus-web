@@ -6,7 +6,7 @@ import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 
 export default {
-  title: 'Card Templates/Kona',
+  title: 'Card Templates/KonaWide',
   excludeStories: /.*Data$/,
 }
 
@@ -15,7 +15,7 @@ export const actionsData = {
 }
 
 //👇 We create a “template” of how args map to rendering
-const KonaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
+const KonaWideTemplateTemplate: Story<CardTemplateRenderOptions> = ({
   ...options
 }) => {
   return (
@@ -24,7 +24,7 @@ const KonaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
         <TemplateCard
           shadow
           width="400px"
-          templateId="kona"
+          templateId="konawide"
           side="front"
           options={options}
         />
@@ -33,7 +33,7 @@ const KonaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
         <TemplateCard
           shadow
           width="400px"
-          templateId="kona"
+          templateId="konawide"
           side="back"
           options={options}
         />
@@ -42,7 +42,7 @@ const KonaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
   )
 }
 
-export const Kona = KonaTemplateTemplate.bind({})
+export const KonaWide = KonaWideTemplateTemplate.bind({})
 
 const args: CardTemplateRenderOptions = {
   contactInfo: {
@@ -62,4 +62,4 @@ const args: CardTemplateRenderOptions = {
   omittedContactInfoFields: [],
 }
 
-Kona.args = args
+KonaWide.args = args
