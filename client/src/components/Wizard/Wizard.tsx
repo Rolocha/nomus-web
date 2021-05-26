@@ -4,7 +4,7 @@ import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
 import { ComplexCondition } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import Icon from '../Icon'
 import { WizardStepProps } from './WizardStep'
 
@@ -66,6 +66,7 @@ function Wizard<ValidStepType extends string>({
     processingPreviousTransition,
     setProcessingPreviousTransition,
   ] = React.useState(false)
+  const isDesktop = useBreakpoint('lg')
 
   const allStepDetails =
     React.Children.map(children, (child) => {
@@ -131,7 +132,7 @@ function Wizard<ValidStepType extends string>({
       display="flex"
       flexDirection={{ base: 'column', [bp]: 'row' }}
       alignItems={{ [bp]: 'flex-start' }}
-      pb={2}
+      pb={{ base: 0, [bp]: '8rem' }}
     >
       {/* Menu for selecting dashboard section */}
       <Box
@@ -188,11 +189,12 @@ function Wizard<ValidStepType extends string>({
               }}
             >
               <Box
-                py="24px"
+                py={{ base: '0.75em', [bp]: '24px' }}
                 px={3}
                 display="flex"
                 flexDirection={{ base: 'column', [bp]: 'row' }}
                 alignItems="center"
+                textAlign="center"
               >
                 <Icon
                   of={icon}
@@ -206,7 +208,7 @@ function Wizard<ValidStepType extends string>({
                   fontSize={{ base: 10, [bp]: 'unset' }}
                   fontWeight={isCurrentSection ? 500 : 'undefined'}
                 >
-                  {`Step ${index + 1} / ${label}`}
+                  {`Step ${index + 1}`} {isDesktop ? ' / ' : <br />} {label}
                 </Text.Plain>
               </Box>
             </Box>
@@ -224,31 +226,45 @@ function Wizard<ValidStepType extends string>({
         position="relative"
         zIndex={10}
         height="100%"
-        minHeight="400px"
+        // Make the content take up at least the remaining space after the navbar (60px) and steps bar (icon + margin + 2 lines of text + padding)
+        // minus a liiiitle bit so on iOS it doesn't
+        minHeight={{
+          base: `calc(100vh - 60px - calc(24px + 0.5em + 30px + 1.5em) - 100px)`,
+          [bp]: '400px',
+        }}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
       >
-        <Box overflowY="hidden" height="100%">
-          {/* Content for selected section */}
-          <Box
-            overflow="visible"
-            height="100%"
-            p={{ base: '24px', md: '48px' }}
-          >
-            {currentStepDetails.children}
-          </Box>
+        {/* <Box height="100%"> */}
+        {/* Content for selected section */}
+        <Box overflow="visible" height="100%" p={{ base: '24px', md: '48px' }}>
+          {currentStepDetails.children}
+        </Box>
 
+        {/* Previous/next buttons */}
+        <Box
+          position="relative"
+          p={{ base: '24px', md: 0 }}
+          bg={{ base: colors.white, md: undefined }}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          borderBottomRightRadius="inherit"
+        >
           {/* Previous step button */}
-          {!isFirstStep && (
+          {!isFirstStep ? (
             <Button
               px={{ base: 2, [bp]: 4 }}
               py={{ base: 1, [bp]: 3 }}
-              position="absolute"
-              bottom="0"
-              left="0"
+              // position="absolute"
+              // bottom="0"
+              // left="0"
               transform={{
-                base: 'translate(5%, 110%)',
+                base: undefined,
                 [bp]: 'translate(-10%, 30%)',
               }}
-              size="big"
+              size={isDesktop ? 'big' : 'normal'}
               variant="primary"
               isLoading={processingPreviousTransition}
               disabled={processingPreviousTransition}
@@ -261,35 +277,43 @@ function Wizard<ValidStepType extends string>({
               }
               onClick={handleTransitionToStepAtIndex(currentStepIndex - 1)}
             >
-              {`Previous step: ${allStepDetails[currentStepIndex - 1].label}`}
+              {`${isDesktop ? 'Previous step: ' : ''}${
+                allStepDetails[currentStepIndex - 1].label
+              }`}
             </Button>
+          ) : (
+            <Box />
           )}
           {/* Next step (or submit) button */}
           {isReadyToMoveForwardFromStepAtIndex(currentStepIndex) &&
-            (!isLastStep || completionButtonLabel) && (
-              <Button
-                px={{ base: 2, [bp]: 4 }}
-                py={{ base: 1, [bp]: 3 }}
-                position="absolute"
-                bottom="0"
-                right="0"
-                transform={{
-                  base: 'translate(-5%, 110%)',
-                  [bp]: 'translate(10%, 30%)',
-                }}
-                size="big"
-                variant={isLastStep ? 'success' : 'primary'}
-                disabled={processingNextTransition}
-                isLoading={processingNextTransition}
-                rightIcon={<Icon of="arrowRightO" color="white" />}
-                onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
-              >
-                {isLastStep
-                  ? completionButtonLabel || ''
-                  : `Next step: ${allStepDetails[currentStepIndex + 1].label}`}
-              </Button>
-            )}
+          (!isLastStep || completionButtonLabel) ? (
+            <Button
+              px={{ base: 2, [bp]: 4 }}
+              py={{ base: 1, [bp]: 3 }}
+              // bottom="0"
+              // right="0"
+              transform={{
+                base: undefined,
+                [bp]: 'translate(10%, 30%)',
+              }}
+              size={isDesktop ? 'big' : 'normal'}
+              variant={isLastStep ? 'success' : 'primary'}
+              disabled={processingNextTransition}
+              isLoading={processingNextTransition}
+              rightIcon={<Icon of="arrowRightO" color="white" />}
+              onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
+            >
+              {isLastStep
+                ? completionButtonLabel || ''
+                : `${isDesktop ? 'Next step: ' : ''}${
+                    allStepDetails[currentStepIndex + 1].label
+                  }`}
+            </Button>
+          ) : (
+            <Box />
+          )}
         </Box>
+        {/* </Box> */}
       </Box>
     </Box>
   )

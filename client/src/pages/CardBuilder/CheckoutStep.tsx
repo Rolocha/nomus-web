@@ -71,7 +71,7 @@ const CheckoutStep = ({
     return (
       <Box
         transition="0.3s ease transform"
-        transform={`scale(${selected ? 1.05 : 1})`}
+        transform={`scale(${selected ? 1.02 : 1})`}
       >
         <Card
           key={quantity}
@@ -81,10 +81,10 @@ const CheckoutStep = ({
           align="mix"
           size="small"
           icon={icon}
-          header={`${quantity} cards / ${formatDollarAmount(price)}`}
-          subheader={`${formatDollarAmount(
+          header={`${quantity} cards`}
+          subheader={`${formatDollarAmount(price)} (${formatDollarAmount(
             Math.round(price / quantity),
-          )} per card`}
+          )}/card)`}
           bodyText={description}
           boxShadow={selected ? 'prominent' : 'workingWindow'}
           onClick={() =>
@@ -105,12 +105,15 @@ const CheckoutStep = ({
       </Text.SectionSubheader>
       <Box
         display="grid"
-        gridTemplateColumns="repeat(3, 4fr)"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(3, 4fr)' }}
         gridColumnGap={3}
         gridRowGap={2}
       >
         {quantityOptions}
-        <Box gridColumn="3/4" gridRow="2/2" placeSelf="start end">
+        <Box
+          gridColumn={{ base: '1/2', lg: '3/4' }}
+          placeSelf={{ base: 'start', lg: 'start end' }}
+        >
           <Link to="#">
             <Text.Body2 color="inherit">
               Need more than 100? Let us know.
@@ -119,139 +122,172 @@ const CheckoutStep = ({
         </Box>
       </Box>
 
-      <Form.Form onSubmit={checkoutFormMethods.handleSubmit(handleCardSubmit)}>
-        <Text.SectionSubheader>Shipping information</Text.SectionSubheader>
-        <Box
-          display="grid"
-          gridTemplateColumns="6fr 2fr 4fr"
-          overflow="visible"
-          pr={2}
+      <Box mt="32px">
+        <Form.Form
+          onSubmit={checkoutFormMethods.handleSubmit(handleCardSubmit)}
         >
-          <Box>
-            <Box
-              display="grid"
-              gridTemplateColumns="repeat(6, 1fr)"
-              gridColumnGap={3}
-              gridRowGap={3}
-              justifyItems="stretch"
-            >
-              <Box gridColumn="1/5">
-                <Form.Label>Name</Form.Label>
-                <Form.Input
-                  name="name"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                />
-              </Box>
-              <Box gridColumn="1/7" gridRow="2/2">
-                <Form.Label>Address Line 1</Form.Label>
-                <Form.Input
-                  name="addressLine1"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                />
-              </Box>
-              <Box gridColumn="1/7" gridRow="3/3">
-                <Form.Label>Address Line 2</Form.Label>
-                <Form.Input
-                  name="addressLine2"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                />
-              </Box>
-              <Box gridColumn="1/4" gridRow="4/4">
-                <Form.Label>City</Form.Label>
-                <Form.Input
-                  name="city"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                />
-              </Box>
-              <Box gridColumn="4/5" gridRow="4/4">
-                <Form.Label>State</Form.Label>
-                <Form.Input
-                  name="state"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                  maxLength={2}
-                  sx={{ textTransform: 'uppercase' }}
-                />
-              </Box>
-              <Box gridColumn="5/7" gridRow="4/4">
-                <Form.Label>Zip Code</Form.Label>
-                <Form.Input
-                  name="postalCode"
-                  ref={checkoutFormMethods.register}
-                  width="100%"
-                />
-              </Box>
-
-              <Box gridColumn="1/7" gridRow="5/5">
-                <Form.Label htmlFor="card-element">
-                  Credit or debit card
-                </Form.Label>
-                {cardBuilderState.stripeToken ? (
-                  <Text.Body2>{`**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`}</Text.Body2>
-                ) : (
-                  <CreditCardInput
-                    id="card-element"
-                    handleChange={handleCardInputChange}
-                    postalCode={checkoutFormMethods.getValues().postalCode}
+          <Text.SectionSubheader>Shipping information</Text.SectionSubheader>
+          <Box
+            display="grid"
+            gridTemplateColumns={{ base: '1fr', lg: '6fr 2fr 4fr' }}
+            gridTemplateAreas={{
+              base: `
+            "formFields"
+            "costSummary"
+            `,
+              lg: `
+            "formFields . costSummary"
+            `,
+            }}
+            overflow="visible"
+            gridRowGap={{ base: '16px', lg: 0 }}
+            pr={2}
+          >
+            {/* Form fields */}
+            <Box gridArea="formFields">
+              <Box
+                display="grid"
+                gridTemplateColumns={{ base: '4fr 8fr', lg: '3fr 1fr 2fr' }}
+                gridTemplateAreas={{
+                  base: `
+                "name       name"
+                "line1      line1"
+                "line2      line2"
+                "city       city"
+                "state      zip"
+                "cardNumber cardNumber"
+                `,
+                  lg: `
+                "name name ."
+                "line1 line1 line1"
+                "line2 line2 line2"
+                "city state zip"
+                "cardNumber cardNumber cardNumber"
+                `,
+                }}
+                gridColumnGap={3}
+                gridRowGap={3}
+                justifyItems="stretch"
+              >
+                <Box gridArea="name">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Input
+                    name="name"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
                   />
-                )}
+                </Box>
+                <Box gridArea="line1">
+                  <Form.Label>Address Line 1</Form.Label>
+                  <Form.Input
+                    name="addressLine1"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
+                  />
+                </Box>
+                <Box gridArea="line2">
+                  <Form.Label>Address Line 2</Form.Label>
+                  <Form.Input
+                    name="addressLine2"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
+                  />
+                </Box>
+                <Box gridArea="city">
+                  <Form.Label>City</Form.Label>
+                  <Form.Input
+                    name="city"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
+                  />
+                </Box>
+                <Box gridArea="state">
+                  <Form.Label>State</Form.Label>
+                  <Form.Input
+                    name="state"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
+                    maxLength={2}
+                    sx={{ textTransform: 'uppercase' }}
+                  />
+                </Box>
+                <Box gridArea="zip">
+                  <Form.Label>Zip Code</Form.Label>
+                  <Form.Input
+                    name="postalCode"
+                    ref={checkoutFormMethods.register}
+                    width="100%"
+                  />
+                </Box>
+                <Box gridArea="cardNumber">
+                  <Form.Label htmlFor="card-element">
+                    Credit or debit card
+                  </Form.Label>
+                  {cardBuilderState.stripeToken ? (
+                    <Text.Body2>{`**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`}</Text.Body2>
+                  ) : (
+                    <CreditCardInput
+                      id="card-element"
+                      handleChange={handleCardInputChange}
+                      postalCode={checkoutFormMethods.getValues().postalCode}
+                    />
+                  )}
+                </Box>
               </Box>
             </Box>
+
+            {/* Cost summary */}
+            <Box
+              gridArea="costSummary"
+              width="100%"
+              boxShadow="workingWindow"
+              borderRadius="lg"
+              placeSelf="end end"
+              p={4}
+              display="grid"
+              gridTemplateColumns="2fr 1fr 1fr"
+              sx={{
+                '& > *:nth-child(3n)': {
+                  placeSelf: 'center end',
+                },
+              }}
+              gridRowGap={3}
+            >
+              <Text.Body2>Subtotal</Text.Body2>
+              <Box></Box>
+              <Text.Body2>
+                {costSummary?.subtotal
+                  ? formatDollarAmount(costSummary.subtotal)
+                  : '...'}
+              </Text.Body2>
+
+              <Text.Body2>Estimated Taxes</Text.Body2>
+              <Box></Box>
+              <Text.Body2>
+                {costSummary?.estimatedTaxes != null
+                  ? formatDollarAmount(costSummary.estimatedTaxes)
+                  : '...'}
+              </Text.Body2>
+
+              <Text.Body2>Shipping</Text.Body2>
+              <Box></Box>
+              <Text.Body2>
+                {costSummary
+                  ? formatDollarAmount(costSummary?.shipping)
+                  : formatDollarAmount(0)}
+              </Text.Body2>
+
+              <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
+              <Box></Box>
+              <Text.Body2 fontWeight={500}>
+                {costSummary?.total
+                  ? formatDollarAmount(costSummary.total)
+                  : '...'}
+              </Text.Body2>
+            </Box>
           </Box>
-          <Box />
-          <Box
-            width="100%"
-            boxShadow="workingWindow"
-            borderRadius="lg"
-            placeSelf="end end"
-            p={4}
-            display="grid"
-            gridTemplateColumns="2fr 1fr 1fr"
-            sx={{
-              '& > *:nth-child(3n)': {
-                placeSelf: 'center end',
-              },
-            }}
-            gridRowGap={3}
-          >
-            <Text.Body2>Subtotal</Text.Body2>
-            <Box></Box>
-            <Text.Body2>
-              {costSummary?.subtotal
-                ? formatDollarAmount(costSummary.subtotal)
-                : '...'}
-            </Text.Body2>
-
-            <Text.Body2>Estimated Taxes</Text.Body2>
-            <Box></Box>
-            <Text.Body2>
-              {costSummary?.estimatedTaxes != null
-                ? formatDollarAmount(costSummary.estimatedTaxes)
-                : '...'}
-            </Text.Body2>
-
-            <Text.Body2>Shipping</Text.Body2>
-            <Box></Box>
-            <Text.Body2>
-              {costSummary
-                ? formatDollarAmount(costSummary?.shipping)
-                : formatDollarAmount(0)}
-            </Text.Body2>
-
-            <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
-            <Box></Box>
-            <Text.Body2 fontWeight={500}>
-              {costSummary?.total
-                ? formatDollarAmount(costSummary.total)
-                : '...'}
-            </Text.Body2>
-          </Box>
-        </Box>
-      </Form.Form>
+        </Form.Form>
+      </Box>
     </Box>
   )
 }

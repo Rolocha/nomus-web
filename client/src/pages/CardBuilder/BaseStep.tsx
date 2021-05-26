@@ -73,7 +73,10 @@ const BaseStep = ({
                 </Text.SectionSubheader>
                 <Box
                   display="grid"
-                  gridTemplateColumns="repeat(4, 1fr)"
+                  gridTemplateColumns={{
+                    base: 'repeat(2, 1fr)',
+                    md: 'repeat(4, 1fr)',
+                  }}
                   gridColumnGap={3}
                   gridRowGap={3}
                 >

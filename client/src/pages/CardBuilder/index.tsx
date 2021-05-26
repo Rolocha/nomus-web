@@ -36,7 +36,7 @@ import {
   CardBuilderStep,
   CheckoutFormData,
 } from 'src/pages/CardBuilder/types'
-import breakpoints from 'src/styles/breakpoints'
+import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
@@ -51,6 +51,7 @@ const CardBuilder = () => {
   const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
   const location = useLocation()
   const history = useHistory()
+  const isDesktop = useBreakpoint('lg')
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
@@ -345,7 +346,7 @@ const CardBuilder = () => {
     >
       <Navbar />
       <Box
-        container
+        container={isDesktop}
         width="100%"
         display="flex"
         flexDirection="column"
