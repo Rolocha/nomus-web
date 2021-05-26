@@ -271,6 +271,7 @@ const TemplateBuildStep = ({
           }
           renderFront={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="front"
@@ -279,6 +280,7 @@ const TemplateBuildStep = ({
           )}
           renderBack={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="back"
