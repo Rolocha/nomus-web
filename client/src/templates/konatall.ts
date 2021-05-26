@@ -24,7 +24,7 @@ const KonaTall = new CardTemplate({
     },
     headline: {
       label: 'Headline',
-      required: false,
+      required: true,
       placeholder: 'Businessperson',
     },
   } as const,

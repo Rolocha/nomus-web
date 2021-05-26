@@ -120,7 +120,7 @@ const Nicole = new CardTemplate({
     ctx.fillStyle = options.contactInfo.headline
       ? palette.text
       : placeholderTextColor
-    this.wrapTextCenteredAnchoredTop(
+    this.drawTextHorizontallyCenteredAtY(
       ctx,
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
@@ -138,7 +138,7 @@ const Nicole = new CardTemplate({
         options.contactInfo.line1 ||
         this.contactInfoSpec.line1.placeholder ||
         ''
-      this.wrapTextCenteredAnchoredTop(
+      this.drawTextHorizontallyCenteredAtY(
         ctx,
         line1Text,
         this.proportionalize(93 + 7),
@@ -153,7 +153,7 @@ const Nicole = new CardTemplate({
         options.contactInfo.line2 ||
         this.contactInfoSpec.line2.placeholder ||
         ''
-      this.wrapTextCenteredAnchoredTop(
+      this.drawTextHorizontallyCenteredAtY(
         ctx,
         line2Text,
         this.proportionalize(105 + 7),
@@ -168,7 +168,7 @@ const Nicole = new CardTemplate({
         options.contactInfo.line3 ||
         this.contactInfoSpec.line3.placeholder ||
         ''
-      this.wrapTextCenteredAnchoredTop(
+      this.drawTextHorizontallyCenteredAtY(
         ctx,
         line3Text,
         this.proportionalize(117 + 7),
@@ -183,7 +183,7 @@ const Nicole = new CardTemplate({
         options.contactInfo.line4 ||
         this.contactInfoSpec.line4.placeholder ||
         ''
-      this.wrapTextCenteredAnchoredTop(
+      this.drawTextHorizontallyCenteredAtY(
         ctx,
         line4Text,
         this.proportionalize(129 + 7),
@@ -201,7 +201,7 @@ const Nicole = new CardTemplate({
         options.contactInfo.footer ||
         this.contactInfoSpec.footer.placeholder ||
         ''
-      this.wrapTextCenteredAnchoredTop(
+      this.drawTextHorizontallyCenteredAtY(
         ctx,
         footerText,
         this.proportionalize(141 + 7),
