@@ -76,6 +76,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
         display="grid"
         gridTemplateColumns={{ base: '1fr', lg: 'repeat(3, 4fr)' }}
         gridColumnGap={3}
+        gridRowGap="16px"
       >
         {cardImages?.front && (
           <BusinessCardImage width="100%" frontImageUrl={cardImages.front} />
