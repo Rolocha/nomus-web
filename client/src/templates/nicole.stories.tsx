@@ -2,7 +2,6 @@ import { action } from '@storybook/addon-actions'
 import { Story } from '@storybook/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
-import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 
 export default {
@@ -59,12 +58,7 @@ const args: CardTemplateRenderOptions = {
       'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
     size: 0.5,
   },
-  colorScheme: {
-    background: colors.white,
-    accent: colors.gold,
-    accent2: colors.nomusBlue,
-    text: colors.midnightGray,
-  },
+  colorScheme: {},
   qrCodeUrl: 'https://nomus.me',
   omittedContactInfoFields: [],
 }

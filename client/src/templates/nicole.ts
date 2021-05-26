@@ -13,7 +13,7 @@ const Nicole = new CardTemplate({
       defaultValue: '#ffffff',
     },
     accent: {
-      defaultValue: colors.golden[700],
+      defaultValue: colors.cyanProcess,
     },
     accent2: {
       defaultValue: colors.nomusBlue,
@@ -71,7 +71,18 @@ const Nicole = new CardTemplate({
       throw new Error('Got null for canvas context')
     }
 
-    const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
+    const palette = {
+      background:
+        options.colorScheme.background ??
+        this.colorSchemeSpec.background.defaultValue,
+      text: options.colorScheme.text ?? this.colorSchemeSpec.text.defaultValue,
+      accent:
+        options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue,
+      accent2:
+        options.colorScheme.accent2 ??
+        this.colorSchemeSpec.accent2.defaultValue,
+    }
+    const placeholderTextColor = lighten(0.4)(palette.text)
 
     // Draw the background
     ctx.fillStyle =
@@ -92,8 +103,8 @@ const Nicole = new CardTemplate({
     // Render the name
     ctx.font = this.proportionalize(14) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.name
-      ? options.colorScheme.accent2
-      : lighten(0.4)(options.colorScheme.accent2)
+      ? palette.accent2
+      : lighten(0.4)(palette.accent2)
     this.wrapTextCenteredAnchoredBottom(
       ctx,
       options.contactInfo.name ||
@@ -107,7 +118,7 @@ const Nicole = new CardTemplate({
     // Render the headline
     ctx.font = this.proportionalize(8) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.headline
-      ? options.colorScheme.text
+      ? palette.text
       : placeholderTextColor
     this.wrapTextCenteredAnchoredTop(
       ctx,
@@ -121,7 +132,7 @@ const Nicole = new CardTemplate({
     if (!options.omittedContactInfoFields.includes('line1')) {
       ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line1
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line1Text =
         options.contactInfo.line1 ||
@@ -136,7 +147,7 @@ const Nicole = new CardTemplate({
     if (!options.omittedContactInfoFields.includes('line2')) {
       ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line2
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line2Text =
         options.contactInfo.line2 ||
@@ -151,7 +162,7 @@ const Nicole = new CardTemplate({
     if (!options.omittedContactInfoFields.includes('line3')) {
       ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line3
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line3Text =
         options.contactInfo.line3 ||
@@ -166,7 +177,7 @@ const Nicole = new CardTemplate({
     if (!options.omittedContactInfoFields.includes('line4')) {
       ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line4
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line4Text =
         options.contactInfo.line4 ||
@@ -184,7 +195,7 @@ const Nicole = new CardTemplate({
     if (!options.omittedContactInfoFields.includes('footer')) {
       ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.footer
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const footerText =
         options.contactInfo.footer ||
@@ -203,8 +214,8 @@ const Nicole = new CardTemplate({
       y: this.proportionalize(174),
       width: this.proportionalize(32),
       height: this.proportionalize(32),
-      backgroundColor: options.colorScheme.background,
-      foregroundColor: options.colorScheme.accent2,
+      backgroundColor: palette.background,
+      foregroundColor: palette.accent2,
     })
 
     // Render Nomus logo
@@ -212,7 +223,7 @@ const Nicole = new CardTemplate({
       x: this.proportionalize(64),
       y: this.proportionalize(210),
       size: this.proportionalize(12),
-      color: options.colorScheme.accent2,
+      color: palette.accent2,
     })
 
     // Render NFC tap icon
@@ -220,7 +231,7 @@ const Nicole = new CardTemplate({
       x: this.proportionalize(78),
       y: this.proportionalize(210),
       size: this.proportionalize(12),
-      color: options.colorScheme.accent2,
+      color: palette.accent2,
     })
   },
   async renderBack(
@@ -235,15 +246,24 @@ const Nicole = new CardTemplate({
       throw new Error('Got null for canvas context')
     }
 
+    const palette = {
+      background:
+        options.colorScheme.background ??
+        this.colorSchemeSpec.background.defaultValue,
+      text: options.colorScheme.text ?? this.colorSchemeSpec.text.defaultValue,
+      accent:
+        options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue,
+      accent2:
+        options.colorScheme.accent2 ??
+        this.colorSchemeSpec.accent2.defaultValue,
+    }
+
     // Draw the background
-    ctx.fillStyle =
-      options.colorScheme.background ??
-      this.colorSchemeSpec.background.defaultValue
+    ctx.fillStyle = palette.background
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
     // Draw the bottom accent bar
-    ctx.fillStyle =
-      options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue
+    ctx.fillStyle = palette.accent
     ctx.fillRect(
       0,
       this.proportionalize(242),
