@@ -53,6 +53,7 @@ const colors = {
 
   // Other Colors
   poppy: '#EA9C00',
+  viridianGreen: '#067D78',
 
   // Backgrounds
   ivory: '#FBF9F0',
