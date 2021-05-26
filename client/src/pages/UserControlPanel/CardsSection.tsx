@@ -5,23 +5,17 @@ import {
   UCPCardsSectionQuery,
   UCPCardsSectionQuery_cardVersionsStats as UCPCardsSectionQueryCardVersionsStats,
 } from 'src/apollo/types/UCPCardsSectionQuery'
-import { UpdateUserCheckpoints } from 'src/apollo/types/UpdateUserCheckpoints'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
-import Icon from 'src/components/Icon'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
-import { colors } from 'src/styles'
 import { getMonthAbbreviation } from 'src/utils/date'
 import { createMailtoURL } from 'src/utils/email'
 import cardsEmptyStateSvg from './cards_empty_state.svg'
-import {
-  CHANGE_ACTIVE_CARD_VERSION,
-  UPDATE_USER_CHECKPOINTS,
-} from './mutations'
+import { CHANGE_ACTIVE_CARD_VERSION } from './mutations'
 
 const bp = 'md'
 
@@ -91,9 +85,6 @@ export default () => {
   const [changeActiveCardVersion] = useMutation<ChangeActiveCardVersion>(
     CHANGE_ACTIVE_CARD_VERSION,
   )
-  const [updateUserCheckpoints] = useMutation<UpdateUserCheckpoints>(
-    UPDATE_USER_CHECKPOINTS,
-  )
 
   const createCardActivationHandler = React.useCallback(
     (cardVersionId: string) => async (base: any) =>
@@ -105,26 +96,30 @@ export default () => {
     [changeActiveCardVersion],
   )
 
-  const handleNomusCardInterestClick = React.useCallback(() => {
-    updateUserCheckpoints({
-      variables: {
-        checkpointsReached: ['expressedInterestInOrderingNomusCard'],
-      },
-    })
-  }, [updateUserCheckpoints])
-
   if (loading || !data) {
     return <LoadingPage fullscreen />
   }
 
-  const defaultCardVersion = data.cardVersions.find(
+  // TODO: We automatically create a card version when the user enters
+  // Card Builder which helps us track progress / populate the QR code URL
+  // but it has a side effect of making a bunch of incomplete card versions
+  // for the user. We need to filter these out from this page's UI. We
+  // do so here for now but eventually should do this earlier by adding
+  // a `state` to `CardVersion` and using that to detect whether the
+  // card version has been fully built out
+  // See https://www.notion.so/nomus/Add-state-to-CardVersion-model-filtering-to-cardVersions-resolver-87142b924f7b4b21b996cac911cd73d6
+  const showableCardVersions = data.cardVersions.filter(
+    (cardV) => cardV.frontImageUrl != null,
+  )
+
+  const defaultCardVersion = showableCardVersions.find(
     (version) => version.id === data.user.defaultCardVersion?.id,
   )
   const defaultCardVersionStats = data.cardVersionsStats.find(
     (version) => version.id === data.user.defaultCardVersion?.id,
   )
 
-  const nonDefaultCardVersions = data.cardVersions.filter(
+  const nonDefaultCardVersions = showableCardVersions.filter(
     (version) => version.id !== data.user.defaultCardVersion?.id,
   )
   const cardVersionStatsById = data.cardVersionsStats.reduce<
@@ -326,26 +321,19 @@ export default () => {
           <Image src={cardsEmptyStateSvg} />
           <Text.Body2>
             But Nomus cards are even cooler. Take your professional game to the
-            next level. Reach out to request a Nomus card of your own.
+            next level.
           </Text.Body2>
 
-          {data.user.checkpoints?.expressedInterestInOrderingNomusCard ? (
-            <Box display="flex" flexDirection="column" alignItems="center">
-              <Icon of="check" color={colors.nomusBlue} boxSize="50px" />{' '}
-              <Text.Body3>
-                Thanks for expressing interest. We'll reach out soon!
-              </Text.Body3>
-            </Box>
-          ) : (
-            <Button
-              variant="primary"
-              size="big"
-              width="100%"
-              onClick={handleNomusCardInterestClick}
-            >
-              I'm interested!
-            </Button>
-          )}
+          <Link
+            variant="primary"
+            size="big"
+            width="100%"
+            buttonStyle="primary"
+            buttonSize="big"
+            to="/shop"
+          >
+            Let's build a Nomus card
+          </Link>
         </Box>
       )}
     </Box>

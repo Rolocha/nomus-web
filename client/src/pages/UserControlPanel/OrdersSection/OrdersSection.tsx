@@ -4,8 +4,8 @@ import { gql, useQuery } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
 import { UCPOrdersSectionQuery } from 'src/apollo/types/UCPOrdersSectionQuery'
 import Box from 'src/components/Box'
-import Button from 'src/components/Button'
 import Image from 'src/components/Image'
+import Link from 'src/components/Link'
 import Modal from 'src/components/Modal'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -87,11 +87,16 @@ export default () => {
             There are no orders to see here, but you can fix that.
           </Text.Body2>
 
-          {
-            <Button variant="primary" size="big" width="100%" disabled>
-              Coming soon...
-            </Button>
-          }
+          <Link
+            variant="primary"
+            size="big"
+            width="100%"
+            buttonStyle="primary"
+            buttonSize="big"
+            to="/shop"
+          >
+            Let's build a Nomus card
+          </Link>
         </Box>
       )}
 

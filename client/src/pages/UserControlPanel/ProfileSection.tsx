@@ -13,7 +13,6 @@ import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { colors } from 'src/styles'
-import { createMailtoURL } from 'src/utils/email'
 import { formatName } from 'src/utils/name'
 import { formatPhoneNumber } from 'src/utils/string'
 import ProfileEditorModal from './ProfileEditorModal'
@@ -214,15 +213,8 @@ export default () => {
           >
             <BusinessCardImage width="100%" placeholder />
             <Box mt={2} flexGrow={0}>
-              <Link
-                buttonStyle="secondary"
-                to={createMailtoURL({
-                  to: 'help@nomus.me',
-                  subject: 'New Nomus Card',
-                  body: "Hi, I'd like to get a Nomus Card!",
-                })}
-              >
-                Get a Nomus Card
+              <Link buttonStyle="secondary" to="/shop">
+                Get a Nomus card
               </Link>
             </Box>
           </Box>
