@@ -331,7 +331,9 @@ const CardBuilder = () => {
           )
 
           updateCardBuilderState({
-            omittedOptionalFields: fieldsLeftEmptyButForgotToOmit,
+            omittedOptionalFields: fieldsLeftEmptyButForgotToOmit.map(
+              (fieldName) => `contactInfo.${fieldName}`,
+            ),
           })
         }
         break

@@ -58,10 +58,9 @@ const TemplateBuildStep = ({
     (fieldFormKey, shouldOmit) => {
       if (shouldOmit) {
         updateCardBuilderState({
-          omittedOptionalFields: [
-            ...cardBuilderState.omittedOptionalFields,
-            fieldFormKey,
-          ],
+          omittedOptionalFields: Array.from(
+            new Set([...cardBuilderState.omittedOptionalFields, fieldFormKey]),
+          ),
         })
       } else {
         updateCardBuilderState({
@@ -182,19 +181,19 @@ const TemplateBuildStep = ({
             const fieldFormKey = `contactInfo.${fieldName}`
             const fieldRequired = fieldDetails.required
             const userWantsToOmitThisField = cardBuilderState.omittedOptionalFields.includes(
-              fieldName,
+              fieldFormKey,
             )
             const inputDisabled = !fieldRequired && userWantsToOmitThisField
 
             const label = (
-              <Form.Label required={fieldDetails.required}>
+              <Form.Label required={fieldRequired}>
                 {fieldDetails.label}
               </Form.Label>
             )
 
             return (
               <Box key={fieldName} mb={4}>
-                {fieldDetails.required ? (
+                {fieldRequired ? (
                   label
                 ) : (
                   <Box
@@ -205,7 +204,7 @@ const TemplateBuildStep = ({
                     {label}
                     <Switch
                       colorScheme="blue"
-                      isChecked={!fieldRequired && !userWantsToOmitThisField}
+                      isChecked={!userWantsToOmitThisField}
                       onChange={(event) => {
                         const shouldOmit = !event.target.checked
                         setOptionalFieldOmission(fieldFormKey, shouldOmit)
