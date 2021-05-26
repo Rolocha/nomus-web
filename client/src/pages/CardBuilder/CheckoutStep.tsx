@@ -8,6 +8,7 @@ import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
 import * as SVG from 'src/components/SVG'
 import * as Text from 'src/components/Text'
+import { createMailtoURL } from 'src/utils/email'
 import { formatDollarAmount } from 'src/utils/money'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/utils/pricing'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
@@ -114,7 +115,13 @@ const CheckoutStep = ({
           gridColumn={{ base: '1/2', lg: '3/4' }}
           placeSelf={{ base: 'start', lg: 'start end' }}
         >
-          <Link to="#">
+          <Link
+            to={createMailtoURL({
+              to: 'hi@nomus.me',
+              subject: 'Large Card Order',
+              body: `I'd like to put in a large order!\n(Put Details of your order here)`.trim(),
+            })}
+          >
             <Text.Body2 color="inherit">
               Need more than 100? Let us know.
             </Text.Body2>
