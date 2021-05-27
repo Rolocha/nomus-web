@@ -398,8 +398,8 @@ const AboutPage = () => {
             </Text.Body>
             <Image src={anshul} mb={{ base: '6px', [bp]: '8px' }} />
             <Text.Body2>
-              A fan of overextending himself due to being passionate about
-              people among a million and one things.
+              A fan of overextending himself from being passionate about a
+              million and one things.
             </Text.Body2>
           </Box>
 
