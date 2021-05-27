@@ -2,17 +2,20 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
-const Velia = new CardTemplate({
-  name: 'Velia',
-  width: 264,
-  height: 154,
+const Nicole = new CardTemplate({
+  name: 'Nicole',
+  width: 154,
+  height: 264,
   demoImageUrl:
-    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/velia.svg',
+    'https://nomus-assets.s3.amazonaws.com/site-assets/templates/nicole.svg',
   colorScheme: {
     background: {
       defaultValue: colors.white,
     },
     accent: {
+      defaultValue: colors.cyanProcess,
+    },
+    accent2: {
       defaultValue: colors.nomusBlue,
     },
     text: {
@@ -45,6 +48,11 @@ const Velia = new CardTemplate({
       required: false,
       placeholder: 'Apple Seed, LLC',
     },
+    line4: {
+      label: 'Line 4',
+      required: false,
+      placeholder: 'Established in CA',
+    },
     footer: {
       label: 'Footer',
       required: false,
@@ -63,144 +71,174 @@ const Velia = new CardTemplate({
       throw new Error('Got null for canvas context')
     }
 
-    const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
+    const palette = {
+      background:
+        options.colorScheme.background ??
+        this.colorSchemeSpec.background.defaultValue,
+      text: options.colorScheme.text ?? this.colorSchemeSpec.text.defaultValue,
+      accent:
+        options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue,
+      accent2:
+        options.colorScheme.accent2 ??
+        this.colorSchemeSpec.accent2.defaultValue,
+    }
+    const placeholderTextColor = lighten(0.4)(palette.text)
 
     // Draw the background
     ctx.fillStyle =
       options.colorScheme.background ??
-      this.colorSchemeSpec.background.defaultValue ??
-      // Should never have go this far
-      colors.white
+      this.colorSchemeSpec.background.defaultValue
     ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
 
     // Draw the bottom accent bar
     ctx.fillStyle =
-      options.colorScheme.accent ??
-      this.colorSchemeSpec.accent.defaultValue ??
-      // Should never have go this far
-      colors.nomusBlue
+      options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue
     ctx.fillRect(
       0,
-      this.proportionalize(133),
+      this.proportionalize(242),
       this.proportionalizedWidth,
-      this.proportionalize(21),
+      this.proportionalize(22),
     )
+
+    ctx.textAlign = 'center'
 
     // Render the name
     ctx.font = this.proportionalize(14) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.name
-      ? options.colorScheme.text
-      : placeholderTextColor
+      ? palette.accent2
+      : lighten(0.4)(palette.accent2)
     ctx.textAlign = 'center'
-    ctx.fillText(
+    this.wrapText(
+      ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
-      this.proportionalizedWidth / 2,
-      this.proportionalize(25 + 14),
+      {
+        anchorTo: 'bottom',
+        x: this.proportionalizedWidth / 2,
+        y: this.proportionalize(60),
+        maxWidth: this.proportionalize(120),
+        lineHeight: this.proportionalize(17),
+      },
     )
 
     // Render the headline
     ctx.font = this.proportionalize(8) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.headline
-      ? options.colorScheme.text
+      ? palette.text
       : placeholderTextColor
-    ctx.textAlign = 'center'
     ctx.fillText(
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
       this.proportionalizedWidth / 2,
-      this.proportionalize(45 + 8),
+      this.proportionalize(68 + 8),
     )
 
-    ctx.textAlign = 'left'
-    // Render the 3 contact info lines, all 8px left from center
-    const rightEdgeForLines =
-      this.proportionalizedWidth / 2 - this.proportionalize(8)
-    ctx.font = this.proportionalize(7) + 'px Rubik'
-
+    // Render line 1-4, all centered
     if (!options.omittedContactInfoFields.includes('line1')) {
+      ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line1
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line1Text =
         options.contactInfo.line1 ||
         this.contactInfoSpec.line1.placeholder ||
         ''
-      const line1TextMetrics = ctx.measureText(line1Text)
-      const line1TextX = rightEdgeForLines - line1TextMetrics.width
-      ctx.fillText(line1Text, line1TextX, this.proportionalize(70 + 7))
+      ctx.fillText(
+        line1Text,
+        this.proportionalizedWidth / 2,
+        this.proportionalize(93 + 7),
+      )
     }
-
     if (!options.omittedContactInfoFields.includes('line2')) {
+      ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line2
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line2Text =
         options.contactInfo.line2 ||
         this.contactInfoSpec.line2.placeholder ||
         ''
-      const line2TextMetrics = ctx.measureText(line2Text)
-      const line2TextX = rightEdgeForLines - line2TextMetrics.width
-      ctx.fillText(line2Text, line2TextX, this.proportionalize(82 + 7))
+      ctx.fillText(
+        line2Text,
+        this.proportionalizedWidth / 2,
+        this.proportionalize(105 + 7),
+      )
     }
-
     if (!options.omittedContactInfoFields.includes('line3')) {
+      ctx.font = this.proportionalize(7) + 'px Rubik'
       ctx.fillStyle = options.contactInfo.line3
-        ? options.colorScheme.text
+        ? palette.text
         : placeholderTextColor
       const line3Text =
         options.contactInfo.line3 ||
         this.contactInfoSpec.line3.placeholder ||
         ''
-      const line3TextMetrics = ctx.measureText(line3Text)
-      const line3TextX = rightEdgeForLines - line3TextMetrics.width
-      ctx.fillText(line3Text, line3TextX, this.proportionalize(94 + 7))
+      ctx.fillText(
+        line3Text,
+        this.proportionalizedWidth / 2,
+        this.proportionalize(117 + 7),
+      )
+    }
+    if (!options.omittedContactInfoFields.includes('line4')) {
+      ctx.font = this.proportionalize(7) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.line4
+        ? palette.text
+        : placeholderTextColor
+      const line4Text =
+        options.contactInfo.line4 ||
+        this.contactInfoSpec.line4.placeholder ||
+        ''
+      ctx.fillText(
+        line4Text,
+        this.proportionalizedWidth / 2,
+        this.proportionalize(129 + 7),
+      )
     }
 
+    // Render footer
+    // TODO: Make it wrap to max 2 lines
     if (!options.omittedContactInfoFields.includes('footer')) {
-      // Render the footer
+      ctx.font = this.proportionalize(7) + 'px Rubik'
+      ctx.fillStyle = options.contactInfo.footer
+        ? palette.text
+        : placeholderTextColor
       const footerText =
         options.contactInfo.footer ||
         this.contactInfoSpec.footer.placeholder ||
         ''
-      ctx.font = this.proportionalize(7) + 'px Rubik'
-      ctx.fillStyle = options.contactInfo.footer
-        ? options.colorScheme.text
-        : placeholderTextColor
-      ctx.textAlign = 'center'
       ctx.fillText(
         footerText,
         this.proportionalizedWidth / 2,
-        this.proportionalize(113),
+        this.proportionalize(141 + 7),
       )
     }
 
     // Render QR code
     await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {
-      x: this.proportionalize(140),
-      y: this.proportionalize(70),
+      x: this.proportionalize(61),
+      y: this.proportionalize(174),
       width: this.proportionalize(32),
       height: this.proportionalize(32),
-      backgroundColor: options.colorScheme.background,
-      foregroundColor: options.colorScheme.accent,
+      backgroundColor: palette.background,
+      foregroundColor: palette.accent2,
     })
 
     // Render Nomus logo
     await this.drawNomusLogo(ctx, {
-      x: this.proportionalize(176),
-      y: this.proportionalize(75),
-      size: this.proportionalize(11),
-      color: options.colorScheme.accent,
+      x: this.proportionalize(64),
+      y: this.proportionalize(210),
+      size: this.proportionalize(12),
+      color: palette.accent2,
     })
 
     // Render NFC tap icon
     await this.drawNFCTapIcon(ctx, {
-      x: this.proportionalize(176),
-      y: this.proportionalize(90),
-      size: this.proportionalize(11),
-      color: options.colorScheme.accent,
+      x: this.proportionalize(78),
+      y: this.proportionalize(210),
+      size: this.proportionalize(12),
+      color: palette.accent2,
     })
   },
   async renderBack(
@@ -215,46 +253,43 @@ const Velia = new CardTemplate({
       throw new Error('Got null for canvas context')
     }
 
-    const ACCENT_BAR_SIZE = 21
+    const palette = {
+      background:
+        options.colorScheme.background ??
+        this.colorSchemeSpec.background.defaultValue,
+      text: options.colorScheme.text ?? this.colorSchemeSpec.text.defaultValue,
+      accent:
+        options.colorScheme.accent ?? this.colorSchemeSpec.accent.defaultValue,
+      accent2:
+        options.colorScheme.accent2 ??
+        this.colorSchemeSpec.accent2.defaultValue,
+    }
 
-    // Draw the main background with accent color
-    ctx.fillStyle =
-      options.colorScheme.accent ??
-      this.colorSchemeSpec.accent.defaultValue ??
-      // Should never have go this far
-      colors.nomusBlue
+    // Draw the background
+    ctx.fillStyle = palette.background
+    ctx.fillRect(0, 0, this.proportionalizedWidth, this.proportionalizedHeight)
+
+    // Draw the bottom accent bar
+    ctx.fillStyle = palette.accent
     ctx.fillRect(
       0,
-      0,
+      this.proportionalize(242),
       this.proportionalizedWidth,
-      this.proportionalize(this.height - ACCENT_BAR_SIZE),
-    )
-
-    // Draw the bottom bar with background color
-    ctx.fillStyle =
-      options.colorScheme.background ??
-      this.contactInfoSpec.name.defaultValue ??
-      // Should never have go this far
-      colors.white
-    ctx.fillRect(
-      0,
-      this.proportionalize(this.height - ACCENT_BAR_SIZE),
-      this.proportionalizedWidth,
-      this.proportionalize(ACCENT_BAR_SIZE),
+      this.proportionalize(22),
     )
 
     // Render user-provided logo if provided
     if (options.graphic?.url) {
       const logoImg = await this.createImage(options.graphic.url)
       const imageHeight =
-        (options.graphic.size ?? 1) * this.proportionalize(100)
+        (options.graphic.size ?? 1) * this.proportionalize(220)
       const imageWidth =
         (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
 
+      // y + imageHeight + y + ACCENT_BAR_SIZE = this.usableHeight
+      // y = (this.usableHeight - ACCENT_BAR_SIZE - imageHeight) / 2
       const imageY =
-        (this.proportionalize(this.height) -
-          this.proportionalize(ACCENT_BAR_SIZE) -
-          imageHeight) /
+        (this.proportionalizedHeight - this.proportionalize(22) - imageHeight) /
         2
       const imageX = (this.proportionalizedWidth - imageWidth) / 2
       ctx.drawImage(logoImg, imageX, imageY, imageWidth, imageHeight)
@@ -262,4 +297,4 @@ const Velia = new CardTemplate({
   },
 })
 
-export default Velia
+export default Nicole

@@ -189,15 +189,18 @@ const Rolocha = new CardTemplate({
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.accent
       : placeholderTextColor
-    this.wrapTextAnchorBottomLeft(
+    this.wrapText(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
-      this.proportionalize(21),
-      this.proportionalize(48),
-      this.proportionalize(112),
-      this.proportionalize(14),
+      {
+        anchorTo: 'bottom',
+        x: this.proportionalize(21),
+        y: this.proportionalize(56),
+        maxWidth: this.proportionalize(112),
+        lineHeight: this.proportionalize(14),
+      },
     )
 
     // Render the headline
@@ -205,15 +208,18 @@ const Rolocha = new CardTemplate({
     ctx.fillStyle = options.contactInfo.headline
       ? options.colorScheme.text
       : placeholderTextColor
-    this.wrapTextAnchorTopLeft(
+    this.wrapText(
       ctx,
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
-      this.proportionalize(21),
-      this.proportionalize(60),
-      this.proportionalize(112),
-      this.proportionalize(9),
+      {
+        anchorTo: 'top',
+        x: this.proportionalize(21),
+        y: this.proportionalize(60 + 9),
+        maxWidth: this.proportionalize(112),
+        lineHeight: this.proportionalize(11),
+      },
     )
 
     // Render line1

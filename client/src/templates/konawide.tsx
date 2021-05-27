@@ -24,7 +24,7 @@ const KonaWide = new CardTemplate({
     },
     headline: {
       label: 'Headline',
-      required: false,
+      required: true,
       placeholder: 'Businessperson',
     },
   } as const,
@@ -55,34 +55,38 @@ const KonaWide = new CardTemplate({
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.text
       : placeholderTextColor
-    const { height: nameHeight } = this.wrapTextAnchorTopLeft(
+    const { height: nameHeight } = this.wrapText(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
-      this.proportionalize(18),
-      this.proportionalize(41),
-      this.proportionalize(228),
-      this.proportionalize(28),
+      {
+        anchorTo: 'top',
+        x: this.proportionalize(18),
+        y: this.proportionalize(41),
+        maxWidth: this.proportionalize(228),
+        lineHeight: this.proportionalize(28),
+      },
     )
 
     // Render the headline
-    if (!options.omittedContactInfoFields.includes('headline')) {
-      ctx.font = this.proportionalize(10) + 'px Rubik'
-      ctx.fillStyle = options.contactInfo.headline
-        ? options.colorScheme.text
-        : placeholderTextColor
-      this.wrapTextAnchorTopLeft(
-        ctx,
-        options.contactInfo.headline ||
-          this.contactInfoSpec.headline.placeholder ||
-          '[headline]',
-        this.proportionalize(18),
-        nameHeight + this.proportionalize(30),
-        this.proportionalize(228),
-        this.proportionalize(10),
-      )
-    }
+    ctx.font = this.proportionalize(10) + 'px Rubik'
+    ctx.fillStyle = options.contactInfo.headline
+      ? options.colorScheme.text
+      : placeholderTextColor
+    this.wrapText(
+      ctx,
+      options.contactInfo.headline ||
+        this.contactInfoSpec.headline.placeholder ||
+        '[headline]',
+      {
+        anchorTo: 'top',
+        x: this.proportionalize(18),
+        y: nameHeight + this.proportionalize(30),
+        maxWidth: this.proportionalize(228),
+        lineHeight: this.proportionalize(10),
+      },
+    )
 
     // Render QR code
     await this.drawQRCode(ctx, options.qrCodeUrl || 'https://nomus.me', {

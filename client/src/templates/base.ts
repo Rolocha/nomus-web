@@ -296,124 +296,79 @@ export default class CardTemplate {
     )
   }
 
-  protected wrapTextAnchorTopLeft(
+  // Renders text that wraps when it grows beyond the specified maxWidth
+  protected wrapText(
     ctx: CanvasRenderingContext2D,
     text: string,
-    x: number,
-    y: number,
-    maxWidth: number,
-    lineHeight: number,
+    positioning: {
+      anchorTo: 'bottom' | 'top'
+      x: number
+      y: number
+      maxWidth: number
+      lineHeight: number
+    },
   ): { width: number; height: number } {
-    const oldTextAlign = ctx.textAlign
-    ctx.textAlign = 'left'
-    const words = text.split(' ')
-    let line = ''
-    let width = 0
-    let height = 0
+    const { x, y, maxWidth, lineHeight, anchorTo } = positioning
+    const totalMeasurements = { width: 0, height: 0 }
 
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' '
-      const metrics = ctx.measureText(testLine)
-      const testWidth = metrics.width
-      if (testWidth > maxWidth && n > 0) {
-        ctx.fillText(line, x, y)
-        line = words[n] + ' '
-        y += lineHeight
-        width += metrics.width
-        height += lineHeight
-      } else {
-        line = testLine
-      }
+    const words = {
+      top: text.split(' '),
+      bottom: text.split(' ').reverse(),
+    }[anchorTo]
+
+    // The anchorTo we adjust line height each time depends on which way we're wrapping
+    const lineHeightDelta = {
+      top: lineHeight,
+      bottom: -lineHeight,
+    }[anchorTo]
+
+    let currentY = y
+
+    const writeLine = (text: string) => {
+      const measured = ctx.measureText(text)
+      totalMeasurements.width = Math.max(
+        totalMeasurements.width,
+        measured.width,
+      )
+      totalMeasurements.height += lineHeight
+      ctx.fillText(text, x, currentY)
+      currentY += lineHeightDelta
     }
-    const lineWidth = ctx.measureText(line).width
-    ctx.fillText(line, x, y)
-    width += lineWidth
-    height += lineHeight
 
-    ctx.textAlign = oldTextAlign
-    return { width, height }
-  }
+    // Maintain a queue of words that will fit on the current line
+    // and render it then clear it once we're ready to draw the line
+    let lineOfWordsQueue: string[] = []
+    words.forEach((candidateWord) => {
+      // See if the current line fits within the specified maxWidth
+      const candidateLineContents = {
+        top: [...lineOfWordsQueue, candidateWord],
+        bottom: [candidateWord, ...lineOfWordsQueue],
+      }[anchorTo]
+      const candidateLineText = candidateLineContents.join(' ')
+      const currentLineMeasurements = ctx.measureText(
+        candidateLineContents.join(' '),
+      )
+      const candidateWordFits = currentLineMeasurements.width <= maxWidth
+      const candidateWordWouldBeAloneOnTheLine = lineOfWordsQueue.length === 0
 
-  protected wrapTextAnchorBottomLeft(
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    x: number,
-    y: number,
-    maxWidth: number,
-    lineHeight: number,
-  ) {
-    const oldTextAlign = ctx.textAlign
-    ctx.textAlign = 'left'
-    const words = text.split(' ')
-    let line = ''
-
-    for (let n = words.length - 1; n >= 0; n--) {
-      const testLine = words[n] + ' ' + line
-      const metrics = ctx.measureText(testLine)
-      const testWidth = metrics.width
-      if (testWidth > maxWidth && n < words.length - 1) {
-        ctx.fillText(line, x, y)
-        line = words[n] + ' '
-        y -= lineHeight
+      if (!candidateWordFits && candidateWordWouldBeAloneOnTheLine) {
+        // This word is already too wide even though it's the only one on this line
+        // so draw it anyways because that's the best we can do
+        writeLine(candidateLineText)
+      } else if (candidateWordFits) {
+        // The current line contents fit, add the next word in there and let's keep going
+        lineOfWordsQueue = candidateLineContents
       } else {
-        line = testLine
+        // This line would be too wide if we added candidateWord; draw the words queued so far
+        // and add the overflowed word to wordsQueuedForRenderOnCurrentLine
+        writeLine(lineOfWordsQueue.join(' '))
+        lineOfWordsQueue = [candidateWord]
       }
-    }
-    ctx.textAlign = oldTextAlign
-    ctx.fillText(line, x, y)
-  }
+    })
 
-  protected wrapTextAnchorTopRight(
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    x: number,
-    y: number,
-    maxWidth: number,
-    lineHeight: number,
-  ): { width: number; height: number } {
-    const oldTextAlign = ctx.textAlign
-    ctx.textAlign = 'right'
-    const words = text.split(' ')
-    let line = ''
-    let width = 0
-    let height = 0
-
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' '
-      const metrics = ctx.measureText(testLine)
-      const testWidth = metrics.width
-      if (testWidth > maxWidth && n > 0) {
-        ctx.fillText(line, x, y)
-        line = words[n] + ' '
-        y += lineHeight
-        width += metrics.width
-        height += lineHeight
-      } else {
-        line = testLine
-      }
-    }
-    const lineWidth = ctx.measureText(line).width
-    ctx.fillText(line, x, y)
-    width += lineWidth
-    height += lineHeight
-
-    ctx.textAlign = oldTextAlign
-    return { width, height }
-  }
-
-  // Writes text vertically centered within the canvas with the top of the text at the specified y value
-  protected drawTextHorizontallyCenteredAtY(
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    y: number,
-  ): TextMetrics {
-    const oldTextAlign = ctx.textAlign
-    ctx.textAlign = 'left'
-    const textMeasurements = ctx.measureText(text)
-    const textX = (this.proportionalizedWidth - textMeasurements.width) / 2
-    ctx.fillText(text, textX, y)
-    ctx.textAlign = oldTextAlign
-    return textMeasurements
+    // If there are words left in the queue, write them
+    writeLine(lineOfWordsQueue.join(' '))
+    return totalMeasurements
   }
 
   protected async drawNomusLogo(
