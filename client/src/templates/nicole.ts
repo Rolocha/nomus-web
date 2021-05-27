@@ -10,7 +10,7 @@ const Nicole = new CardTemplate({
     'https://nomus-assets.s3.amazonaws.com/site-assets/templates/nicole.svg',
   colorScheme: {
     background: {
-      defaultValue: '#ffffff',
+      defaultValue: colors.white,
     },
     accent: {
       defaultValue: colors.cyanProcess,
