@@ -31,19 +31,19 @@ const isNestedNavItem = (item: NavLink): item is NestedNavItem =>
 type NavLink = DirectNavItem | NestedNavItem
 
 const navItems: Array<NavLink> = [
-  // {
-  //   name: 'shop',
-  //   linkType: 'internal',
-  //   path: '/shop',
-  // },
+  {
+    name: 'shop',
+    linkType: 'internal',
+    path: '/shop',
+  },
   {
     name: 'about',
-    linkType: 'external',
+    linkType: 'internal',
     path: '/about',
   },
   {
     name: 'faq',
-    linkType: 'external',
+    linkType: 'internal',
     path: '/faq',
   },
 ]
@@ -104,7 +104,7 @@ const Navbar = (props: Props) => {
         display="grid"
         gridTemplateColumns="auto 1fr auto"
         alignItems="center"
-        gridColumnGap={{ base: 0, [bp]: 4 }}
+        gridColumnGap={{ base: 0, [bp]: '40px' }}
         height={{ base: '60px', [bp]: '100px' }}
         position="relative"
         zIndex={2}
