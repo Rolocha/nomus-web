@@ -61,7 +61,7 @@ const Jim = new CardTemplate({
     line3: {
       label: 'Line 3',
       required: false,
-      placeholder: '',
+      placeholder: '1 Apple Park Road',
     },
     footer: {
       label: 'Footer',
@@ -82,6 +82,7 @@ const Jim = new CardTemplate({
     }
 
     const placeholderTextColor = lighten(0.4)(options.colorScheme.text)
+    const placeholderAccentColor = lighten(0.4)(options.colorScheme.text)
 
     // Background color fill
     ctx.fillStyle =
@@ -131,35 +132,43 @@ const Jim = new CardTemplate({
     })
 
     // Render the name
+    ctx.textAlign = 'right'
     ctx.font = this.proportionalize(10) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.name
       ? options.colorScheme.accent
-      : placeholderTextColor
-    this.wrapTextAnchorTopRight(
+      : placeholderAccentColor
+    this.wrapText(
       ctx,
       options.contactInfo.name ||
         this.contactInfoSpec.name.placeholder ||
         '[name]',
-      this.proportionalize(103),
-      this.proportionalize(45),
-      this.proportionalize(85),
-      this.proportionalize(12),
+      {
+        anchorTo: 'top',
+        x: this.proportionalize(103),
+        y: this.proportionalize(45),
+        maxWidth: this.proportionalize(85),
+        lineHeight: this.proportionalize(12),
+      },
     )
 
     // Render the headline
+    ctx.textAlign = 'left'
     ctx.font = this.proportionalize(8) + 'px Rubik'
     ctx.fillStyle = options.contactInfo.headline
       ? options.colorScheme.text
       : placeholderTextColor
-    this.wrapTextAnchorTopLeft(
+    this.wrapText(
       ctx,
       options.contactInfo.headline ||
         this.contactInfoSpec.headline.placeholder ||
         '[headline]',
-      this.proportionalize(111),
-      this.proportionalize(44),
-      this.proportionalize(112),
-      this.proportionalize(10),
+      {
+        anchorTo: 'top',
+        x: this.proportionalize(111),
+        y: this.proportionalize(44),
+        maxWidth: this.proportionalize(112),
+        lineHeight: this.proportionalize(10),
+      },
     )
 
     ctx.textAlign = 'left'
@@ -174,7 +183,7 @@ const Jim = new CardTemplate({
           this.contactInfoSpec.line1.placeholder ||
           '[line 1]',
         this.proportionalize(111),
-        this.proportionalize(62),
+        this.proportionalize(66),
       )
     }
     // Render line2
@@ -188,7 +197,7 @@ const Jim = new CardTemplate({
           this.contactInfoSpec.line2.placeholder ||
           '[line 2]',
         this.proportionalize(111),
-        this.proportionalize(75),
+        this.proportionalize(78),
       )
     }
     // Render line3
@@ -202,7 +211,7 @@ const Jim = new CardTemplate({
           this.contactInfoSpec.line3.placeholder ||
           '[line 3]',
         this.proportionalize(111),
-        this.proportionalize(88),
+        this.proportionalize(90),
       )
     }
 
