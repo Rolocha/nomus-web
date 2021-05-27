@@ -2,6 +2,7 @@ import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { CardBuilderState } from 'src/pages/CardBuilder/card-builder-state'
+import CostSummary from 'src/pages/CardBuilder/CostSummary'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
 import { getCostSummary } from 'src/utils/pricing'
@@ -82,6 +83,7 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
           <Text.Body2>Shipping info</Text.Body2>
           <Box>
             {[
+              cardBuilderState.formData.name,
               cardBuilderState.formData?.addressLine1,
               cardBuilderState.formData?.addressLine2,
               `${cardBuilderState.formData?.city}, ${cardBuilderState.formData?.state} ${cardBuilderState.formData?.postalCode}`,
@@ -105,47 +107,11 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
           </Box>
         </Box>
 
-        <Box
-          gridArea="costSummary"
-          width="100%"
-          boxShadow="workingWindow"
-          borderRadius="lg"
-          placeSelf="end end"
-          p={4}
-          display="grid"
-          gridTemplateColumns="2fr 1fr 1fr"
-          sx={{
-            '& > *:nth-child(3n)': {
-              placeSelf: 'center end',
-            },
-          }}
-          gridRowGap={3}
-        >
-          <Text.Body2>Subtotal</Text.Body2>
-          <Box />
-          <Text.Body2>
-            {costSummary?.subtotal
-              ? formatDollarAmount(costSummary.subtotal)
-              : '...'}
-          </Text.Body2>
-
-          <Text.Body2>Estimated Taxes</Text.Body2>
-          <Box />
-          <Text.Body2>
-            {costSummary?.estimatedTaxes != null
-              ? formatDollarAmount(costSummary.estimatedTaxes)
-              : '...'}
-          </Text.Body2>
-
-          <Text.Body2>Shipping</Text.Body2>
-          <Box />
-          <Text.Body2>{formatDollarAmount(500)}</Text.Body2>
-
-          <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
-          <Box />
-          <Text.Body2 fontWeight={500}>
-            {costSummary?.total ? formatDollarAmount(costSummary.total) : '...'}
-          </Text.Body2>
+        <Box gridArea="costSummary" placeSelf="end end" width="100%">
+          <CostSummary
+            quantity={cardBuilderState.quantity}
+            state={cardBuilderState.formData?.state}
+          />
         </Box>
       </Box>
     </Box>

@@ -68,9 +68,13 @@ const BaseStep = ({
             ),
             template: (
               <Box pt={4}>
-                <Text.SectionSubheader mb={2}>
+                <Text.SectionSubheader mb="24px">
                   Pick your favorite template to customize
                 </Text.SectionSubheader>
+                <Text.Body2 mb="24px">
+                  You can always come back to this step if the template you've
+                  chosen isn't your cup of tea.
+                </Text.Body2>
                 <Box
                   display="grid"
                   gridTemplateColumns={{
@@ -93,7 +97,7 @@ const BaseStep = ({
                         position="relative"
                         border={
                           cardBuilderState.templateId === templateId
-                            ? `4px solid ${colors.nomusBlue}`
+                            ? `3px solid ${colors.blue[500]}`
                             : undefined
                         }
                       >

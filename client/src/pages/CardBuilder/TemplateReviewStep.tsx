@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
-import * as Text from 'src/components/Text'
+import CardDesignReview from 'src/pages/CardBuilder/CardDesignReview'
 import OrderSummary from 'src/pages/CardBuilder/OrderSummary'
 import templateLibrary from 'src/templates'
 import { CardBuilderState } from './card-builder-state'
@@ -61,7 +60,7 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
           value,
         })
       }
-    }, [])
+    })
     return info
   }, [
     cardBuilderState.templateId,
@@ -69,31 +68,25 @@ const TemplateReviewStep = ({ cardBuilderState }: Props) => {
     cardBuilderState.omittedOptionalFields,
   ])
 
+  const orientation = React.useMemo(() => {
+    const template = templateLibrary[cardBuilderState.templateId!]
+    if (template.width > template.height) return 'horizontal'
+    return 'vertical'
+  }, [cardBuilderState.templateId])
+
   return (
     <Box height="100%">
-      <Text.SectionHeader mb="24px">Your card design</Text.SectionHeader>
-      <Box
-        display="grid"
-        gridTemplateColumns={{ base: '1fr', lg: 'repeat(3, 4fr)' }}
-        gridColumnGap={3}
-        gridRowGap="16px"
-      >
-        {cardImages?.front && (
-          <BusinessCardImage width="100%" frontImageUrl={cardImages.front} />
-        )}
-        {cardImages?.back && (
-          <BusinessCardImage width="100%" backImageUrl={cardImages.back} />
-        )}
-        <Box>
-          <Text.SectionSubheader>Associated information</Text.SectionSubheader>
-          <Box display="grid" gridTemplateColumns="2fr 2fr" gridRowGap={2}>
-            {associatedInfo.map((item, index) => [
-              <Text.Body2 key={index + '0'}>{item.label}</Text.Body2>,
-              <Text.Body2 key={index + '1'}>{item.value}</Text.Body2>,
-            ])}
-          </Box>
-        </Box>
-      </Box>
+      {cardImages && (
+        <CardDesignReview
+          cardBuilderState={cardBuilderState}
+          orientation={orientation}
+          associatedInfo={associatedInfo}
+          cardImages={{
+            front: cardImages.front,
+            back: cardImages.back,
+          }}
+        />
+      )}
 
       <OrderSummary
         cardBuilderState={cardBuilderState}

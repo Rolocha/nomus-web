@@ -10,6 +10,7 @@ type SideRenderer = (opts: { showGuides: boolean }) => React.ReactNode
 
 interface Props {
   cardOrientation?: 'horizontal' | 'vertical'
+  hideBleed?: boolean
   renderFront: SideRenderer | null
   renderBack: SideRenderer | null
 }
@@ -18,6 +19,7 @@ const CardBuilderPreview = ({
   cardOrientation = 'horizontal',
   renderFront,
   renderBack,
+  hideBleed,
 }: Props) => {
   const missingBothImages = renderBack == null && renderFront == null
   const missingAtLeastOneImage = renderBack == null || renderFront == null
@@ -44,11 +46,13 @@ const CardBuilderPreview = ({
             "guideToggle . bothSidesToggle whichSideToggle"
           `,
         }}
+        placeItems="stretch"
         gridTemplateRows="auto"
         gridGap={{ base: '8px', lg: '16px' }}
         mb={3}
       >
         <Button
+          width="100%"
           gridArea="guideToggle"
           variant="secondary"
           disabled={missingBothImages}
@@ -65,6 +69,7 @@ const CardBuilderPreview = ({
           }
         />
         <Button
+          width="100%"
           gridArea="bothSidesToggle"
           variant="secondary"
           disabled={missingAtLeastOneImage}
@@ -73,6 +78,7 @@ const CardBuilderPreview = ({
           children={`${showBothSides ? 'Show one side' : 'Show both sides'}`}
         />
         <Button
+          width="100%"
           gridArea="whichSideToggle"
           variant="secondary"
           disabled={missingBothImages || showBothSides}
@@ -119,7 +125,7 @@ const CardBuilderPreview = ({
           placeSelf="end center"
         >
           <Box gridColumn={{ base: '1/4', lg: '2/3' }}>
-            <CardBuilderPreviewLegend />
+            <CardBuilderPreviewLegend hideBleed={hideBleed} />
           </Box>
         </Box>
       ) : null}

@@ -7,9 +7,8 @@ import * as Form from 'src/components/Form'
 import Link from 'src/components/Link'
 import PricingTiers from 'src/components/PricingTiers'
 import * as Text from 'src/components/Text'
+import CostSummary from 'src/pages/CardBuilder/CostSummary'
 import { createMailtoURL } from 'src/utils/email'
-import { formatDollarAmount } from 'src/utils/money'
-import { getCostSummary } from 'src/utils/pricing'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -41,11 +40,6 @@ const CheckoutStep = ({
     updateCardBuilderState({ cardEntryComplete: event.complete })
     // TODO: Handle errors from event.error
   }
-
-  const costSummary = getCostSummary(
-    cardBuilderState.quantity,
-    checkoutFormMethods.getValues('state'),
-  )
 
   return (
     <Box height="100%">
@@ -80,7 +74,9 @@ const CheckoutStep = ({
         <Form.Form
           onSubmit={checkoutFormMethods.handleSubmit(handleCardSubmit)}
         >
-          <Text.SectionSubheader>Shipping information</Text.SectionSubheader>
+          <Text.SectionSubheader mb="8px">
+            Shipping & payment information
+          </Text.SectionSubheader>
           <Box
             display="grid"
             gridTemplateColumns={{ base: '1fr', lg: '6fr 2fr 4fr' }}
@@ -200,53 +196,11 @@ const CheckoutStep = ({
             </Box>
 
             {/* Cost summary */}
-            <Box
-              gridArea="costSummary"
-              width="100%"
-              boxShadow="workingWindow"
-              borderRadius="lg"
-              placeSelf="end end"
-              p={4}
-              display="grid"
-              gridTemplateColumns="2fr 1fr 1fr"
-              sx={{
-                '& > *:nth-child(3n)': {
-                  placeSelf: 'center end',
-                },
-              }}
-              gridRowGap={3}
-            >
-              <Text.Body2>Subtotal</Text.Body2>
-              <Box></Box>
-              <Text.Body2>
-                {costSummary?.subtotal
-                  ? formatDollarAmount(costSummary.subtotal)
-                  : '...'}
-              </Text.Body2>
-
-              <Text.Body2>Estimated Taxes</Text.Body2>
-              <Box></Box>
-              <Text.Body2>
-                {costSummary?.estimatedTaxes != null
-                  ? formatDollarAmount(costSummary.estimatedTaxes)
-                  : '...'}
-              </Text.Body2>
-
-              <Text.Body2>Shipping</Text.Body2>
-              <Box></Box>
-              <Text.Body2>
-                {costSummary
-                  ? formatDollarAmount(costSummary?.shipping)
-                  : formatDollarAmount(0)}
-              </Text.Body2>
-
-              <Text.Body2 fontWeight={500}>Estimated Total</Text.Body2>
-              <Box></Box>
-              <Text.Body2 fontWeight={500}>
-                {costSummary?.total
-                  ? formatDollarAmount(costSummary.total)
-                  : '...'}
-              </Text.Body2>
+            <Box gridArea="costSummary" placeSelf="end end" width="100%">
+              <CostSummary
+                quantity={cardBuilderState.quantity}
+                state={cardBuilderState.formData?.state}
+              />
             </Box>
           </Box>
         </Form.Form>

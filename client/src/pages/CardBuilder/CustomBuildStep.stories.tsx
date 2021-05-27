@@ -6,13 +6,12 @@ import {
   cardBuilderReducer,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
+import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import { BaseType } from 'src/pages/CardBuilder/types'
-import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
-import { colors } from 'src/styles'
 
 export default {
-  title: 'components/CardBuilder/Template/BuildStep',
-  component: TemplateBuildStep,
+  title: 'components/CardBuilder/Custom/BuildStep',
+  component: CustomBuildStep,
   excludeStories: /.*Data$/,
   decorators: [
     (Story: any) => (
@@ -33,29 +32,8 @@ export const Primary = () => {
     {
       ...initialStateOptions[BaseType.Template],
       cardVersionId: 'cardv_1234',
-      baseType: BaseType.Template,
+      baseType: BaseType.Custom,
       templateId: 'velia',
-      templateCustomization: {
-        contactInfo: {
-          name: 'Spongebob Squarepants',
-          headline: 'Fry Cook at the Krusty Krab',
-          line1: 'The Krusty Krab',
-          line2: '(555)-555-5555',
-          footer: "I'm ready, I'm ready, I'm ready",
-        },
-        graphic: {
-          file: {
-            url:
-              'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
-          },
-          size: 1,
-        },
-        colorScheme: {
-          background: colors.offWhite,
-          accent: colors.gold,
-          text: colors.midnightGray,
-        },
-      },
       quantity: 100,
       formData: {
         name: 'Spongebob',
@@ -79,7 +57,7 @@ export const Primary = () => {
 
   return (
     <Box maxWidth="1200px" border="1px solid #eee" p={4}>
-      <TemplateBuildStep
+      <CustomBuildStep
         cardBuilderState={cardBuilderState}
         updateCardBuilderState={updateCardBuilderState}
       />

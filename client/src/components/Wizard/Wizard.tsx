@@ -200,7 +200,7 @@ function Wizard<ValidStepType extends string>({
                   of={icon}
                   color={isStepAccessible ? colors.white : colors.disabledBlue}
                   mb={{ base: '0.5em', [bp]: 0 }}
-                  mr={{ base: 0, [bp]: '24px' }}
+                  mr={{ base: 0, [bp]: '8px' }}
                 />
                 <Text.Plain
                   m={0}
@@ -251,22 +251,21 @@ function Wizard<ValidStepType extends string>({
           position="relative"
           p={{ base: '24px', [bp]: 0 }}
           bg={{ base: colors.white, [bp]: undefined }}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
+          display="grid"
+          gridTemplateColumns="3fr 6fr 3fr"
+          gridTemplateAreas={`"previousButton . nextButton"`}
           borderBottomRightRadius="inherit"
         >
           {/* Previous step button */}
-          {!isFirstStep ? (
+          {!isFirstStep && (
             <Button
+              gridArea="previousButton"
+              width="100%"
               px={{ base: 2, [bp]: 4 }}
               py={{ base: 1, [bp]: 3 }}
-              // position="absolute"
-              // bottom="0"
-              // left="0"
               transform={{
                 base: undefined,
-                [bp]: 'translate(-10%, 30%)',
+                [bp]: 'translate(-16px, 16px)',
               }}
               size={isDesktop ? 'big' : 'normal'}
               variant="primary"
@@ -274,7 +273,7 @@ function Wizard<ValidStepType extends string>({
               disabled={processingPreviousTransition}
               leftIcon={
                 <Icon
-                  of="arrowRightO"
+                  of="arrowRight"
                   transform="rotate(180deg)"
                   color="white"
                 />
@@ -285,39 +284,34 @@ function Wizard<ValidStepType extends string>({
                 allStepDetails[currentStepIndex - 1].label
               }`}
             </Button>
-          ) : (
-            <Box />
           )}
           {/* Next step (or submit) button */}
           {isReadyToMoveForwardFromStepAtIndex(currentStepIndex) &&
-          (!isLastStep || completionButtonLabel) ? (
-            <Button
-              px={{ base: 2, [bp]: 4 }}
-              py={{ base: 1, [bp]: 3 }}
-              // bottom="0"
-              // right="0"
-              transform={{
-                base: undefined,
-                [bp]: 'translate(10%, 30%)',
-              }}
-              size={isDesktop ? 'big' : 'normal'}
-              variant={isLastStep ? 'success' : 'primary'}
-              disabled={processingNextTransition}
-              isLoading={processingNextTransition}
-              rightIcon={<Icon of="arrowRightO" color="white" />}
-              onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
-            >
-              {isLastStep
-                ? completionButtonLabel || ''
-                : `${isDesktop ? 'Next step: ' : ''}${
-                    allStepDetails[currentStepIndex + 1].label
-                  }`}
-            </Button>
-          ) : (
-            <Box />
-          )}
+            (!isLastStep || completionButtonLabel) && (
+              <Button
+                gridArea="nextButton"
+                width="100%"
+                px={{ base: 2, [bp]: 4 }}
+                py={{ base: 1, [bp]: 3 }}
+                transform={{
+                  base: undefined,
+                  [bp]: 'translate(16px, 16px)',
+                }}
+                size={isDesktop ? 'big' : 'normal'}
+                variant={isLastStep ? 'success' : 'primary'}
+                disabled={processingNextTransition}
+                isLoading={processingNextTransition}
+                rightIcon={<Icon of="arrowRight" color="white" />}
+                onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
+              >
+                {isLastStep
+                  ? completionButtonLabel || ''
+                  : `${isDesktop ? 'Next step: ' : ''}${
+                      allStepDetails[currentStepIndex + 1].label
+                    }`}
+              </Button>
+            )}
         </Box>
-        {/* </Box> */}
       </Box>
     </Box>
   )

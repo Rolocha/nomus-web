@@ -15,7 +15,6 @@ import { acceptableImageFileTypes } from './config'
 import { specs } from './copy'
 
 interface Props {
-  selectedBaseType: string | undefined
   cardBuilderState: CardBuilderState
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
@@ -69,14 +68,22 @@ const CustomBuildStep = ({
 }: Props) => {
   const { frontDesignFile, backDesignFile } = cardBuilderState
 
-  const setFrontDesignFile = (file: FileItem | null) =>
+  const setFrontDesignFile = (file: FileItem | null) => {
     updateCardBuilderState({
       frontDesignFile: file,
     })
-  const setBackDesignFile = (file: FileItem | null) =>
+    if (file == null) {
+      setDimensionMismatch(false)
+    }
+  }
+  const setBackDesignFile = (file: FileItem | null) => {
     updateCardBuilderState({
       backDesignFile: file,
     })
+    if (file == null) {
+      setDimensionMismatch(false)
+    }
+  }
 
   const [dimensionMismatch, setDimensionMismatch] = React.useState(false)
   const [dimensions, setDimensions] = React.useState<ImageDimensions | null>(
