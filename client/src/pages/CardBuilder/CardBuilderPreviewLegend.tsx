@@ -3,11 +3,15 @@ import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import { colors } from 'src/styles'
 
-const CardBuilderPreviewLegend = () => {
+interface Props {
+  hideBleed?: boolean
+}
+
+const CardBuilderPreviewLegend = ({ hideBleed }: Props) => {
   return (
     <Box
       display="grid"
-      gridTemplateColumns="1fr 1fr 1fr"
+      gridTemplateColumns={`repeat(${hideBleed ? 2 : 3}, 1fr)`}
       gridColumnGap={3}
       textAlign="center"
       sx={{
@@ -18,9 +22,11 @@ const CardBuilderPreviewLegend = () => {
         },
       }}
     >
-      <Box bg="#FBDD9D" p={2}>
-        <Text.Body2>bleed</Text.Body2>
-      </Box>
+      {!hideBleed && (
+        <Box bg="#FBDD9D" p={2}>
+          <Text.Body2>bleed</Text.Body2>
+        </Box>
+      )}
       <Box border="2px solid #444" p={2}>
         <Text.Body2>business card</Text.Body2>
       </Box>

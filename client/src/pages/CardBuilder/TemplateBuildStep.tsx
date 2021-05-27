@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { Switch } from '@chakra-ui/react'
+import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
 import FileUploadButton from 'src/components/FileUploadButton'
@@ -164,6 +164,7 @@ const TemplateBuildStep = ({
           </Box>
           {templateCardOptions.graphic?.url && (
             <Form.Input
+              p={0}
               name="graphic.size"
               type="range"
               width="100%"
@@ -267,6 +268,7 @@ const TemplateBuildStep = ({
         }}
       >
         <CardBuilderPreview
+          hideBleed
           cardOrientation={
             templateLibrary[templateId].height >
             templateLibrary[templateId].width

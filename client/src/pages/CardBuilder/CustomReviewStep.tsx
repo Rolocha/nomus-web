@@ -1,8 +1,9 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
+import CardDesignReview from 'src/pages/CardBuilder/CardDesignReview'
 import OrderSummary from 'src/pages/CardBuilder/OrderSummary'
+import { getImageDimensions } from 'src/utils/image'
 import { CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -13,30 +14,59 @@ const CustomReviewStep = ({ cardBuilderState }: Props) => {
   const frontFileItem = cardBuilderState.frontDesignFile
   const backFileItem = cardBuilderState.backDesignFile
 
+  const [orientation, setOrientation] = React.useState<
+    'horizontal' | 'vertical' | null
+  >(null)
+
+  React.useEffect(() => {
+    const determineOrientation = async () => {
+      if (frontFileItem?.url || backFileItem?.url) {
+        const frontDims = frontFileItem?.url
+          ? await getImageDimensions(frontFileItem.url)
+          : null
+        const backDims = backFileItem?.url
+          ? await getImageDimensions(backFileItem.url)
+          : null
+        setOrientation(
+          (frontDims && frontDims.width > frontDims.height) ||
+            (backDims && backDims.width > backDims.height)
+            ? 'horizontal'
+            : 'vertical',
+        )
+      }
+    }
+
+    determineOrientation()
+  }, [frontFileItem, backFileItem])
+
+  const associatedInfo = React.useMemo(() => {
+    return [
+      {
+        label: 'Front design file',
+        value: frontFileItem?.file.name ?? 'None',
+      },
+      {
+        label: 'Back design file',
+        value: backFileItem?.file.name ?? 'None',
+      },
+    ]
+  }, [frontFileItem, backFileItem])
+
   return (
     <Box height="100%">
       <Text.SectionHeader mb="24px">Your card design</Text.SectionHeader>
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(3, 4fr)"
-        gridColumnGap={3}
-      >
-        {frontFileItem && (
-          <BusinessCardImage width="100%" frontImageUrl={frontFileItem.url} />
-        )}
-        {backFileItem && (
-          <BusinessCardImage width="100%" backImageUrl={backFileItem.url} />
-        )}
-        <Box>
-          <Text.SectionSubheader>Associated information</Text.SectionSubheader>
-          <Box display="grid" gridTemplateColumns="2fr 2fr" gridRowGap={2}>
-            <Text.Body2>Front design file</Text.Body2>
-            <Text.Body2>{frontFileItem?.file.name ?? 'None'}</Text.Body2>
-            <Text.Body2>Back design file</Text.Body2>
-            <Text.Body2>{backFileItem?.file.name ?? 'None'}</Text.Body2>
-          </Box>
-        </Box>
-      </Box>
+
+      {orientation && (frontFileItem?.url || backFileItem?.url) && (
+        <CardDesignReview
+          cardBuilderState={cardBuilderState}
+          orientation={orientation}
+          associatedInfo={associatedInfo}
+          cardImages={{
+            front: frontFileItem?.url,
+            back: backFileItem?.url,
+          }}
+        />
+      )}
 
       <OrderSummary
         cardBuilderState={cardBuilderState}

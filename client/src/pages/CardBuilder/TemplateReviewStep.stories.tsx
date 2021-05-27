@@ -10,7 +10,7 @@ import { BaseType } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 
 export default {
-  title: 'components/CardBuilder/TemplateReviewStep',
+  title: 'components/CardBuilder/Template/ReviewStep',
   component: TemplateReviewStep,
   excludeStories: /.*Data$/,
   decorators: [
@@ -30,7 +30,7 @@ export const Primary = () => {
   const cardBuilderState: CardBuilderState = {
     ...initialStateOptions[BaseType.Template],
     baseType: BaseType.Template,
-    templateId: 'velia',
+    templateId: 'konatall',
     templateCustomization: {
       contactInfo: {
         name: 'Spongebob Squarepants',
@@ -55,7 +55,7 @@ export const Primary = () => {
     omittedOptionalFields: ['contactInfo.line3'],
     quantity: 100,
     formData: {
-      name: 'Spongebob',
+      name: 'Spongebob Squarepants',
       addressLine1: '123 Pineapple St',
       city: 'Bikini Bottom',
       state: 'UW',
