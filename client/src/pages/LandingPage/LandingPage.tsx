@@ -9,7 +9,7 @@ import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
 import cardCustomBg from 'src/images/card-custom-promo-bg.png'
-import contactRollImage from 'src/images/contact-roll.png'
+import contactRollImage from 'src/images/contact-roll.gif'
 import anshulImage from 'src/images/crew/anshul.png'
 import bibekImage from 'src/images/crew/bibek.png'
 import cindyImage from 'src/images/crew/cindy.png'
@@ -25,31 +25,26 @@ import humanServiceImage from 'src/images/human-service.svg'
 import professionalCardsImage from 'src/images/professional-cards.png'
 import qualityYouCanTrustImage from 'src/images/quality-you-can-trust.svg'
 import seamlessExperienceImage from 'src/images/seamless-experience.svg'
-import testimonialBg from 'src/images/testimonial-bg.svg'
 import wavyLoopImage from 'src/images/wavy-loop.svg'
 import yourDashboardDesktop from 'src/images/your-dashboard-desktop.png'
 import yourDashboardMobile from 'src/images/your-dashboard-mobile.png'
 import { colors } from 'src/styles'
-import { useBreakpoint } from 'src/styles/breakpoints'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 // Landing-page specific imports
 import CrewMemberCell from './CrewMemberCell'
 import MiniCardBuilder from './MiniCardBuilder'
 import PromiseItem from './PromiseItem'
-import TestimonialCarousel from './TestimonialCarousel'
-import testimonials from './testimonials'
 
 const ivoryGradientBg = `linear-gradient(180deg, ${colors.ivory} 70%, ${colors.white} 100%)`
 
 const LandingPage = () => {
   const [userEnteredName, setUserEnteredName] = React.useState('')
-  const isDesktop = useBreakpoint('lg')
 
   const sampleCardOptions: CardTemplateRenderOptions = React.useMemo(
     () => ({
       colorScheme: {
         background: colors.white,
-        text: colors.nomusBlue,
+        text: colors.midnightGray,
       },
       contactInfo: {
         name: userEnteredName || 'Replace with your lovely name',
@@ -256,14 +251,9 @@ const LandingPage = () => {
           `,
           }}
           gridColumnGap="16px"
-          gridRowGap="16px"
+          gridRowGap={{ base: '16px', lg: '24px' }}
         >
-          <Text.H1
-            gridArea="title"
-            color={colors.nomusBlue}
-            mb="24px"
-            fontWeight="300"
-          >
+          <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
             Your identity, wherever you go
           </Text.H1>
 
@@ -407,14 +397,9 @@ const LandingPage = () => {
           `,
           }}
           gridColumnGap="16px"
-          gridRowGap="16px"
+          gridRowGap={{ base: '16px', lg: '24px' }}
         >
-          <Text.H1
-            gridArea="title"
-            color={colors.nomusBlue}
-            mb="24px"
-            fontWeight="300"
-          >
+          <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
             Upload your own design
           </Text.H1>
           <Box gridArea="description">
@@ -477,14 +462,9 @@ const LandingPage = () => {
           `,
           }}
           gridColumnGap="16px"
-          gridRowGap="16px"
+          gridRowGap={{ base: '16px', lg: '24px' }}
         >
-          <Text.H1
-            gridArea="title"
-            color={colors.nomusBlue}
-            mb="24px"
-            fontWeight="300"
-          >
+          <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
             Maintain a richer contacts list
           </Text.H1>
 
@@ -524,31 +504,6 @@ const LandingPage = () => {
               borderRadius="8px"
               boxShadow="businessCard"
             />
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Testimonials */}
-      <Box pt={{ base: '64px', lg: '80px' }}>
-        <Text.H1
-          color={colors.nomusBlue}
-          mb="24px"
-          fontWeight="300"
-          textAlign="center"
-        >
-          Take it from our early adopters
-        </Text.H1>
-        <Box position="relative">
-          <Box
-            bg={`url(${testimonialBg})`}
-            backgroundPosition="center"
-            backgroundSize="contain"
-            backgroundRepeat="no-repeat"
-            py="24px"
-          >
-            <Box container={isDesktop}>
-              <TestimonialCarousel testimonials={testimonials} />
-            </Box>
           </Box>
         </Box>
       </Box>

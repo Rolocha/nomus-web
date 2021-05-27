@@ -23,14 +23,14 @@ const textStyles: Record<string, any> = {
     ...baseTextStyles,
     fontWeight: 300,
     fontSize: [32, 32, 40, 40],
-    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    lineHeight: [1.4, 1.4, 1.4, 1.4],
     color: colors.midnightGray,
   },
   h3: {
     ...baseTextStyles,
     fontWeight: 300,
     fontSize: [24, 24, 32, 32],
-    lineHeight: [1.4, 1.4, 1.5, 1.5],
+    lineHeight: [1.4, 1.4, 1.4, 1.4],
     color: colors.midnightGray,
   },
   h4: {
