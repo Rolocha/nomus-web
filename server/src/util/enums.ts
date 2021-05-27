@@ -45,8 +45,8 @@ registerEnumType(Role, {
 })
 
 export enum CardSpecBaseType {
-  Custom = 'custom',
-  Template = 'template',
+  Custom = 'Custom',
+  Template = 'Template',
 }
 
 registerEnumType(CardSpecBaseType, {

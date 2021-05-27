@@ -227,16 +227,16 @@ class ContactsResolver {
     })
 
     if (existingConnection) {
-      if (contactInfo.meetingDate) {
+      if (contactInfo.meetingDate != null) {
         existingConnection.meetingDate = contactInfo.meetingDate
       }
-      if (contactInfo.meetingPlace) {
+      if (contactInfo.meetingPlace != null) {
         existingConnection.meetingPlace = contactInfo.meetingPlace
       }
-      if (contactInfo.tags) {
+      if (contactInfo.tags != null) {
         existingConnection.tags = contactInfo.tags
       }
-      if (contactInfo.notes) {
+      if (contactInfo.notes != null) {
         existingConnection.notes = contactInfo.notes
       }
       await existingConnection.save()

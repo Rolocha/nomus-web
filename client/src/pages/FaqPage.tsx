@@ -44,7 +44,7 @@ export default () => {
     const ticketId = getRandomInt(1000, 9999)
 
     window.location.href = createMailtoURL({
-      to: 'help@nomus.me',
+      to: 'hi@nomus.me',
       subject: `Customer Support for ${formData.name} #${ticketId}`,
       body: `${formData.entry}`,
     })

@@ -16,7 +16,6 @@ import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 import OrderEvent from './OrderEvent'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
@@ -29,12 +28,6 @@ const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
   [OrderState.Enroute]: [OrderState.Fulfilled],
   [OrderState.Fulfilled]: [],
   [OrderState.Canceled]: [],
-}
-
-export const ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES: Partial<Record<OrderState, string>> = {
-  [OrderState.Paid]: SendgridTemplate.OrderPaid,
-  [OrderState.Enroute]: SendgridTemplate.OrderEnroute,
-  [OrderState.Fulfilled]: SendgridTemplate.OrderFulfilled,
 }
 
 @pre<Order>('save', async function (next) {
@@ -153,24 +146,6 @@ class Order extends BaseModel({
         })
         this.state = futureState
         await this.save()
-
-        if (this.state in ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES) {
-          const user = await User.mongo.findById(this.user)
-          await sgMail.send({
-            to: user.email,
-            from: 'hi@nomus.me',
-            templateId: ORDER_STATE_EMAIL_NOTIFICATION_TEMPLATES[this.state],
-            dynamicTemplateData: {
-              id: this.id,
-              quantity: this.quantity,
-              price: this.price,
-              state: this.state,
-              trackingNumber: this.trackingNumber,
-            },
-          })
-          console.log('stop')
-        }
-
         return Result.ok(this)
       } catch (e) {
         return Result.fail('save-error')

@@ -154,7 +154,7 @@ class CardVersionResolver {
     description: 'Initializes a bare card version for use in the Card Builder UI',
   })
   async createEmptyCardVersion(
-    @Arg('baseType', () => CardSpecBaseType, { nullable: true }) baseType: CardSpecBaseType,
+    @Arg('baseType', () => CardSpecBaseType, { nullable: false }) baseType: CardSpecBaseType,
     @Ctx() context: IApolloContext
   ) {
     const cv = new CardVersion.mongo()

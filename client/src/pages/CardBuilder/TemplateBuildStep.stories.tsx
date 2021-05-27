@@ -6,11 +6,12 @@ import {
   cardBuilderReducer,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
+import { BaseType } from 'src/pages/CardBuilder/types'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import { colors } from 'src/styles'
 
 export default {
-  title: 'components/CardBuilder/TemplateBuildStep',
+  title: 'components/CardBuilder/Template/BuildStep',
   component: TemplateBuildStep,
   excludeStories: /.*Data$/,
   decorators: [
@@ -30,16 +31,18 @@ export const Primary = () => {
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
     {
-      ...initialStateOptions.template,
+      ...initialStateOptions[BaseType.Template],
       cardVersionId: 'cardv_1234',
-      baseType: 'template',
-      templateId: 'velia',
+      baseType: BaseType.Template,
+      templateId: 'nicole',
       templateCustomization: {
         contactInfo: {
           name: 'Spongebob Squarepants',
           headline: 'Fry Cook at the Krusty Krab',
           line1: 'The Krusty Krab',
           line2: '(555)-555-5555',
+          line3: '(555)-555-5555',
+          line4: '(555)-555-5555',
           footer: "I'm ready, I'm ready, I'm ready",
         },
         graphic: {
@@ -52,10 +55,11 @@ export const Primary = () => {
         colorScheme: {
           background: colors.offWhite,
           accent: colors.gold,
+          accent2: colors.nomusBlue,
           text: colors.midnightGray,
         },
       },
-      quantity: 50,
+      quantity: 100,
       formData: {
         name: 'Spongebob',
         addressLine1: '123 Pineapple St',

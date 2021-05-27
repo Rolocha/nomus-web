@@ -1,12 +1,7 @@
 import QRCode from 'qrcode'
 import { specMeasurements } from 'src/pages/CardBuilder/config'
 import { colors } from 'src/styles'
-import {
-  ColorScheme,
-  BaseColorScheme,
-  CustomizableFieldSpec,
-  CustomizableField,
-} from './customization'
+import { CustomizableField, CustomizableFieldSpec } from './customization'
 import {
   createNFCTapIconSVG,
   createNomusLogoSVG,
@@ -19,40 +14,29 @@ import {
 // move this to TemplateCard
 const RESOLUTION_FACTOR = 5
 
-export type CardTemplateRenderOptions<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> = {
-  colorScheme: Record<
-    ExtendedColors | keyof BaseColorScheme,
-    CustomizableField.Color
-  >
-  contactInfo: Record<ContactInfoFields, CustomizableField.ContactInfo>
+export type CardTemplateRenderOptions = {
+  colorScheme: Record<string, CustomizableField.Color>
+  contactInfo: Record<string, CustomizableField.ContactInfo | null>
   graphic: CustomizableField.Graphic
   qrCodeUrl: CustomizableField.QRCode
+  omittedContactInfoFields: Array<string>
 }
 
-export interface CardTemplateDefinition<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> {
+export interface CardTemplateDefinition {
   name: string
   width: number
   height: number
   demoImageUrl: string
-  colorScheme: Record<
-    keyof ColorScheme<ExtendedColors>,
-    CustomizableFieldSpec.Color
-  >
-  contactInfo: Record<ContactInfoFields, CustomizableFieldSpec.ContactInfo>
+  colorScheme: Record<string, CustomizableFieldSpec.Color>
+  contactInfo: Record<string, CustomizableFieldSpec.ContactInfo>
 
   renderFront: (
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) => void | Promise<void>
   renderBack: (
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ) => void | Promise<void>
 }
 
@@ -66,42 +50,19 @@ interface RenderResponse {
 //
 // Using this instance also gives the template definition's render functions
 // access to useful utility methods such as drawNomusLogo, drawQRCode, etc.
-export default class CardTemplate<
-  ContactInfoFields extends string,
-  ExtendedColors extends string
-> {
+export default class CardTemplate {
   public name: string
   public width: number
   public height: number
   public demoImageUrl: string
-  public contactInfoSpec: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['contactInfo']
-  public colorSchemeSpec: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['colorScheme']
+  public contactInfoSpec: CardTemplateDefinition['contactInfo']
+  public colorSchemeSpec: CardTemplateDefinition['colorScheme']
 
-  private _renderFront: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['renderFront']
-  private _renderBack: CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['renderBack']
-  private userSpecifiedOptions: CardTemplateRenderOptions<
-    ContactInfoFields,
-    ExtendedColors
-  > | null = null
+  private _renderFront: CardTemplateDefinition['renderFront']
+  private _renderBack: CardTemplateDefinition['renderBack']
+  private userSpecifiedOptions: CardTemplateRenderOptions | null = null
 
-  constructor(
-    templateDefinition: CardTemplateDefinition<
-      ContactInfoFields,
-      ExtendedColors
-    >,
-  ) {
+  constructor(templateDefinition: CardTemplateDefinition) {
     this.name = templateDefinition.name
     this.width = templateDefinition.width
     this.height = templateDefinition.height
@@ -122,16 +83,10 @@ export default class CardTemplate<
   public get proportionalizedHeight() {
     return this.proportionalize(this.height)
   }
-  public get contactInfoFieldNames(): (keyof CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['contactInfo'])[] {
+  public get contactInfoFieldNames(): (keyof CardTemplateDefinition['contactInfo'])[] {
     return Object.keys(this.contactInfoSpec) as any[]
   }
-  public get colorKeys(): (keyof CardTemplateDefinition<
-    ContactInfoFields,
-    ExtendedColors
-  >['colorScheme'])[] {
+  public get colorKeys(): (keyof CardTemplateDefinition['colorScheme'])[] {
     return Object.keys(this.colorSchemeSpec) as any[]
   }
 
@@ -146,17 +101,16 @@ export default class CardTemplate<
     )
   }
 
-  public get defaultOptions(): CardTemplateRenderOptions<
-    ContactInfoFields,
-    ExtendedColors
-  > {
+  public get defaultOptions(): CardTemplateRenderOptions {
     return {
       contactInfo: this.contactInfoFieldNames.reduce((acc, fieldName) => {
-        if (this.contactInfoSpec[fieldName].defaultValue) {
-          acc[fieldName] = this.contactInfoSpec[fieldName].defaultValue
+        if (this.contactInfoSpec[fieldName].required) {
+          acc[fieldName] = ''
+        } else {
+          acc[fieldName] = null
         }
         return acc
-      }, {} as Record<string, any>),
+      }, {} as Partial<Record<string, any>>),
       colorScheme: this.colorKeys.reduce((acc, fieldName) => {
         if (this.colorSchemeSpec[fieldName].defaultValue) {
           acc[fieldName] = this.colorSchemeSpec[fieldName].defaultValue
@@ -168,6 +122,7 @@ export default class CardTemplate<
         size: 1,
       },
       qrCodeUrl: 'https://nomus.me',
+      omittedContactInfoFields: [],
     }
   }
 
@@ -182,7 +137,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderFrontToCanvas(
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -197,7 +152,7 @@ export default class CardTemplate<
   // using the specified options
   public async renderBackToCanvas(
     canvas: HTMLCanvasElement,
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
     this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
@@ -210,7 +165,7 @@ export default class CardTemplate<
 
   // Renders both the front and back of the cards each to a separate data URL string
   public async renderBothSidesToDataUrls(
-    options: CardTemplateRenderOptions<ContactInfoFields, ExtendedColors>,
+    options: CardTemplateRenderOptions,
   ): Promise<{ front: string; back: string }> {
     const frontCanvas = document.createElement('canvas')
     const backCanvas = document.createElement('canvas')
@@ -250,7 +205,8 @@ export default class CardTemplate<
   // lets us handle any such data transformations.
   public createOptionsFromFormFields(
     formFields: Record<string, any>,
-  ): CardTemplateRenderOptions<ContactInfoFields, ExtendedColors> {
+    omittedFields: Array<string>,
+  ): CardTemplateRenderOptions {
     const { graphic, ...otherFormFields } = formFields
     const result: any = {
       ...otherFormFields,
@@ -261,6 +217,9 @@ export default class CardTemplate<
               size: graphic.size,
             }
           : null,
+      omittedContactInfoFields: omittedFields
+        ? omittedFields.map((field) => field.replace('contactInfo.', ''))
+        : [],
     }
     return result
   }
@@ -337,16 +296,79 @@ export default class CardTemplate<
     )
   }
 
-  // Writes text vertically centered within the canvas with the top of the text at the specified y value
-  protected drawTextHorizontallyCenteredAtY(
+  // Renders text that wraps when it grows beyond the specified maxWidth
+  protected wrapText(
     ctx: CanvasRenderingContext2D,
     text: string,
-    y: number,
-  ): TextMetrics {
-    const textMeasurements = ctx.measureText(text)
-    const textX = (this.proportionalizedWidth - textMeasurements.width) / 2
-    ctx.fillText(text, textX, y)
-    return textMeasurements
+    positioning: {
+      anchorTo: 'bottom' | 'top'
+      x: number
+      y: number
+      maxWidth: number
+      lineHeight: number
+    },
+  ): { width: number; height: number } {
+    const { x, y, maxWidth, lineHeight, anchorTo } = positioning
+    const totalMeasurements = { width: 0, height: 0 }
+
+    const words = {
+      top: text.split(' '),
+      bottom: text.split(' ').reverse(),
+    }[anchorTo]
+
+    // The anchorTo we adjust line height each time depends on which way we're wrapping
+    const lineHeightDelta = {
+      top: lineHeight,
+      bottom: -lineHeight,
+    }[anchorTo]
+
+    let currentY = y
+
+    const writeLine = (text: string) => {
+      const measured = ctx.measureText(text)
+      totalMeasurements.width = Math.max(
+        totalMeasurements.width,
+        measured.width,
+      )
+      totalMeasurements.height += lineHeight
+      ctx.fillText(text, x, currentY)
+      currentY += lineHeightDelta
+    }
+
+    // Maintain a queue of words that will fit on the current line
+    // and render it then clear it once we're ready to draw the line
+    let lineOfWordsQueue: string[] = []
+    words.forEach((candidateWord) => {
+      // See if the current line fits within the specified maxWidth
+      const candidateLineContents = {
+        top: [...lineOfWordsQueue, candidateWord],
+        bottom: [candidateWord, ...lineOfWordsQueue],
+      }[anchorTo]
+      const candidateLineText = candidateLineContents.join(' ')
+      const currentLineMeasurements = ctx.measureText(
+        candidateLineContents.join(' '),
+      )
+      const candidateWordFits = currentLineMeasurements.width <= maxWidth
+      const candidateWordWouldBeAloneOnTheLine = lineOfWordsQueue.length === 0
+
+      if (!candidateWordFits && candidateWordWouldBeAloneOnTheLine) {
+        // This word is already too wide even though it's the only one on this line
+        // so draw it anyways because that's the best we can do
+        writeLine(candidateLineText)
+      } else if (candidateWordFits) {
+        // The current line contents fit, add the next word in there and let's keep going
+        lineOfWordsQueue = candidateLineContents
+      } else {
+        // This line would be too wide if we added candidateWord; draw the words queued so far
+        // and add the overflowed word to wordsQueuedForRenderOnCurrentLine
+        writeLine(lineOfWordsQueue.join(' '))
+        lineOfWordsQueue = [candidateWord]
+      }
+    })
+
+    // If there are words left in the queue, write them
+    writeLine(lineOfWordsQueue.join(' '))
+    return totalMeasurements
   }
 
   protected async drawNomusLogo(

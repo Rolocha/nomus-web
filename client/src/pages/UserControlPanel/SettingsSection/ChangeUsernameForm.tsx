@@ -82,7 +82,7 @@ const ChangeUsernameForm = ({ username }: Props) => {
       display="grid"
       gridTemplateColumns={{
         base: '8fr 4fr',
-        [bp]: '4fr 2fr 6fr',
+        [bp]: '4fr 3fr 5fr',
       }}
       gridTemplateAreas={{
         base: `
@@ -118,10 +118,7 @@ const ChangeUsernameForm = ({ username }: Props) => {
         )}
       </Box>
 
-      <Box
-        gridArea="editUsername"
-        placeSelf={{ base: 'end', [bp]: 'end center' }}
-      >
+      <Box gridArea="editUsername" placeSelf={'center'}>
         {active ? (
           <Box
             height="100%"
@@ -129,21 +126,31 @@ const ChangeUsernameForm = ({ username }: Props) => {
             gridTemplateAreas={`
               "save cancel"
             `}
-            gridGap={2}
+            gridGap={3}
           >
             <Box gridArea="save">
               <Button
-                variant="success"
+                size="sm"
+                variant="successSecondary"
                 rightIcon={<Icon of="check" color={colors.validGreen} />}
                 onClick={handleSubmit(onSubmitUsername)}
-              />
+              >
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
+                  Save
+                </Box>
+              </Button>
             </Box>
             <Box gridArea="cancel">
               <Button
+                size="sm"
                 variant="dangerSecondary"
                 rightIcon={<Icon of="close" color={colors.invalidRed} />}
                 onClick={closeForm}
-              />
+              >
+                <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
+                  Cancel
+                </Box>
+              </Button>
             </Box>
           </Box>
         ) : (

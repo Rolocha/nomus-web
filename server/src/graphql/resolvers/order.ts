@@ -4,12 +4,17 @@ import { FileUpload } from 'graphql-upload'
 import { GraphQLUpload } from 'apollo-server-express'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
-import { Address, OrderPrice } from 'src/models/subschemas'
+import {
+  Address,
+  OrderPrice,
+  TemplateColorScheme,
+  TemplateContactInfoFields,
+} from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { calculateCost } from 'src/util/pricing'
+import { getCostSummary } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
-import { stripe } from 'src/util/stripe'
+import { Stripe, stripe } from 'src/util/stripe'
 import {
   Arg,
   Authorized,
@@ -25,24 +30,6 @@ import {
   UnauthorizedError,
 } from 'type-graphql'
 import { AdminOnlyArgs } from '../auth'
-
-@InputType({ description: 'Specification for a new Card Version object for Order' })
-class BaseCardSpecInput implements Partial<CardVersion> {
-  @Field({ nullable: true })
-  cardSlug?: string
-
-  @Field({ nullable: true })
-  vcfNotes?: string
-}
-
-@InputType({ description: 'Specification for a card built using custom assets' })
-class CustomCardSpecInput extends BaseCardSpecInput {
-  @Field((type) => GraphQLUpload, { nullable: false })
-  frontImageDataUrl: Promise<FileUpload>
-
-  @Field((type) => GraphQLUpload, { nullable: true })
-  backImageDataUrl?: Promise<FileUpload>
-}
 
 @InputType({
   description: 'Input to generate new Order object, regardless of what type of card base was used',
@@ -110,14 +97,46 @@ class OrdersInput extends OrdersQueryInput {
   user: string
 }
 
-@InputType({ description: 'Payload for submitting a custom order' })
+@InputType({ description: 'Payload for submitting a card builder order with a custom design' })
 class SubmitCustomOrderInput extends BaseSubmitOrderInput {
-  @Field((type) => CustomCardSpecInput)
-  cardSpec: CustomCardSpecInput
+  @Field((type) => GraphQLUpload, { nullable: false })
+  frontImageDataUrl: Promise<FileUpload>
+
+  @Field((type) => GraphQLUpload, { nullable: true })
+  backImageDataUrl?: Promise<FileUpload>
+}
+
+@InputType({
+  description: 'Payload for submitting a card builder order with a template-based design',
+})
+class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
+  @Field({ nullable: false })
+  templateId: string
+
+  @Field({ nullable: false })
+  cardVersionId: string
+
+  @Field((type) => TemplateColorScheme, { nullable: false })
+  colorScheme: TemplateColorScheme
+
+  @Field((type) => TemplateContactInfoFields, { nullable: false })
+  contactInfo: TemplateContactInfoFields
+
+  @Field((type) => GraphQLUpload, { nullable: true })
+  graphic?: Promise<FileUpload> | null
+
+  @Field({ nullable: false })
+  qrCodeUrl: string
+
+  @Field((type) => GraphQLUpload, { nullable: false })
+  frontImageDataUrl: Promise<FileUpload>
+
+  @Field((type) => GraphQLUpload, { nullable: true })
+  backImageDataUrl?: Promise<FileUpload> | null
 }
 
 @ObjectType()
-class SubmitCustomOrderResponse {
+class SubmitOrderResponse {
   @Field()
   clientSecret: string
 
@@ -173,9 +192,10 @@ class OrderResolver {
   }
 
   @Authorized(Role.Admin)
-  @Mutation((type) => Order)
-  // updateOrder cannot be used to update the state of the order.
-  // Use transitionOrderState instead
+  @Mutation((type) => Order, {
+    description:
+      'Updates the simple fields of an order; for updating the order state, use transitionOrderState instead',
+  })
   async updateOrder(
     @Arg('orderId', { nullable: true }) orderId: string | null,
     @Arg('payload', { nullable: true }) payload: OrdersQueryInput,
@@ -213,7 +233,10 @@ class OrderResolver {
     if (!context.user) {
       throw new Error('no-user-specified')
     }
-    const order = await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+    const order = context.user.roles.includes(Role.Admin)
+      ? await Order.mongo.findOne({ _id: orderId })
+      : await Order.mongo.findOne({ _id: orderId, user: context.user.id })
+
     if (!order) {
       throw new Error('no-matching-order')
     }
@@ -287,88 +310,200 @@ class OrderResolver {
     return orders
   }
 
-  // TODO: Make Card Builder work even for logged out users and eventually
-  // remove this @Authorized decorator
   @Authorized(Role.User)
-  @Mutation((type) => SubmitCustomOrderResponse)
+  @Mutation((type) => SubmitOrderResponse, {
+    description:
+      'Handles submission of an order created via the Card Builder UI for a custom user design',
+  })
   async submitCustomOrder(
     @Arg('payload', { nullable: false }) payload: SubmitCustomOrderInput,
     @Ctx() context: IApolloContext
-  ): Promise<SubmitCustomOrderResponse> {
+  ): Promise<SubmitOrderResponse> {
     const { user } = context
     if (user == null) {
       throw new AuthenticationError('No user')
     }
-    const { quantity, cardSpec } = payload
 
     const cardVersion = new CardVersion.mongo({
       user: user.id,
-      vcfNotes: cardSpec.vcfNotes,
       baseType: CardSpecBaseType.Custom,
     })
 
-    // Upload the front image and put the resulting S3 key on the card version
-    const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
-      await payload.cardSpec.frontImageDataUrl,
-      `${cardVersion.id}/front`,
-      S3.S3AssetCategory.CardVersions
+    const uploadedImageUrls = await this.uploadCardImages(
+      {
+        front: payload.frontImageDataUrl,
+        back: payload.backImageDataUrl,
+      },
+      cardVersion.id
     )
 
-    if (frontImageUploadResult.isSuccess) {
-      cardVersion.frontImageUrl = S3.getObjectUrl(frontImageUploadResult.value)
-    } else {
-      throw new Error('Failed to upload front card image')
-    }
-
-    // Upload the back image too if present (it's optional)
-    if (payload.cardSpec.backImageDataUrl) {
-      const backImageUploadResult = await S3.uploadGraphQLFileToS3(
-        await payload.cardSpec.backImageDataUrl,
-        `${cardVersion.id}/back`,
-        S3.S3AssetCategory.CardVersions
-      )
-      if (backImageUploadResult.isSuccess) {
-        cardVersion.backImageUrl = S3.getObjectUrl(backImageUploadResult.value)
-      } else {
-        throw new Error('Failed to upload back card image')
-      }
+    cardVersion.frontImageUrl = uploadedImageUrls.front
+    if (uploadedImageUrls.back) {
+      cardVersion.backImageUrl = uploadedImageUrls.back
     }
 
     await cardVersion.save()
 
-    const subtotal = calculateCost(quantity)
-    if (subtotal == null) {
+    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+      user,
+      cardVersion,
+      quantity: payload.quantity,
+      state: payload.shippingAddress.state,
+    })
+
+    // Update the user's default card version to the newly created one
+    user.defaultCardVersion = cardVersion.id
+    await user.save()
+
+    return {
+      orderId: createdOrder.id,
+      clientSecret: paymentIntent.client_secret,
+    }
+  }
+
+  @Authorized(Role.User)
+  @Mutation((type) => SubmitOrderResponse, {
+    description:
+      'Handles submission of an order created via the Card Builder UI for a template-based design',
+  })
+  async submitTemplateOrder(
+    @Arg('payload', { nullable: false }) payload: SubmitTemplateOrderInput,
+    @Ctx() context: IApolloContext
+  ): Promise<SubmitOrderResponse> {
+    const { user } = context
+    if (user == null) {
+      throw new AuthenticationError('No user')
+    }
+
+    const cardVersion = await CardVersion.mongo.findById(payload.cardVersionId)
+    if (cardVersion == null) {
+      throw new Error(`No card version found with id: ${payload.cardVersionId}`)
+    }
+
+    // Update the card version with the customized template details
+    cardVersion.contactInfo = payload.contactInfo
+    cardVersion.colorScheme = payload.colorScheme
+    cardVersion.qrCodeUrl = payload.qrCodeUrl
+
+    // Even though the above fields contain all the data necessary to render the card image,
+    // for now we still require images to be rendered on the client side and sent to the backend.
+    // This is because the image generation happens using HTML5 Canvas which isn't supported natively
+    // in Node.
+    //
+    // Down the line, we can & might want to enable server-side card image generation by leveraging
+    // a third-party NPM package that implements the Canvas API in Node, as well as by refactoring the
+    // template rendering logic (in src/client/templates) to be isomorphic for use on both client & server.
+    const uploadedImageUrls = await this.uploadCardImages(
+      {
+        front: payload.frontImageDataUrl,
+        back: payload.backImageDataUrl,
+      },
+      cardVersion.id
+    )
+
+    cardVersion.frontImageUrl = uploadedImageUrls.front
+    if (uploadedImageUrls.back) {
+      cardVersion.backImageUrl = uploadedImageUrls.back
+    }
+    await cardVersion.save()
+
+    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+      user,
+      cardVersion,
+      quantity: payload.quantity,
+      state: payload.shippingAddress.state,
+    })
+
+    // Update the user's default card version to the newly created one
+    user.defaultCardVersion = cardVersion.id
+    await user.save()
+
+    return {
+      orderId: createdOrder.id,
+      clientSecret: paymentIntent.client_secret,
+    }
+  }
+
+  /**
+   * Private helpers
+   */
+
+  async createPaymentIntent(amount: number, user: DocumentType<User>) {
+    return await stripe.paymentIntents.create({
+      /* eslint-disable camelcase */
+      amount,
+      currency: 'usd', // We'll know we made it when we can change this line :')
+      receipt_email: user.email,
+      /* eslint-enable camelcase */
+    })
+  }
+
+  async uploadCardImages(
+    imageFiles: { front: Promise<FileUpload>; back?: Promise<FileUpload> },
+    cardVersionId: string
+  ) {
+    // Upload the front image and put the resulting S3 key on the card version
+    const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
+      await imageFiles.front,
+      `${cardVersionId}/front`,
+      S3.S3AssetCategory.CardVersions
+    )
+
+    if (!frontImageUploadResult.isSuccess) {
+      throw new Error(`Failed to upload front card image: ${frontImageUploadResult.error}`)
+    }
+
+    let backImageUploadResult = null
+    if (imageFiles.back) {
+      backImageUploadResult = await S3.uploadGraphQLFileToS3(
+        await imageFiles.back,
+        `${cardVersionId}/back`,
+        S3.S3AssetCategory.CardVersions
+      )
+      if (!backImageUploadResult.isSuccess) {
+        throw new Error('Failed to upload back card image')
+      }
+    }
+
+    return {
+      front: S3.getObjectUrl(frontImageUploadResult.value),
+      back: backImageUploadResult ? S3.getObjectUrl(backImageUploadResult.value) : null,
+    }
+  }
+
+  async createOrderAndPayment({
+    user,
+    cardVersion,
+    quantity,
+    state,
+  }: {
+    user: DocumentType<User>
+    cardVersion: DocumentType<CardVersion>
+    quantity: number
+    state: string
+  }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
+    const costSummary = getCostSummary(quantity, state)
+    if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
       )
     }
 
-    // TODO: Factor in tax and shipping into calculateCost()
-    const total = subtotal
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: total,
-      currency: 'usd', // We'll know we made it when we can change this line :')
-    })
-
+    const paymentIntent = await this.createPaymentIntent(costSummary.total, user)
     const createdOrder = await Order.mongo.create({
       user: user.id,
       cardVersion: cardVersion.id,
       state: OrderState.Captured,
       paymentIntent: paymentIntent.id,
+      quantity,
       price: {
-        subtotal,
-        shipping: 0,
-        tax: 0,
-        total,
+        subtotal: costSummary.subtotal,
+        shipping: costSummary.shipping,
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
       },
-      ...payload,
     })
-
-    return {
-      clientSecret: paymentIntent.client_secret,
-      orderId: createdOrder.id,
-    }
+    return { createdOrder, paymentIntent }
   }
 }
 export default OrderResolver

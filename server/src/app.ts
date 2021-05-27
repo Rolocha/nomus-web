@@ -26,7 +26,7 @@ app.get('/ping', async (req: Request, res: Response) => {
 app.use('/auth', cookieMiddleware, bodyParser.json(), authRouter)
 
 // Set up GraphQL
-app.use('/graphql', cookieMiddleware, authMiddleware)
+app.use('/graphql', bodyParser.json({ limit: '2mb' }), cookieMiddleware, authMiddleware)
 gqlServer.applyMiddleware({ app, path: '/graphql' })
 
 app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)

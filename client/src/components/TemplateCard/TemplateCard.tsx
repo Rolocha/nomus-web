@@ -1,7 +1,8 @@
 import * as React from 'react'
 import templates from 'src/templates'
-import { TemplateID, TemplateOptionsType } from 'src/templates'
+import { TemplateID } from 'src/templates'
 import shadows from 'src/styles/shadows'
+import { CardTemplateRenderOptions } from 'src/templates/base'
 
 interface Props<T extends TemplateID> {
   templateId: T
@@ -10,7 +11,8 @@ interface Props<T extends TemplateID> {
   maxWidth?: string
   shadow?: boolean
   showGuides?: boolean
-  options: TemplateOptionsType<T>
+  showBorder?: boolean
+  options: CardTemplateRenderOptions
 }
 
 function TemplateCard<T extends TemplateID>({
@@ -21,6 +23,7 @@ function TemplateCard<T extends TemplateID>({
   maxWidth,
   options,
   showGuides,
+  showBorder,
 }: Props<T>) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const isRenderingRef = React.useRef<boolean>(false)
@@ -38,18 +41,32 @@ function TemplateCard<T extends TemplateID>({
         await template.renderBackToCanvas(canvas, options)
       }
       isRenderingRef.current = false
-      template.drawBorder(canvas.getContext('2d')!)
+      if (showBorder) {
+        template.drawBorder(canvas.getContext('2d')!)
+      }
       if (showGuides) {
         template.drawInnerBleed(canvas.getContext('2d')!)
       }
     },
-    [options, side, templateId, showGuides, isRenderingRef],
+    [options, side, templateId, showGuides, showBorder, isRenderingRef],
   )
 
   React.useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
-    updateCard(canvas)
+    if (!canvas) {
+      return
+    }
+
+    // We shouldn't render the card until all fonts have loaded or else it'll
+    // likely render with the wrong (system fallback) fonts.
+    // In the future, this might be a good place/moment to show some sort of loading
+    // indicator and/or animation since waiting for fonts to load may take a non-trivial
+    // amount of time depending on the user's network conditions.
+    // @ts-expect-error TS doesn't seem to have types for this API yet
+    const documentFontFaceSet = document.fonts as any
+    documentFontFaceSet.ready.then(() => {
+      updateCard(canvas)
+    })
   }, [updateCard])
 
   return (

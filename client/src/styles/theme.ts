@@ -7,6 +7,7 @@ import shadows from './shadows'
 import radii from './radii'
 import buttonStyles from './components/button'
 import iconButtonStyles from './components/icon-button'
+import switchStyles from './components/switch'
 
 export default extendTheme({
   colors,
@@ -18,5 +19,6 @@ export default extendTheme({
   components: {
     Button: buttonStyles,
     IconButton: iconButtonStyles,
+    Switch: switchStyles,
   },
 })

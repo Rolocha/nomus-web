@@ -1,3 +1,4 @@
+import { Switch } from '@chakra-ui/react'
 import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Box from 'src/components/Box'
@@ -8,8 +9,9 @@ import * as Text from 'src/components/Text'
 import CardBuilderPreview from 'src/pages/CardBuilder/CardBuilderPreview'
 import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
 import templateLibrary from 'src/templates'
-import { areObjectsDeepEqual } from 'src/utils/object'
+import { areObjectsDeepEqual, deepMergeObjects } from 'src/utils/object'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
+import { getNameForColorKey } from 'src/templates/utils'
 
 interface Props {
   cardBuilderState: CardBuilderState
@@ -39,14 +41,38 @@ const TemplateBuildStep = ({
 
   const customizationForm = useForm<Record<string, any>>({
     defaultValues: {
-      ...(templateCustomization ?? defaultOptions),
-      qrCodeUrl: cardBuilderState.cardVersionId
-        ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
-        : 'https://nomus.me',
+      ...deepMergeObjects(
+        { ...defaultOptions },
+        {
+          ...templateCustomization,
+          qrCodeUrl: cardBuilderState.cardVersionId
+            ? `${window.location.host}/d/${cardBuilderState.cardVersionId}`
+            : `${window.location.host}`,
+        },
+      ),
     },
   })
 
   const fields = customizationForm.watch()
+
+  const setOptionalFieldOmission = React.useCallback(
+    (fieldFormKey, shouldOmit) => {
+      if (shouldOmit) {
+        updateCardBuilderState({
+          omittedOptionalFields: Array.from(
+            new Set([...cardBuilderState.omittedOptionalFields, fieldFormKey]),
+          ),
+        })
+      } else {
+        updateCardBuilderState({
+          omittedOptionalFields: cardBuilderState.omittedOptionalFields.filter(
+            (key) => key !== fieldFormKey,
+          ),
+        })
+      }
+    },
+    [updateCardBuilderState, cardBuilderState],
+  )
 
   React.useEffect(() => {
     if (!areObjectsDeepEqual(fields, cardBuilderState.templateCustomization)) {
@@ -57,21 +83,32 @@ const TemplateBuildStep = ({
   }, [fields, updateCardBuilderState, cardBuilderState])
 
   const templateCardOptions = selectedTemplate.createOptionsFromFormFields(
-    customizationForm.watch(),
+    fields,
+    cardBuilderState.omittedOptionalFields as Array<any>,
   )
 
   return (
     <Box
       height="100%"
       display="grid"
-      gridTemplateColumns="4fr 8fr"
-      gridColumnGap={3}
+      gridTemplateColumns={{ base: '1fr', lg: '4fr 8fr' }}
+      gridTemplateAreas={{
+        base: `
+        "preview"
+        "controls"
+        `,
+        lg: `
+        "controls preview"
+        `,
+      }}
+      gridGap={3}
     >
-      {/* Left-hand side: customizable fields */}
+      {/* Controls/customizable fields */}
       <Box
-        overflowY="scroll"
+        gridArea="controls"
         display="grid"
         gridTemplateColumns="1fr"
+        gridTemplateRows="auto auto 1fr"
         gridRowGap={4}
       >
         {/* Color scheme */}
@@ -79,8 +116,8 @@ const TemplateBuildStep = ({
           <Text.SectionSubheader mb={3}>Color scheme</Text.SectionSubheader>
           <Box
             display="grid"
-            gridTemplateColumns={`repeat(${colorKeys.length}, 1fr)`}
-            gridColumnGap={3}
+            gridTemplateColumns={`repeat(min(${colorKeys.length}, 3), 1fr)`}
+            gridGap={3}
           >
             {colorKeys.map((colorKey) => (
               <Box display="flex" flexDirection="column" alignItems="center">
@@ -91,7 +128,9 @@ const TemplateBuildStep = ({
                   width="100%"
                   ref={customizationForm.register()}
                 />
-                <Text.Body3 textTransform="capitalize">{colorKey}</Text.Body3>
+                <Text.Body3 textTransform="capitalize">
+                  {getNameForColorKey(colorKey)}
+                </Text.Body3>
               </Box>
             ))}
           </Box>
@@ -125,6 +164,7 @@ const TemplateBuildStep = ({
           </Box>
           {templateCardOptions.graphic?.url && (
             <Form.Input
+              p={0}
               name="graphic.size"
               type="range"
               width="100%"
@@ -143,34 +183,82 @@ const TemplateBuildStep = ({
           </Text.SectionSubheader>
           {contactInfoFieldNames.map((fieldName) => {
             const fieldDetails = contactInfo[fieldName]
+            const fieldFormKey = `contactInfo.${fieldName}`
+            const fieldRequired = fieldDetails.required
+            const userWantsToOmitThisField = cardBuilderState.omittedOptionalFields.includes(
+              fieldFormKey,
+            )
+            const inputDisabled = !fieldRequired && userWantsToOmitThisField
+
+            const label = (
+              <Form.Label required={fieldRequired}>
+                {fieldDetails.label}
+              </Form.Label>
+            )
+
             return (
               <Box key={fieldName} mb={4}>
-                <Form.Label required={fieldDetails.required}>
-                  {fieldDetails.label}
-                </Form.Label>
+                {fieldRequired ? (
+                  label
+                ) : (
+                  <Box
+                    display="grid"
+                    gridTemplateColumns="1fr auto"
+                    gridColumnGap={2}
+                  >
+                    {label}
+                    <Switch
+                      colorScheme="blue"
+                      isChecked={!userWantsToOmitThisField}
+                      onChange={(event) => {
+                        const shouldOmit = !event.target.checked
+                        setOptionalFieldOmission(fieldFormKey, shouldOmit)
+                      }}
+                    />
+                  </Box>
+                )}
 
-                <Form.Input
-                  width="100%"
-                  name={'contactInfo.' + fieldName}
-                  placeholder={fieldDetails.placeholder}
-                  ref={customizationForm.register()}
-                />
+                <Box
+                  // We need to set this onClick handler on a box wrapping the Form.Input
+                  // because inputs that are disabled won't pick up (or bubble up) click
+                  // events so the only option is to have the input ignore pointerEvents altogher
+                  // and handle the click event on a wrapper component
+                  onClick={() => {
+                    // If user clicks on the field that's disabled, they probably want to include it
+                    // so automatically remove it from the omitted fields list
+                    if (inputDisabled) {
+                      setOptionalFieldOmission(fieldFormKey, false)
+                    }
+                  }}
+                >
+                  <Form.Input
+                    width="100%"
+                    name={fieldFormKey}
+                    placeholder={fieldDetails.placeholder}
+                    ref={customizationForm.register()}
+                    disabled={inputDisabled}
+                    sx={{ pointerEvents: inputDisabled ? 'none' : undefined }}
+                  />
+                </Box>
               </Box>
             )
           })}
+          <Form.Input
+            hidden
+            name="qrCodeUrl"
+            ref={customizationForm.register()}
+            value={
+              cardBuilderState.cardVersionId
+                ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
+                : 'https://nomus.me'
+            }
+          />
         </Box>
-        <Form.Input
-          hidden
-          name="qrCodeUrl"
-          ref={customizationForm.register()}
-          value={
-            cardBuilderState.cardVersionId
-              ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
-              : 'https://nomus.me'
-          }
-        />
       </Box>
+
+      {/* Card preview */}
       <Box
+        gridArea="preview"
         overflow="visible"
         sx={{
           '& > canvas': {
@@ -180,6 +268,7 @@ const TemplateBuildStep = ({
         }}
       >
         <CardBuilderPreview
+          hideBleed
           cardOrientation={
             templateLibrary[templateId].height >
             templateLibrary[templateId].width
@@ -188,6 +277,7 @@ const TemplateBuildStep = ({
           }
           renderFront={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="front"
@@ -196,6 +286,7 @@ const TemplateBuildStep = ({
           )}
           renderBack={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="back"

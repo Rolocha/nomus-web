@@ -6,10 +6,11 @@ import {
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
+import { BaseType } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 
 export default {
-  title: 'components/CardBuilder/TemplateReviewStep',
+  title: 'components/CardBuilder/Template/ReviewStep',
   component: TemplateReviewStep,
   excludeStories: /.*Data$/,
   decorators: [
@@ -27,9 +28,9 @@ export const actionsData = {
 
 export const Primary = () => {
   const cardBuilderState: CardBuilderState = {
-    ...initialStateOptions.template,
-    baseType: 'template',
-    templateId: 'velia',
+    ...initialStateOptions[BaseType.Template],
+    baseType: BaseType.Template,
+    templateId: 'konatall',
     templateCustomization: {
       contactInfo: {
         name: 'Spongebob Squarepants',
@@ -51,9 +52,10 @@ export const Primary = () => {
         text: colors.midnightGray,
       },
     },
-    quantity: 50,
+    omittedOptionalFields: ['contactInfo.line3'],
+    quantity: 100,
     formData: {
-      name: 'Spongebob',
+      name: 'Spongebob Squarepants',
       addressLine1: '123 Pineapple St',
       city: 'Bikini Bottom',
       state: 'UW',

@@ -4,7 +4,6 @@ import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
 import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
-import { VeliaContactFields, VeliaExtendedColors } from './velia'
 
 export default {
   title: 'Card Templates/Velia',
@@ -16,9 +15,9 @@ export const actionsData = {
 }
 
 //👇 We create a “template” of how args map to rendering
-const VeliaTemplateTemplate: Story<
-  CardTemplateRenderOptions<VeliaContactFields, VeliaExtendedColors>
-> = ({ ...options }) => {
+const VeliaTemplateTemplate: Story<CardTemplateRenderOptions> = ({
+  ...options
+}) => {
   return (
     <Box display="flex">
       <Box mr={3}>
@@ -45,10 +44,7 @@ const VeliaTemplateTemplate: Story<
 
 export const Velia = VeliaTemplateTemplate.bind({})
 
-const args: CardTemplateRenderOptions<
-  VeliaContactFields,
-  VeliaExtendedColors
-> = {
+const args: CardTemplateRenderOptions = {
   contactInfo: {
     name: 'Spongebob Squarepants',
     headline: 'Fry Cook at the Krusty Krab',
@@ -68,6 +64,7 @@ const args: CardTemplateRenderOptions<
     text: colors.midnightGray,
   },
   qrCodeUrl: 'https://nomus.me',
+  omittedContactInfoFields: [],
 }
 
 Velia.args = args

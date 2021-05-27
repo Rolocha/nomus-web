@@ -21,7 +21,7 @@ const BaseStep = ({
   updateCardBuilderState,
 }: Props) => {
   return (
-    <Box overflowY="scroll" height="100%">
+    <Box height="100%">
       {selectedBaseType === 'custom' || selectedBaseType === 'template'
         ? {
             custom: (
@@ -68,12 +68,19 @@ const BaseStep = ({
             ),
             template: (
               <Box pt={4}>
-                <Text.SectionSubheader mb={2}>
+                <Text.SectionSubheader mb="24px">
                   Pick your favorite template to customize
                 </Text.SectionSubheader>
+                <Text.Body2 mb="24px">
+                  You can always come back to this step if the template you've
+                  chosen isn't your cup of tea.
+                </Text.Body2>
                 <Box
                   display="grid"
-                  gridTemplateColumns="repeat(4, 1fr)"
+                  gridTemplateColumns={{
+                    base: 'repeat(2, 1fr)',
+                    md: 'repeat(4, 1fr)',
+                  }}
                   gridColumnGap={3}
                   gridRowGap={3}
                 >
@@ -86,25 +93,29 @@ const BaseStep = ({
                           updateCardBuilderState({ templateId })
                         }}
                         cursor="pointer"
-                        borderRadius={2}
+                        borderRadius="16px"
                         position="relative"
                         border={
                           cardBuilderState.templateId === templateId
-                            ? `4px solid ${colors.outlineBlue}`
+                            ? `3px solid ${colors.blue[500]}`
                             : undefined
                         }
                       >
-                        <Image w="100%" src={templateDetails.demoImageUrl} />
+                        <Image
+                          w="100%"
+                          src={templateDetails.demoImageUrl}
+                          borderRadius="inherit"
+                        />
                         <Box
                           position="absolute"
-                          bg="rgba(0,0,0,0.5)"
+                          textAlign="center"
                           bottom={0}
                           left={0}
                           width="100%"
                           px={2}
                           py={1}
                         >
-                          <Text.Body2 color={colors.white}>
+                          <Text.Body2 color={colors.midnightGray}>
                             {templateDetails.name}
                           </Text.Body2>
                         </Box>

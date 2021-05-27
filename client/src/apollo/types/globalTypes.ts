@@ -40,16 +40,6 @@ export interface ContactInfoInput {
 }
 
 /**
- * Specification for a card built using custom assets
- */
-export interface CustomCardSpecInput {
-  cardSlug?: string | null
-  vcfNotes?: string | null
-  frontImageDataUrl: any
-  backImageDataUrl?: any | null
-}
-
-/**
  * Input for udpating user profile
  */
 export interface ProfileUpdateInput {
@@ -64,14 +54,54 @@ export interface ProfileUpdateInput {
 }
 
 /**
- * Payload for submitting a custom order
+ * Payload for submitting a card builder order with a custom design
  */
 export interface SubmitCustomOrderInput {
   orderId?: string | null
   quantity?: number | null
   stripeToken?: string | null
   shippingAddress?: AddressInput | null
-  cardSpec: CustomCardSpecInput
+  frontImageDataUrl: any
+  backImageDataUrl?: any | null
+}
+
+/**
+ * Payload for submitting a card builder order with a template-based design
+ */
+export interface SubmitTemplateOrderInput {
+  orderId?: string | null
+  quantity?: number | null
+  stripeToken?: string | null
+  shippingAddress?: AddressInput | null
+  templateId: string
+  cardVersionId: string
+  colorScheme: TemplateColorSchemeInput
+  contactInfo: TemplateContactInfoFieldsInput
+  graphic?: any | null
+  qrCodeUrl: string
+  frontImageDataUrl: any
+  backImageDataUrl?: any | null
+}
+
+/**
+ * Colors defined when customizing a template card
+ */
+export interface TemplateColorSchemeInput {
+  background: string
+  accent: string
+  text: string
+}
+
+/**
+ * Contact info fields potentially specified when customizing a template card
+ */
+export interface TemplateContactInfoFieldsInput {
+  name?: string | null
+  line1?: string | null
+  line2?: string | null
+  line3?: string | null
+  headline?: string | null
+  footer?: string | null
 }
 
 //==============================================================
