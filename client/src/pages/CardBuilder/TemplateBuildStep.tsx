@@ -11,6 +11,7 @@ import { acceptableImageFileTypes } from 'src/pages/CardBuilder/config'
 import templateLibrary from 'src/templates'
 import { areObjectsDeepEqual, deepMergeObjects } from 'src/utils/object'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
+import { getNameForColorKey } from 'src/templates/utils'
 
 interface Props {
   cardBuilderState: CardBuilderState
@@ -107,6 +108,7 @@ const TemplateBuildStep = ({
         gridArea="controls"
         display="grid"
         gridTemplateColumns="1fr"
+        gridTemplateRows="auto auto 1fr"
         gridRowGap={4}
       >
         {/* Color scheme */}
@@ -114,8 +116,8 @@ const TemplateBuildStep = ({
           <Text.SectionSubheader mb={3}>Color scheme</Text.SectionSubheader>
           <Box
             display="grid"
-            gridTemplateColumns={`repeat(${colorKeys.length}, 1fr)`}
-            gridColumnGap={3}
+            gridTemplateColumns={`repeat(min(${colorKeys.length}, 3), 1fr)`}
+            gridGap={3}
           >
             {colorKeys.map((colorKey) => (
               <Box display="flex" flexDirection="column" alignItems="center">
@@ -126,7 +128,9 @@ const TemplateBuildStep = ({
                   width="100%"
                   ref={customizationForm.register()}
                 />
-                <Text.Body3 textTransform="capitalize">{colorKey}</Text.Body3>
+                <Text.Body3 textTransform="capitalize">
+                  {getNameForColorKey(colorKey)}
+                </Text.Body3>
               </Box>
             ))}
           </Box>
@@ -238,17 +242,17 @@ const TemplateBuildStep = ({
               </Box>
             )
           })}
+          <Form.Input
+            hidden
+            name="qrCodeUrl"
+            ref={customizationForm.register()}
+            value={
+              cardBuilderState.cardVersionId
+                ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
+                : 'https://nomus.me'
+            }
+          />
         </Box>
-        <Form.Input
-          hidden
-          name="qrCodeUrl"
-          ref={customizationForm.register()}
-          value={
-            cardBuilderState.cardVersionId
-              ? `https://nomus.me/d/${cardBuilderState.cardVersionId}`
-              : 'https://nomus.me'
-          }
-        />
       </Box>
 
       {/* Card preview */}
@@ -271,6 +275,7 @@ const TemplateBuildStep = ({
           }
           renderFront={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="front"
@@ -279,6 +284,7 @@ const TemplateBuildStep = ({
           )}
           renderBack={({ showGuides }) => (
             <TemplateCard
+              showBorder
               showGuides={showGuides}
               templateId={templateId}
               side="back"

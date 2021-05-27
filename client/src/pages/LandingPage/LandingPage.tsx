@@ -49,19 +49,16 @@ const LandingPage = () => {
     () => ({
       colorScheme: {
         background: colors.white,
-        accent: colors.nomusBlue,
-        text: colors.midnightGray,
+        text: colors.nomusBlue,
       },
       contactInfo: {
-        name: userEnteredName,
-        headline: 'Chief of Everything',
-        line1: '(555)-555-5555',
-        line2: 'yourname@email.com',
-        line3: 'Company, LLC',
+        name: userEnteredName || 'Replace with your lovely name',
+        headline: 'chief of everything',
       },
-      omittedContactInfoFields: ['footer'],
+      omittedContactInfoFields: [],
       graphic: {
-        url: '',
+        url: '/logo.png',
+        size: 0.5,
       },
       qrCodeUrl: 'https://nomus.me',
     }),
@@ -341,7 +338,7 @@ const LandingPage = () => {
         mt="80px"
       >
         <Box gridArea="cardPreview" flexShrink={0}>
-          <MiniCardBuilder templateId="velia" options={sampleCardOptions} />
+          <MiniCardBuilder templateId="konawide" options={sampleCardOptions} />
         </Box>
 
         <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">

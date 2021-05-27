@@ -41,3 +41,18 @@ export const rgb2hex = (rgb: string) => {
         ('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
     : ''
 }
+
+const colorKeyToNameMap = {
+  background: 'Background',
+  accent: 'Accent',
+  accent1: 'Accent 1',
+  accent2: 'Accent 2',
+  accent3: 'Accent 3',
+  text: 'Text',
+}
+export const getNameForColorKey = (colorKey: string): string => {
+  if (colorKeyToNameMap.hasOwnProperty(colorKey)) {
+    return colorKeyToNameMap[colorKey as keyof typeof colorKeyToNameMap]
+  }
+  return ''
+}
