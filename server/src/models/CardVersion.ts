@@ -71,7 +71,7 @@ export class CardVersion extends BaseModel({
   colorScheme: TemplateColorScheme | null
 
   @prop({ required: false })
-  @Field({ nullable: false })
+  @Field({ nullable: true })
   qrCodeUrl: string
 
   // TODO: Maybe also upload the user's graphic to S3 and store a ref to it on a property here?
