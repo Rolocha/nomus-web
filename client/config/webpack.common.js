@@ -3,6 +3,7 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const webpack = require('webpack')
 
 const PATHS = {
   src: path.resolve(__dirname, '../src'),
@@ -76,6 +77,15 @@ module.exports = {
           },
         },
       ],
+    }),
+    new webpack.DefinePlugin({
+      'process.env.STRIPE_PUBLISHABLE_KEY': JSON.stringify(
+        // process.env.DEPLOY_ENV gets defined during the drone build process. See drone.jsonnet
+        process.env.DEPLOY_ENV === 'production'
+          ? 'pk_live_51IdRQ2GTbyReVwrol2lP7lBRnV7pbaMwMzLV02O3X0QrXglQ9U4DbA8CF0a4In2tPCReZTAuQVrVtaXPKwwQW8ND00IcWYX1iA'
+          : // Use testmode Stripe key for both development and staging
+            'pk_test_51IdRQ2GTbyReVwroG0zSDehnVl2mFiST5kAU8wVfwnDdEtHorY5xiEeoLLfbLpUkKaRdllLCKVqXEGcIcKNDQ1VP008nRLt8Lp',
+      ),
     }),
   ],
 }
