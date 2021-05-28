@@ -75,7 +75,7 @@ local runCmd(app, cmd, when) = {
 };
 
 local buildClient(when, deployEnv) = {
-  "name": "build client app" ,
+  "name": "build " + deployEnv + " client app",
   "image": "node:12",
   "when": when,
   "environment": {
