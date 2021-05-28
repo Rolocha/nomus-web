@@ -56,19 +56,22 @@ export class CardVersion extends BaseModel({
   @Field({ nullable: true })
   templateId: string
 
+  @prop({ _id: false, required: false })
   @Field(() => TemplateContactInfoFields, {
     nullable: true,
     description: 'User-specified contact info, only present for template-based card versions',
   })
   contactInfo: TemplateContactInfoFields | null
 
+  @prop({ _id: false, required: false })
   @Field((type) => TemplateColorScheme, {
     nullable: true,
     description: 'User-specified color scheme, only present for template-based card versions',
   })
   colorScheme: TemplateColorScheme | null
 
-  @Field({ nullable: false })
+  @prop({ required: false })
+  @Field({ nullable: true })
   qrCodeUrl: string
 
   // TODO: Maybe also upload the user's graphic to S3 and store a ref to it on a property here?
