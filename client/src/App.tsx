@@ -14,9 +14,8 @@ import smoothscroll from 'smoothscroll-polyfill'
 smoothscroll.polyfill()
 
 AOS.init()
-const stripePromise = loadStripe(
-  'pk_live_51IdRQ2GTbyReVwrol2lP7lBRnV7pbaMwMzLV02O3X0QrXglQ9U4DbA8CF0a4In2tPCReZTAuQVrVtaXPKwwQW8ND00IcWYX1iA',
-)
+// STRIPE_PUBLISHABLE_KEY is set via webpack.common.js during build process
+const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY!)
 
 interface PropsType {}
 interface StateType {

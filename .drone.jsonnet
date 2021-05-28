@@ -74,10 +74,13 @@ local runCmd(app, cmd, when) = {
   ],
 };
 
-local buildClient(when) = {
+local buildClient(when, deployEnv) = {
   "name": "build client app" ,
   "image": "node:12",
   "when": when,
+  "environment": {
+    "DEPLOY_ENV": deployEnv
+  },
   "commands": [
     "cd client",
     "yarn install --production=false",
@@ -150,7 +153,8 @@ local ALWAYS_CONDITION = {};
       // resulting in builds succeeding while the PR is up but then failing once merged into master.
       // Building always causes PR builds to take 1.5+ minutes longer but it's worth it to avoid
       // the annoyance of having builds on master fail unexpectedly.
-      buildClient(ALWAYS_CONDITION),
+      buildClient(PRODUCTION_DEPLOY_CONDITION, "production"),
+      buildClient(STAGING_DEPLOY_CONDITION, "staging"),
 
       // Staging
       syncToBucket("stage.nomus.me", "us-east-1", STAGING_DEPLOY_CONDITION),
