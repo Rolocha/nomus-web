@@ -74,10 +74,13 @@ local runCmd(app, cmd, when) = {
   ],
 };
 
-local buildClient(when) = {
-  "name": "build client app" ,
+local buildClient(when, deployEnv) = {
+  "name": "build " + deployEnv + " client app",
   "image": "node:12",
   "when": when,
+  "environment": {
+    "DEPLOY_ENV": deployEnv
+  },
   "commands": [
     "cd client",
     "yarn install --production=false",
@@ -129,6 +132,11 @@ local updateDeployConfig(env, host, when) = {
 
 local STAGING_DEPLOY_CONDITION = { "branch": ["master"] };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
+local NON_DEPLOY_CONDITION = { 
+  "branch": {
+    "exclude": ["production", "staging"],
+  }
+};
 local STAGING_OR_PRODUCTION_DEPLOY_CONDITION = { "branch": ["master", "production"] };
 local ALWAYS_CONDITION = {};
 
@@ -145,12 +153,14 @@ local ALWAYS_CONDITION = {};
       runCmd("client", "yarn lint:ci", ALWAYS_CONDITION),
       runCmd("client", "yarn test", ALWAYS_CONDITION),
 
+      buildClient(PRODUCTION_DEPLOY_CONDITION, "production"),
+      buildClient(STAGING_DEPLOY_CONDITION, "staging"),
       // We used to only build when we needed the built assets (i.e. when deploying)
       // but this caused there to occasionally be errors that only show up during build time
       // resulting in builds succeeding while the PR is up but then failing once merged into master.
-      // Building always causes PR builds to take 1.5+ minutes longer but it's worth it to avoid
+      // Always building causes PR builds to take 1.5+ minutes longer but it's worth it to avoid
       // the annoyance of having builds on master fail unexpectedly.
-      buildClient(ALWAYS_CONDITION),
+      buildClient(NON_DEPLOY_CONDITION, "test"),
 
       // Staging
       syncToBucket("stage.nomus.me", "us-east-1", STAGING_DEPLOY_CONDITION),
