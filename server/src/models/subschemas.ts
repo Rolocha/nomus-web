@@ -100,26 +100,36 @@ export class TemplateContactInfoFields {
   line3: string | null
 
   @Field({ nullable: true })
+  line4: string | null
+
+  @Field({ nullable: true })
   headline: string | null
 
   @Field({ nullable: true })
   footer: string | null
 }
 
+// Keep in sync with the array in client/src/templates/index.test.ts
 @InputType('TemplateColorSchemeInput', {
   description: 'Colors defined when customizing a template card',
 })
 @ObjectType()
 export class TemplateColorScheme {
-  // Mandatory base colors
   @Field({ nullable: false })
   background: string
 
   @Field({ nullable: false })
-  accent: string
-
-  @Field({ nullable: false })
   text: string
 
-  // Define additional template-specific colors below
+  @Field({ nullable: true })
+  accent: string | null
+
+  @Field({ nullable: true })
+  accent2: string | null
+
+  @Field({ nullable: true })
+  accent3: string | null
+
+  @Field({ nullable: true })
+  accent4: string | null
 }
