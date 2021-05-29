@@ -467,23 +467,19 @@ const CardBuilder = () => {
               id="checkout"
               icon="cart"
               label="Checkout"
-              isReadyForNextStep={() => {
-                const conditions = [
-                  formData.addressLine1,
-                  formData.state,
-                  formData.city,
-                  formData.postalCode,
-                  formData.name,
-                  cardBuilderState.cardEntryComplete,
-                  // If the current step isn't build, formState won't be valid since the form
-                  // isn't mounted so we trust that it's valid since we were able to get off
-                  // the build step in the first place
-                  cardBuilderState.currentStep !== 'build' ||
-                    checkoutFormMethods.formState.isValid,
-                ]
-                console.log({ conditions })
-                return conditions.every(Boolean)
-              }}
+              isReadyForNextStep={[
+                formData.addressLine1,
+                formData.state,
+                formData.city,
+                formData.postalCode,
+                formData.name,
+                cardBuilderState.cardEntryComplete,
+                // If the current step isn't build, formState won't be valid since the form
+                // isn't mounted so we trust that it's valid since we were able to get off
+                // the build step in the first place
+                cardBuilderState.currentStep !== 'build' ||
+                  checkoutFormMethods.formState.isValid,
+              ].every(Boolean)}
             >
               <CheckoutStep
                 cardBuilderState={cardBuilderState}
