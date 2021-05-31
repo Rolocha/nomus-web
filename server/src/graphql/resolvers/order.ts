@@ -36,9 +36,6 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
-  orderId: string
-
-  @Field({ nullable: true })
   quantity: number
 
   // Credit/debit card Stripe token we'll use for payment auth/capture
@@ -348,7 +345,7 @@ class OrderResolver {
       user,
       cardVersion,
       quantity: payload.quantity,
-      state: payload.shippingAddress.state,
+      shippingAddress: payload.shippingAddress,
     })
 
     // Update the user's default card version to the newly created one
@@ -411,7 +408,7 @@ class OrderResolver {
       user,
       cardVersion,
       quantity: payload.quantity,
-      state: payload.shippingAddress.state,
+      shippingAddress: payload.shippingAddress,
     })
 
     // Update the user's default card version to the newly created one
@@ -475,14 +472,14 @@ class OrderResolver {
     user,
     cardVersion,
     quantity,
-    state,
+    shippingAddress,
   }: {
     user: DocumentType<User>
     cardVersion: DocumentType<CardVersion>
     quantity: number
-    state: string
+    shippingAddress: Address
   }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
-    const costSummary = getCostSummary(quantity, state)
+    const costSummary = getCostSummary(quantity, shippingAddress.state)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
@@ -496,6 +493,7 @@ class OrderResolver {
       state: OrderState.Captured,
       paymentIntent: paymentIntent.id,
       quantity,
+      shippingAddress,
       price: {
         subtotal: costSummary.subtotal,
         shipping: costSummary.shipping,
