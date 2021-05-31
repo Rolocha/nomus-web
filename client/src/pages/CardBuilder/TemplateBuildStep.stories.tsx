@@ -2,13 +2,9 @@ import { action } from '@storybook/addon-actions'
 import * as React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import Box from 'src/components/Box'
-import {
-  cardBuilderReducer,
-  initialStateOptions,
-} from 'src/pages/CardBuilder/card-builder-state'
-import { BaseType } from 'src/pages/CardBuilder/types'
+import { cardBuilderReducer } from 'src/pages/CardBuilder/card-builder-state'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
-import { colors } from 'src/styles'
+import { sampleCardBuilderState } from 'src/pages/CardBuilder/util'
 
 export default {
   title: 'components/CardBuilder/Template/BuildStep',
@@ -30,54 +26,7 @@ export const actionsData = {
 export const Primary = () => {
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
-    {
-      ...initialStateOptions[BaseType.Template],
-      cardVersionId: 'cardv_1234',
-      baseType: BaseType.Template,
-      templateId: 'nicole',
-      templateCustomization: {
-        contactInfo: {
-          name: 'Spongebob Squarepants',
-          headline: 'Fry Cook at the Krusty Krab',
-          line1: 'The Krusty Krab',
-          line2: '(555)-555-5555',
-          line3: '(555)-555-5555',
-          line4: '(555)-555-5555',
-          footer: "I'm ready, I'm ready, I'm ready",
-        },
-        graphic: {
-          file: {
-            url:
-              'https://static.wikia.nocookie.net/spongebob/images/6/65/Krabby_Patty_stock_art.png',
-          },
-          size: 1,
-        },
-        colorScheme: {
-          background: colors.offWhite,
-          accent: colors.gold,
-          accent2: colors.nomusBlue,
-          text: colors.midnightGray,
-        },
-      },
-      quantity: 100,
-      formData: {
-        name: 'Spongebob',
-        addressLine1: '123 Pineapple St',
-        city: 'Bikini Bottom',
-        state: 'UW',
-        postalCode: '12345',
-      },
-      stripeToken: {
-        card: {
-          id: 'idk',
-          brand: 'Visa',
-          funding: 'credit',
-          last4: '4242',
-          // eslint-disable-next-line
-          address_zip: '94115',
-        },
-      } as any,
-    },
+    sampleCardBuilderState,
   )
 
   return (

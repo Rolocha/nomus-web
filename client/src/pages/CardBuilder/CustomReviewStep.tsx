@@ -3,14 +3,19 @@ import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
 import CardDesignReview from 'src/pages/CardBuilder/CardDesignReview'
 import OrderSummary from 'src/pages/CardBuilder/OrderSummary'
+import { colors } from 'src/styles'
 import { getImageDimensions } from 'src/utils/image'
-import { CardBuilderState } from './card-builder-state'
+import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
   cardBuilderState: CardBuilderState
+  updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
 
-const CustomReviewStep = ({ cardBuilderState }: Props) => {
+const CustomReviewStep = ({
+  cardBuilderState,
+  updateCardBuilderState,
+}: Props) => {
   const frontFileItem = cardBuilderState.frontDesignFile
   const backFileItem = cardBuilderState.backDesignFile
 
@@ -68,10 +73,33 @@ const CustomReviewStep = ({ cardBuilderState }: Props) => {
         />
       )}
 
-      <OrderSummary
-        cardBuilderState={cardBuilderState}
-        cardDescription="Nomus card - custom design"
-      />
+      <Box mt={4}>
+        <OrderSummary
+          cardBuilderState={cardBuilderState}
+          cardDescription="Nomus card - custom design"
+        />
+      </Box>
+
+      {cardBuilderState.submissionError && (
+        <Text.Body2 mt="24px" color={colors.invalidRed}>
+          {cardBuilderState.submissionError.message}
+          {cardBuilderState.submissionError.backlinkToStep && (
+            <Text.Body2
+              as="span"
+              role="button"
+              cursor="pointer"
+              color={colors.linkBlue}
+              onClick={() => {
+                updateCardBuilderState({
+                  currentStep: cardBuilderState.submissionError?.backlinkToStep,
+                })
+              }}
+            >
+              {` Return to the ${cardBuilderState.submissionError.backlinkToStep} step.`}
+            </Text.Body2>
+          )}
+        </Text.Body2>
+      )}
     </Box>
   )
 }

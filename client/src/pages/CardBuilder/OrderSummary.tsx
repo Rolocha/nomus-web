@@ -19,9 +19,7 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
   )
   return (
     <Box>
-      <Text.SectionHeader mt={4} mb="24px">
-        Order summary
-      </Text.SectionHeader>
+      <Text.SectionHeader mb="24px">Order summary</Text.SectionHeader>
 
       <Box
         display="grid"

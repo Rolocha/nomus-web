@@ -148,27 +148,6 @@ const CardBuilder = () => {
     SUBMIT_TEMPLATE_ORDER_MUTATION,
   )
 
-  const handleCardSubmit = React.useCallback(async () => {
-    if (stripe == null || elements == null) {
-      throw new Error('Stripe and/or Stripe Elements not initialized')
-    }
-
-    const card = elements.getElement(CardElement)
-    if (card == null) {
-      throw new Error('Could not find a Card Element')
-    }
-
-    try {
-      const result = await stripe.createToken(card)
-      if (result.error == null && result.token != null) {
-        const { token: stripeToken } = result
-        updateCardBuilderState({ stripeToken })
-      }
-    } catch (err) {
-    } finally {
-    }
-  }, [stripe, elements])
-
   const confirmCardPayment = React.useCallback(
     async (clientSecret: string) => {
       if (stripe == null || cardBuilderState.stripeToken == null) {
@@ -298,7 +277,16 @@ const CardBuilder = () => {
     )
 
     if (cardConfirmationResult.error) {
-      throw cardConfirmationResult.error
+      updateCardBuilderState({
+        submissionError: {
+          message:
+            cardConfirmationResult.error.message ??
+            'An unknown error occurred while submitting your card information.',
+          field: 'cardDetails',
+          backlinkToStep: 'checkout',
+        },
+      })
+      return
     } else if (cardConfirmationResult.paymentIntent == null) {
       throw new Error('paymentIntent in response undefined')
     }
@@ -328,7 +316,13 @@ const CardBuilder = () => {
     const comingFromStep = cardBuilderState.currentStep
     const goingToStep = _goingToStep as CardBuilderStep
 
-    const cardBuilderStateUpdate: CardBuilderAction = {}
+    // We need to update the cardBuilderState.currentStep at the end of
+    // the transition process but the process itself may require other
+    // state updates. We queue up all those updates in this object and apply it
+    // at the end of this method call.
+    const cardBuilderStateUpdate: CardBuilderAction = {
+      currentStep: goingToStep,
+    }
 
     // (base) => build => checkout => review
     switch (comingFromStep) {
@@ -357,18 +351,35 @@ const CardBuilder = () => {
         // Cache the current form data in cardBuilderState since react-hook-form
         // will drop it when the form fields unmount
         cardBuilderStateUpdate.formData = checkoutFormMethods.getValues()
+
         if (!cardBuilderState.stripeToken) {
-          await handleCardSubmit()
+          // Submit the card info to Stripe if they didn't already do so during a previous pass
+          // through this step
+          if (stripe == null || elements == null) {
+            throw new Error('Stripe and/or Stripe Elements not initialized')
+          }
+
+          const card = elements.getElement(CardElement)
+          if (card == null) {
+            throw new Error('Could not find a Card Element')
+          }
+
+          try {
+            const result = await stripe.createToken(card)
+            if (result.error == null && result.token != null) {
+              const { token: stripeToken } = result
+              cardBuilderStateUpdate.stripeToken = stripeToken
+            }
+          } catch (err) {
+            console.log({ err })
+          }
         }
         break
       default:
         break
     }
 
-    updateCardBuilderState({
-      ...cardBuilderStateUpdate,
-      currentStep: goingToStep,
-    })
+    updateCardBuilderState(cardBuilderStateUpdate)
   }
 
   return (
@@ -484,7 +495,6 @@ const CardBuilder = () => {
               <CheckoutStep
                 cardBuilderState={cardBuilderState}
                 updateCardBuilderState={updateCardBuilderState}
-                handleCardSubmit={handleCardSubmit}
                 checkoutFormMethods={checkoutFormMethods}
               />
             </WizardStep>
@@ -492,10 +502,16 @@ const CardBuilder = () => {
               {
                 {
                   [BaseType.Custom]: (
-                    <CustomReviewStep cardBuilderState={cardBuilderState} />
+                    <CustomReviewStep
+                      cardBuilderState={cardBuilderState}
+                      updateCardBuilderState={updateCardBuilderState}
+                    />
                   ),
                   [BaseType.Template]: (
-                    <TemplateReviewStep cardBuilderState={cardBuilderState} />
+                    <TemplateReviewStep
+                      cardBuilderState={cardBuilderState}
+                      updateCardBuilderState={updateCardBuilderState}
+                    />
                   ),
                 }[cardBuilderState.baseType]
               }
