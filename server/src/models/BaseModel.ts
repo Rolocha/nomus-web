@@ -26,6 +26,13 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
   class BaseModel {
     static mongo: ReturnModelType<typeof BaseModel>
 
+    static prefix = prefix
+
+    // Sometimes you'll need to get an ID before you can create the object
+    static createId(): string {
+      return defaultId(prefix)()
+    }
+
     @prop({ required: true, default: defaultId(prefix) })
     _id: string
 

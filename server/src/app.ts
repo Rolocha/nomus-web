@@ -8,9 +8,12 @@ import morgan from 'morgan'
 
 import * as db from 'src/db'
 import authRouter, { authMiddleware } from 'src/auth'
-import apiRouter from 'src/api'
 import { server as gqlServer } from 'src/graphql'
 import { cardRouter } from './api/cardRouter'
+
+import { contactRouter } from './api/contact'
+import { sendgridRouter } from './api/sendgrid'
+import { stripeWebhooksRouter } from './api/stripehooks'
 
 db.init()
 
@@ -29,6 +32,8 @@ app.use('/auth', cookieMiddleware, bodyParser.json(), authRouter)
 app.use('/graphql', bodyParser.json({ limit: '2mb' }), cookieMiddleware, authMiddleware)
 gqlServer.applyMiddleware({ app, path: '/graphql' })
 
-app.use('/api', cookieMiddleware, bodyParser.json(), apiRouter)
+app.use('/api/sendgrid', cookieMiddleware, bodyParser.json(), sendgridRouter)
+app.use('/api/contact', cookieMiddleware, bodyParser.json(), contactRouter)
+app.use('/api/stripehooks', stripeWebhooksRouter)
 
 app.use('/d', cookieMiddleware, bodyParser.json(), cardRouter)
