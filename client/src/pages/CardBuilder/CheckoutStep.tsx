@@ -83,9 +83,7 @@ const CheckoutStep = ({
       </Box>
 
       <Box mt="32px">
-        <Form.Form
-        // onSubmit={checkoutFormMethods.handleSubmit(handleCardSubmit)}
-        >
+        <Form.Form>
           <Text.SectionSubheader mb="8px">
             Shipping & payment information
           </Text.SectionSubheader>
