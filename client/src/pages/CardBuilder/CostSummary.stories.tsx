@@ -16,10 +16,3 @@ const CostSummaryTemplate = ({ ...options }) => {
 }
 
 export const CostSummaryComponent = CostSummaryTemplate.bind({})
-
-const args = {
-  quantity: 25,
-  state: 'CA',
-}
-
-CostSummaryComponent(args)

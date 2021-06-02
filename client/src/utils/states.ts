@@ -64,7 +64,7 @@ export type StateCode = keyof typeof abrMap
 export const allStateCodes = Object.keys(abrMap) as StateCode[]
 
 export function isValidStateAbr(stateAbr: string): stateAbr is StateCode {
-  return abrMap.hasOwnProperty(stateAbr)
+  return abrMap.hasOwnProperty(stateAbr.toUpperCase())
 }
 
 export function getStateFromAbr(stateAbr: StateCode): string {

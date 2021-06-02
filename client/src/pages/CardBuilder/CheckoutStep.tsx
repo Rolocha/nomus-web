@@ -25,6 +25,8 @@ const CheckoutStep = ({
   updateCardBuilderState,
   checkoutFormMethods,
 }: Props) => {
+  console.log('hello!')
+  console.log('cardState: ' + cardBuilderState.formData.state)
   const loadedPreviousFormState = React.useRef(false)
   // Prepopulate the form on load if we already have data from a previous visit of this step
   React.useEffect(() => {
