@@ -103,7 +103,6 @@ const CardBuilder = () => {
       },
     })
     if (result.errors) {
-      console.log(result.errors)
       throw new Error('oh no!')
     }
     updateCardBuilderState({
