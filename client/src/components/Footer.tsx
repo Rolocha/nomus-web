@@ -58,61 +58,96 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
     'unsubmitted' | 'submitting' | 'success' | 'failure'
   >('unsubmitted')
   return (
-    <Box bg={colorPalette.background} py={{ base: '40px', [bp]: '70px' }}>
+    <Box bg={colorPalette.background} my={{ base: '24px', [bp]: '80px' }}>
       <Box container>
         <Box
-          display="flex"
-          flexDirection={{ base: 'column', [bp]: 'row' }}
-          alignItems={{ base: 'flex-start', [bp]: 'center' }}
-          justifyContent={{ base: 'flex-start', [bp]: 'space-between' }}
+          display="grid"
+          gridTemplateColumns={{
+            base: 'repeat(4,1fr)',
+            [bp]: 'repeat(12,1fr)',
+          }}
+          gridTemplateRows={{
+            base: 'repeat(2,1fr)',
+            [bp]: '1fr',
+          }}
+          gridColumnGap={'22px'}
+          alignItems="center"
+          // flexDirection={{ base: 'column', [bp]: 'row' }}
+
+          // alignItems={{ base: 'flex-start', [bp]: 'center' }}
+          // justifyContent={{ base: 'flex-start', [bp]: 'space-between' }}
         >
-          <SVG.LogoWithText color={colorPalette.accent} />
+          <Box
+            gridColumn="span 2"
+            alignItems="start"
+            gridRow="1/2"
+            justifyItems="start"
+          >
+            <SVG.LogoWithText color={colorPalette.accent} />
+          </Box>
           <Text.Body
-            ml={{ base: 0, [bp]: 3 }}
-            mt={{ base: 3, [bp]: 0 }}
-            color={colorPalette.accent}
+            gridColumn={{ base: '1 / 5', [bp]: '3 / 13' }}
+            gridRow={{ base: '2 / 3', [bp]: '1 / 2' }}
+            // ml={{ base: '0px', [bp]: '22px' }}
+            mt={{ base: '8px', [bp]: '0px' }}
+            color={colorPalette.basicText}
+            position={{ base: '', [bp]: 'relative' }}
+            top={{ base: '0px', [bp]: '6px' }}
           >
             Tap. Connect. Network with a purpose.
           </Text.Body>
         </Box>
 
         <Box
-          my={4}
+          mt={{ base: '24px', [bp]: '32px' }}
           display="grid"
-          gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr' }}
-          gridColumnGap={4}
+          gridTemplateColumns={{
+            base: 'repeat(4,1fr)',
+            [bp]: 'repeat(12,1fr)',
+          }}
+          gridColumnGap={'22px'}
           gridRowGap={4}
         >
-          <Box display="grid" gridTemplateColumns="1fr 1fr 1fr">
-            <Box>
-              <Text.Label color={colors.africanElephant}>MAIN</Text.Label>
-              <Link to="/">
-                <Text.Body2 color={colorPalette.accent}>Home</Text.Body2>
-              </Link>
-              <Link to="/about">
-                <Text.Body2 color={colorPalette.accent}>About</Text.Body2>
-              </Link>
-              <Link to="/faq">
-                <Text.Body2 color={colorPalette.accent}>FAQ</Text.Body2>
-              </Link>
-            </Box>
-            <Box>
-              <Text.Label color={colors.africanElephant}>CARDS</Text.Label>
-              <Link to="/shop">
-                <Text.Body2 color={colorPalette.accent}>Shop</Text.Body2>
-              </Link>
-              <Link to="/card-studio/template">
-                <Text.Body2 color={colorPalette.accent}>Nomus cards</Text.Body2>
-              </Link>
-              <Link to="/card-studio/custom">
-                <Text.Body2 color={colorPalette.accent}>
-                  Custom cards
-                </Text.Body2>
-              </Link>
-            </Box>
+          <Box display="flex" flexDirection="column" gridColumn="1 / 2">
+            <Text.Label color={colors.africanElephant}>MAIN</Text.Label>
+            <Link to="/" mt={{ base: '5px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>Home</Text.Body>
+            </Link>
+            <Link to="/about" mt={{ base: '8px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>About</Text.Body>
+            </Link>
+            <Link to="/faq" mt={{ base: '8px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>FAQ</Text.Body>
+            </Link>
           </Box>
-          <Box placeSelf="end stretch">
-            <Text.Body2 color={colorPalette.basicText} mb={2}>
+          <Box
+            gridColumn={{ base: '2 / 5', [bp]: '3 / 6' }}
+            display="flex"
+            flexDirection="column"
+          >
+            <Text.Label color={colors.africanElephant}>SHOP</Text.Label>
+            <Link to="/shop" mt={{ base: '5px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>Shop front</Text.Body>
+            </Link>
+            <Link to="/card-studio/template" mt={{ base: '8px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>
+                Build a card from a template
+              </Text.Body>
+            </Link>
+            <Link to="/card-studio/custom" mt={{ base: '8px', [bp]: '8px' }}>
+              <Text.Body color={colorPalette.accent}>
+                Build a card from your design
+              </Text.Body>
+            </Link>
+          </Box>
+
+          <Box
+            display="grid"
+            gridColumn={{ base: '1 / 5', [bp]: '7 / 13' }}
+            placeSelf="end stretch"
+            mt={{ base: '0px', [bp]: '24px' }}
+          >
+            <Text.Body2 color={colorPalette.basicText}>
               Get updates about all things Nomus right to your inbox.
             </Text.Body2>
             {submitState === 'unsubmitted' || submitState === 'submitting' ? (
@@ -122,6 +157,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
                   flexDirection={{ base: 'column', [bp]: 'row' }}
                   alignItems="stretch"
                   justifyContent="stretch"
+                  mt={{ base: '8px', [bp]: '24px' }}
                 >
                   <Form.Input
                     name="email"
@@ -178,9 +214,11 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
         {/* Contact info row */}
         <Box
           display="flex"
-          flexDirection={{ base: 'column', [bp]: 'row' }}
+          flexDirection="row"
           justifyContent="space-between"
-          alignItems="flex-start"
+          alignItems="center"
+          mt={{ base: '24px', [bp]: '48px' }}
+          mb={{ base: '24px', [bp]: '40px' }}
         >
           <Link to="mailto:hi@nomus.me">
             <Text.Body2 color={colorPalette.accent}>hi@nomus.me</Text.Body2>
@@ -213,7 +251,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
         </Box>
 
         {/* Separator */}
-        <Box my={4} height="1px" width="100%" bg={colors.africanElephant} />
+        <Box height="1px" width="100%" bg={colors.africanElephant} />
 
         {/* Legal info row */}
         <Box
@@ -222,6 +260,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
           alignItems={{ base: 'flex-start', [bp]: 'center' }}
           justifyContent="space-between"
           textAlign={{ base: 'left', [bp]: 'left' }}
+          mt={{ base: '24px', [bp]: '45px' }}
         >
           <Text.Body2 color={colorPalette.basicText}>
             {`© ${new Date().getFullYear()} Nomus, Inc.`}{' '}
@@ -232,10 +271,10 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
           <Box
             display="flex"
             flexDirection="row"
-            mt={{ base: 4, [bp]: 'unset' }}
+            mt={{ base: '24px', [bp]: '0px' }}
           >
             <Link to="/terms-of-service">
-              <Text.Body2 color={colorPalette.accent} mr={3}>
+              <Text.Body2 color={colorPalette.accent} mr={'32px'}>
                 Terms of service
               </Text.Body2>
             </Link>
