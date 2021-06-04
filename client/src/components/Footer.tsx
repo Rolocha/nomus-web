@@ -145,7 +145,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
             display="grid"
             gridColumn={{ base: '1 / 5', [bp]: '7 / 13' }}
             placeSelf="end stretch"
-            mt={{ base: '0px', [bp]: '24px' }}
+            mt={{ base: '24px', [bp]: '0px' }}
           >
             <Text.Body2 color={colorPalette.basicText}>
               Get updates about all things Nomus right to your inbox.
