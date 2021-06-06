@@ -425,12 +425,15 @@ class OrderResolver {
    * Private helpers
    */
 
-  async createPaymentIntent(amount: number, user: DocumentType<User>) {
+  async createPaymentIntent(amount: number, user: DocumentType<User>, orderId: string) {
     return await stripe.paymentIntents.create({
       /* eslint-disable camelcase */
       amount,
       currency: 'usd', // We'll know we made it when we can change this line :')
       receipt_email: user.email,
+      metadata: {
+        orderId,
+      },
       /* eslint-enable camelcase */
     })
   }
@@ -486,8 +489,10 @@ class OrderResolver {
       )
     }
 
-    const paymentIntent = await this.createPaymentIntent(costSummary.total, user)
+    const orderId = Order.createId()
+    const paymentIntent = await this.createPaymentIntent(costSummary.total, user, orderId)
     const createdOrder = await Order.mongo.create({
+      _id: orderId,
       user: user.id,
       cardVersion: cardVersion.id,
       state: OrderState.Captured,

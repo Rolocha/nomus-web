@@ -24,6 +24,7 @@ export const EMAIL_VERIFICATION_TOKEN_LIFESPAN = ms('24 hours')
 export const PASSWORD_RESET_TOKEN_LIFESPAN = ms('24 hours')
 export const S3_BUCKET_NAME = 'nomus-assets'
 export const STRIPE_TOKEN = process.env.STRIPE_TOKEN
+export const STRIPE_WEBHOOK_ENDPOINT_SECRET = process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET
 export const BASE_URL =
   {
     development: 'http://localhost:1234',
@@ -38,6 +39,7 @@ export const RESERVED_ROUTES = [
   'api',
   'auth',
   'card-builder',
+  'card-studio',
   'careers',
   'd',
   'dashboard',
@@ -53,6 +55,7 @@ export const RESERVED_ROUTES = [
   'profile',
   'register',
   'registration',
+  'shop',
   'signup',
 ]
 export const MINIMUM_PASSWORD_STRENGTH = 2 // on zxcvbn's 0-4 scale
