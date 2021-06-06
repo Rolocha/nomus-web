@@ -27,3 +27,13 @@ export interface CheckoutFormData {
 }
 
 export type ComplexCondition = boolean | (() => boolean) | null
+
+// A list of Card Builder fields that could cause errors that are only
+// detectable after submission.
+export type CardBuilderSubmissionErrorField = 'cardDetails'
+
+export interface CardBuilderSubmissionError {
+  message: string
+  field?: CardBuilderSubmissionErrorField
+  backlinkToStep?: CardBuilderStep
+}

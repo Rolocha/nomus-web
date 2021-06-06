@@ -2,26 +2,27 @@ import * as stripeJs from '@stripe/stripe-js'
 import * as React from 'react'
 import { UseFormMethods } from 'react-hook-form'
 import Box from 'src/components/Box'
+import Button from 'src/components/Button'
 import CreditCardInput from 'src/components/CreditCardInput'
 import * as Form from 'src/components/Form'
+import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
 import PricingTiers from 'src/components/PricingTiers'
 import * as Text from 'src/components/Text'
 import CostSummary from 'src/pages/CardBuilder/CostSummary'
+import { colors } from 'src/styles'
 import { createMailtoURL } from 'src/utils/email'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
   cardBuilderState: CardBuilderState
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
-  handleCardSubmit: () => Promise<void>
   checkoutFormMethods: UseFormMethods<any>
 }
 
 const CheckoutStep = ({
   cardBuilderState,
   updateCardBuilderState,
-  handleCardSubmit,
   checkoutFormMethods,
 }: Props) => {
   const loadedPreviousFormState = React.useRef(false)
@@ -39,6 +40,17 @@ const CheckoutStep = ({
   ) => {
     updateCardBuilderState({ cardEntryComplete: event.complete })
     // TODO: Handle errors from event.error
+  }
+
+  const clearEnteredCardInformation = () => {
+    const nextCBState: Partial<CardBuilderState> = {
+      stripeToken: null,
+      cardEntryComplete: false,
+    }
+    if (cardBuilderState.submissionError?.field === 'cardDetails') {
+      nextCBState.submissionError = null
+    }
+    updateCardBuilderState(nextCBState)
   }
 
   return (
@@ -71,9 +83,7 @@ const CheckoutStep = ({
       </Box>
 
       <Box mt="32px">
-        <Form.Form
-          onSubmit={checkoutFormMethods.handleSubmit(handleCardSubmit)}
-        >
+        <Form.Form>
           <Text.SectionSubheader mb="8px">
             Shipping & payment information
           </Text.SectionSubheader>
@@ -183,7 +193,26 @@ const CheckoutStep = ({
                     Credit or debit card
                   </Form.Label>
                   {cardBuilderState.stripeToken ? (
-                    <Text.Body2>{`**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`}</Text.Body2>
+                    <Box
+                      display="flex"
+                      width="100%"
+                      justifyContent="space-between"
+                      alignItems="flex-start"
+                    >
+                      <Text.Body2>
+                        {`${cardBuilderState?.stripeToken?.card?.brand} ${cardBuilderState?.stripeToken?.card?.funding} card ending in ${cardBuilderState?.stripeToken?.card?.last4}`}
+                      </Text.Body2>
+
+                      <Button
+                        variant="tertiary"
+                        leftIcon={<Icon of="pen" />}
+                        color={colors.nomusBlue}
+                        onClick={clearEnteredCardInformation}
+                        py={0}
+                      >
+                        Edit
+                      </Button>
+                    </Box>
                   ) : (
                     <CreditCardInput
                       id="card-element"
