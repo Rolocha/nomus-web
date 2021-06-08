@@ -52,12 +52,44 @@ const Card = ({
       <Box
         p={{ small: '16px', medium: '24px' }[size]}
         display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridColumnGap={3}
+        gridTemplateColumns={align === 'center' ? '1fr' : '3fr 9fr'}
+        gridTemplateAreas={
+          {
+            left: `
+            "icon header"
+            "icon body"
+            "icon button"
+          `,
+            center: `
+            "icon"
+            "header"
+            "graphic"
+            "body"
+            "button"
+          `,
+            mix: `
+            "icon header"
+            "body body"
+            "button button"
+          `,
+          }[align]
+        }
+        gridGap="16px"
       >
-        {icon && <Box gridColumn="1/4">{icon}</Box>}
+        {icon && (
+          <Box
+            gridArea="icon"
+            placeSelf={align === 'center' ? 'center' : 'start'}
+          >
+            {icon}
+          </Box>
+        )}
 
-        <Box gridColumn={icon ? '4/13' : '1/13'}>
+        <Box
+          gridArea="header"
+          placeSelf={align === 'center' ? 'center' : 'start'}
+          textAlign={align === 'center' ? 'center' : 'left'}
+        >
           <Text.CardHeader>{header}</Text.CardHeader>
           {subheader && (
             <Text.Body2 color="africanElephant">{subheader}</Text.Body2>
@@ -65,14 +97,11 @@ const Card = ({
         </Box>
 
         {bodyText && (
-          <Box
-            gridColumn={align === 'mix' || align === 'center' ? '1/13' : '4/13'}
-          >
+          <Box gridArea="body">
             <Text.Body2
               textAlign={
                 align === 'mix' || align === 'center' ? 'center' : 'unset'
               }
-              mt={3}
             >
               {bodyText}
             </Text.Body2>
@@ -80,12 +109,7 @@ const Card = ({
         )}
 
         {buttonText && (
-          <Button
-            gridColumn=""
-            mt={3}
-            variant="primary"
-            onClick={onButtonClick}
-          >
+          <Button gridArea="button" variant="primary" onClick={onButtonClick}>
             {buttonText}
           </Button>
         )}
