@@ -28,7 +28,12 @@ const FieldPrompt = ({ children, modalOpener, fieldRef }: Props) => {
   )
 
   return (
-    <Button variant="tertiary" px={0} onClick={openAndFocus(fieldRef)}>
+    <Button
+      whiteSpace="initial"
+      variant="tertiary"
+      px={0}
+      onClick={openAndFocus(fieldRef)}
+    >
       <Text.Plain
         textAlign="left"
         fontWeight="normal"
