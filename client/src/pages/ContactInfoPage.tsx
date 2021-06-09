@@ -8,6 +8,7 @@ import {
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
+import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
 import IconButton from 'src/components/IconButton'
 import Link from 'src/components/Link'
@@ -308,19 +309,13 @@ const ContactInfoPage = () => {
                   {contact.meetingPlace}
                 </Text.Body2>
               ) : (
-                <Button
-                  variant="tertiary"
-                  onClick={openModalAndFocusOn(meetingPlaceRef)}
+                <Form.FieldPrompt
+                  modalOpener={openNotesModal}
+                  fieldRef={meetingPlaceRef}
                 >
-                  <Text.Plain
-                    textAlign="left"
-                    fontWeight="normal"
-                    fontStyle="italic"
-                    color={colors.nomusBlue}
-                  >
-                    Make note of where you met {formatName(contact.name)}
-                  </Text.Plain>
-                </Button>
+                  This is your time to shine. Tell us all about what makes you,
+                  you.
+                </Form.FieldPrompt>
               )}
             </Box>
 
@@ -343,19 +338,12 @@ const ContactInfoPage = () => {
                   ))}
                 </Box>
               ) : (
-                <Button
-                  variant="tertiary"
-                  onClick={openModalAndFocusOn(tagsRef)}
+                <Form.FieldPrompt
+                  modalOpener={openNotesModal}
+                  fieldRef={tagsRef}
                 >
-                  <Text.Plain
-                    textAlign="left"
-                    fontWeight="normal"
-                    fontStyle="italic"
-                    color={colors.nomusBlue}
-                  >
-                    Add tags to make organizing and searching easier
-                  </Text.Plain>
-                </Button>
+                  Add tags to make organizing and searching easier
+                </Form.FieldPrompt>
               )}
             </Box>
 
@@ -366,21 +354,13 @@ const ContactInfoPage = () => {
                   {contact.notes}
                 </Text.Body2>
               ) : (
-                <Button
-                  whiteSpace="initial"
-                  variant="tertiary"
-                  onClick={openModalAndFocusOn(notesRef)}
+                <Form.FieldPrompt
+                  modalOpener={openNotesModal}
+                  fieldRef={notesRef}
                 >
-                  <Text.Plain
-                    textAlign="left"
-                    fontWeight="normal"
-                    fontStyle="italic"
-                    color={colors.nomusBlue}
-                  >
-                    Add your own notes to this contact. Do they have cool
-                    glasses? Like the same sports team?
-                  </Text.Plain>
-                </Button>
+                  Add your own notes to this contact. Do they have cool glasses?
+                  Like the same sports team?
+                </Form.FieldPrompt>
               )}
             </Box>
           </Box>

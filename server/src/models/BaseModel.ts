@@ -26,6 +26,22 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
   class BaseModel {
     static mongo: ReturnModelType<typeof BaseModel>
 
+    static prefix = prefix
+
+    // Use this static method to create an `{prefix}_*` id string in cases
+    // where you need an ID before you create the object itself. This may
+    // be necessary in cases of circular dependencies, e.g. you're creating
+    // an order where you want to set 
+    //   order.paymentIntent = 'pi_*'
+    // but while you're creating the paymentIntent with Stripe, you want to pass
+    //   paymentIntent.metadata = orderId
+    // 
+    // ⚠️ Note that this method only creates an ID string, it does NOT create
+    // the object itself!
+    static createId(): string {
+      return defaultId(prefix)()
+    }
+
     @prop({ required: true, default: defaultId(prefix) })
     _id: string
 

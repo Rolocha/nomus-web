@@ -4,6 +4,7 @@ import { FileItem } from 'src/types/files'
 import {
   BaseType,
   CardBuilderStep,
+  CardBuilderSubmissionError,
   CheckoutFormData,
   OrderQuantityOption,
   TemplateID,
@@ -30,6 +31,8 @@ export type CardBuilderState = {
   cardEntryComplete: boolean
   stripeToken: Token | null
   paymentIntent: PaymentIntent | null
+
+  submissionError?: CardBuilderSubmissionError | null
 }
 
 const createInitialState = (baseType: BaseType): CardBuilderState => ({
