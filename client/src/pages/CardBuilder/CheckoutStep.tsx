@@ -25,8 +25,6 @@ const CheckoutStep = ({
   updateCardBuilderState,
   checkoutFormMethods,
 }: Props) => {
-  console.log('hello!')
-  console.log('cardState: ' + cardBuilderState.formData.state)
   const loadedPreviousFormState = React.useRef(false)
   // Prepopulate the form on load if we already have data from a previous visit of this step
   React.useEffect(() => {
@@ -54,6 +52,8 @@ const CheckoutStep = ({
     }
     updateCardBuilderState(nextCBState)
   }
+  
+  const formValues = checkoutFormMethods.getValues()
 
   return (
     <Box height="100%">
@@ -219,7 +219,7 @@ const CheckoutStep = ({
                     <CreditCardInput
                       id="card-element"
                       handleChange={handleCardInputChange}
-                      postalCode={checkoutFormMethods.getValues().postalCode}
+                      postalCode={formValues.postalCode}
                     />
                   )}
                 </Box>
@@ -230,7 +230,7 @@ const CheckoutStep = ({
             <Box gridArea="costSummary" placeSelf="end end" width="100%">
               <CostSummary
                 quantity={cardBuilderState.quantity}
-                state={cardBuilderState.formData?.state}
+                state={formValues.state}
               />
             </Box>
           </Box>
