@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { action } from '@storybook/addon-actions'
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { BrowserRouter as Router } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
@@ -30,6 +30,7 @@ export const actionsData = {
 
 interface FormData {
   email: string
+  phoneNumber: string
   password: string
 }
 
@@ -40,6 +41,7 @@ export const ExampleForm = () => {
     errors,
     formState,
     watch,
+    control,
   } = useForm<FormData>({
     mode: 'onBlur',
     resolver: yupResolver(
@@ -48,9 +50,15 @@ export const ExampleForm = () => {
           .string()
           .email('Please enter a valid email address.')
           .required('Email is required.'),
+        phoneNumber: yup.string().required('Phone number is required.'),
         password: yup.string().required('Password is required.'),
       }),
     ),
+    defaultValues: {
+      email: '',
+      phoneNumber: '',
+      password: '',
+    },
   })
 
   const values = watch()
@@ -75,6 +83,23 @@ export const ExampleForm = () => {
             error={errors.email}
           />
           <Form.FieldError fieldError={errors.email} />
+        </Form.Item>
+        <Form.Item mb="20px">
+          <Form.Label htmlFor="email">PHONE NUMBER</Form.Label>
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ name, value, onChange, onBlur }) => (
+              <Form.PhoneNumberInput
+                name={name}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                error={errors.phoneNumber}
+              />
+            )}
+          />
+          <Form.FieldError fieldError={errors.phoneNumber} />
         </Form.Item>
         <Form.Item mb="20px">
           <Box display="flex" justifyContent="space-between">
@@ -109,6 +134,7 @@ export const ExampleForm = () => {
       </Form.Form>
       <Box mt={3}>
         <Text.Body2>Email: {values.email}</Text.Body2>
+        <Text.Body2>Phone number: {values.phoneNumber}</Text.Body2>
         <Text.Body2>Password: {values.password}</Text.Body2>
       </Box>
     </Box>
