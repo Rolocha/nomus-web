@@ -52,6 +52,8 @@ const CheckoutStep = ({
     }
     updateCardBuilderState(nextCBState)
   }
+  
+  const formValues = checkoutFormMethods.getValues()
 
   return (
     <Box height="100%">
@@ -217,7 +219,7 @@ const CheckoutStep = ({
                     <CreditCardInput
                       id="card-element"
                       handleChange={handleCardInputChange}
-                      postalCode={checkoutFormMethods.getValues().postalCode}
+                      postalCode={formValues.postalCode}
                     />
                   )}
                 </Box>
@@ -228,7 +230,7 @@ const CheckoutStep = ({
             <Box gridArea="costSummary" placeSelf="end end" width="100%">
               <CostSummary
                 quantity={cardBuilderState.quantity}
-                state={cardBuilderState.formData?.state}
+                state={formValues.state}
               />
             </Box>
           </Box>

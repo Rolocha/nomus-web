@@ -84,7 +84,11 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
               cardBuilderState.formData.name,
               cardBuilderState.formData?.addressLine1,
               cardBuilderState.formData?.addressLine2,
-              `${cardBuilderState.formData?.city}, ${cardBuilderState.formData?.state} ${cardBuilderState.formData?.postalCode}`,
+              `${
+                cardBuilderState.formData?.city
+              }, ${cardBuilderState.formData?.state.toUpperCase()} ${
+                cardBuilderState.formData?.postalCode
+              }`,
             ]
               .filter(Boolean)
               .map((line, index) => (
