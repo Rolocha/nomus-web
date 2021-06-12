@@ -231,7 +231,6 @@ const CustomBuildStep = ({
         }}
       >
         <CardBuilderPreview
-          forceShowBothSides
           cardOrientation={
             dimensions
               ? dimensions.height > dimensions.width
