@@ -35,28 +35,51 @@ const CardContainer = ({
 
   const imageUrl = fileItem?.url
 
-  return (
-    <Box display="flex" flexDirection="column" alignItems="center">
-      {imageUrl ? (
-        <CardWithGuides
-          cardImageUrl={imageUrl}
-          showGuides={showGuides ?? false}
-          css={css({
-            flexBasis: 'auto',
-            maxHeight: '500px',
-          })}
+  if (!imageUrl) {
+    return (
+      <Box position="relative">
+        {/* Using padding-bottom trick to get a responsive 3.5 x 2 (or 2 x 3.5) aspect ratio rectangle */}
+        <Box
+          position="relative"
+          pb={{
+            base: 'calc(100% * calc(2/3.5))',
+            lg: 'calc(100% * calc(3.5/2))',
+          }}
         />
-      ) : (
-        <FileUploadButton
-          name={`${name}DesignFile`}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
           width="100%"
           height="100%"
-          accept={acceptableImageFileTypes.join(' ')}
-          selectedFileItem={fileItem}
-          handleFileItemChange={changeHandler}
-          uploadText={uploadText}
-        />
-      )}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <FileUploadButton
+            name={`${name}DesignFile`}
+            width="100%"
+            height="100%"
+            accept={acceptableImageFileTypes.join(' ')}
+            selectedFileItem={fileItem}
+            handleFileItemChange={changeHandler}
+            uploadText={uploadText}
+          />
+          <Text.Body2>{labelText}</Text.Body2>
+        </Box>
+      </Box>
+    )
+  }
+  return (
+    <Box display="flex" flexDirection="column" alignItems="center">
+      <CardWithGuides
+        cardImageUrl={imageUrl}
+        showGuides={showGuides ?? false}
+        css={css({
+          flexBasis: 'auto',
+          maxHeight: '500px',
+        })}
+      />
       <Text.Body2>{labelText}</Text.Body2>
     </Box>
   )
@@ -110,11 +133,23 @@ const CustomBuildStep = ({
     <Box
       height="100%"
       display="grid"
-      gridTemplateColumns="4fr 8fr"
+      gridTemplateColumns={{ base: '1fr', lg: '4fr 8fr' }}
+      gridTemplateAreas={{
+        base: `
+        "notification"
+        "preview"
+        "controls"
+        `,
+        lg: `
+        "notification notification"
+        "controls preview"
+        `,
+      }}
+      gridGap={3}
       gridColumnGap={3}
     >
       {dimensionMismatch && (
-        <Box gridColumn="1/3" pt={2} mb={4} overflow="visible">
+        <Box gridArea="notification" pt={2} mb={4} overflow="visible">
           <Banner
             type="danger"
             title="Your card's front and back images have different dimensions!"
@@ -123,7 +158,7 @@ const CustomBuildStep = ({
         </Box>
       )}
 
-      <Box overflowY="scroll" pt={4}>
+      <Box gridArea="controls" overflowY="scroll" pt={4}>
         <Box>
           <Text.SectionSubheader mb={2}>
             Upload front design
@@ -187,6 +222,7 @@ const CustomBuildStep = ({
       </Box>
 
       <Box
+        gridArea="preview"
         overflow="visible"
         sx={{
           '& > div': {
@@ -196,34 +232,28 @@ const CustomBuildStep = ({
       >
         <CardBuilderPreview
           cardOrientation={
-            dimensions && dimensions.height > dimensions.width
-              ? 'vertical'
-              : 'horizontal'
+            dimensions
+              ? dimensions.height > dimensions.width
+                ? 'vertical'
+                : 'horizontal'
+              : 'vertical'
           }
-          renderFront={
-            frontDesignFile
-              ? ({ showGuides }) => (
-                  <CardContainer
-                    name="front"
-                    fileItem={frontDesignFile}
-                    showGuides={showGuides}
-                    changeHandler={setFrontDesignFile}
-                  />
-                )
-              : null
-          }
-          renderBack={
-            backDesignFile
-              ? ({ showGuides }) => (
-                  <CardContainer
-                    name="back"
-                    fileItem={backDesignFile}
-                    showGuides={showGuides}
-                    changeHandler={setBackDesignFile}
-                  />
-                )
-              : null
-          }
+          renderFront={({ showGuides }) => (
+            <CardContainer
+              name="front"
+              fileItem={frontDesignFile}
+              showGuides={!frontDesignFile || showGuides}
+              changeHandler={setFrontDesignFile}
+            />
+          )}
+          renderBack={({ showGuides }) => (
+            <CardContainer
+              name="back"
+              fileItem={backDesignFile}
+              showGuides={showGuides}
+              changeHandler={setBackDesignFile}
+            />
+          )}
         />
       </Box>
     </Box>
