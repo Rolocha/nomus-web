@@ -24,8 +24,6 @@ export default createMigration({
     }
   },
   down: async () => {
-    // No need to do anything since this is a non-destructive migration.
-    // The only potential thing we could do here is to delete the UserProfile objects we created in up().
-    // Not sure we want to do that
+    // No need
   },
 })

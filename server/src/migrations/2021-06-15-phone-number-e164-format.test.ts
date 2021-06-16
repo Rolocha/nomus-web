@@ -16,11 +16,9 @@ describe('phoneNumberE164Format', () => {
     await dropAllCollections()
   })
 
-  it('migrates user profile information to a new UserProfile object', async () => {
+  it('works for 10-digit phone numbers', async () => {
     const user = await createMockUser({
-      profilePicS3Key: 's3key',
       phoneNumber: '1234567890',
-      email: 'foo@bar.com',
     })
     await user.save()
 
@@ -28,5 +26,17 @@ describe('phoneNumberE164Format', () => {
 
     const migratedUser = await User.mongo.findById(user.id)
     expect(migratedUser.phoneNumber).toBe('+1' + user.phoneNumber)
+  })
+
+  it('works for 11-digit phone numbers', async () => {
+    const user = await createMockUser({
+      phoneNumber: '11234567890',
+    })
+    await user.save()
+
+    await phoneNumberE164FormatMigration.execute()
+
+    const migratedUser = await User.mongo.findById(user.id)
+    expect(migratedUser.phoneNumber).toBe('+' + user.phoneNumber)
   })
 })
