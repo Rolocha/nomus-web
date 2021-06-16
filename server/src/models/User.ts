@@ -89,7 +89,8 @@ export class User extends BaseModel({
   @prop()
   profilePicS3Key: string
 
-  @prop({ match: /^\d{10,11}$/ })
+  // Follows E.164 format - https://en.wikipedia.org/wiki/E.164
+  @prop({ match: /^\+?[1-9]\d{1,14}$/ })
   @Field({ nullable: true })
   phoneNumber: string
 

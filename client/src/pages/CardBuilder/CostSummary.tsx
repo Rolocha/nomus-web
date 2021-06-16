@@ -11,7 +11,7 @@ interface Props {
 }
 
 const CostSummary = ({ quantity, state }: Props) => {
-  const costSummary = getCostSummary(quantity, state)
+  const costSummary = getCostSummary(quantity, state?.toUpperCase())
   return (
     <Box
       boxShadow="workingWindow"
