@@ -1,4 +1,5 @@
 export { default as User } from './User'
+export { default as UserProfile } from './UserProfile'
 export { default as Card } from './Card'
 export { default as CardVersion } from './CardVersion'
 export { default as CardInteraction } from './CardInteraction'
