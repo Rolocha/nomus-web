@@ -1,6 +1,6 @@
 {
   "React component file": {
-    "prefix": "rcf",
+    "prefix": "r.file",
     "body": [
       "import * as React from 'react'",
       "",
@@ -15,6 +15,11 @@
       "export default $TM_FILENAME_BASE"
     ],
     "description": "The basics for a new React component from a blank file"
+  },
+  "React state var": {
+    "prefix": "r.state",
+    "description": "A React useState line",
+    "body": ["const [${1:value}, set${1/(.*)/${1:/capitalize}/}] = React.useState($2)"]
   },
   "import default component": {
     "prefix": "idc",

@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import deepEqual from 'deep-equal'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
 import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
 import Box from 'src/components/Box'
@@ -49,6 +49,7 @@ export default ({
     reset,
     watch,
     errors,
+    control,
   } = useForm<FormData>({
     mode: 'onBlur',
     defaultValues,
@@ -205,14 +206,19 @@ export default ({
             >
               <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
                 <Form.Label htmlFor="phoneNumber">PHONE NUMBER</Form.Label>
-                <Form.Input
+                <Controller
                   name="phoneNumber"
-                  ref={registerWithRef(fieldRefs.phoneNumber, {
-                    required: false,
-                  })}
-                  type="text"
-                  autoComplete="tel"
-                  error={errors.phoneNumber}
+                  control={control}
+                  render={({ name, value, onChange, onBlur }) => (
+                    <Form.PhoneNumberInput
+                      width="100%"
+                      name={name}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      error={errors.phoneNumber}
+                    />
+                  )}
                 />
                 <Form.FieldError fieldError={errors.phoneNumber} />
               </Form.Item>

@@ -14,7 +14,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import { colors } from 'src/styles'
 import { formatName } from 'src/utils/name'
-import { formatPhoneNumber } from 'src/utils/string'
+import { formatPhoneNumber } from 'react-phone-number-input'
 import ProfileEditorModal from './ProfileEditorModal'
 
 const bp = 'md'
@@ -252,7 +252,7 @@ export default () => {
               modalOpener={openProfileEditorModal}
               fieldRef={phoneNumberFieldRef}
             >
-              {formatPhoneNumber('1231231234')}
+              {formatPhoneNumber('+15551234567')}
             </Form.FieldPrompt>
           )}
         </Box>
