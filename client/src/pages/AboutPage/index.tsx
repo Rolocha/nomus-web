@@ -95,7 +95,7 @@ const AboutPage = () => {
             `,
           }}
           gridColumnGap="16px"
-          mx={{ base: '24px', [bp]: '96px' }}
+          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           pb="32px"
         >
@@ -113,7 +113,7 @@ const AboutPage = () => {
             textAlign="right"
             position="relative"
             top={{ base: '0', [bp]: '-72px' }}
-            mb={{ base: '0', [bp]: '-72px' }}
+            mb={{ base: '16px', [bp]: '-72px' }}
             mr={{ base: '-72px', [bp]: '0' }}
             placeSelf="stretch flex-start"
             objectFit="contain"
@@ -121,12 +121,12 @@ const AboutPage = () => {
             borderRadius="8px"
           />
 
-          <Box gridArea="description" py="9px">
-            <Text.Body mb="4px">Our Mission Statement is simple:</Text.Body>
-            <Text.Body mb="16px">
-              <strong>to empower effective, human-centered business.</strong>
+          <Box gridArea="description">
+            <Text.Body mb="4px">Our mission statement is simple:</Text.Body>
+            <Text.Body mb="16px" fontWeight={500}>
+              to empower effective, human-centered business.
             </Text.Body>
-            <Text.Body2>How do we do that? Glad you asked.</Text.Body2>
+            <Text.Body2>How do we do that? We're glad you asked.</Text.Body2>
             <Text.Body2>
               Nomus provides custom NFC-enabled business cards to professionals
               trying to find a more effective way to connect with people. In the
@@ -154,7 +154,7 @@ const AboutPage = () => {
             base: 'repeat(4, 1fr) / 1fr',
             [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
-          mx={{ base: '24px', [bp]: '96px' }}
+          // mx={{ base: '24px', [bp]: '96px' }}
           gridColumnGap={{ base: 2, [bp]: 3 }}
           mb={{ base: '48px', [bp]: '80px' }}
         >
@@ -164,10 +164,12 @@ const AboutPage = () => {
             alignItems="center"
             gridArea={{ base: '1 / 1 / 2 / 2', [bp]: '1 / 1 / 2 / 2' }}
             mb={{ base: '24px', [bp]: '0px' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.SectionSubheader
               textAlign="center"
               mb={{ base: '8px', [bp]: '17px' }}
+              fontWeight={500}
             >
               Our value
             </Text.SectionSubheader>
@@ -175,8 +177,9 @@ const AboutPage = () => {
               src={waterHose}
               textAlign="center"
               mb={{ base: '8px', [bp]: '17px' }}
+              px={{ base: '0px', [bp]: '8px' }}
             />
-            <Text.Body2>
+            <Text.Body2 textAlign="center" color="black">
               We work towards a product you're proud to use and we're proud to
               work on.
             </Text.Body2>
@@ -188,12 +191,20 @@ const AboutPage = () => {
             alignItems="center"
             gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '1 / 2 / 2 / 3' }}
             mb={{ base: '24px', [bp]: '0px' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
-            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+            <Text.SectionSubheader
+              mb={{ base: '8px', [bp]: '17px' }}
+              fontWeight={500}
+            >
               Doing good
             </Text.SectionSubheader>
-            <Image src={pointAtSky} mb={{ base: '8px', [bp]: '17px' }} />
-            <Text.Body2>
+            <Image
+              src={pointAtSky}
+              mb={{ base: '8px', [bp]: '17px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" color="black">
               We're always asking, "what's the right thing to do here?" Our goal
               is to do business the good way.
             </Text.Body2>
@@ -205,12 +216,20 @@ const AboutPage = () => {
             alignItems="center"
             gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '1 / 3 / 2 / 4' }}
             mb={{ base: '24px', [bp]: '0px' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
-            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+            <Text.SectionSubheader
+              mb={{ base: '8px', [bp]: '17px' }}
+              fontWeight={500}
+            >
               Enabling great ideas
             </Text.SectionSubheader>
-            <Image src={handShake} mb={{ base: '8px', [bp]: '17px' }} />
-            <Text.Body2>
+            <Image
+              src={handShake}
+              mb={{ base: '8px', [bp]: '17px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" color="black">
               Whether individuals or business, we believe that connecting people
               with people drives innovation.
             </Text.Body2>
@@ -223,11 +242,18 @@ const AboutPage = () => {
             gridArea={{ base: '4 / 1 / 5 / 2', [bp]: '1 / 4 / 2 / 5' }}
             mb={{ base: '24px', [bp]: '0px' }}
           >
-            <Text.SectionSubheader mb={{ base: '8px', [bp]: '17px' }}>
+            <Text.SectionSubheader
+              mb={{ base: '8px', [bp]: '17px' }}
+              fontWeight={500}
+            >
               You
             </Text.SectionSubheader>
-            <Image src={raiseHand} mb={{ base: '8px', [bp]: '17px' }} />
-            <Text.Body2>
+            <Image
+              src={raiseHand}
+              mb={{ base: '8px', [bp]: '17px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" color="black">
               We want you to succeed – show us who you are. We're here to listen
               – tell us how we can do better.
             </Text.Body2>
@@ -251,12 +277,13 @@ const AboutPage = () => {
             [bp]: '1fr 1fr / 1fr 1fr 1fr',
           }}
           gridGap={{ base: 2, [bp]: 3 }}
-          mx={{ base: '24px', [bp]: '96px' }}
+          // mx={{ base: '24px', [bp]: '96px' }}
           sx={{
             '& svg': {
               width: '100%',
             },
           }}
+          mb={{ base: '48px', [bp]: '0px' }}
         >
           {cardSet.map(({ header, icon, text }) => (
             <Card
@@ -278,50 +305,53 @@ const AboutPage = () => {
             display="grid"
             gridTemplateAreas={{
               base: 'repeat(4, 1fr) / repeat(12, 1fr)',
-              [bp]: 'repeat(3, 1fr) / repeat(12, 1fr)',
+              [bp]: '1fr 1fr / repeat(12, 1fr)',
             }}
             pt={{ base: '32px', [bp]: '64px' }}
-            pb={{ base: '32px', [bp]: '74px' }}
-            mx={{ base: '24px', [bp]: '96px' }}
-            mt={{ base: '48px', [bp]: '98px' }}
+            mb={{ base: '32px', [bp]: '74px' }}
           >
             <Text.SectionHeader
               textAlign={{ base: 'center', [bp]: 'left' }}
               gridArea={{ base: '1 / 1 / 2 / 13', [bp]: '1 / 1 / 2 / 9' }}
+              mb={{ base: '16px', [bp]: '16px' }}
             >
               Why NFC?
             </Text.SectionHeader>
+
             <Image
               gridArea={{ base: '2 / 1 / 3 / 13', [bp]: '1 / 9 / span 3 / 13' }}
               src={threePhones}
               mb={{ base: '16px', [bp]: '64px' }}
+              ml={{ base: '0px', [bp]: '19px' }}
             />
-
-            <Text.Body2
-              textAlign="left"
-              gridArea={{
-                base: '3 / 1 / 4 / 13',
-                [bp]: '2 / 1 / 3/ 9',
-              }}
-              mb="16px"
-            >
-              Inside these business cards, there’s something that sets it apart
-              from all the others – an NFC (Near Field Communication) chip. You
-              might have used similar contactless payment through your credit
-              card or technologies like Apple Pay.
-            </Text.Body2>
-            <Text.Body2
-              textAlign="left"
-              gridArea={{
-                base: '4 / 1 / 5 / 13',
-                [bp]: '3 / 1 / 4/ 9',
-              }}
-            >
-              We're big fans of NFC. We've seen the rise to mass market adoption
-              in credit cards, integration and support across devices, and we're
-              ready to bring that power to networking. With Nomus, you're on the
-              cutting edge of modern tech that's here to stay.
-            </Text.Body2>
+            <Box gridArea={{ base: '3 / 1 / 4 / 13', [bp]: '2 / 1 / 3 / 9' }}>
+              <Text.Body2
+                textAlign="left"
+                // gridArea={{
+                //   base: '3 / 1 / 4 / 13',
+                //   [bp]: '2 / 1 / 3/ 9',
+                // }}
+                mb={{ base: '16px', [bp]: '16px' }}
+              >
+                Inside these business cards, there’s something that sets it
+                apart from all the others – an NFC (Near Field Communication)
+                chip. You might have used similar contactless payment through
+                your credit card or technologies like Apple Pay.
+              </Text.Body2>
+              <Text.Body2
+                textAlign="left"
+                // gridArea={{
+                //   base: '4 / 1 / 5 / 13',
+                //   [bp]: '3 / 1 / 4/ 9',
+                // }}
+              >
+                We're big fans of NFC. We've seen the rise to mass market
+                adoption in credit cards, integration and support across
+                devices, and we're ready to bring that power to networking. With
+                Nomus, you're on the cutting edge of modern tech that's here to
+                stay.
+              </Text.Body2>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -335,7 +365,7 @@ const AboutPage = () => {
             [bp]: 'repeat(3, 1fr) / repeat(12, 1fr)',
           }}
           gridColumnGap={{ base: 2, [bp]: 3 }}
-          mx={{ base: '24px', [bp]: '96px' }}
+          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
         >
           <Image
@@ -348,7 +378,10 @@ const AboutPage = () => {
             mt={{ base: '', [bp]: '64px' }}
             mb={{ base: '48px', [bp]: '' }}
           >
-            <Text.SectionHeader textAlign={{ base: 'center', [bp]: 'left' }}>
+            <Text.SectionHeader
+              textAlign={{ base: 'center', [bp]: 'left' }}
+              mb="16px"
+            >
               The Nomus story
             </Text.SectionHeader>
             <Text.Body2 mb="16px">
@@ -379,7 +412,7 @@ const AboutPage = () => {
             base: 'repeat(4, 1fr) / 1fr',
             [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
-          mx={{ base: '24px', [bp]: '96px' }}
+          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           gridColumnGap={{ base: 2, [bp]: 3 }}
           mb={{ base: '54px', [bp]: '80px' }}
@@ -391,13 +424,18 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '1 / 1 / 2 / 2', [bp]: '1 / 1 / 2 / 2' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
-            <Text.SectionSubheader>Anshul Aggarwal</Text.SectionSubheader>
+            <Text.Body fontWeight={500}>Anshul Aggarwal</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
               Chief Executive Officer
             </Text.Body>
-            <Image src={anshul} mb={{ base: '6px', [bp]: '8px' }} />
-            <Text.Body2>
+            <Image
+              src={anshul}
+              mb={{ base: '6px', [bp]: '8px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
               A fan of overextending himself from being passionate about a
               million and one things.
             </Text.Body2>
@@ -409,13 +447,18 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '1 / 2 / 2 / 3' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
-            <Text.SectionSubheader>Cindy Cheung</Text.SectionSubheader>
+            <Text.Body fontWeight={500}>Cindy Cheung</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
               Chief Design Officer
             </Text.Body>
-            <Image src={cindy} mb={{ base: '6px', [bp]: '8px' }} />
-            <Text.Body2>
+            <Image
+              src={cindy}
+              mb={{ base: '6px', [bp]: '8px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
               Counts her senior-year high school yearbook as one of her greatest
               achievements still.
             </Text.Body2>
@@ -427,13 +470,18 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '1 / 3 / 2 / 4' }}
+            mr={{ base: '0px', [bp]: '42px' }}
           >
-            <Text.SectionSubheader>Bibek Ghimire</Text.SectionSubheader>
+            <Text.Body fontWeight={500}>Bibek Ghimire</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
               Chief Technical Officer
             </Text.Body>
-            <Image src={bibek} mb={{ base: '6px', [bp]: '8px' }} />
-            <Text.Body2>
+            <Image
+              src={bibek}
+              mb={{ base: '6px', [bp]: '8px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
               Fought through months of sickness and back pain to bring Nomus
               into the world.
             </Text.Body2>
@@ -446,12 +494,16 @@ const AboutPage = () => {
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '4 / 1 / 5 / 2', [bp]: '1 / 4 / 2 / 5' }}
           >
-            <Text.SectionSubheader>Hanad Musa</Text.SectionSubheader>
+            <Text.Body fontWeight={500}>Hanad Musa</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
               Chief Operations Officer
             </Text.Body>
-            <Image src={hanad} mb={{ base: '6px', [bp]: '8px' }} />
-            <Text.Body2>
+            <Image
+              src={hanad}
+              mb={{ base: '6px', [bp]: '8px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
               King of crosswords and planning “get-togethers” that are probably
               too popular for their own good.
             </Text.Body2>
@@ -473,7 +525,7 @@ const AboutPage = () => {
               base: 'repeat(4, auto)',
               [bp]: 'repeat(3, auto)',
             }}
-            mx={{ base: '24px', [bp]: '96px' }}
+            // mx={{ base: '24px', [bp]: '96px' }}
             pt={{ base: '32px', [bp]: '64px' }}
             pb={{ base: '48px', [bp]: '64px' }}
             gridColumnGap={{ base: 2, [bp]: 3 }}
@@ -507,7 +559,6 @@ const AboutPage = () => {
                   <Form.Input
                     name="email"
                     placeholder="hi@nomus.me"
-                    mb={{ base: 2, [bp]: 0 }}
                     flexGrow={1}
                     sx={{
                       [mq[bp]]: {
@@ -537,6 +588,7 @@ const AboutPage = () => {
                     disabled={
                       formState.isSubmitting || formState.isSubmitSuccessful
                     }
+                    mt={{ base: 2, [bp]: 0 }}
                   >
                     <Box display="flex">
                       {formState.isSubmitting && (
@@ -546,9 +598,9 @@ const AboutPage = () => {
                       )}
 
                       {formState.isSubmitted ? (
-                        <Text.Plain>Keep me updated</Text.Plain>
-                      ) : (
                         <Text.Plain>You're in the loop!</Text.Plain>
+                      ) : (
+                        <Text.Plain>Keep me updated </Text.Plain>
                       )}
                     </Box>
                   </Button>
