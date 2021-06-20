@@ -5,6 +5,7 @@
   "dependencies": {
     "@sendgrid/client": "^7.4.0",
     "@sendgrid/mail": "^7.4.0",
+    "@slack/bolt": "^3.4.0",
     "@typegoose/typegoose": "^7.4.1",
     "@types/vcards-js": "^2.10.0",
     "@types/zxcvbn": "^4.4.0",
