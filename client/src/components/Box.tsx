@@ -1,5 +1,6 @@
 import { chakra, PropsOf, system } from '@chakra-ui/react'
 import styled from '@emotion/styled'
+import isPropValid from '@emotion/is-prop-valid'
 
 export interface BoxProps extends PropsOf<typeof chakra.div> {}
 
@@ -11,7 +12,10 @@ type ContainerProp = {
 const isContainerPropBoolean = (cp: ContainerProp | boolean): cp is boolean =>
   typeof cp === 'boolean'
 
-const Box = styled(chakra.div)<BoxProps>(
+const Box = styled(chakra.div, {
+  shouldForwardProp: (prop) =>
+    isPropValid(String(prop)) && prop !== 'container',
+})<BoxProps>(
   {
     boxSizing: 'border-box',
     minWidth: 0,
