@@ -185,7 +185,7 @@ const Navbar = (props: Props) => {
             flexDirection="row"
             alignItems="center"
             sx={{
-              '& > *:not(:first-child)': {
+              '& > *:not(*:first-of-type)': {
                 cursor: 'pointer',
                 marginLeft: '16px',
               },
