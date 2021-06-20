@@ -52,7 +52,7 @@ const CheckoutStep = ({
     }
     updateCardBuilderState(nextCBState)
   }
-  
+
   const formValues = checkoutFormMethods.getValues()
 
   return (
