@@ -10,7 +10,6 @@ import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
-import IconButton from 'src/components/IconButton'
 import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
@@ -22,7 +21,6 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -39,7 +37,6 @@ const bp = 'lg'
 
 const ContactInfoPage = () => {
   const { username }: UrlParams = useParams()
-  const isDesktopWidth = useBreakpoint(bp)
   const [isNotesModalOpen, setIsNotesModalOpen] = React.useState(false)
   const { loggedIn } = useAuth()
   const history = useHistory()
@@ -166,7 +163,7 @@ const ContactInfoPage = () => {
               "buttons notes"
             `,
           }}
-          mb={{ base: '100px', [bp]: 0 }}
+          mb={{ base: '150px', [bp]: 0 }}
           gridColumnGap={3}
           gridRowGap={4}
         >
@@ -398,11 +395,20 @@ const ContactInfoPage = () => {
             padding={{ base: '16px', [bp]: 0 }}
             bg="white"
             boxShadow={{ base: 'workingWindow', [bp]: 'unset' }}
-            gridTemplateColumns={{ base: 'auto 1fr', [bp]: '3fr 3fr 1fr' }}
+            gridTemplateColumns={{ base: 'auto', [bp]: '3fr 3fr 1fr' }}
+            gridTemplateAreas={{
+              base: `
+              "saveDevice"
+              "saveNomus"
+            `,
+              [bp]: `
+              "saveDevice saveNomus"
+            `,
+            }}
             gridColumnGap={{ base: 2, [bp]: 3 }}
             gridRowGap={2}
           >
-            {isDesktopWidth ? (
+            <Box gridArea="saveDevice">
               <Link
                 // Force it to use an external link to enable proper download behavior
                 linkType="external"
@@ -411,27 +417,15 @@ const ContactInfoPage = () => {
                 {...downloadLinkProps}
               >
                 <Icon of="download" color={colors.white} />{' '}
-                <Box
-                  as="span"
-                  ml={2}
-                  display={{ base: 'none', [bp]: 'inline-block' }}
-                >
-                  Save contact
+                <Box as="span" ml={2} display={'inline-block'}>
+                  Save to Device
                 </Box>
               </Link>
-            ) : (
-              <IconButton
-                as="a"
-                {...downloadLinkProps}
-                aria-label="Save contact"
-                icon={<Icon of="download" color={colors.white} />}
-                isRound
-                height="100%"
-              />
-            )}
+            </Box>
 
             {loggedIn && contact.connected ? (
               <Link
+                gridArea="saveNomus"
                 buttonStyle="secondary"
                 buttonSize="big"
                 to={`/dashboard/contacts/detail/${username}`}
@@ -440,6 +434,7 @@ const ContactInfoPage = () => {
               </Link>
             ) : (
               <Link
+                gridArea="saveNomus"
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
                 buttonStyle="secondary"
                 buttonSize="big"
