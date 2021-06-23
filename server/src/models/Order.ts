@@ -93,10 +93,16 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  // Stripe PaymentIntent id. For now, this is null but future work will replace this
+  // Stripe PaymentIntent id; may
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
+
+  // Stripe CheckoutSession id
+  // See https://stripe.com/docs/api/checkout/sessions/object
+  @prop({ required: false })
+  @Field({ nullable: true })
+  checkoutSession: string
 
   @prop({
     required: false,

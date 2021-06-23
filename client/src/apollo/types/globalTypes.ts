@@ -8,6 +8,14 @@
 //==============================================================
 
 /**
+ * The base type for a card being built
+ */
+export enum CardSpecBaseType {
+  Custom = 'Custom',
+  Template = 'Template',
+}
+
+/**
  * Current State in Order Tracking State Machine
  */
 export enum OrderState {
@@ -57,9 +65,7 @@ export interface ProfileUpdateInput {
  * Payload for submitting a card builder order with a custom design
  */
 export interface SubmitCustomOrderInput {
-  orderId?: string | null
   quantity?: number | null
-  stripeToken?: string | null
   shippingAddress?: AddressInput | null
   frontImageDataUrl: any
   backImageDataUrl?: any | null
@@ -69,11 +75,10 @@ export interface SubmitCustomOrderInput {
  * Payload for submitting a card builder order with a template-based design
  */
 export interface SubmitTemplateOrderInput {
-  orderId?: string | null
   quantity?: number | null
-  stripeToken?: string | null
   shippingAddress?: AddressInput | null
   templateId: string
+  templateName: string
   cardVersionId: string
   colorScheme: TemplateColorSchemeInput
   contactInfo: TemplateContactInfoFieldsInput
@@ -88,8 +93,11 @@ export interface SubmitTemplateOrderInput {
  */
 export interface TemplateColorSchemeInput {
   background: string
-  accent: string
   text: string
+  accent?: string | null
+  accent2?: string | null
+  accent3?: string | null
+  accent4?: string | null
 }
 
 /**
@@ -100,6 +108,7 @@ export interface TemplateContactInfoFieldsInput {
   line1?: string | null
   line2?: string | null
   line3?: string | null
+  line4?: string | null
   headline?: string | null
   footer?: string | null
 }

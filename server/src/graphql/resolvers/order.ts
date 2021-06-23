@@ -1,7 +1,8 @@
 import { DocumentType, mongoose } from '@typegoose/typegoose'
 import { AuthenticationError } from 'apollo-server-errors'
-import { FileUpload } from 'graphql-upload'
 import { GraphQLUpload } from 'apollo-server-express'
+import { FileUpload } from 'graphql-upload'
+import { BASE_URL } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import {
@@ -12,7 +13,7 @@ import {
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { getCostSummary } from 'src/util/pricing'
+import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
 import {
@@ -38,10 +39,6 @@ class BaseSubmitOrderInput {
   @Field({ nullable: true })
   quantity: number
 
-  // Credit/debit card Stripe token we'll use for payment auth/capture
-  @Field({ nullable: true })
-  stripeToken: string
-
   @Field((type) => Address, { nullable: true })
   shippingAddress: Address
 }
@@ -53,12 +50,6 @@ class OrdersQueryInput {
 
   @Field({ nullable: true, description: 'quantity of cards in an order' })
   quantity: number
-
-  @Field({
-    nullable: true,
-    description: 'Credit/debit card Stripe token used for payment auth/capture',
-  })
-  stripeToken: string
 
   @Field((type) => Address, { nullable: true, description: 'shipping address for the order' })
   shippingAddress: Address
@@ -110,6 +101,12 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   @Field({ nullable: false })
   templateId: string
 
+  @Field({
+    nullable: false,
+    description: 'The human-readable, user-presentable name of the template',
+  })
+  templateName: string
+
   @Field({ nullable: false })
   cardVersionId: string
 
@@ -135,12 +132,22 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
 @ObjectType()
 class SubmitOrderResponse {
   @Field()
-  clientSecret: string
+  checkoutSession: string
 
   @Field()
   orderId: string
 }
 
+interface CreateCheckoutSessionArgs {
+  user: User
+  cardVersion: CardVersion
+  orderId: string
+  type: CardSpecBaseType
+  templateName?: string
+  images: string[]
+  quantity: number
+  shippingAddress: Address
+}
 @Resolver((of) => Order)
 class OrderResolver {
   @FieldResolver()
@@ -341,7 +348,7 @@ class OrderResolver {
 
     await cardVersion.save()
 
-    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+    const { createdOrder, checkoutSession } = await this.createOrderAndCheckoutSession({
       user,
       cardVersion,
       quantity: payload.quantity,
@@ -354,7 +361,7 @@ class OrderResolver {
 
     return {
       orderId: createdOrder.id,
-      clientSecret: paymentIntent.client_secret,
+      checkoutSession: checkoutSession.id,
     }
   }
 
@@ -378,6 +385,7 @@ class OrderResolver {
     }
 
     // Update the card version with the customized template details
+    cardVersion.templateId = payload.templateId
     cardVersion.contactInfo = payload.contactInfo
     cardVersion.colorScheme = payload.colorScheme
     cardVersion.qrCodeUrl = payload.qrCodeUrl
@@ -404,9 +412,10 @@ class OrderResolver {
     }
     await cardVersion.save()
 
-    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+    const { createdOrder, checkoutSession } = await this.createOrderAndCheckoutSession({
       user,
       cardVersion,
+      templateName: payload.templateName,
       quantity: payload.quantity,
       shippingAddress: payload.shippingAddress,
     })
@@ -417,7 +426,7 @@ class OrderResolver {
 
     return {
       orderId: createdOrder.id,
-      clientSecret: paymentIntent.client_secret,
+      checkoutSession: checkoutSession.id,
     }
   }
 
@@ -425,17 +434,46 @@ class OrderResolver {
    * Private helpers
    */
 
-  async createPaymentIntent(amount: number, user: DocumentType<User>, orderId: string) {
-    return await stripe.paymentIntents.create({
-      /* eslint-disable camelcase */
-      amount,
-      currency: 'usd', // We'll know we made it when we can change this line :')
-      receipt_email: user.email,
-      metadata: {
-        orderId,
+  // Creates a Checkout Session
+  async createCheckoutSession(args: CreateCheckoutSessionArgs): Promise<Stripe.Checkout.Session> {
+    const productName = {
+      [CardSpecBaseType.Custom]: `Nomus card - custom design (${args.quantity} pack)`,
+      [CardSpecBaseType.Template]: `Nomus card - ${args.templateName} template (${args.quantity} pack)`,
+    }[args.type]
+
+    /* eslint-disable camelcase */
+    return stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: productName,
+              images: args.images,
+            },
+            unit_amount: QUANTITY_TO_PRICE[args.quantity],
+          },
+          quantity: 1,
+          tax_rates:
+            args.shippingAddress.state === 'CA' ? ['txr_1J5P6LGTbyReVwro0YiKRJns'] : undefined,
+        },
+      ],
+      payment_intent_data: {
+        metadata: {
+          orderId: args.orderId,
+        },
       },
-      /* eslint-enable camelcase */
+      customer_email: args.user.email,
+      mode: 'payment',
+      success_url: `${BASE_URL}/card-studio/success`,
+      cancel_url: `${BASE_URL}/card-studio/cancel`,
+      metadata: {
+        orderId: args.orderId,
+        cardVersionId: args.cardVersion.id,
+      },
     })
+    /* eslint-enable camelcase */
   }
 
   async uploadCardImages(
@@ -471,17 +509,19 @@ class OrderResolver {
     }
   }
 
-  async createOrderAndPayment({
+  async createOrderAndCheckoutSession({
     user,
     cardVersion,
     quantity,
     shippingAddress,
+    templateName,
   }: {
     user: DocumentType<User>
     cardVersion: DocumentType<CardVersion>
     quantity: number
     shippingAddress: Address
-  }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
+    templateName?: string
+  }): Promise<{ createdOrder: DocumentType<Order>; checkoutSession: Stripe.Checkout.Session }> {
     const costSummary = getCostSummary(quantity, shippingAddress.state)
     if (costSummary == null) {
       throw new Error(
@@ -490,13 +530,23 @@ class OrderResolver {
     }
 
     const orderId = Order.createId()
-    const paymentIntent = await this.createPaymentIntent(costSummary.total, user, orderId)
+    const checkoutSession = await this.createCheckoutSession({
+      templateName,
+      orderId,
+      shippingAddress,
+      cardVersion,
+      user,
+      quantity,
+      type: cardVersion.baseType,
+      images: [cardVersion.frontImageUrl, cardVersion.backImageUrl],
+    })
     const createdOrder = await Order.mongo.create({
       _id: orderId,
       user: user.id,
       cardVersion: cardVersion.id,
       state: OrderState.Captured,
-      paymentIntent: paymentIntent.id,
+      checkoutSession: checkoutSession.id,
+      paymentIntent: checkoutSession.payment_intent,
       quantity,
       shippingAddress,
       price: {
@@ -506,7 +556,7 @@ class OrderResolver {
         total: costSummary.total,
       },
     })
-    return { createdOrder, paymentIntent }
+    return { createdOrder, checkoutSession }
   }
 }
 export default OrderResolver

@@ -42,16 +42,6 @@ export const Primary = () => {
         state: 'UW',
         postalCode: '12345',
       },
-      stripeToken: {
-        card: {
-          id: 'idk',
-          brand: 'Visa',
-          funding: 'credit',
-          last4: '4242',
-          // eslint-disable-next-line
-          address_zip: '94115',
-        },
-      } as any,
     },
   )
 

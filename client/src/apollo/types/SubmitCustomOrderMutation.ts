@@ -11,8 +11,8 @@ import { SubmitCustomOrderInput } from './globalTypes'
 
 export interface SubmitCustomOrderMutation_submitCustomOrder {
   __typename: 'SubmitOrderResponse'
-  clientSecret: string
   orderId: string
+  checkoutSession: string
 }
 
 export interface SubmitCustomOrderMutation {

@@ -95,18 +95,6 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
                 <Text.Body2 key={index}>{line}</Text.Body2>
               ))}
           </Box>
-
-          {/* next row */}
-          <Text.Body2>Payment</Text.Body2>
-          <Box>
-            {[
-              `${cardBuilderState?.stripeToken?.card?.brand} ${cardBuilderState?.stripeToken?.card?.funding} card`,
-              `**** **** **** ${cardBuilderState?.stripeToken?.card?.last4}`,
-              `${cardBuilderState?.stripeToken?.card?.address_zip}`,
-            ].map((line, index) => (
-              <Text.Body2 key={index}>{line}</Text.Body2>
-            ))}
-          </Box>
         </Box>
 
         <Box gridArea="costSummary" placeSelf="end end" width="100%">

@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
+import { Redirect, useLocation, useParams } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
 import {
   SubmitCustomOrderMutation,
@@ -53,7 +53,6 @@ const bp = 'lg'
 const CardBuilder = () => {
   const { buildBaseType: baseTypeQueryParam } = useParams<ParamsType>()
   const location = useLocation()
-  const history = useHistory()
   const isDesktop = useBreakpoint('lg')
 
   const baseType =
@@ -140,7 +139,6 @@ const CardBuilder = () => {
   const watchedFields = checkoutFormMethods.watch()
 
   const stripe = useStripe()
-  const elements = useElements()
   const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
     SUBMIT_CUSTOM_ORDER_MUTATION,
   )
@@ -148,31 +146,8 @@ const CardBuilder = () => {
     SUBMIT_TEMPLATE_ORDER_MUTATION,
   )
 
-  const confirmCardPayment = React.useCallback(
-    async (clientSecret: string) => {
-      if (stripe == null || cardBuilderState.stripeToken == null) {
-        // TODO: Handle errors gracefully
-        throw new Error('stripe is not defined or the token is missing')
-      }
-
-      return stripe.confirmCardPayment(clientSecret, {
-        // eslint-disable-next-line camelcase
-        payment_method: {
-          card: {
-            token: cardBuilderState.stripeToken.id,
-          },
-          // eslint-disable-next-line camelcase
-          billing_details: {
-            name: cardBuilderState.formData.name,
-          },
-        },
-      })
-    },
-    [cardBuilderState, stripe],
-  )
-
   const submitOrder = React.useCallback(async () => {
-    const { formData, stripeToken, quantity } = cardBuilderState
+    const { formData, quantity } = cardBuilderState
 
     if (
       formData == null ||
@@ -180,8 +155,7 @@ const CardBuilder = () => {
       formData.addressLine1 == null ||
       formData.city == null ||
       formData.state == null ||
-      formData.postalCode == null ||
-      stripeToken == null
+      formData.postalCode == null
     ) {
       console.log('missing data')
       return
@@ -199,7 +173,6 @@ const CardBuilder = () => {
         postalCode: formData?.postalCode,
       },
       quantity,
-      stripeToken: stripeToken?.id,
     }
 
     let result = null
@@ -218,7 +191,14 @@ const CardBuilder = () => {
         break
       case BaseType.Template:
         // Use <any, any> to appease TS for now. See TemplateCard.tsx for more details on why this is necessary.
-        const template = templateLibrary[cardBuilderState.templateId!]
+        const { templateId } = cardBuilderState
+        if (!templateId) {
+          throw new Error(
+            'Sumbitting a template order without a templateId defined',
+          )
+        }
+
+        const template = templateLibrary[templateId]
         const cardImageDataUrls = await template.renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(
             cardBuilderState.templateCustomization!,
@@ -228,6 +208,7 @@ const CardBuilder = () => {
 
         const templateSpecificRequiredPayload = {
           templateId: cardBuilderState.templateId,
+          templateName: templateLibrary[templateId].name,
           cardVersionId: cardBuilderState.cardVersionId,
           colorScheme: cardBuilderState.templateCustomization?.colorScheme,
           contactInfo: cardBuilderState.templateCustomization?.contactInfo,
@@ -272,31 +253,11 @@ const CardBuilder = () => {
       throw new Error('Failed to create order, submitOrderResult was null')
     }
 
-    const cardConfirmationResult = await confirmCardPayment(
-      submitOrderResult.clientSecret,
-    )
-
-    if (cardConfirmationResult.error) {
-      updateCardBuilderState({
-        submissionError: {
-          message:
-            cardConfirmationResult.error.message ??
-            'An unknown error occurred while submitting your card information.',
-          field: 'cardDetails',
-          backlinkToStep: 'checkout',
-        },
-      })
-      return
-    } else if (cardConfirmationResult.paymentIntent == null) {
-      throw new Error('paymentIntent in response undefined')
-    }
-    updateCardBuilderState({
-      paymentIntent: cardConfirmationResult.paymentIntent,
+    // Order successfully created, redirect to Stripe Checkout so we can get that moola
+    stripe?.redirectToCheckout({
+      sessionId: submitOrderResult.checkoutSession,
     })
-
-    // All done, redirect to the dashboard cards page so they can see their newly active card
-    history.push(`/dashboard/cards`)
-  }, [confirmCardPayment, submitOrder, history])
+  }, [submitOrder, stripe])
 
   if (!baseType) {
     // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
@@ -351,29 +312,6 @@ const CardBuilder = () => {
         // Cache the current form data in cardBuilderState since react-hook-form
         // will drop it when the form fields unmount
         cardBuilderStateUpdate.formData = checkoutFormMethods.getValues()
-
-        if (!cardBuilderState.stripeToken) {
-          // Submit the card info to Stripe if they didn't already do so during a previous pass
-          // through this step
-          if (stripe == null || elements == null) {
-            throw new Error('Stripe and/or Stripe Elements not initialized')
-          }
-
-          const card = elements.getElement(CardElement)
-          if (card == null) {
-            throw new Error('Could not find a Card Element')
-          }
-
-          try {
-            const result = await stripe.createToken(card)
-            if (result.error == null && result.token != null) {
-              const { token: stripeToken } = result
-              cardBuilderStateUpdate.stripeToken = stripeToken
-            }
-          } catch (err) {
-            console.log({ err })
-          }
-        }
         break
       default:
         break
@@ -484,7 +422,6 @@ const CardBuilder = () => {
                 formData.city,
                 formData.postalCode,
                 formData.name,
-                cardBuilderState.cardEntryComplete,
                 // If the current step isn't build, formState won't be valid since the form
                 // isn't mounted so we trust that it's valid since we were able to get off
                 // the build step in the first place

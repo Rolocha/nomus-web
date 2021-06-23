@@ -1,4 +1,3 @@
-import { PaymentIntent, Token } from '@stripe/stripe-js'
 import { templateNames } from 'src/templates'
 import { FileItem } from 'src/types/files'
 import {
@@ -27,11 +26,6 @@ export type CardBuilderState = {
   frontDesignFile: FileItem | null
   backDesignFile: FileItem | null
 
-  // Card/payment details
-  cardEntryComplete: boolean
-  stripeToken: Token | null
-  paymentIntent: PaymentIntent | null
-
   submissionError?: CardBuilderSubmissionError | null
 }
 
@@ -59,9 +53,6 @@ const createInitialState = (baseType: BaseType): CardBuilderState => ({
   },
   templateCustomization: null,
   omittedOptionalFields: [],
-  stripeToken: null,
-  paymentIntent: null,
-  cardEntryComplete: false,
 })
 
 export const initialStateOptions: Record<BaseType, CardBuilderState> = {

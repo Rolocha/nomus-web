@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { CardSpecBaseType } from './globalTypes'
+
 // ====================================================
 // GraphQL mutation operation: InitializeCardBuilder
 // ====================================================
@@ -17,4 +19,8 @@ export interface InitializeCardBuilder {
    * Initializes a bare card version for use in the Card Builder UI
    */
   createEmptyCardVersion: InitializeCardBuilder_createEmptyCardVersion
+}
+
+export interface InitializeCardBuilderVariables {
+  baseType: CardSpecBaseType
 }

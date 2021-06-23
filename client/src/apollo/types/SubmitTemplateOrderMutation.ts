@@ -11,8 +11,8 @@ import { SubmitTemplateOrderInput } from './globalTypes'
 
 export interface SubmitTemplateOrderMutation_submitTemplateOrder {
   __typename: 'SubmitOrderResponse'
-  clientSecret: string
   orderId: string
+  checkoutSession: string
 }
 
 export interface SubmitTemplateOrderMutation {
