@@ -426,20 +426,26 @@ const ContactInfoPage = () => {
             {loggedIn && contact.connected ? (
               <Link
                 gridArea="saveNomus"
-                buttonStyle="secondary"
-                buttonSize="big"
+                buttonStyle="tertiary"
+                buttonSize="normal"
                 to={`/dashboard/contacts/detail/${username}`}
               >
-                View in dashboard
+                <Icon of="logo" color={colors.nomusBlue} />{' '}
+                <Box as="span" ml={2} display={'inline-block'}>
+                  View in dashboard
+                </Box>
               </Link>
             ) : (
               <Link
                 gridArea="saveNomus"
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
-                buttonStyle="secondary"
-                buttonSize="big"
+                buttonStyle="tertiary"
+                buttonSize="normal"
               >
-                Save to Nomus
+                <Icon of="logo" color={colors.nomusBlue} />{' '}
+                <Box as="span" ml={2} display={'inline-block'}>
+                  Save to Nomus
+                </Box>
               </Link>
             )}
           </Box>
