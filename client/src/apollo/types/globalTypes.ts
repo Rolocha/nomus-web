@@ -11,106 +11,106 @@
  * The base type for a card being built
  */
 export enum CardSpecBaseType {
-  Custom = 'Custom',
-  Template = 'Template',
+  Custom = "Custom",
+  Template = "Template",
 }
 
 /**
  * Current State in Order Tracking State Machine
  */
 export enum OrderState {
-  Canceled = 'Canceled',
-  Captured = 'Captured',
-  Created = 'Created',
-  Creating = 'Creating',
-  Enroute = 'Enroute',
-  Fulfilled = 'Fulfilled',
-  Paid = 'Paid',
-  Reviewed = 'Reviewed',
+  Canceled = "Canceled",
+  Captured = "Captured",
+  Created = "Created",
+  Creating = "Creating",
+  Enroute = "Enroute",
+  Fulfilled = "Fulfilled",
+  Paid = "Paid",
+  Reviewed = "Reviewed",
 }
 
 export interface AddressInput {
-  line1: string
-  line2?: string | null
-  city: string
-  state: string
-  postalCode: string
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
 }
 
 /**
  * Information one user saves about another such as meeting date, meeting place, and tags
  */
 export interface ContactInfoInput {
-  meetingPlace?: string | null
-  meetingDate?: string | null
-  notes?: string | null
-  tags?: string[] | null
+  meetingPlace?: string | null;
+  meetingDate?: string | null;
+  notes?: string | null;
+  tags?: string[] | null;
 }
 
 /**
  * Input for udpating user profile
  */
 export interface ProfileUpdateInput {
-  firstName?: string | null
-  middleName?: string | null
-  lastName?: string | null
-  phoneNumber?: string | null
-  email?: string | null
-  headline?: string | null
-  bio?: string | null
-  activated?: boolean | null
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  email?: string | null;
+  headline?: string | null;
+  bio?: string | null;
+  activated?: boolean | null;
 }
 
 /**
  * Payload for submitting a card builder order with a custom design
  */
 export interface SubmitCustomOrderInput {
-  quantity?: number | null
-  shippingAddress?: AddressInput | null
-  frontImageDataUrl: any
-  backImageDataUrl?: any | null
+  quantity?: number | null;
+  shippingAddress?: AddressInput | null;
+  frontImageDataUrl: any;
+  backImageDataUrl?: any | null;
 }
 
 /**
  * Payload for submitting a card builder order with a template-based design
  */
 export interface SubmitTemplateOrderInput {
-  quantity?: number | null
-  shippingAddress?: AddressInput | null
-  templateId: string
-  templateName: string
-  cardVersionId: string
-  colorScheme: TemplateColorSchemeInput
-  contactInfo: TemplateContactInfoFieldsInput
-  graphic?: any | null
-  qrCodeUrl: string
-  frontImageDataUrl: any
-  backImageDataUrl?: any | null
+  quantity?: number | null;
+  shippingAddress?: AddressInput | null;
+  templateId: string;
+  templateName: string;
+  cardVersionId: string;
+  colorScheme: TemplateColorSchemeInput;
+  contactInfo: TemplateContactInfoFieldsInput;
+  graphic?: any | null;
+  qrCodeUrl: string;
+  frontImageDataUrl: any;
+  backImageDataUrl?: any | null;
 }
 
 /**
  * Colors defined when customizing a template card
  */
 export interface TemplateColorSchemeInput {
-  background: string
-  text: string
-  accent?: string | null
-  accent2?: string | null
-  accent3?: string | null
-  accent4?: string | null
+  background: string;
+  text: string;
+  accent?: string | null;
+  accent2?: string | null;
+  accent3?: string | null;
+  accent4?: string | null;
 }
 
 /**
  * Contact info fields potentially specified when customizing a template card
  */
 export interface TemplateContactInfoFieldsInput {
-  name?: string | null
-  line1?: string | null
-  line2?: string | null
-  line3?: string | null
-  line4?: string | null
-  headline?: string | null
-  footer?: string | null
+  name?: string | null;
+  line1?: string | null;
+  line2?: string | null;
+  line3?: string | null;
+  line4?: string | null;
+  headline?: string | null;
+  footer?: string | null;
 }
 
 //==============================================================

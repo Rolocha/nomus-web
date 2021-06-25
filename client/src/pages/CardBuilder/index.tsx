@@ -4,6 +4,9 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { Redirect, useLocation, useParams } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
+import { InitializeCardBuilder } from 'src/apollo/types/InitializeCardBuilder'
+import { LoadExistingCardBuilderOrder } from 'src/apollo/types/LoadExistingCardBuilderOrder'
 import {
   SubmitCustomOrderMutation,
   SubmitCustomOrderMutationVariables,
@@ -20,6 +23,7 @@ import BaseStep from 'src/pages/CardBuilder/BaseStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
+  CardBuilderState,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
 import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
@@ -27,6 +31,7 @@ import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
 import {
   INITIALIZE_CARD_BUILDER_MUTATION,
+  LOAD_EXISTING_CARD_BUILDER_ORDER,
   SUBMIT_CUSTOM_ORDER_MUTATION,
   SUBMIT_TEMPLATE_ORDER_MUTATION,
 } from 'src/pages/CardBuilder/mutations'
@@ -39,13 +44,13 @@ import {
 } from 'src/pages/CardBuilder/types'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
-import templateLibrary from 'src/templates'
+import templateLibrary, { TemplateID } from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
 import { isValidStateAbr } from 'src/utils/states'
 import * as yup from 'yup'
 
 interface ParamsType {
-  buildBaseType?: 'custom' | 'template' | string
+  buildBaseType?: 'custom' | 'template' | 'success' | 'cancel' | string
 }
 
 const bp = 'lg'
@@ -86,29 +91,71 @@ const CardBuilder = () => {
   const [
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
-  ] = useMutation(INITIALIZE_CARD_BUILDER_MUTATION)
+  ] = useMutation<InitializeCardBuilder>(INITIALIZE_CARD_BUILDER_MUTATION)
+
+  const [loadExistingOrder] = useMutation<LoadExistingCardBuilderOrder>(
+    LOAD_EXISTING_CARD_BUILDER_ORDER,
+  )
 
   // Request an initialized CardVersion from the API
   // when the card builder loads so we can use its id
   // things like the QR code URL
   const initialize = React.useCallback(async () => {
-    if (initializeCardBuilderMutationResult.called) {
-      return
-    }
+    // If the user canceled the order from an external location (currently
+    // this would just be Stripe Checkout), there should be an orderId query param
+    // that we should use to load the card builder up with
+    if (baseTypeQueryParam === 'cancel') {
+      const searchParams = new URLSearchParams(location.search)
+      const orderIdParam = searchParams.get('orderId')
+      if (!orderIdParam) {
+        return <Redirect to="/shop" />
+      }
+      const result = await loadExistingOrder({
+        variables: {
+          orderId: orderIdParam,
+        },
+      })
 
-    const result = await initializeCardBuilder({
-      variables: {
-        baseType: cardBuilderState.baseType,
-      },
-    })
-    if (result.errors) {
-      console.log(result.errors)
-      throw new Error('oh no!')
+      const _order = result.data?.order
+      if (!_order) {
+        return <Redirect to="/shop" />
+      }
+      const _cv = _order.cardVersion
+
+      const cardBuilderStateUpdate: Partial<CardBuilderState> = {
+        ...(_cv.templateId && {
+          templateId: _cv.templateId as TemplateID,
+        }),
+        ...(_cv.baseType && {
+          baseType: (_cv.baseType as unknown) as BaseType,
+        }),
+      }
+      if (_order.cardVersion.templateId) {
+      }
+      if (_order.cardVersion.baseType) {
+      }
+
+      updateCardBuilderState(cardBuilderStateUpdate)
+    } else {
+      if (initializeCardBuilderMutationResult.called) {
+        return
+      }
+
+      const result = await initializeCardBuilder({
+        variables: {
+          baseType: cardBuilderState.baseType,
+        },
+      })
+      if (result.errors) {
+        console.log(result.errors)
+        throw new Error('oh no!')
+      }
+      updateCardBuilderState({
+        cardVersionId: result.data?.createEmptyCardVersion.id,
+      })
     }
-    updateCardBuilderState({
-      cardVersionId: result.data.createEmptyCardVersion.id,
-    })
   }, [
+    baseTypeQueryParam,
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
     cardBuilderState,

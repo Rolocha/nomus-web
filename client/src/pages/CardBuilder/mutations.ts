@@ -25,3 +25,36 @@ export const INITIALIZE_CARD_BUILDER_MUTATION = gql`
     }
   }
 `
+
+export const LOAD_EXISTING_CARD_BUILDER_ORDER = gql`
+  query LoadExistingCardBuilderOrder($orderId: String!) {
+    order(orderId: $orderId) {
+      id
+      cardVersion {
+        id
+        baseType
+        frontImageUrl
+        backImageUrl
+        templateId
+        contactInfo {
+          name
+          line1
+          line2
+          line3
+          line4
+          headline
+          footer
+        }
+        colorScheme {
+          background
+          text
+          accent
+          accent2
+          accent3
+          accent4
+        }
+        qrCodeUrl
+      }
+    }
+  }
+`

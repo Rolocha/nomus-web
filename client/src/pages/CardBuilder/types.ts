@@ -1,11 +1,7 @@
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { TemplateID } from 'src/templates'
 
 export type { TemplateID }
-
-export enum BaseType {
-  Custom = 'Custom',
-  Template = 'Template',
-}
 
 export type CardBuilderStep =
   | 'base'

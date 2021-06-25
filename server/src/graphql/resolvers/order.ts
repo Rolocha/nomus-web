@@ -466,8 +466,8 @@ class OrderResolver {
       },
       customer_email: args.user.email,
       mode: 'payment',
-      success_url: `${BASE_URL}/card-studio/success`,
-      cancel_url: `${BASE_URL}/card-studio/cancel`,
+      success_url: `${BASE_URL}/card-studio/success?orderId=${args.orderId}`,
+      cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${args.orderId}`,
       metadata: {
         orderId: args.orderId,
         cardVersionId: args.cardVersion.id,

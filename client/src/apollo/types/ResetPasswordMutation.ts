@@ -8,11 +8,11 @@
 // ====================================================
 
 export interface ResetPasswordMutation {
-  resetPassword: any | null
+  resetPassword: any | null;
 }
 
 export interface ResetPasswordMutationVariables {
-  token: string
-  newPassword: string
-  userId: string
+  token: string;
+  newPassword: string;
+  userId: string;
 }
