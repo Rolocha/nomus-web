@@ -14,7 +14,6 @@ export const MONGO_CREDENTIALS = {
   dbUri: process.env.MONGO_DB_URI,
 }
 export const APP_SERVER_PORT = process.env.APP_SERVER_PORT ?? '3000'
-export const BOT_SERVER_PORT = parseInt(process.env.BOT_SERVER_PORT) ?? 3001
 export const SENDGRID_TOKEN =
   process.env.NODE_ENV === 'test'
     ? 'SG.whatever-as-long-as-it-starts-with-SG'
