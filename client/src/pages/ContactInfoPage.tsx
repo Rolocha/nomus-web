@@ -21,6 +21,7 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
+import { mq } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
@@ -392,18 +393,25 @@ const ContactInfoPage = () => {
             bottom="0"
             left="0"
             width="100%"
-            padding={{ base: '16px', [bp]: 0 }}
-            bg="white"
+            padding={{ base: '12px', [bp]: 0 }}
+            bg={colors.white}
             boxShadow={{ base: 'workingWindow', [bp]: 'unset' }}
             gridTemplateColumns={{ base: 'auto', [bp]: '3fr 3fr 1fr' }}
-            gridTemplateAreas={{
-              base: `
-              "saveDevice"
-              "saveNomus"
-            `,
-              [bp]: `
-              "saveDevice saveNomus"
-            `,
+            sx={{
+              [mq[bp]]: {
+                gridTemplateAreas: `"saveDevice saveNomus"`,
+              },
+              '@media (orientation: portrait)': {
+                gridTemplateAreas: `
+                "saveDevice"
+                "saveNomus"
+              `,
+              },
+              '@media (orientation: landscape)': {
+                gridTemplateAreas: `
+                "saveDevice saveNomus"
+              `,
+              },
             }}
             gridColumnGap={{ base: 2, [bp]: 3 }}
             gridRowGap={2}
@@ -427,7 +435,7 @@ const ContactInfoPage = () => {
               <Link
                 gridArea="saveNomus"
                 buttonStyle="tertiary"
-                buttonSize="normal"
+                buttonSize="big"
                 to={`/dashboard/contacts/detail/${username}`}
               >
                 <Icon of="logo" color={colors.nomusBlue} />{' '}
@@ -440,7 +448,7 @@ const ContactInfoPage = () => {
                 gridArea="saveNomus"
                 to={createSaveToNomusLink(getNotesFormDataFromContact(contact))}
                 buttonStyle="tertiary"
-                buttonSize="normal"
+                buttonSize="big"
               >
                 <Icon of="logo" color={colors.nomusBlue} />{' '}
                 <Box as="span" ml={2} display={'inline-block'}>
