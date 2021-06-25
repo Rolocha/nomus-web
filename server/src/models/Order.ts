@@ -16,6 +16,7 @@ import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 import OrderEvent from './OrderEvent'
+import { postNewOrder } from 'src/util/slack'
 
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
@@ -146,6 +147,8 @@ class Order extends BaseModel({
         })
         this.state = futureState
         await this.save()
+
+        postNewOrder('C02598Y499U', this)
         return Result.ok(this)
       } catch (e) {
         return Result.fail('save-error')
