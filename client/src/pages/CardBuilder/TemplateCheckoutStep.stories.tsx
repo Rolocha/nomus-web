@@ -34,7 +34,7 @@ export const Primary = () => {
   )
 
   const checkoutFormMethods = useForm<CheckoutFormData>({
-    defaultValues: cardBuilderState.formData ?? undefined,
+    defaultValues: cardBuilderState.checkoutFormData ?? undefined,
     mode: 'onBlur',
     resolver: yupResolver(
       yup.object().shape({

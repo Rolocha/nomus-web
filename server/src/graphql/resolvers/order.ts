@@ -37,7 +37,13 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
+  previousOrder: string
+
+  @Field({ nullable: true })
   quantity: number
+
+  @Field({ nullable: false })
+  shippingName: string
 
   @Field((type) => Address, { nullable: true })
   shippingAddress: Address
@@ -142,9 +148,7 @@ interface CreateCheckoutSessionArgs {
   user: User
   cardVersion: CardVersion
   orderId: string
-  type: CardSpecBaseType
   templateName?: string
-  images: string[]
   quantity: number
   shippingAddress: Address
 }
@@ -348,11 +352,10 @@ class OrderResolver {
 
     await cardVersion.save()
 
-    const { createdOrder, checkoutSession } = await this.createOrderAndCheckoutSession({
+    const order = await this.createOrUpdateExistingOrder({
       user,
       cardVersion,
-      quantity: payload.quantity,
-      shippingAddress: payload.shippingAddress,
+      payload,
     })
 
     // Update the user's default card version to the newly created one
@@ -360,8 +363,8 @@ class OrderResolver {
     await user.save()
 
     return {
-      orderId: createdOrder.id,
-      checkoutSession: checkoutSession.id,
+      orderId: order.id,
+      checkoutSession: order.checkoutSession,
     }
   }
 
@@ -412,12 +415,10 @@ class OrderResolver {
     }
     await cardVersion.save()
 
-    const { createdOrder, checkoutSession } = await this.createOrderAndCheckoutSession({
+    const order = await this.createOrUpdateExistingOrder({
       user,
       cardVersion,
-      templateName: payload.templateName,
-      quantity: payload.quantity,
-      shippingAddress: payload.shippingAddress,
+      payload,
     })
 
     // Update the user's default card version to the newly created one
@@ -425,8 +426,8 @@ class OrderResolver {
     await user.save()
 
     return {
-      orderId: createdOrder.id,
-      checkoutSession: checkoutSession.id,
+      orderId: order.id,
+      checkoutSession: order.checkoutSession,
     }
   }
 
@@ -435,11 +436,19 @@ class OrderResolver {
    */
 
   // Creates a Checkout Session
-  async createCheckoutSession(args: CreateCheckoutSessionArgs): Promise<Stripe.Checkout.Session> {
+  async createCheckoutSession(
+    order: DocumentType<Order>,
+    templateName: string
+  ): Promise<Stripe.Checkout.Session> {
+    const [cardVersion, user] = await Promise.all([
+      CardVersion.mongo.findById(order.cardVersion),
+      User.mongo.findById(order.user),
+    ])
+
     const productName = {
-      [CardSpecBaseType.Custom]: `Nomus card - custom design (${args.quantity} pack)`,
-      [CardSpecBaseType.Template]: `Nomus card - ${args.templateName} template (${args.quantity} pack)`,
-    }[args.type]
+      [CardSpecBaseType.Custom]: `Nomus card - custom design (${order.quantity} pack)`,
+      [CardSpecBaseType.Template]: `Nomus card - ${templateName} template (${order.quantity} pack)`,
+    }[cardVersion.baseType]
 
     /* eslint-disable camelcase */
     return stripe.checkout.sessions.create({
@@ -450,27 +459,27 @@ class OrderResolver {
             currency: 'usd',
             product_data: {
               name: productName,
-              images: args.images,
+              images: [cardVersion.frontImageUrl, cardVersion.backImageUrl],
             },
-            unit_amount: QUANTITY_TO_PRICE[args.quantity],
+            unit_amount: QUANTITY_TO_PRICE[order.quantity],
           },
           quantity: 1,
           tax_rates:
-            args.shippingAddress.state === 'CA' ? ['txr_1J5P6LGTbyReVwro0YiKRJns'] : undefined,
+            order.shippingAddress.state === 'CA' ? ['txr_1J5P6LGTbyReVwro0YiKRJns'] : undefined,
         },
       ],
       payment_intent_data: {
         metadata: {
-          orderId: args.orderId,
+          orderId: order.id,
         },
       },
-      customer_email: args.user.email,
+      customer_email: user.email,
       mode: 'payment',
-      success_url: `${BASE_URL}/card-studio/success?orderId=${args.orderId}`,
-      cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${args.orderId}`,
+      success_url: `${BASE_URL}/card-studio/success?orderId=${order.id}`,
+      cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${order.id}`,
       metadata: {
-        orderId: args.orderId,
-        cardVersionId: args.cardVersion.id,
+        orderId: order.id,
+        cardVersionId: cardVersion.id,
       },
     })
     /* eslint-enable camelcase */
@@ -509,54 +518,68 @@ class OrderResolver {
     }
   }
 
-  async createOrderAndCheckoutSession({
+  async createOrUpdateExistingOrder({
     user,
     cardVersion,
-    quantity,
-    shippingAddress,
-    templateName,
+    payload,
   }: {
     user: DocumentType<User>
     cardVersion: DocumentType<CardVersion>
-    quantity: number
-    shippingAddress: Address
-    templateName?: string
-  }): Promise<{ createdOrder: DocumentType<Order>; checkoutSession: Stripe.Checkout.Session }> {
+    payload: SubmitTemplateOrderInput | SubmitCustomOrderInput
+  }): Promise<DocumentType<Order>> {
+    const { quantity, shippingName, shippingAddress } = payload
+
     const costSummary = getCostSummary(quantity, shippingAddress.state)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
       )
     }
+    const price: OrderPrice = {
+      subtotal: costSummary.subtotal,
+      shipping: costSummary.shipping,
+      tax: costSummary.estimatedTaxes,
+      total: costSummary.total,
+    }
 
-    const orderId = Order.createId()
-    const checkoutSession = await this.createCheckoutSession({
-      templateName,
-      orderId,
-      shippingAddress,
-      cardVersion,
-      user,
-      quantity,
-      type: cardVersion.baseType,
-      images: [cardVersion.frontImageUrl, cardVersion.backImageUrl],
-    })
-    const createdOrder = await Order.mongo.create({
-      _id: orderId,
-      user: user.id,
-      cardVersion: cardVersion.id,
-      state: OrderState.Captured,
-      checkoutSession: checkoutSession.id,
-      paymentIntent: checkoutSession.payment_intent,
-      quantity,
-      shippingAddress,
-      price: {
-        subtotal: costSummary.subtotal,
-        shipping: costSummary.shipping,
-        tax: costSummary.estimatedTaxes,
-        total: costSummary.total,
-      },
-    })
-    return { createdOrder, checkoutSession }
+    let order: DocumentType<Order> | null = null
+    // Check if the payload includes the id of a previous Order object
+    if (payload.previousOrder) {
+      // If so, use that Order (with updates applied) rather than creating a new one
+      order = await Order.mongo.findOne({ _id: payload.previousOrder, user: user.id })
+
+      if (!order) {
+        throw new Error('Paylod specified a previous order but that order could not be found')
+      }
+
+      order.quantity = quantity
+      order.shippingName = shippingName
+      order.shippingAddress = shippingAddress
+      order.price = price
+    } else {
+      // No previous order existed; create a new one
+      order = await Order.mongo.create({
+        user: user.id,
+        cardVersion: cardVersion.id,
+        state: OrderState.Captured,
+        quantity,
+        shippingName,
+        shippingAddress,
+        price,
+      })
+    }
+
+    // Create a new Stripe Checkout session regardless of whether a previous one
+    // existed since some details may have changed in this submission
+    const checkoutSession = await this.createCheckoutSession(
+      order,
+      'templateName' in payload ? payload.templateName : null
+    )
+
+    order.checkoutSession = checkoutSession.id
+    order.paymentIntent = checkoutSession.payment_intent as string
+    await order.save()
+    return order
   }
 }
 export default OrderResolver

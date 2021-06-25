@@ -36,3 +36,13 @@ export const dataURItoBlob = (dataURI: string) => {
 
   return new Blob([ia], { type: mimeString })
 }
+
+export const imageUrlToFile = async (
+  imageUrl: string,
+  name: string = 'file',
+): Promise<File> => {
+  const fetchedImage = await fetch(imageUrl)
+  const blob = await fetchedImage.blob()
+  const file = new File([blob], name)
+  return file
+}

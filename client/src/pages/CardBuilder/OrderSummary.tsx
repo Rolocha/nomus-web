@@ -15,7 +15,7 @@ interface Props {
 const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
   const costSummary = getCostSummary(
     cardBuilderState.quantity,
-    cardBuilderState.formData?.state,
+    cardBuilderState.checkoutFormData?.state,
   )
   return (
     <Box>
@@ -81,13 +81,13 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
           <Text.Body2>Shipping info</Text.Body2>
           <Box>
             {[
-              cardBuilderState.formData.name,
-              cardBuilderState.formData?.addressLine1,
-              cardBuilderState.formData?.addressLine2,
+              cardBuilderState.checkoutFormData.name,
+              cardBuilderState.checkoutFormData?.line1,
+              cardBuilderState.checkoutFormData?.line2,
               `${
-                cardBuilderState.formData?.city
-              }, ${cardBuilderState.formData?.state.toUpperCase()} ${
-                cardBuilderState.formData?.postalCode
+                cardBuilderState.checkoutFormData?.city
+              }, ${cardBuilderState.checkoutFormData?.state.toUpperCase()} ${
+                cardBuilderState.checkoutFormData?.postalCode
               }`,
             ]
               .filter(Boolean)
@@ -100,7 +100,7 @@ const OrderSummary = ({ cardBuilderState, cardDescription }: Props) => {
         <Box gridArea="costSummary" placeSelf="end end" width="100%">
           <CostSummary
             quantity={cardBuilderState.quantity}
-            state={cardBuilderState.formData?.state}
+            state={cardBuilderState.checkoutFormData?.state}
           />
         </Box>
       </Box>

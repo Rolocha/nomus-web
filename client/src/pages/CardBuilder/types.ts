@@ -1,4 +1,3 @@
-import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { TemplateID } from 'src/templates'
 
 export type { TemplateID }
@@ -15,8 +14,8 @@ export type OrderQuantityOption = 25 | 100 | 250
 // Data from the order details form
 export interface CheckoutFormData {
   name: string
-  addressLine1: string
-  addressLine2?: string
+  line1: string
+  line2?: string
   city: string
   state: string
   postalCode: string

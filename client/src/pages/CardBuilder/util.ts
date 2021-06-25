@@ -1,14 +1,14 @@
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import {
   CardBuilderState,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
-import { BaseType } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 
 export const sampleCardBuilderState: CardBuilderState = {
-  ...initialStateOptions[BaseType.Template],
+  ...initialStateOptions[CardSpecBaseType.Template],
   cardVersionId: 'cardv_1234',
-  baseType: BaseType.Template,
+  baseType: CardSpecBaseType.Template,
   templateId: 'nicole',
   templateCustomization: {
     contactInfo: {
@@ -35,9 +35,9 @@ export const sampleCardBuilderState: CardBuilderState = {
     },
   },
   quantity: 100,
-  formData: {
+  checkoutFormData: {
     name: 'Spongebob',
-    addressLine1: '123 Pineapple St',
+    line1: '123 Pineapple St',
     city: 'Bikini Bottom',
     state: 'UW',
     postalCode: '12345',

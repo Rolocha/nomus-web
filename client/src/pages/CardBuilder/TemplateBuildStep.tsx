@@ -120,7 +120,12 @@ const TemplateBuildStep = ({
             gridGap={3}
           >
             {colorKeys.map((colorKey) => (
-              <Box display="flex" flexDirection="column" alignItems="center">
+              <Box
+                key={colorKey}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+              >
                 <Form.Input
                   type="color"
                   name={'colorScheme.' + colorKey}

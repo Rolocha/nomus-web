@@ -23,11 +23,15 @@ const CheckoutStep = ({
   const loadedPreviousFormState = React.useRef(false)
   // Prepopulate the form on load if we already have data from a previous visit of this step
   React.useEffect(() => {
-    if (cardBuilderState.formData && !loadedPreviousFormState.current) {
-      checkoutFormMethods.reset(cardBuilderState.formData)
+    if (cardBuilderState.checkoutFormData && !loadedPreviousFormState.current) {
+      checkoutFormMethods.reset(cardBuilderState.checkoutFormData)
       loadedPreviousFormState.current = true
     }
-  }, [cardBuilderState.formData, checkoutFormMethods, loadedPreviousFormState])
+  }, [
+    cardBuilderState.checkoutFormData,
+    checkoutFormMethods,
+    loadedPreviousFormState,
+  ])
 
   const formValues = checkoutFormMethods.getValues()
 
@@ -116,7 +120,7 @@ const CheckoutStep = ({
                 <Box gridArea="line1">
                   <Form.Label>Address Line 1</Form.Label>
                   <Form.Input
-                    name="addressLine1"
+                    name="line1"
                     ref={checkoutFormMethods.register}
                     width="100%"
                   />
@@ -124,7 +128,7 @@ const CheckoutStep = ({
                 <Box gridArea="line2">
                   <Form.Label>Address Line 2</Form.Label>
                   <Form.Input
-                    name="addressLine2"
+                    name="line2"
                     ref={checkoutFormMethods.register}
                     width="100%"
                   />

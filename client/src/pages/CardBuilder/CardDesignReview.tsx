@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
-import { BaseType } from 'src/pages/CardBuilder/types'
 import templateLibrary from 'src/templates'
 import { CardBuilderState } from './card-builder-state'
 
@@ -117,7 +117,7 @@ const CardDesignReview = ({
           ])}
         </Box>
       </Box>
-      {cardBuilderState.baseType === BaseType.Template && (
+      {cardBuilderState.baseType === CardSpecBaseType.Template && (
         <Box gridArea="colorInfo">
           <Text.SectionSubheader mb={{ base: '8px', lg: '16px' }}>
             Colors

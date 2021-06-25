@@ -30,11 +30,31 @@ export const LOAD_EXISTING_CARD_BUILDER_ORDER = gql`
   query LoadExistingCardBuilderOrder($orderId: String!) {
     order(orderId: $orderId) {
       id
+      quantity
+      shippingName
+      shippingAddress {
+        line1
+        line2
+        city
+        state
+        postalCode
+      }
+
+      user {
+        name {
+          first
+          middle
+          last
+        }
+      }
+
       cardVersion {
         id
         baseType
         frontImageUrl
         backImageUrl
+        qrCodeUrl
+
         templateId
         contactInfo {
           name
@@ -53,7 +73,6 @@ export const LOAD_EXISTING_CARD_BUILDER_ORDER = gql`
           accent3
           accent4
         }
-        qrCodeUrl
       }
     }
   }

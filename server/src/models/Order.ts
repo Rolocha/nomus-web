@@ -120,6 +120,10 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   printSpecUrl: string
 
+  @prop({ required: false, description: 'The name of the person to ship the order to' })
+  @Field({ nullable: true })
+  shippingName: string
+
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
