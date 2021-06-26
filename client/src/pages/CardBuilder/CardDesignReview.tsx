@@ -4,6 +4,7 @@ import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import * as Text from 'src/components/Text'
 import templateLibrary from 'src/templates'
+import { getNameForColorKey } from 'src/templates/utils'
 import { CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -37,14 +38,10 @@ const CardDesignReview = ({
     )
     const info: Array<{ label: string; value: string }> = []
     template.colorKeys.forEach((colorKey) => {
-      // TODO: Map this to the proper name
-      const label = colorKey
-      const value = options.colorScheme[colorKey]
+      const label = getNameForColorKey(colorKey)
+      const value = options.colorScheme[colorKey]?.toUpperCase()
       if (label && value) {
-        info.push({
-          label,
-          value,
-        })
+        info.push({ label, value })
       }
     }, [])
 
@@ -124,8 +121,8 @@ const CardDesignReview = ({
           </Text.SectionSubheader>
           <Box display="grid" gridTemplateColumns="2fr 2fr" gridRowGap={2}>
             {colorInfo.map((item, index) => [
-              <Text.Body2 key={index + '0'}>{item.label}</Text.Body2>,
-              <Box display="flex" key={index + '1'}>
+              <Text.Body2 key={item.label + 'label'}>{item.label}</Text.Body2>,
+              <Box display="flex" key={item.label + 'color'}>
                 <Box
                   width="24px"
                   height="24px"

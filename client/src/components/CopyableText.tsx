@@ -42,7 +42,7 @@ const CopyableText = ({ copyText, children }: Props) => {
           '> div:first-of-type': {
             display: 'block',
           },
-          '> :nth-child(2)': {
+          '> div:nth-of-type(2)': {
             backgroundColor: colors.outlineBlue,
           },
         },

@@ -20,7 +20,7 @@ const CostSummary = ({ quantity, state }: Props) => {
       display="grid"
       gridTemplateColumns="2fr 1fr 1fr"
       sx={{
-        '& > *:nth-child(3n)': {
+        '& > *:nth-of-type(3n)': {
           placeSelf: 'center end',
         },
       }}

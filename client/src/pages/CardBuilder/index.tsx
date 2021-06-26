@@ -2,8 +2,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { Redirect, useLocation, useHistory, useParams } from 'react-router-dom'
-import { useQuery, useMutation } from 'src/apollo'
+import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
+import { useMutation, useQuery } from 'src/apollo'
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { InitializeCardBuilder } from 'src/apollo/types/InitializeCardBuilder'
 import { LoadExistingCardBuilderOrder } from 'src/apollo/types/LoadExistingCardBuilderOrder'
@@ -23,7 +23,7 @@ import BaseStep from 'src/pages/CardBuilder/BaseStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
-  CardBuilderState,
+  createCardBuilderStateFromExistingOrder,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
 import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
@@ -37,16 +37,12 @@ import {
 } from 'src/pages/CardBuilder/mutations'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
-import {
-  CardBuilderStep,
-  CheckoutFormData,
-  OrderQuantityOption,
-} from 'src/pages/CardBuilder/types'
+import { CardBuilderStep, CheckoutFormData } from 'src/pages/CardBuilder/types'
 import LoadingPage from 'src/pages/LoadingPage'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
-import templateLibrary, { TemplateID } from 'src/templates'
-import { dataURItoBlob, imageUrlToFile } from 'src/utils/image'
+import templateLibrary from 'src/templates'
+import { dataURItoBlob } from 'src/utils/image'
 import { isValidStateAbr } from 'src/utils/states'
 import * as yup from 'yup'
 
@@ -61,6 +57,7 @@ const CardBuilder = () => {
   const location = useLocation()
   const history = useHistory()
   const isDesktop = useBreakpoint('lg')
+  const orderIdSearchParam = new URLSearchParams(location.search).get('orderId')
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
@@ -95,113 +92,78 @@ const CardBuilder = () => {
     initializeCardBuilderMutationResult,
   ] = useMutation<InitializeCardBuilder>(INITIALIZE_CARD_BUILDER_MUTATION)
 
-  const { refetch: loadExistingOrder } = useQuery<LoadExistingCardBuilderOrder>(
-    LOAD_EXISTING_CARD_BUILDER_ORDER,
-    {
-      skip: true,
-      variables: {
-        orderId: new URLSearchParams(location.search).get('orderId') as string,
-      },
+  const {
+    data: existingOrderData,
+    ...loadExistingOrderQuery
+  } = useQuery<LoadExistingCardBuilderOrder>(LOAD_EXISTING_CARD_BUILDER_ORDER, {
+    skip: !orderIdSearchParam,
+    variables: {
+      orderId: orderIdSearchParam,
     },
-  )
+  })
 
-  // Request an initialized CardVersion from the API
-  // when the card builder loads so we can use its id
-  // things like the QR code URL
   const initialize = React.useCallback(async () => {
     // If the user canceled the order from an external location (currently
     // this would just be Stripe Checkout), there should be an orderId query param
-    // that we should use to load the card builder up with
-    if (baseTypeQueryParam === 'cancel') {
-      const searchParams = new URLSearchParams(location.search)
-      const orderIdParam = searchParams.get('orderId')
-      if (!orderIdParam) {
-        return <Redirect to="/shop" />
+    // that we fired off an "orders" query with above, wait for its result
+    switch (baseTypeQueryParam) {
+      case 'cancel': {
+        if (!loadExistingOrderQuery.called || loadExistingOrderQuery.loading) {
+          return null
+        }
+
+        const existingOrder = existingOrderData?.order
+        if (!existingOrder) {
+          return <Redirect to="/shop" />
+        }
+
+        // Build up the card builder state from the order specified in the orderId search param
+        const cardBuilderStateFromBefore = await createCardBuilderStateFromExistingOrder(
+          existingOrder,
+        )
+        updateCardBuilderState(cardBuilderStateFromBefore)
+
+        history.push(
+          `/card-studio/${existingOrder.cardVersion.baseType.toLowerCase()}`,
+        )
+        break
       }
-      const result = await loadExistingOrder({
-        variables: {
-          orderId: orderIdParam,
-        },
-      })
-
-      const _order = result.data?.order
-      if (!_order) {
-        return <Redirect to="/shop" />
+      case 'success': {
+        break
       }
-      const _cv = _order.cardVersion
+      // Request an initialized CardVersion from the API when the card builder loads so we can use its id
+      // for things like the QR code URL
+      case 'custom':
+      case 'template': {
+        if (
+          cardBuilderState.cardVersionId ||
+          initializeCardBuilderMutationResult.called
+        ) {
+          return
+        }
 
-      const cardBuilderStateUpdate: Partial<CardBuilderState> = {
-        currentStep: 'review',
-        previousOrder: orderIdParam,
-        ...(_cv.baseType && { baseType: _cv.baseType }),
-        ...(_order.quantity && {
-          quantity: _order.quantity as OrderQuantityOption,
-        }),
-        ...(_order.shippingAddress &&
-          _order.shippingName && {
-            checkoutFormData: {
-              name: _order.shippingName,
-              line1: _order.shippingAddress.line1,
-              line2: _order.shippingAddress.line2 ?? '',
-              city: _order.shippingAddress.city,
-              state: _order.shippingAddress.state,
-              postalCode: _order.shippingAddress.postalCode,
-            },
-          }),
-        ...(_cv.id && { cardVersionId: _cv.id }),
-
-        // Template-specific fields
-        ...(_cv.templateId && { templateId: _cv.templateId as TemplateID }),
-        ...(_cv.contactInfo &&
-          _cv.colorScheme &&
-          _cv.qrCodeUrl && {
-            templateCustomization: {
-              contactInfo: (({ __typename, ...rest }) => rest)(_cv.contactInfo),
-              colorScheme: (({ __typename, ...rest }) => rest)(_cv.colorScheme),
-              qrCodeUrl: _cv.qrCodeUrl,
-            },
-          }),
-        omittedOptionalFields: [], // TODO: Figure out a way to autofill this properly
-
-        // Custom-specific fields
-        ...(_cv.frontImageUrl && {
-          frontDesignFile: {
-            file: await imageUrlToFile(_cv.frontImageUrl),
-            url: _cv.frontImageUrl,
+        const result = await initializeCardBuilder({
+          variables: {
+            baseType: cardBuilderState.baseType,
           },
-        }),
-        ...(_cv.backImageUrl && {
-          backDesignFile: {
-            file: await imageUrlToFile(_cv.backImageUrl),
-            url: _cv.backImageUrl,
-          },
-        }),
+        })
+        if (result.errors) {
+          console.log(result.errors)
+          throw new Error('oh no!')
+        }
+        updateCardBuilderState({
+          cardVersionId: result.data?.createEmptyCardVersion.id,
+        })
+        break
       }
-
-      updateCardBuilderState(cardBuilderStateUpdate)
-
-      history.push(`/card-studio/${_cv.baseType.toLowerCase()}`)
-    } else {
-      if (initializeCardBuilderMutationResult.called) {
-        return
-      }
-
-      const result = await initializeCardBuilder({
-        variables: {
-          baseType: cardBuilderState.baseType,
-        },
-      })
-      if (result.errors) {
-        console.log(result.errors)
-        throw new Error('oh no!')
-      }
-      updateCardBuilderState({
-        cardVersionId: result.data?.createEmptyCardVersion.id,
-      })
+      default:
+        // Should never come to this
+        break
     }
   }, [
-    loadExistingOrder,
-    location,
+    existingOrderData,
+    loadExistingOrderQuery.called,
+    loadExistingOrderQuery.loading,
     history,
     baseTypeQueryParam,
     initializeCardBuilder,
@@ -291,7 +253,6 @@ const CardBuilder = () => {
         result = customResult.data?.submitCustomOrder
         break
       case CardSpecBaseType.Template:
-        // Use <any, any> to appease TS for now. See TemplateCard.tsx for more details on why this is necessary.
         const { templateId } = cardBuilderState
         if (!templateId) {
           throw new Error(
@@ -425,7 +386,7 @@ const CardBuilder = () => {
   }
 
   if (baseTypeQueryParam === 'success' || baseTypeQueryParam === 'cancel') {
-    return <LoadingPage />
+    return <LoadingPage fullscreen />
   } else if (!baseType) {
     // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
     return <Redirect to="/shop" />

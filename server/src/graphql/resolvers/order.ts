@@ -144,14 +144,6 @@ class SubmitOrderResponse {
   orderId: string
 }
 
-interface CreateCheckoutSessionArgs {
-  user: User
-  cardVersion: CardVersion
-  orderId: string
-  templateName?: string
-  quantity: number
-  shippingAddress: Address
-}
 @Resolver((of) => Order)
 class OrderResolver {
   @FieldResolver()
@@ -438,13 +430,10 @@ class OrderResolver {
   // Creates a Checkout Session
   async createCheckoutSession(
     order: DocumentType<Order>,
+    cardVersion: DocumentType<CardVersion>,
+    user: DocumentType<User>,
     templateName: string
   ): Promise<Stripe.Checkout.Session> {
-    const [cardVersion, user] = await Promise.all([
-      CardVersion.mongo.findById(order.cardVersion),
-      User.mongo.findById(order.user),
-    ])
-
     const productName = {
       [CardSpecBaseType.Custom]: `Nomus card - custom design (${order.quantity} pack)`,
       [CardSpecBaseType.Template]: `Nomus card - ${templateName} template (${order.quantity} pack)`,
@@ -492,7 +481,7 @@ class OrderResolver {
     // Upload the front image and put the resulting S3 key on the card version
     const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
       await imageFiles.front,
-      `${cardVersionId}/front`,
+      `${cardVersionId}/front/${Date.now()}`,
       S3.S3AssetCategory.CardVersions
     )
 
@@ -504,7 +493,7 @@ class OrderResolver {
     if (imageFiles.back) {
       backImageUploadResult = await S3.uploadGraphQLFileToS3(
         await imageFiles.back,
-        `${cardVersionId}/back`,
+        `${cardVersionId}/back/${Date.now()}`,
         S3.S3AssetCategory.CardVersions
       )
       if (!backImageUploadResult.isSuccess) {
@@ -573,6 +562,8 @@ class OrderResolver {
     // existed since some details may have changed in this submission
     const checkoutSession = await this.createCheckoutSession(
       order,
+      cardVersion,
+      user,
       'templateName' in payload ? payload.templateName : null
     )
 

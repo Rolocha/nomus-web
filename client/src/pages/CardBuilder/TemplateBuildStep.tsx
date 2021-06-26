@@ -155,6 +155,7 @@ const TemplateBuildStep = ({
             <Controller
               control={customizationForm.control}
               name="graphic.file"
+              defaultValue={null}
               render={(fieldProps, inputState) => (
                 <FileUploadButton
                   name="graphic.file"
@@ -250,6 +251,7 @@ const TemplateBuildStep = ({
           })}
           <Form.Input
             hidden
+            readOnly
             name="qrCodeUrl"
             ref={customizationForm.register()}
             value={
