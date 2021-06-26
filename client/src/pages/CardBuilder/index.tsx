@@ -1,7 +1,5 @@
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
 import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'src/apollo'
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
@@ -26,7 +24,6 @@ import {
   createCardBuilderStateFromExistingOrder,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
-import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
 import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
 import {
@@ -37,14 +34,12 @@ import {
 } from 'src/pages/CardBuilder/mutations'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
-import { CardBuilderStep, CheckoutFormData } from 'src/pages/CardBuilder/types'
+import { CardBuilderStep } from 'src/pages/CardBuilder/types'
 import LoadingPage from 'src/pages/LoadingPage'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
-import { isValidStateAbr } from 'src/utils/states'
-import * as yup from 'yup'
 
 interface ParamsType {
   buildBaseType?: 'custom' | 'template' | 'success' | 'cancel' | string
@@ -80,7 +75,6 @@ const CardBuilder = () => {
         initialState.templateCustomization = {
           contactInfo: { name: prefillName },
         }
-        initialState.checkoutFormData.name = prefillName
       }
 
       return initialState
@@ -181,25 +175,6 @@ const CardBuilder = () => {
     initialize()
   }, [initialize])
 
-  const checkoutFormMethods = useForm<CheckoutFormData>({
-    defaultValues: cardBuilderState.checkoutFormData ?? undefined,
-    mode: 'onBlur',
-    resolver: yupResolver(
-      yup.object().shape({
-        state: yup
-          .string()
-          .required('Required')
-          .test('is-state', 'Invalid state', isValidStateAbr),
-        postalCode: yup
-          .string()
-          .required('Required')
-          .matches(/^\d{5}$/, 'Invalid ZIP code'),
-      }),
-    ),
-  })
-
-  const watchedFields = checkoutFormMethods.watch()
-
   const stripe = useStripe()
   const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
     SUBMIT_CUSTOM_ORDER_MUTATION,
@@ -209,37 +184,13 @@ const CardBuilder = () => {
   )
 
   const submitOrder = React.useCallback(async () => {
-    const {
-      checkoutFormData: formData,
-      quantity,
-      previousOrder,
-    } = cardBuilderState
-
-    if (
-      formData == null ||
-      formData.name == null ||
-      formData.line1 == null ||
-      formData.city == null ||
-      formData.state == null ||
-      formData.postalCode == null
-    ) {
-      console.log('missing data')
-      return
-    }
+    const { quantity, previousOrder } = cardBuilderState
 
     // The parameters needed for both custom and template-based orders
     const basePayload:
       | Partial<SubmitCustomOrderMutationVariables['payload']>
       | Partial<SubmitTemplateOrderMutationVariables['payload']> = {
       previousOrder,
-      shippingName: formData?.name,
-      shippingAddress: {
-        line1: formData?.line1,
-        line2: formData?.line2,
-        city: formData?.city,
-        state: formData?.state.toUpperCase(),
-        postalCode: formData?.postalCode,
-      },
       quantity,
     }
 
@@ -334,15 +285,6 @@ const CardBuilder = () => {
     }
   }, [submitOrder, stripe])
 
-  // When the checkout form is mounted, the most up-to-date data comes from watchedFields
-  // since the user may be editing the fields. On wizard step change, we cache the form data to
-  // cardBuilderState before react-hook-form unmounts the input (and watchedFields becomes empty)
-  // so if we're not on the checkout step, use that cache instead
-  const formData =
-    cardBuilderState.currentStep === 'checkout'
-      ? watchedFields
-      : cardBuilderState.checkoutFormData
-
   const handleWizardStepTransition = async (_goingToStep: string) => {
     const comingFromStep = cardBuilderState.currentStep
     const goingToStep = _goingToStep as CardBuilderStep
@@ -377,11 +319,6 @@ const CardBuilder = () => {
             ),
           })
         }
-        break
-      case 'checkout':
-        // Cache the current form data in cardBuilderState since react-hook-form
-        // will drop it when the form fields unmount
-        cardBuilderStateUpdate.checkoutFormData = checkoutFormMethods.getValues()
         break
       default:
         break
@@ -433,7 +370,7 @@ const CardBuilder = () => {
             </Text.PageHeader>
           </Box>
           <Wizard
-            completionButtonLabel="Submit order"
+            completionButtonLabel="Continue to payment"
             currentStep={cardBuilderState.currentStep}
             handleStepTransition={handleWizardStepTransition}
             handleSubmit={handleWizardSubmit}
@@ -493,29 +430,13 @@ const CardBuilder = () => {
               }
             </WizardStep>
             <WizardStep
-              id="checkout"
-              icon="cart"
-              label="Checkout"
-              isReadyForNextStep={[
-                formData.line1,
-                formData.state,
-                formData.city,
-                formData.postalCode,
-                formData.name,
-                // If the current step isn't build, formState won't be valid since the form
-                // isn't mounted so we trust that it's valid since we were able to get off
-                // the build step in the first place
-                cardBuilderState.currentStep !== 'build' ||
-                  checkoutFormMethods.formState.isValid,
-              ].every(Boolean)}
+              id="review"
+              icon="checkO"
+              label="Review"
+              isReadyForNextStep={[cardBuilderState.quantity != null].every(
+                Boolean,
+              )}
             >
-              <CheckoutStep
-                cardBuilderState={cardBuilderState}
-                updateCardBuilderState={updateCardBuilderState}
-                checkoutFormMethods={checkoutFormMethods}
-              />
-            </WizardStep>
-            <WizardStep id="review" icon="checkO" label="Review">
               {
                 {
                   [CardSpecBaseType.Custom]: (

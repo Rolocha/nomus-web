@@ -35,13 +35,6 @@ export const Primary = () => {
       baseType: CardSpecBaseType.Custom,
       templateId: 'velia',
       quantity: 100,
-      checkoutFormData: {
-        name: 'Spongebob',
-        line1: '123 Pineapple St',
-        city: 'Bikini Bottom',
-        state: 'UW',
-        postalCode: '12345',
-      },
     },
   )
 

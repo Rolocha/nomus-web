@@ -4,10 +4,8 @@ import { templateNames } from 'src/templates'
 import { FileItem } from 'src/types/files'
 import { imageUrlToFile } from 'src/utils/image'
 import {
-  // CardSpecBaseType,
   CardBuilderStep,
   CardBuilderSubmissionError,
-  CheckoutFormData,
   OrderQuantityOption,
   TemplateID,
 } from './types'
@@ -22,7 +20,6 @@ export type CardBuilderState = {
 
   baseType: CardSpecBaseType
   quantity: OrderQuantityOption | null
-  checkoutFormData: CheckoutFormData
   cardVersionId: string | null
 
   // Template details
@@ -51,14 +48,6 @@ const createInitialState = (baseType: CardSpecBaseType): CardBuilderState => ({
   } as const)[baseType],
   frontDesignFile: null,
   backDesignFile: null,
-  checkoutFormData: {
-    name: '',
-    line1: '',
-    line2: '',
-    city: '',
-    state: '',
-    postalCode: '',
-  },
   templateCustomization: null,
   omittedOptionalFields: [],
 })
@@ -75,17 +64,6 @@ export const createCardBuilderStateFromExistingOrder = async (
     ...(order.quantity && {
       quantity: order.quantity as OrderQuantityOption,
     }),
-    ...(order.shippingAddress &&
-      order.shippingName && {
-        checkoutFormData: {
-          name: order.shippingName,
-          line1: order.shippingAddress.line1,
-          line2: order.shippingAddress.line2 ?? '',
-          city: order.shippingAddress.city,
-          state: order.shippingAddress.state,
-          postalCode: order.shippingAddress.postalCode,
-        },
-      }),
     ...(cv.id && { cardVersionId: cv.id }),
 
     // Template-specific fields

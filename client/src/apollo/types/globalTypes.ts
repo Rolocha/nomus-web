@@ -29,14 +29,6 @@ export enum OrderState {
   Reviewed = 'Reviewed',
 }
 
-export interface AddressInput {
-  line1: string
-  line2?: string | null
-  city: string
-  state: string
-  postalCode: string
-}
-
 /**
  * Information one user saves about another such as meeting date, meeting place, and tags
  */
@@ -67,8 +59,6 @@ export interface ProfileUpdateInput {
 export interface SubmitCustomOrderInput {
   previousOrder?: string | null
   quantity?: number | null
-  shippingName: string
-  shippingAddress?: AddressInput | null
   frontImageDataUrl: any
   backImageDataUrl?: any | null
 }
@@ -79,8 +69,6 @@ export interface SubmitCustomOrderInput {
 export interface SubmitTemplateOrderInput {
   previousOrder?: string | null
   quantity?: number | null
-  shippingName: string
-  shippingAddress?: AddressInput | null
   templateId: string
   templateName: string
   cardVersionId: string

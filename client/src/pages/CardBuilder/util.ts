@@ -9,7 +9,7 @@ export const sampleCardBuilderState: CardBuilderState = {
   ...initialStateOptions[CardSpecBaseType.Template],
   cardVersionId: 'cardv_1234',
   baseType: CardSpecBaseType.Template,
-  templateId: 'nicole',
+  templateId: 'konawide',
   templateCustomization: {
     contactInfo: {
       name: 'Spongebob Squarepants',
@@ -35,15 +35,9 @@ export const sampleCardBuilderState: CardBuilderState = {
     },
   },
   quantity: 100,
-  checkoutFormData: {
-    name: 'Spongebob',
-    line1: '123 Pineapple St',
-    city: 'Bikini Bottom',
-    state: 'UW',
-    postalCode: '12345',
-  },
-  submissionError: {
-    message: 'The security code you entered is incorrect.',
-    backlinkToStep: 'checkout',
-  },
+  // ============ UNCOMMENT THESE LINES TO RENDER A SUBMISSION ERROR
+  // submissionError: {
+  //   message: 'The security code you entered is incorrect.',
+  //   backlinkToStep: 'checkout',
+  // },
 }

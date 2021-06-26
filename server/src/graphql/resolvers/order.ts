@@ -41,12 +41,6 @@ class BaseSubmitOrderInput {
 
   @Field({ nullable: true })
   quantity: number
-
-  @Field({ nullable: false })
-  shippingName: string
-
-  @Field((type) => Address, { nullable: true })
-  shippingAddress: Address
 }
 
 @InputType({ description: 'Input to update fields on an existing Order' })
@@ -453,8 +447,12 @@ class OrderResolver {
             unit_amount: QUANTITY_TO_PRICE[order.quantity],
           },
           quantity: 1,
-          tax_rates:
-            order.shippingAddress.state === 'CA' ? ['txr_1J5P6LGTbyReVwro0YiKRJns'] : undefined,
+          // The TS types don't have dynamic_tax_rates yet but we can use it. This lets
+          // us let Stripe Checkout dynamically apply taxes using the tax rates we specify
+          // based on the shipping address the user enters
+          // See https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-dynamic_tax_rates
+          // @ts-ignore
+          dynamic_tax_rates: ['txr_1J5P6LGTbyReVwro0YiKRJns'],
         },
       ],
       payment_intent_data: {
@@ -464,6 +462,10 @@ class OrderResolver {
       },
       customer_email: user.email,
       mode: 'payment',
+      allow_promotion_codes: true,
+      shipping_address_collection: {
+        allowed_countries: ['US'],
+      },
       success_url: `${BASE_URL}/card-studio/success?orderId=${order.id}`,
       cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${order.id}`,
       metadata: {
@@ -516,9 +518,9 @@ class OrderResolver {
     cardVersion: DocumentType<CardVersion>
     payload: SubmitTemplateOrderInput | SubmitCustomOrderInput
   }): Promise<DocumentType<Order>> {
-    const { quantity, shippingName, shippingAddress } = payload
+    const { quantity } = payload
 
-    const costSummary = getCostSummary(quantity, shippingAddress.state)
+    const costSummary = getCostSummary(quantity)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
@@ -527,6 +529,8 @@ class OrderResolver {
     const price: OrderPrice = {
       subtotal: costSummary.subtotal,
       shipping: costSummary.shipping,
+      // We don't know the cost of tax yet since that requires knowing the shipping address
+      // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
       tax: costSummary.estimatedTaxes,
       total: costSummary.total,
     }
@@ -542,8 +546,6 @@ class OrderResolver {
       }
 
       order.quantity = quantity
-      order.shippingName = shippingName
-      order.shippingAddress = shippingAddress
       order.price = price
     } else {
       // No previous order existed; create a new one
@@ -552,8 +554,6 @@ class OrderResolver {
         cardVersion: cardVersion.id,
         state: OrderState.Captured,
         quantity,
-        shippingName,
-        shippingAddress,
         price,
       })
     }
