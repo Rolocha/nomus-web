@@ -20,7 +20,7 @@ describe('pricing', () => {
     it('returns a price object if successful', async () => {
       expect(getCostSummary(25)).toMatchObject({
         subtotal: QUANTITY_TO_PRICE[25],
-        estimatedTaxes: null,
+        estimatedTaxes: 0,
         shipping: 0,
         total: QUANTITY_TO_PRICE[25] + 0 + 0,
       })
@@ -31,10 +31,10 @@ describe('pricing', () => {
         total: QUANTITY_TO_PRICE[25] + Math.round(QUANTITY_TO_PRICE[25] * 0.085) + 0,
       })
     })
-    it('calculates tax null for improper state', async () => {
+    it('calculates tax as 0 for improper state', async () => {
       expect(getCostSummary(25, 'OP')).toMatchObject({
         subtotal: QUANTITY_TO_PRICE[25],
-        estimatedTaxes: null,
+        estimatedTaxes: 0,
         shipping: 0,
         total: QUANTITY_TO_PRICE[25] + 0 + 0,
       })
