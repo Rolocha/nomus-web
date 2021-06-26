@@ -103,10 +103,10 @@ const CardBuilder = () => {
   })
 
   const initialize = React.useCallback(async () => {
-    // If the user canceled the order from an external location (currently
-    // this would just be Stripe Checkout), there should be an orderId query param
-    // that we fired off an "orders" query with above, wait for its result
     switch (baseTypeQueryParam) {
+      // If the user canceled the order from an external location (currently
+      // this would just be Stripe Checkout), there should be an orderId query param
+      // that we fired off an "orders" query with above, wait for its result
       case 'cancel': {
         if (!loadExistingOrderQuery.called || loadExistingOrderQuery.loading) {
           return null
@@ -114,7 +114,7 @@ const CardBuilder = () => {
 
         const existingOrder = existingOrderData?.order
         if (!existingOrder) {
-          return <Redirect to="/shop" />
+          return history.push('/shop')
         }
 
         // Build up the card builder state from the order specified in the orderId search param
@@ -128,7 +128,11 @@ const CardBuilder = () => {
         )
         break
       }
+      // This means the user landed here after a successful Stripe Checkout payment + redirection.
+      // The URL would have an `?orderId=ord_*` on it so we can use that to redirect them to the
+      // order detail view for this completed order.
       case 'success': {
+        history.push(`/dashboard/orders/${orderIdSearchParam}`)
         break
       }
       // Request an initialized CardVersion from the API when the card builder loads so we can use its id
@@ -161,6 +165,7 @@ const CardBuilder = () => {
         break
     }
   }, [
+    orderIdSearchParam,
     existingOrderData,
     loadExistingOrderQuery.called,
     loadExistingOrderQuery.loading,

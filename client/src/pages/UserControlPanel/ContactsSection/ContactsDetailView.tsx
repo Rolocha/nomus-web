@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { formatPhoneNumber } from 'react-phone-number-input'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
@@ -132,7 +133,7 @@ const ContactsDetailView = ({
                 <Text.Label>Phone</Text.Label>
                 <Text.Body2>
                   <Link to={`tel:${selectedContact.phoneNumber}`}>
-                    {selectedContact.phoneNumber}
+                    {formatPhoneNumber(selectedContact.phoneNumber)}
                   </Link>
                 </Text.Body2>
               </Box>
