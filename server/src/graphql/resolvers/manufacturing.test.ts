@@ -20,7 +20,7 @@ describe('EncodingResolver', () => {
     await dropAllCollections()
   })
 
-  describe('createMassSheetEncoding', () => {
+  describe('createSheetBatch', () => {
     it('creates a mass sheet encoding, 5 sheets for an admin', async () => {
       AWSMock.setSDKInstance(AWS)
       const putObjectMock = jest.fn().mockImplementation((_, cb) => {
@@ -33,9 +33,9 @@ describe('EncodingResolver', () => {
 
       const response = await execQuery({
         source: `
-          mutation CreateMassSheetEncodingMutation($numSheets: Float!) {
-            createMassSheetEncoding(numSheets: $numSheets) {
-              s3Url
+          mutation CreateSheetBatchMutation($numSheets: Float!) {
+            createSheetBatch(numSheets: $numSheets) {
+              batchCsvUrl
             }
           }
         `,
@@ -54,7 +54,9 @@ describe('EncodingResolver', () => {
       expect(createdCards[0].nfcId).toMatch(SHEET_CARD_REGEX)
 
       expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
-      expect(putObjectMock.mock.calls[0][0].Key).toBe(response.data?.createMassSheetEncoding?.s3Url)
+      expect(
+        response.data?.createSheetBatch?.batchCsvUrl.endsWith(putObjectMock.mock.calls[0][0].Key)
+      )
     })
   })
 })

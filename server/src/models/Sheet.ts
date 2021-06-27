@@ -27,6 +27,13 @@ export class Sheet extends BaseModel({
   @prop({ _id: false, required: false, ref: () => Order, type: String })
   @Field(() => Order, { nullable: true })
   order: Ref<Order>
+
+  @prop({ required: false })
+  @Field({
+    nullable: true,
+    description: 'A URL to a CSV for the "sheet batch" that contains this sheet',
+  })
+  batchCsv: string
 }
 
 // Attach the mongoose model onto the core model itself
