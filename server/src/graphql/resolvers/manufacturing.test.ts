@@ -56,7 +56,7 @@ describe('EncodingResolver', () => {
       expect(putObjectMock.mock.calls[0][0].Bucket).toBe('nomus-assets')
       expect(
         response.data?.createSheetBatch?.batchCsvUrl.endsWith(putObjectMock.mock.calls[0][0].Key)
-      )
+      ).toBeTruthy()
     })
   })
 })
