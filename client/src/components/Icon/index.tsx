@@ -37,7 +37,7 @@ import SwitchSidesIcon from './SwitchSidesIcon'
 import SyncIcon from './SyncIcon'
 import TwitterIcon from './TwitterIcon'
 import UploadIcon from './UploadIcon'
-import Logo from 'src/components/Icon/Logo'
+import NomusIcon from 'src/components/Icon/NomusIcon'
 
 const iconLibrary = {
   arrowRight: ArrowRightIcon,
@@ -77,7 +77,7 @@ const iconLibrary = {
   sync: SyncIcon,
   twitter: TwitterIcon,
   upload: UploadIcon,
-  logo: Logo,
+  nomus: NomusIcon,
 } as const
 
 export type IconName = keyof typeof iconLibrary

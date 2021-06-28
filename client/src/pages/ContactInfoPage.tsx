@@ -426,7 +426,7 @@ const ContactInfoPage = () => {
               >
                 <Icon of="download" color={colors.white} />{' '}
                 <Box as="span" ml={2} display={'inline-block'}>
-                  Save to Device
+                  Save to device
                 </Box>
               </Link>
             </Box>
@@ -438,7 +438,7 @@ const ContactInfoPage = () => {
                 buttonSize="big"
                 to={`/dashboard/contacts/detail/${username}`}
               >
-                <Icon of="logo" color={colors.nomusBlue} />{' '}
+                <Icon of="nomus" color={colors.nomusBlue} />{' '}
                 <Box as="span" ml={2} display={'inline-block'}>
                   View in dashboard
                 </Box>
@@ -450,7 +450,7 @@ const ContactInfoPage = () => {
                 buttonStyle="tertiary"
                 buttonSize="big"
               >
-                <Icon of="logo" color={colors.nomusBlue} />{' '}
+                <Icon of="nomus" color={colors.nomusBlue} />{' '}
                 <Box as="span" ml={2} display={'inline-block'}>
                   Save to Nomus
                 </Box>
