@@ -95,7 +95,6 @@ const AboutPage = () => {
             `,
           }}
           gridColumnGap="16px"
-          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           pb="32px"
         >
@@ -154,7 +153,6 @@ const AboutPage = () => {
             base: 'repeat(4, 1fr) / 1fr',
             [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
-          // mx={{ base: '24px', [bp]: '96px' }}
           gridColumnGap={{ base: 2, [bp]: 3 }}
           mb={{ base: '48px', [bp]: '80px' }}
         >
@@ -168,7 +166,7 @@ const AboutPage = () => {
           >
             <Text.SectionSubheader
               textAlign="center"
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               fontWeight={500}
             >
               Our value
@@ -176,7 +174,7 @@ const AboutPage = () => {
             <Image
               src={waterHose}
               textAlign="center"
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               px={{ base: '0px', [bp]: '8px' }}
             />
             <Text.Body2 textAlign="center" color="black">
@@ -194,14 +192,14 @@ const AboutPage = () => {
             mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.SectionSubheader
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               fontWeight={500}
             >
               Doing good
             </Text.SectionSubheader>
             <Image
               src={pointAtSky}
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               px={{ base: '0px', [bp]: '8px' }}
             />
             <Text.Body2 textAlign="center" color="black">
@@ -219,14 +217,14 @@ const AboutPage = () => {
             mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.SectionSubheader
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               fontWeight={500}
             >
               Enabling great ideas
             </Text.SectionSubheader>
             <Image
               src={handShake}
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               px={{ base: '0px', [bp]: '8px' }}
             />
             <Text.Body2 textAlign="center" color="black">
@@ -243,14 +241,14 @@ const AboutPage = () => {
             mb={{ base: '24px', [bp]: '0px' }}
           >
             <Text.SectionSubheader
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               fontWeight={500}
             >
               You
             </Text.SectionSubheader>
             <Image
               src={raiseHand}
-              mb={{ base: '8px', [bp]: '17px' }}
+              mb={{ base: '8px', [bp]: '16px' }}
               px={{ base: '0px', [bp]: '8px' }}
             />
             <Text.Body2 textAlign="center" color="black">
@@ -277,7 +275,6 @@ const AboutPage = () => {
             [bp]: '1fr 1fr / 1fr 1fr 1fr',
           }}
           gridGap={{ base: 2, [bp]: 3 }}
-          // mx={{ base: '24px', [bp]: '96px' }}
           sx={{
             '& svg': {
               width: '100%',
@@ -325,26 +322,13 @@ const AboutPage = () => {
               ml={{ base: '0px', [bp]: '19px' }}
             />
             <Box gridArea={{ base: '3 / 1 / 4 / 13', [bp]: '2 / 1 / 3 / 9' }}>
-              <Text.Body2
-                textAlign="left"
-                // gridArea={{
-                //   base: '3 / 1 / 4 / 13',
-                //   [bp]: '2 / 1 / 3/ 9',
-                // }}
-                mb={{ base: '16px', [bp]: '16px' }}
-              >
-                Inside these business cards, there’s something that sets it
+              <Text.Body2 textAlign="left" mb={{ base: '16px', [bp]: '16px' }}>
+                Inside these business cards, there’s something that sets them
                 apart from all the others – an NFC (Near Field Communication)
                 chip. You might have used similar contactless payment through
                 your credit card or technologies like Apple Pay.
               </Text.Body2>
-              <Text.Body2
-                textAlign="left"
-                // gridArea={{
-                //   base: '4 / 1 / 5 / 13',
-                //   [bp]: '3 / 1 / 4/ 9',
-                // }}
-              >
+              <Text.Body2 textAlign="left">
                 We're big fans of NFC. We've seen the rise to mass market
                 adoption in credit cards, integration and support across
                 devices, and we're ready to bring that power to networking. With
@@ -365,7 +349,6 @@ const AboutPage = () => {
             [bp]: 'repeat(3, 1fr) / repeat(12, 1fr)',
           }}
           gridColumnGap={{ base: 2, [bp]: 3 }}
-          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
         >
           <Image
@@ -412,11 +395,9 @@ const AboutPage = () => {
             base: 'repeat(4, 1fr) / 1fr',
             [bp]: '1fr / 1fr 1fr 1fr 1fr',
           }}
-          // mx={{ base: '24px', [bp]: '96px' }}
           pt="16px"
           gridColumnGap={{ base: 2, [bp]: 3 }}
           mb={{ base: '54px', [bp]: '80px' }}
-          // width="270px"
         >
           <Box
             display="flex"
@@ -525,7 +506,6 @@ const AboutPage = () => {
               base: 'repeat(4, auto)',
               [bp]: 'repeat(3, auto)',
             }}
-            // mx={{ base: '24px', [bp]: '96px' }}
             pt={{ base: '32px', [bp]: '64px' }}
             pb={{ base: '48px', [bp]: '64px' }}
             gridColumnGap={{ base: 2, [bp]: 3 }}
