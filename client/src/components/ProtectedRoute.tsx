@@ -22,7 +22,9 @@ const ProtectedRoute = ({ requiredAuthLevel, children, ...rest }: Props) => {
         // User isn't logged in so we don't know yet if they can access this route
         if (loggedIn === false) {
           return (
-            <Redirect to={{ pathname: '/login', state: { from: location } }} />
+            <Redirect
+              to={{ pathname: '/register', state: { from: location } }}
+            />
           )
         }
 

@@ -362,7 +362,7 @@ const LandingPage = () => {
             to={
               userEnteredName
                 ? `/card-studio/template?prefillName=${userEnteredName}`
-                : `/register`
+                : `/card-studio/template`
             }
           >
             <Button
@@ -408,7 +408,7 @@ const LandingPage = () => {
               Nomus.
             </Text.Body>
             <Box display="grid" placeContent={{ base: 'stretch', lg: 'start' }}>
-              <Link to="/register">
+              <Link to="/card-studio/custom">
                 <Button
                   width="100%"
                   variant="golden"
