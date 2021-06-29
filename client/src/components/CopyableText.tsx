@@ -39,7 +39,7 @@ const CopyableText = ({ copyText, children }: Props) => {
       onMouseOver={() => setDidCopy(false)}
       sx={{
         '&:hover': {
-          '> :first-child': {
+          '> div:first-of-type': {
             display: 'block',
           },
           '> :nth-child(2)': {

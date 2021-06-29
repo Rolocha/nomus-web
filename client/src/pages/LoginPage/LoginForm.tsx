@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, Redirect } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -46,7 +46,6 @@ const LoginForm = () => {
   })
   const { logIn, loggedIn } = useAuth()
 
-  const history = useHistory()
   const location = useLocation<{ from: Location }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
@@ -73,16 +72,22 @@ const LoginForm = () => {
     }
   }
 
+  const redirectUrl = React.useMemo(
+    () =>
+      searchParams.get('redirect_url') ??
+      location.state?.from.pathname ??
+      '/dashboard',
+    [searchParams, location],
+  )
+
   // Redirect to the redirect_uri once the user is logged in
   if (loggedIn) {
-    const redirectUrl = searchParams.get('redirect_url')
-    const nextUrl = redirectUrl ?? location.state?.from.pathname ?? '/dashboard'
-    if (nextUrl.startsWith('/')) {
-      history.replace(nextUrl)
+    if (redirectUrl.startsWith('/')) {
+      return <Redirect to={redirectUrl} />
     } else {
       // If the URL doesn't start with /, it's probably a different domain
       // in which case we have to use window.location's .replace() instead of history's
-      window.location.replace(nextUrl)
+      window.location.replace(redirectUrl)
     }
     return null
   }
