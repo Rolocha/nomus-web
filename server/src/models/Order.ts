@@ -16,7 +16,7 @@ import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 import OrderEvent from './OrderEvent'
-import { postNewOrder, slackChannel } from 'src/util/slack'
+import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { DEPLOY_ENV } from 'src/config'
 
 // Mapping of current possible state transitions according to our Order Flow State Machine
@@ -153,8 +153,10 @@ class Order extends BaseModel({
       }
       if (DEPLOY_ENV === 'production') {
         try {
-          postNewOrder(slackChannel.Orders, this)
-        } catch (e) {}
+          postNewOrder(SlackChannel.Orders, this)
+        } catch (e) {
+          console.error(e)
+        }
       }
       return Result.ok(this)
     }
