@@ -2,6 +2,10 @@ import axios from 'axios'
 import { SLACK_BOT_TOKEN } from 'src/config'
 import { Order } from 'src/models'
 
+export enum slackChannel {
+  Orders = 'C02598Y499U',
+}
+
 export const postNewOrder = async (channel: string, order: Order) => {
   const url = 'https://slack.com/api/chat.postMessage'
   const res = await axios.post(
@@ -10,21 +14,34 @@ export const postNewOrder = async (channel: string, order: Order) => {
       channel: channel,
       blocks: [
         {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: `Order *${order.id}* in state *${order.state}*`,
+            emoji: true,
+          },
+        },
+        {
           type: 'section',
-          text: { type: 'mrkdwn', text: 'New order!' },
           fields: [
-            { type: 'mrkdwn', text: '*Name*\nJohn Smith' },
-            { type: 'mrkdwn', text: `*Amount*\n${order.price.total}` },
+            {
+              type: 'mrkdwn',
+              text: `*Amount: *\n$${[
+                order.price.total.toString().slice(0, order.price.total.toString().length - 2),
+                '.',
+                order.price.total.toString().slice(order.price.total.toString().length - 2),
+              ].join('')}`,
+            },
+            { type: 'mrkdwn', text: `*Short ID: *\n${order.shortId}` },
           ],
+        },
+        {
+          type: 'section',
+          fields: [{ type: 'mrkdwn', text: `*Shipping Address: *\n${order.shippingAddress}` }],
         },
       ],
     },
-    // { headers: { authorization: `Bearer ${SLACK_BOT_TOKEN}` } }
-    {
-      headers: {
-        authorization: `Bearer xoxb-1040366702640-1052240990754-KQEbKkr3lEeLKBMFVoEgpJXG`,
-      },
-    }
+    { headers: { authorization: `Bearer ${SLACK_BOT_TOKEN}` } }
   )
   return res
 }

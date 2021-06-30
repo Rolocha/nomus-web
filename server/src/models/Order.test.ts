@@ -36,16 +36,6 @@ describe('Order model', () => {
       }
     )
 
-    it('tries 1', async () => {
-      const order = await createMockOrder({
-        state: OrderState.Paid,
-        price: { subtotal: 500, tax: 0, shipping: 0, total: 500 },
-      })
-      expect(order.state).toBe(OrderState.Paid)
-      await order.transition(OrderState.Canceled)
-      expect(order.state).toBe(OrderState.Canceled)
-    })
-
     it.each([OrderState.Creating, OrderState.Created, OrderState.Enroute, OrderState.Fulfilled])(
       `fails to cancel the order if it's in the %s state`,
       async (initialState) => {
