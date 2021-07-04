@@ -1,7 +1,3 @@
-import { TemplateID } from 'src/templates'
-
-export type { TemplateID }
-
 export type CardBuilderStep =
   | 'base'
   | 'build'
