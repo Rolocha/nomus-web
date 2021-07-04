@@ -8,18 +8,18 @@
 // ====================================================
 
 export interface UpdateProfilePictureMutation_updateProfilePicture {
-  __typename: 'User'
-  id: string
+  __typename: "User";
+  id: string;
   /**
    * A URL pointing to the user's profile picture
    */
-  profilePicUrl: string | null
+  profilePicUrl: string | null;
 }
 
 export interface UpdateProfilePictureMutation {
-  updateProfilePicture: UpdateProfilePictureMutation_updateProfilePicture
+  updateProfilePicture: UpdateProfilePictureMutation_updateProfilePicture;
 }
 
 export interface UpdateProfilePictureMutationVariables {
-  file: any
+  file: any;
 }

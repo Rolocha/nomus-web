@@ -35,7 +35,7 @@ export const getCostSummary = (quantity: number, state?: string) => {
   }
 
   state = state?.toUpperCase()
-  let estimatedTaxes = null
+  let estimatedTaxes = 0
   if (state && isValidStateAbr(state)) {
     estimatedTaxes = subtotal ? calculateEstimatedTaxes(subtotal, state) : null
     if (estimatedTaxes == null) {

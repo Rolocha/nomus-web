@@ -8,20 +8,20 @@
 // ====================================================
 
 export interface UserControlPanelSkeletonQuery_user_name {
-  __typename: 'PersonName'
-  first: string
-  middle: string | null
-  last: string
+  __typename: "PersonName";
+  first: string;
+  middle: string | null;
+  last: string;
 }
 
 export interface UserControlPanelSkeletonQuery_user {
-  __typename: 'User'
-  id: string
-  name: UserControlPanelSkeletonQuery_user_name | null
-  email: string | null
-  isEmailVerified: boolean
+  __typename: "User";
+  id: string;
+  name: UserControlPanelSkeletonQuery_user_name | null;
+  email: string | null;
+  isEmailVerified: boolean;
 }
 
 export interface UserControlPanelSkeletonQuery {
-  user: UserControlPanelSkeletonQuery_user
+  user: UserControlPanelSkeletonQuery_user;
 }

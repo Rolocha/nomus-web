@@ -1,7 +1,8 @@
 import { DocumentType, mongoose } from '@typegoose/typegoose'
 import { AuthenticationError } from 'apollo-server-errors'
-import { FileUpload } from 'graphql-upload'
 import { GraphQLUpload } from 'apollo-server-express'
+import { FileUpload } from 'graphql-upload'
+import { BASE_URL } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import {
@@ -12,7 +13,7 @@ import {
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { getCostSummary } from 'src/util/pricing'
+import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
 import {
@@ -36,14 +37,10 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
-  quantity: number
+  previousOrder: string
 
-  // Credit/debit card Stripe token we'll use for payment auth/capture
   @Field({ nullable: true })
-  stripeToken: string
-
-  @Field((type) => Address, { nullable: true })
-  shippingAddress: Address
+  quantity: number
 }
 
 @InputType({ description: 'Input to update fields on an existing Order' })
@@ -53,12 +50,6 @@ class OrdersQueryInput {
 
   @Field({ nullable: true, description: 'quantity of cards in an order' })
   quantity: number
-
-  @Field({
-    nullable: true,
-    description: 'Credit/debit card Stripe token used for payment auth/capture',
-  })
-  stripeToken: string
 
   @Field((type) => Address, { nullable: true, description: 'shipping address for the order' })
   shippingAddress: Address
@@ -110,6 +101,12 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   @Field({ nullable: false })
   templateId: string
 
+  @Field({
+    nullable: false,
+    description: 'The human-readable, user-presentable name of the template',
+  })
+  templateName: string
+
   @Field({ nullable: false })
   cardVersionId: string
 
@@ -135,7 +132,7 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
 @ObjectType()
 class SubmitOrderResponse {
   @Field()
-  clientSecret: string
+  checkoutSession: string
 
   @Field()
   orderId: string
@@ -341,11 +338,10 @@ class OrderResolver {
 
     await cardVersion.save()
 
-    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+    const order = await this.createOrUpdateExistingOrder({
       user,
       cardVersion,
-      quantity: payload.quantity,
-      shippingAddress: payload.shippingAddress,
+      payload,
     })
 
     // Update the user's default card version to the newly created one
@@ -353,8 +349,8 @@ class OrderResolver {
     await user.save()
 
     return {
-      orderId: createdOrder.id,
-      clientSecret: paymentIntent.client_secret,
+      orderId: order.id,
+      checkoutSession: order.checkoutSession,
     }
   }
 
@@ -378,6 +374,7 @@ class OrderResolver {
     }
 
     // Update the card version with the customized template details
+    cardVersion.templateId = payload.templateId
     cardVersion.contactInfo = payload.contactInfo
     cardVersion.colorScheme = payload.colorScheme
     cardVersion.qrCodeUrl = payload.qrCodeUrl
@@ -404,11 +401,10 @@ class OrderResolver {
     }
     await cardVersion.save()
 
-    const { createdOrder, paymentIntent } = await this.createOrderAndPayment({
+    const order = await this.createOrUpdateExistingOrder({
       user,
       cardVersion,
-      quantity: payload.quantity,
-      shippingAddress: payload.shippingAddress,
+      payload,
     })
 
     // Update the user's default card version to the newly created one
@@ -416,8 +412,8 @@ class OrderResolver {
     await user.save()
 
     return {
-      orderId: createdOrder.id,
-      clientSecret: paymentIntent.client_secret,
+      orderId: order.id,
+      checkoutSession: order.checkoutSession,
     }
   }
 
@@ -425,17 +421,59 @@ class OrderResolver {
    * Private helpers
    */
 
-  async createPaymentIntent(amount: number, user: DocumentType<User>, orderId: string) {
-    return await stripe.paymentIntents.create({
-      /* eslint-disable camelcase */
-      amount,
-      currency: 'usd', // We'll know we made it when we can change this line :')
-      receipt_email: user.email,
-      metadata: {
-        orderId,
+  // Creates a Checkout Session
+  async createCheckoutSession(
+    order: DocumentType<Order>,
+    cardVersion: DocumentType<CardVersion>,
+    user: DocumentType<User>,
+    templateName: string
+  ): Promise<Stripe.Checkout.Session> {
+    const productName = {
+      [CardSpecBaseType.Custom]: `Nomus card - custom design (${order.quantity} pack)`,
+      [CardSpecBaseType.Template]: `Nomus card - ${templateName} template (${order.quantity} pack)`,
+    }[cardVersion.baseType]
+
+    /* eslint-disable camelcase */
+    return stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: productName,
+              images: [cardVersion.frontImageUrl, cardVersion.backImageUrl],
+            },
+            unit_amount: QUANTITY_TO_PRICE[order.quantity],
+          },
+          quantity: 1,
+          // The TS types don't have dynamic_tax_rates yet but we can use it. This lets
+          // us let Stripe Checkout dynamically apply taxes using the tax rates we specify
+          // based on the shipping address the user enters
+          // See https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-dynamic_tax_rates
+          // @ts-ignore
+          dynamic_tax_rates: ['txr_1J5P6LGTbyReVwro0YiKRJns'],
+        },
+      ],
+      payment_intent_data: {
+        metadata: {
+          orderId: order.id,
+        },
       },
-      /* eslint-enable camelcase */
+      customer_email: user.email,
+      mode: 'payment',
+      allow_promotion_codes: true,
+      shipping_address_collection: {
+        allowed_countries: ['US'],
+      },
+      success_url: `${BASE_URL}/card-studio/success?orderId=${order.id}`,
+      cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${order.id}`,
+      metadata: {
+        orderId: order.id,
+        cardVersionId: cardVersion.id,
+      },
     })
+    /* eslint-enable camelcase */
   }
 
   async uploadCardImages(
@@ -445,7 +483,7 @@ class OrderResolver {
     // Upload the front image and put the resulting S3 key on the card version
     const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
       await imageFiles.front,
-      `${cardVersionId}/front`,
+      `${cardVersionId}/front/${Date.now()}`,
       S3.S3AssetCategory.CardVersions
     )
 
@@ -457,7 +495,7 @@ class OrderResolver {
     if (imageFiles.back) {
       backImageUploadResult = await S3.uploadGraphQLFileToS3(
         await imageFiles.back,
-        `${cardVersionId}/back`,
+        `${cardVersionId}/back/${Date.now()}`,
         S3.S3AssetCategory.CardVersions
       )
       if (!backImageUploadResult.isSuccess) {
@@ -471,42 +509,68 @@ class OrderResolver {
     }
   }
 
-  async createOrderAndPayment({
+  async createOrUpdateExistingOrder({
     user,
     cardVersion,
-    quantity,
-    shippingAddress,
+    payload,
   }: {
     user: DocumentType<User>
     cardVersion: DocumentType<CardVersion>
-    quantity: number
-    shippingAddress: Address
-  }): Promise<{ createdOrder: DocumentType<Order>; paymentIntent: Stripe.PaymentIntent }> {
-    const costSummary = getCostSummary(quantity, shippingAddress.state)
+    payload: SubmitTemplateOrderInput | SubmitCustomOrderInput
+  }): Promise<DocumentType<Order>> {
+    const { quantity } = payload
+
+    const costSummary = getCostSummary(quantity)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
       )
     }
+    const price: OrderPrice = {
+      subtotal: costSummary.subtotal,
+      shipping: costSummary.shipping,
+      // We don't know the cost of tax yet since that requires knowing the shipping address
+      // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
+      tax: costSummary.estimatedTaxes,
+      total: costSummary.total,
+    }
 
-    const orderId = Order.createId()
-    const paymentIntent = await this.createPaymentIntent(costSummary.total, user, orderId)
-    const createdOrder = await Order.mongo.create({
-      _id: orderId,
-      user: user.id,
-      cardVersion: cardVersion.id,
-      state: OrderState.Captured,
-      paymentIntent: paymentIntent.id,
-      quantity,
-      shippingAddress,
-      price: {
-        subtotal: costSummary.subtotal,
-        shipping: costSummary.shipping,
-        tax: costSummary.estimatedTaxes,
-        total: costSummary.total,
-      },
-    })
-    return { createdOrder, paymentIntent }
+    let order: DocumentType<Order> | null = null
+    // Check if the payload includes the id of a previous Order object
+    if (payload.previousOrder) {
+      // If so, use that Order (with updates applied) rather than creating a new one
+      order = await Order.mongo.findOne({ _id: payload.previousOrder, user: user.id })
+
+      if (!order) {
+        throw new Error('Paylod specified a previous order but that order could not be found')
+      }
+
+      order.quantity = quantity
+      order.price = price
+    } else {
+      // No previous order existed; create a new one
+      order = await Order.mongo.create({
+        user: user.id,
+        cardVersion: cardVersion.id,
+        state: OrderState.Captured,
+        quantity,
+        price,
+      })
+    }
+
+    // Create a new Stripe Checkout session regardless of whether a previous one
+    // existed since some details may have changed in this submission
+    const checkoutSession = await this.createCheckoutSession(
+      order,
+      cardVersion,
+      user,
+      'templateName' in payload ? payload.templateName : null
+    )
+
+    order.checkoutSession = checkoutSession.id
+    order.paymentIntent = checkoutSession.payment_intent as string
+    await order.save()
+    return order
   }
 }
 export default OrderResolver

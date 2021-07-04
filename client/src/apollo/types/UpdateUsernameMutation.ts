@@ -8,15 +8,15 @@
 // ====================================================
 
 export interface UpdateUsernameMutation_updateUsername {
-  __typename: 'User'
-  id: string
-  username: string | null
+  __typename: "User";
+  id: string;
+  username: string | null;
 }
 
 export interface UpdateUsernameMutation {
-  updateUsername: UpdateUsernameMutation_updateUsername
+  updateUsername: UpdateUsernameMutation_updateUsername;
 }
 
 export interface UpdateUsernameMutationVariables {
-  username: string
+  username: string;
 }

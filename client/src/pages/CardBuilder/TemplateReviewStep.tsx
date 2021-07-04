@@ -1,10 +1,11 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
-import CardDesignReview from 'src/pages/CardBuilder/CardDesignReview'
-import OrderSummary from 'src/pages/CardBuilder/OrderSummary'
-import { colors } from 'src/styles'
+import UnifiedReviewStep, {
+  CardMetadata,
+} from 'src/pages/CardBuilder/UnifiedReviewStep'
 import templateLibrary from 'src/templates'
+import { getNameForColorKey } from 'src/templates/utils'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 
 interface Props {
@@ -43,12 +44,12 @@ const TemplateReviewStep = ({
     }
   }, [cardBuilderState, cardImages, setCardImages])
 
-  const associatedInfo = React.useMemo(() => {
+  const metadata: CardMetadata = React.useMemo(() => {
     if (
       !cardBuilderState.templateCustomization ||
       !cardBuilderState.templateId
     ) {
-      return [{ label: 'Unknown', value: 'Unknown' }]
+      return []
     }
 
     const template = templateLibrary[cardBuilderState.templateId]
@@ -56,18 +57,46 @@ const TemplateReviewStep = ({
       cardBuilderState.templateCustomization!,
       cardBuilderState.omittedOptionalFields as Array<any>,
     )
-    const info: Array<{ label: string; value: string }> = []
+    const associatedInformation: CardMetadata[0]['data'] = []
     template.contactInfoFieldNames.forEach((fieldName) => {
       const { label } = template.contactInfoSpec[fieldName]
       const value = options.contactInfo[fieldName]
       if (label && value) {
-        info.push({
+        associatedInformation.push({
           label,
           value,
         })
       }
     })
-    return info
+
+    const colors: CardMetadata[0]['data'] = []
+    template.colorKeys.forEach((colorKey) => {
+      const label = getNameForColorKey(colorKey)
+      const value = options.colorScheme[colorKey]?.toUpperCase()
+      if (label && value) {
+        colors.push({
+          label,
+          value: (
+            <Box display="flex" key={label + 'color'}>
+              <Box
+                width="24px"
+                height="24px"
+                borderRadius="2px"
+                bgColor={value}
+                boxShadow="card"
+                mr="8px"
+              />
+              <Text.Body2>{value}</Text.Body2>
+            </Box>
+          ),
+        })
+      }
+    }, [])
+
+    return [
+      { section: 'Associated information', data: associatedInformation },
+      { section: 'Colors', data: colors },
+    ]
   }, [
     cardBuilderState.templateId,
     cardBuilderState.templateCustomization,
@@ -81,53 +110,18 @@ const TemplateReviewStep = ({
   }, [cardBuilderState.templateId])
 
   return (
-    <Box height="100%">
-      {cardImages && (
-        <CardDesignReview
-          cardBuilderState={cardBuilderState}
-          orientation={orientation}
-          associatedInfo={associatedInfo}
-          cardImages={{
-            front: cardImages.front,
-            back: cardImages.back,
-          }}
-        />
-      )}
-
-      <Box mt={4}>
-        <OrderSummary
-          cardBuilderState={cardBuilderState}
-          cardDescription={
-            'Nomus card - ' +
-            (cardBuilderState.templateId
-              ? templateLibrary[cardBuilderState.templateId].name
-              : 'Unknown') +
-            ' template'
-          }
-        />
-      </Box>
-
-      {cardBuilderState.submissionError && (
-        <Text.Body2 mt="24px" color={colors.invalidRed}>
-          {cardBuilderState.submissionError.message}
-          {cardBuilderState.submissionError.backlinkToStep && (
-            <Text.Body2
-              as="span"
-              role="button"
-              cursor="pointer"
-              color={colors.linkBlue}
-              onClick={() => {
-                updateCardBuilderState({
-                  currentStep: cardBuilderState.submissionError?.backlinkToStep,
-                })
-              }}
-            >
-              {` Return to the ${cardBuilderState.submissionError.backlinkToStep} step.`}
-            </Text.Body2>
-          )}
-        </Text.Body2>
-      )}
-    </Box>
+    <UnifiedReviewStep
+      cardBuilderState={cardBuilderState}
+      updateCardBuilderState={updateCardBuilderState}
+      cardDetails={{
+        images: {
+          front: cardImages?.front,
+          back: cardImages?.back,
+        },
+        orientation,
+        metadata,
+      }}
+    />
   )
 }
 

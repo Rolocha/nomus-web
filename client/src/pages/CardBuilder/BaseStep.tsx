@@ -88,6 +88,7 @@ const BaseStep = ({
                     const templateDetails = templateLibrary[templateId]
                     return (
                       <Box
+                        key={templateId}
                         role="button"
                         onClick={() => {
                           updateCardBuilderState({ templateId })

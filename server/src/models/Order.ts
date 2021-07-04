@@ -93,10 +93,16 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  // Stripe PaymentIntent id. For now, this is null but future work will replace this
+  // Stripe PaymentIntent id; may
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
+
+  // Stripe CheckoutSession id
+  // See https://stripe.com/docs/api/checkout/sessions/object
+  @prop({ required: false })
+  @Field({ nullable: true })
+  checkoutSession: string
 
   @prop({
     required: false,
@@ -113,6 +119,10 @@ class Order extends BaseModel({
   @prop({ required: false, description: 'URL pointing to the document to be printed' })
   @Field({ nullable: true })
   printSpecUrl: string
+
+  @prop({ required: false, description: 'The name of the person to ship the order to' })
+  @Field({ nullable: true })
+  shippingName: string
 
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })

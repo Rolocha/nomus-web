@@ -39,10 +39,10 @@ const CopyableText = ({ copyText, children }: Props) => {
       onMouseOver={() => setDidCopy(false)}
       sx={{
         '&:hover': {
-          '> div:first-of-type': {
+          '> span:first-of-type': {
             display: 'block',
           },
-          '> :nth-child(2)': {
+          '> span:nth-of-type(2)': {
             backgroundColor: colors.outlineBlue,
           },
         },
@@ -61,7 +61,9 @@ const CopyableText = ({ copyText, children }: Props) => {
         px={2}
         as="span"
       >
-        <Text.Body2>{didCopy ? 'Copied!' : 'Copy...'}</Text.Body2>
+        <Text.Body2 fontSize="10px">
+          {didCopy ? 'Copied!' : 'Copy...'}
+        </Text.Body2>
       </Box>
 
       <Box as="span" ref={textRef}>

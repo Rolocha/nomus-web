@@ -87,24 +87,31 @@ export class OrderPrice {
 })
 @ObjectType()
 export class TemplateContactInfoFields {
+  @prop({ required: false })
   @Field({ nullable: true })
   name: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   line1: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   line2: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   line3: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   line4: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   headline: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   footer: string | null
 }
@@ -115,21 +122,27 @@ export class TemplateContactInfoFields {
 })
 @ObjectType()
 export class TemplateColorScheme {
+  @prop({ required: true })
   @Field({ nullable: false })
   background: string
 
+  @prop({ required: true })
   @Field({ nullable: false })
   text: string
 
+  @prop({ required: false })
   @Field({ nullable: true })
   accent: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   accent2: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   accent3: string | null
 
+  @prop({ required: false })
   @Field({ nullable: true })
   accent4: string | null
 }

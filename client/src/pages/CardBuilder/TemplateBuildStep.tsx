@@ -120,7 +120,12 @@ const TemplateBuildStep = ({
             gridGap={3}
           >
             {colorKeys.map((colorKey) => (
-              <Box display="flex" flexDirection="column" alignItems="center">
+              <Box
+                key={colorKey}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+              >
                 <Form.Input
                   type="color"
                   name={'colorScheme.' + colorKey}
@@ -150,6 +155,7 @@ const TemplateBuildStep = ({
             <Controller
               control={customizationForm.control}
               name="graphic.file"
+              defaultValue={null}
               render={(fieldProps, inputState) => (
                 <FileUploadButton
                   name="graphic.file"
@@ -245,6 +251,7 @@ const TemplateBuildStep = ({
           })}
           <Form.Input
             hidden
+            readOnly
             name="qrCodeUrl"
             ref={customizationForm.register()}
             value={
