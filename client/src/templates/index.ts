@@ -14,8 +14,6 @@ export const templateLibrary = {
   nicole: Nicole,
 } as const
 
-export type TemplateID = keyof typeof templateLibrary
-
 export const templateNames = Object.keys(
   templateLibrary,
 ) as (keyof typeof templateLibrary)[]

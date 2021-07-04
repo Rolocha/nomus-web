@@ -26,7 +26,7 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
   // Handle the event
   switch (event.type) {
     // Once the checkout session succeeds, we need to mark the Order as paid
-    case 'checkout.session.succeeded':
+    case 'checkout.session.completed':
       const checkoutSession = event.data.object as Stripe.Checkout.Session
 
       // Grab the orderId from the payment intent's metadata and validate it

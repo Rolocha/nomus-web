@@ -35,6 +35,7 @@ import {
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
 import { CardBuilderStep } from 'src/pages/CardBuilder/types'
+import { getAllOmittedContactFields } from 'src/templates/utils'
 import LoadingPage from 'src/pages/LoadingPage'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
@@ -304,18 +305,11 @@ const CardBuilder = () => {
           // If the user leaves the template build step with any contact info fields not yet explicitly omitted
           // but also not filled in, implicitly mark the fields as omitted
           if (!cardBuilderState.templateId) break
-          const selectedTemplate = templateLibrary[cardBuilderState.templateId]
-
-          const fieldsLeftEmptyButForgotToOmit = selectedTemplate.contactInfoFieldNames.filter(
-            (contactInfoFieldName) =>
-              !cardBuilderState.templateCustomization?.contactInfo[
-                contactInfoFieldName
-              ],
-          )
 
           updateCardBuilderState({
-            omittedOptionalFields: fieldsLeftEmptyButForgotToOmit.map(
-              (fieldName) => `contactInfo.${fieldName}`,
+            omittedOptionalFields: getAllOmittedContactFields(
+              cardBuilderState.templateId,
+              cardBuilderState.templateCustomization?.contactInfo,
             ),
           })
         }

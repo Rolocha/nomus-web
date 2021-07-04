@@ -1,13 +1,15 @@
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { LoadExistingCardBuilderOrder } from 'src/apollo/types/LoadExistingCardBuilderOrder'
+import { getAllOmittedContactFields } from 'src/templates/utils'
 import { templateNames } from 'src/templates'
+import { TemplateID } from 'src/templates/types'
+import { isValidTemplateID } from 'src/templates/utils'
 import { FileItem } from 'src/types/files'
 import { imageUrlToFile } from 'src/utils/image'
 import {
   CardBuilderStep,
   CardBuilderSubmissionError,
   OrderQuantityOption,
-  TemplateID,
 } from './types'
 
 export type CardBuilderState = {
@@ -77,7 +79,14 @@ export const createCardBuilderStateFromExistingOrder = async (
           qrCodeUrl: cv.qrCodeUrl,
         },
       }),
-    omittedOptionalFields: [], // TODO: Figure out a way to autofill this properly
+    ...(cv.templateId &&
+      isValidTemplateID(cv.templateId) &&
+      cv.contactInfo && {
+        omittedOptionalFields: getAllOmittedContactFields(
+          cv.templateId as TemplateID,
+          cv.contactInfo! as Record<string, any>,
+        ),
+      }),
 
     // Custom-specific fields
     ...(cv.frontImageUrl && {

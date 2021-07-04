@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import Box from 'src/components/Box'
 import TemplateCard from 'src/components/TemplateCard'
-import { TemplateID } from 'src/templates'
+import { TemplateID } from 'src/templates/types'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 
 interface Props {
