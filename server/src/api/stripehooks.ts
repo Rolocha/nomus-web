@@ -50,12 +50,16 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
 
       // Alright, we have an Order and have validated it; let's do our business logic
       const transitionResult = await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
+      if (!transitionResult.isSuccess) {
+        console.error('Transitioning the order failed with an error: ' + transitionResult.error)
+      }
 
       // Update Order.price now that we know tax details
       order.price.subtotal = checkoutSession.amount_subtotal
       order.price.tax = checkoutSession.total_details.amount_tax
       order.price.total = checkoutSession.amount_total
 
+      // Verify that our costSummary calculation matches what Stripe reported as the final payment
       const updatedCostSummary = getCostSummary(
         order.quantity,
         checkoutSession.shipping.address.state
@@ -67,19 +71,16 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
         )
       }
 
-      // Save shipping info
+      // Update shipping details
       order.shippingAddress = {
         line1: checkoutSession.shipping.address.line1,
         line2: checkoutSession.shipping.address.line2,
-        state: checkoutSession.shipping.address.state,
         city: checkoutSession.shipping.address.city,
+        state: checkoutSession.shipping.address.state,
         postalCode: checkoutSession.shipping.address.postal_code,
       }
       order.shippingName = checkoutSession.shipping.name
 
-      if (!transitionResult.isSuccess) {
-        console.error('Transitioning the order failed with an error: ' + transitionResult.error)
-      }
       // Last but definitely not least, write the updated Order details to the DB
       await order.save()
       break
