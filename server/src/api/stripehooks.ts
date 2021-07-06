@@ -13,11 +13,16 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
   let event = req.body
   // Verify the webhook actually came from Stripe
   try {
-    event = stripe.webhooks.constructEvent(
-      event,
-      req.headers['stripe-signature'],
-      STRIPE_WEBHOOK_ENDPOINT_SECRET
-    )
+    event =
+      // In tests, we don't need to verify the signature so we'll need to parse
+      // the Buffer into JSON ourselves
+      process.env.NODE_ENV === 'test'
+        ? JSON.parse(event.toString())
+        : stripe.webhooks.constructEvent(
+            event,
+            req.headers['stripe-signature'],
+            STRIPE_WEBHOOK_ENDPOINT_SECRET
+          )
   } catch (err) {
     console.log(`⚠️  Webhook signature verification failed.`, err.message)
     return res.sendStatus(400)
