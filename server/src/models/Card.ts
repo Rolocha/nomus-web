@@ -23,6 +23,9 @@ export class Card extends BaseModel({
   @Field(() => CardVersion, { nullable: false })
   cardVersion: Ref<CardVersion>
 
+  // nfcId is just `${sheet.id}-{card.id}` but it's a clean/useful abstraction
+  // for a Card to always save a reference to its NFC ID (otherwise we'd have to look up
+  // which Sheet it's a part of first...)
   @prop({ required: false })
   @Field({ nullable: true })
   nfcId: string
