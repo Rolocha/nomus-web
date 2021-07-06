@@ -80,6 +80,8 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
       if (!transitionResult.isSuccess) {
         console.error('Transitioning the order failed with an error: ' + transitionResult.error)
       }
+      // Last but definitely not least, write the updated Order details to the DB
+      await order.save()
       break
     default:
       // Unexpected event type
