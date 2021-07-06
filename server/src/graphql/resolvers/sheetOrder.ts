@@ -1,7 +1,7 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, Sheet, SheetOrder } from 'src/models'
 import { doNTimes } from 'src/util/array'
-import { Role } from 'src/util/enums'
+import { Role, SheetState } from 'src/util/enums'
 import { Arg, Authorized, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql'
 
 const DEFAULT_NUM_CARDS_IN_SHEET = 25
@@ -62,6 +62,30 @@ class SheetOrderResolver {
       sheets,
     })
 
+    return sheetOrder
+  }
+
+  @Authorized(Role.Admin)
+  @Mutation(() => SheetOrder, {
+    description: 'Updates the state property of all the sheets within a SheetOrder',
+  })
+  async transitionSheetOrderState(
+    @Arg('sheetOrderId', { nullable: false }) sheetOrderId: string,
+    @Arg('futureState', (type) => SheetState, { nullable: false }) futureState: SheetState
+  ): Promise<SheetOrder> {
+    const sheetOrder = await SheetOrder.mongo.findById(sheetOrderId)
+    const sheetIds = sheetOrder.sheets as string[]
+
+    await Sheet.mongo.updateMany(
+      {
+        _id: {
+          $in: sheetIds,
+        },
+      },
+      {
+        state: futureState,
+      }
+    )
     return sheetOrder
   }
 }

@@ -6,6 +6,7 @@ import { CardVersion } from './CardVersion'
 import { Ref } from './scalars'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import Order from './Order'
+import { SheetState } from 'src/util/enums'
 
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType({
@@ -27,6 +28,11 @@ export class Sheet extends BaseModel({
   @prop({ _id: false, required: false, ref: () => Order, type: String })
   @Field(() => Order, { nullable: true })
   order: Ref<Order>
+
+  // This correlates with SheetState at server/src/util/enums.ts
+  @prop({ enum: SheetState, type: String, required: true, default: SheetState.Created })
+  @Field((type) => SheetState, { nullable: false })
+  state: SheetState
 }
 
 // Attach the mongoose model onto the core model itself
