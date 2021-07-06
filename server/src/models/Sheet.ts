@@ -16,7 +16,7 @@ export class Sheet extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Sheet>
 
-  @prop({ required: true }, WhatIsIt.ARRAY)
+  @prop({ required: true, type: [String], ref: () => Card }, WhatIsIt.ARRAY)
   @Field((type) => [Card], { nullable: false })
   cards: Array<Ref<Card>>
 
