@@ -47,36 +47,13 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
 
       const order = await Order.mongo.findById(orderId)
 
-      if (order.state !== OrderState.Captured) {
-        console.error(
-          'Received a payment_intent.succeeded webhook for an order that wasn\'t in the "Captured" state'
-        )
-      }
-
       // Alright, we have an Order and have validated it; let's do our business logic
-      const transitionResult = await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
-      if (!transitionResult.isSuccess) {
-        console.error('Transitioning the order failed with an error: ' + transitionResult.error)
-      }
 
-      // Update Order.price now that we know tax details
+      // Update all the Order data that we newly received
       order.price.subtotal = checkoutSession.amount_subtotal
       order.price.tax = checkoutSession.total_details.amount_tax
       order.price.total = checkoutSession.amount_total
-
-      // Verify that our costSummary calculation matches what Stripe reported as the final payment
-      const updatedCostSummary = getCostSummary(
-        order.quantity,
-        checkoutSession.shipping.address.state
-      )
-      if (updatedCostSummary.total !== checkoutSession.amount_total) {
-        // Just drop some error logs to catch potential bugs with our costSummary method
-        console.error(
-          `Mismatch between total from Stripe checkout session ${checkoutSession.id} (${checkoutSession.amount_total}) and calculated cost summary (${updatedCostSummary.total})`
-        )
-      }
-
-      // Update shipping details
+      order.shippingName = checkoutSession.shipping.name
       order.shippingAddress = {
         line1: checkoutSession.shipping.address.line1,
         line2: checkoutSession.shipping.address.line2,
@@ -84,10 +61,19 @@ stripeWebhooksRouter.post('/', bodyParser.raw({ type: 'application/json' }), asy
         state: checkoutSession.shipping.address.state,
         postalCode: checkoutSession.shipping.address.postal_code,
       }
-      order.shippingName = checkoutSession.shipping.name
-
-      // Last but definitely not least, write the updated Order details to the DB
       await order.save()
+
+      if (order.state !== OrderState.Captured) {
+        console.error(
+          'Received a payment_intent.succeeded webhook for an order that wasn\'t in the "Captured" state'
+        )
+      }
+
+      // Transition the order to the Paid state
+      const transitionResult = await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
+      if (!transitionResult.isSuccess) {
+        console.error('Transitioning the order failed with an error: ' + transitionResult.error)
+      }
       break
     default:
       // Unexpected event type
