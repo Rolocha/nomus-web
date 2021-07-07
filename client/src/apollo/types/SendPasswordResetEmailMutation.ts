@@ -8,9 +8,9 @@
 // ====================================================
 
 export interface SendPasswordResetEmailMutation {
-  sendPasswordResetEmail: any | null
+  sendPasswordResetEmail: any | null;
 }
 
 export interface SendPasswordResetEmailMutationVariables {
-  email: string
+  email: string;
 }

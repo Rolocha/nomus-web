@@ -1,15 +1,15 @@
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import {
   CardBuilderState,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
-import { BaseType } from 'src/pages/CardBuilder/types'
 import { colors } from 'src/styles'
 
 export const sampleCardBuilderState: CardBuilderState = {
-  ...initialStateOptions[BaseType.Template],
+  ...initialStateOptions[CardSpecBaseType.Template],
   cardVersionId: 'cardv_1234',
-  baseType: BaseType.Template,
-  templateId: 'nicole',
+  baseType: CardSpecBaseType.Template,
+  templateId: 'konawide',
   templateCustomization: {
     contactInfo: {
       name: 'Spongebob Squarepants',
@@ -35,25 +35,9 @@ export const sampleCardBuilderState: CardBuilderState = {
     },
   },
   quantity: 100,
-  formData: {
-    name: 'Spongebob',
-    addressLine1: '123 Pineapple St',
-    city: 'Bikini Bottom',
-    state: 'UW',
-    postalCode: '12345',
-  },
-  stripeToken: {
-    card: {
-      id: 'idk',
-      brand: 'Visa',
-      funding: 'credit',
-      last4: '4242',
-      // eslint-disable-next-line
-      address_zip: '94115',
-    },
-  } as any,
-  submissionError: {
-    message: 'The security code you entered is incorrect.',
-    backlinkToStep: 'checkout',
-  },
+  // ============ UNCOMMENT THESE LINES TO RENDER A SUBMISSION ERROR
+  // submissionError: {
+  //   message: 'The security code you entered is incorrect.',
+  //   backlinkToStep: 'checkout',
+  // },
 }

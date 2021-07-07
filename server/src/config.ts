@@ -3,6 +3,7 @@ import ms from 'ms'
 export const AUTH_TOKEN_PRIVATE_KEY = process.env.AUTH_TOKEN_PRIVATE_KEY
 export const DEPLOY_ENV = process.env.ENV as 'development' | 'staging' | 'production'
 export const NODE_ENV = (process.env.NODE_ENV ?? 'development') as 'development' | 'production'
+export const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN
 export const APP_SERVER_PORT = process.env.APP_SERVER_PORT ?? '3000'
 export const SENDGRID_TOKEN =
   process.env.NODE_ENV === 'test'

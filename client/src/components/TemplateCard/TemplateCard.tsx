@@ -1,6 +1,6 @@
 import * as React from 'react'
 import templates from 'src/templates'
-import { TemplateID } from 'src/templates'
+import { TemplateID } from 'src/templates/types'
 import shadows from 'src/styles/shadows'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 

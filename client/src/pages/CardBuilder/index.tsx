@@ -1,9 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
 import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
-import { useMutation } from 'src/apollo'
+import { useMutation, useQuery } from 'src/apollo'
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
+import { InitializeCardBuilder } from 'src/apollo/types/InitializeCardBuilder'
+import { LoadExistingCardBuilderOrder } from 'src/apollo/types/LoadExistingCardBuilderOrder'
 import {
   SubmitCustomOrderMutation,
   SubmitCustomOrderMutationVariables,
@@ -20,32 +21,29 @@ import BaseStep from 'src/pages/CardBuilder/BaseStep'
 import {
   CardBuilderAction,
   cardBuilderReducer,
+  createCardBuilderStateFromExistingOrder,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
-import CheckoutStep from 'src/pages/CardBuilder/CheckoutStep'
 import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
 import CustomReviewStep from 'src/pages/CardBuilder/CustomReviewStep'
 import {
   INITIALIZE_CARD_BUILDER_MUTATION,
+  LOAD_EXISTING_CARD_BUILDER_ORDER,
   SUBMIT_CUSTOM_ORDER_MUTATION,
   SUBMIT_TEMPLATE_ORDER_MUTATION,
 } from 'src/pages/CardBuilder/mutations'
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
-import {
-  BaseType,
-  CardBuilderStep,
-  CheckoutFormData,
-} from 'src/pages/CardBuilder/types'
+import { CardBuilderStep } from 'src/pages/CardBuilder/types'
+import { getAllOmittedContactFields } from 'src/templates/utils'
+import LoadingPage from 'src/pages/LoadingPage'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { dataURItoBlob } from 'src/utils/image'
-import { isValidStateAbr } from 'src/utils/states'
-import * as yup from 'yup'
 
 interface ParamsType {
-  buildBaseType?: 'custom' | 'template' | string
+  buildBaseType?: 'custom' | 'template' | 'success' | 'cancel' | string
 }
 
 const bp = 'lg'
@@ -55,12 +53,13 @@ const CardBuilder = () => {
   const location = useLocation()
   const history = useHistory()
   const isDesktop = useBreakpoint('lg')
+  const orderIdSearchParam = new URLSearchParams(location.search).get('orderId')
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
       ? {
-          custom: BaseType.Custom,
-          template: BaseType.Template,
+          custom: CardSpecBaseType.Custom,
+          template: CardSpecBaseType.Template,
         }[baseTypeQueryParam]
       : null
 
@@ -69,7 +68,7 @@ const CardBuilder = () => {
     (() => {
       const initialState = baseType
         ? initialStateOptions[baseType]
-        : initialStateOptions[BaseType.Custom]
+        : initialStateOptions[CardSpecBaseType.Custom]
 
       const queryParams = new URLSearchParams(location.search)
       const prefillName = queryParams.get('prefillName')
@@ -77,7 +76,6 @@ const CardBuilder = () => {
         initialState.templateCustomization = {
           contactInfo: { name: prefillName },
         }
-        initialState.formData.name = prefillName
       }
 
       return initialState
@@ -87,29 +85,87 @@ const CardBuilder = () => {
   const [
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
-  ] = useMutation(INITIALIZE_CARD_BUILDER_MUTATION)
+  ] = useMutation<InitializeCardBuilder>(INITIALIZE_CARD_BUILDER_MUTATION)
 
-  // Request an initialized CardVersion from the API
-  // when the card builder loads so we can use its id
-  // things like the QR code URL
+  const {
+    data: existingOrderData,
+    ...loadExistingOrderQuery
+  } = useQuery<LoadExistingCardBuilderOrder>(LOAD_EXISTING_CARD_BUILDER_ORDER, {
+    skip: !orderIdSearchParam,
+    variables: {
+      orderId: orderIdSearchParam,
+    },
+  })
+
   const initialize = React.useCallback(async () => {
-    if (initializeCardBuilderMutationResult.called) {
-      return
-    }
+    switch (baseTypeQueryParam) {
+      // If the user canceled the order from an external location (currently
+      // this would just be Stripe Checkout), there should be an orderId query param
+      // that we fired off an "orders" query with above, wait for its result
+      case 'cancel': {
+        if (!loadExistingOrderQuery.called || loadExistingOrderQuery.loading) {
+          return null
+        }
 
-    const result = await initializeCardBuilder({
-      variables: {
-        baseType: cardBuilderState.baseType,
-      },
-    })
-    if (result.errors) {
-      console.log(result.errors)
-      throw new Error('oh no!')
+        const existingOrder = existingOrderData?.order
+        if (!existingOrder) {
+          return history.push('/shop')
+        }
+
+        // Build up the card builder state from the order specified in the orderId search param
+        const cardBuilderStateFromBefore = await createCardBuilderStateFromExistingOrder(
+          existingOrder,
+        )
+        updateCardBuilderState(cardBuilderStateFromBefore)
+
+        history.push(
+          `/card-studio/${existingOrder.cardVersion.baseType.toLowerCase()}`,
+        )
+        break
+      }
+      // This means the user landed here after a successful Stripe Checkout payment + redirection.
+      // The URL would have an `?orderId=ord_*` on it so we can use that to redirect them to the
+      // order detail view for this completed order.
+      case 'success': {
+        history.push(`/dashboard/orders/${orderIdSearchParam}`)
+        break
+      }
+      // Request an initialized CardVersion from the API when the card builder loads so we can use its id
+      // for things like the QR code URL
+      case 'custom':
+      case 'template': {
+        if (
+          cardBuilderState.cardVersionId ||
+          initializeCardBuilderMutationResult.called
+        ) {
+          return
+        }
+
+        const result = await initializeCardBuilder({
+          variables: {
+            baseType: cardBuilderState.baseType,
+          },
+        })
+        if (result.errors) {
+          console.log(result.errors)
+          throw new Error('oh no!')
+        }
+        updateCardBuilderState({
+          cardVersionId: result.data?.createEmptyCardVersion.id,
+        })
+        break
+      }
+      default:
+        // Should never come to this
+        break
     }
-    updateCardBuilderState({
-      cardVersionId: result.data.createEmptyCardVersion.id,
-    })
   }, [
+    orderIdSearchParam,
+    existingOrderData,
+    loadExistingOrderQuery.called,
+    loadExistingOrderQuery.loading,
+    history,
+    baseTypeQueryParam,
     initializeCardBuilder,
     initializeCardBuilderMutationResult,
     cardBuilderState,
@@ -120,27 +176,7 @@ const CardBuilder = () => {
     initialize()
   }, [initialize])
 
-  const checkoutFormMethods = useForm<CheckoutFormData>({
-    defaultValues: cardBuilderState.formData ?? undefined,
-    mode: 'onBlur',
-    resolver: yupResolver(
-      yup.object().shape({
-        state: yup
-          .string()
-          .required('Required')
-          .test('is-state', 'Invalid state', isValidStateAbr),
-        postalCode: yup
-          .string()
-          .required('Required')
-          .matches(/^\d{5}$/, 'Invalid ZIP code'),
-      }),
-    ),
-  })
-
-  const watchedFields = checkoutFormMethods.watch()
-
   const stripe = useStripe()
-  const elements = useElements()
   const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
     SUBMIT_CUSTOM_ORDER_MUTATION,
   )
@@ -148,63 +184,20 @@ const CardBuilder = () => {
     SUBMIT_TEMPLATE_ORDER_MUTATION,
   )
 
-  const confirmCardPayment = React.useCallback(
-    async (clientSecret: string) => {
-      if (stripe == null || cardBuilderState.stripeToken == null) {
-        // TODO: Handle errors gracefully
-        throw new Error('stripe is not defined or the token is missing')
-      }
-
-      return stripe.confirmCardPayment(clientSecret, {
-        // eslint-disable-next-line camelcase
-        payment_method: {
-          card: {
-            token: cardBuilderState.stripeToken.id,
-          },
-          // eslint-disable-next-line camelcase
-          billing_details: {
-            name: cardBuilderState.formData.name,
-          },
-        },
-      })
-    },
-    [cardBuilderState, stripe],
-  )
-
   const submitOrder = React.useCallback(async () => {
-    const { formData, stripeToken, quantity } = cardBuilderState
-
-    if (
-      formData == null ||
-      formData.name == null ||
-      formData.addressLine1 == null ||
-      formData.city == null ||
-      formData.state == null ||
-      formData.postalCode == null ||
-      stripeToken == null
-    ) {
-      console.log('missing data')
-      return
-    }
+    const { quantity, previousOrder } = cardBuilderState
 
     // The parameters needed for both custom and template-based orders
     const basePayload:
       | Partial<SubmitCustomOrderMutationVariables['payload']>
       | Partial<SubmitTemplateOrderMutationVariables['payload']> = {
-      shippingAddress: {
-        line1: formData?.addressLine1,
-        line2: formData?.addressLine2,
-        city: formData?.city,
-        state: formData?.state.toUpperCase(),
-        postalCode: formData?.postalCode,
-      },
+      previousOrder,
       quantity,
-      stripeToken: stripeToken?.id,
     }
 
     let result = null
     switch (cardBuilderState.baseType) {
-      case BaseType.Custom:
+      case CardSpecBaseType.Custom:
         const customResult = await submitCustomOrder({
           variables: {
             payload: {
@@ -216,9 +209,15 @@ const CardBuilder = () => {
         })
         result = customResult.data?.submitCustomOrder
         break
-      case BaseType.Template:
-        // Use <any, any> to appease TS for now. See TemplateCard.tsx for more details on why this is necessary.
-        const template = templateLibrary[cardBuilderState.templateId!]
+      case CardSpecBaseType.Template:
+        const { templateId } = cardBuilderState
+        if (!templateId) {
+          throw new Error(
+            'Sumbitting a template order without a templateId defined',
+          )
+        }
+
+        const template = templateLibrary[templateId]
         const cardImageDataUrls = await template.renderBothSidesToDataUrls(
           template.createOptionsFromFormFields(
             cardBuilderState.templateCustomization!,
@@ -228,6 +227,7 @@ const CardBuilder = () => {
 
         const templateSpecificRequiredPayload = {
           templateId: cardBuilderState.templateId,
+          templateName: templateLibrary[templateId].name,
           cardVersionId: cardBuilderState.cardVersionId,
           colorScheme: cardBuilderState.templateCustomization?.colorScheme,
           contactInfo: cardBuilderState.templateCustomization?.contactInfo,
@@ -272,45 +272,19 @@ const CardBuilder = () => {
       throw new Error('Failed to create order, submitOrderResult was null')
     }
 
-    const cardConfirmationResult = await confirmCardPayment(
-      submitOrderResult.clientSecret,
-    )
-
-    if (cardConfirmationResult.error) {
+    // Order successfully created, redirect to Stripe Checkout so we can get that moola
+    const result = await stripe?.redirectToCheckout({
+      sessionId: submitOrderResult.checkoutSession,
+    })
+    if (result?.error) {
       updateCardBuilderState({
         submissionError: {
           message:
-            cardConfirmationResult.error.message ??
-            'An unknown error occurred while submitting your card information.',
-          field: 'cardDetails',
-          backlinkToStep: 'checkout',
+            result.error.message || 'Unknown error while loading checkout',
         },
       })
-      return
-    } else if (cardConfirmationResult.paymentIntent == null) {
-      throw new Error('paymentIntent in response undefined')
     }
-    updateCardBuilderState({
-      paymentIntent: cardConfirmationResult.paymentIntent,
-    })
-
-    // All done, redirect to the dashboard cards page so they can see their newly active card
-    history.push(`/dashboard/cards`)
-  }, [confirmCardPayment, submitOrder, history])
-
-  if (!baseType) {
-    // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
-    return <Redirect to="/shop" />
-  }
-
-  // When the checkout form is mounted, the most up-to-date data comes from watchedFields
-  // since the user may be editing the fields. On wizard step change, we cache the form data to
-  // cardBuilderState before react-hook-form unmounts the input (and watchedFields becomes empty)
-  // so if we're not on the checkout step, use that cache instead
-  const formData =
-    cardBuilderState.currentStep === 'checkout'
-      ? watchedFields
-      : cardBuilderState.formData
+  }, [submitOrder, stripe])
 
   const handleWizardStepTransition = async (_goingToStep: string) => {
     const comingFromStep = cardBuilderState.currentStep
@@ -327,52 +301,17 @@ const CardBuilder = () => {
     // (base) => build => checkout => review
     switch (comingFromStep) {
       case 'build':
-        if (baseType === BaseType.Template) {
+        if (baseType === CardSpecBaseType.Template) {
           // If the user leaves the template build step with any contact info fields not yet explicitly omitted
           // but also not filled in, implicitly mark the fields as omitted
           if (!cardBuilderState.templateId) break
-          const selectedTemplate = templateLibrary[cardBuilderState.templateId]
-
-          const fieldsLeftEmptyButForgotToOmit = selectedTemplate.contactInfoFieldNames.filter(
-            (contactInfoFieldName) =>
-              !cardBuilderState.templateCustomization?.contactInfo[
-                contactInfoFieldName
-              ],
-          )
 
           updateCardBuilderState({
-            omittedOptionalFields: fieldsLeftEmptyButForgotToOmit.map(
-              (fieldName) => `contactInfo.${fieldName}`,
+            omittedOptionalFields: getAllOmittedContactFields(
+              cardBuilderState.templateId,
+              cardBuilderState.templateCustomization?.contactInfo,
             ),
           })
-        }
-        break
-      case 'checkout':
-        // Cache the current form data in cardBuilderState since react-hook-form
-        // will drop it when the form fields unmount
-        cardBuilderStateUpdate.formData = checkoutFormMethods.getValues()
-
-        if (!cardBuilderState.stripeToken) {
-          // Submit the card info to Stripe if they didn't already do so during a previous pass
-          // through this step
-          if (stripe == null || elements == null) {
-            throw new Error('Stripe and/or Stripe Elements not initialized')
-          }
-
-          const card = elements.getElement(CardElement)
-          if (card == null) {
-            throw new Error('Could not find a Card Element')
-          }
-
-          try {
-            const result = await stripe.createToken(card)
-            if (result.error == null && result.token != null) {
-              const { token: stripeToken } = result
-              cardBuilderStateUpdate.stripeToken = stripeToken
-            }
-          } catch (err) {
-            console.log({ err })
-          }
         }
         break
       default:
@@ -380,6 +319,13 @@ const CardBuilder = () => {
     }
 
     updateCardBuilderState(cardBuilderStateUpdate)
+  }
+
+  if (baseTypeQueryParam === 'success' || baseTypeQueryParam === 'cancel') {
+    return <LoadingPage fullscreen />
+  } else if (!baseType) {
+    // If user goes straight to `/card-studio` or `/card-studio/adsdfsaf`, redirect them to the shop front
+    return <Redirect to="/shop" />
   }
 
   return (
@@ -410,28 +356,30 @@ const CardBuilder = () => {
             <Text.PageHeader>
               {
                 {
-                  [BaseType.Custom]: 'Build a card with your own design',
-                  [BaseType.Template]: 'Build a card from a template',
+                  [CardSpecBaseType.Custom]:
+                    'Build a card with your own design',
+                  [CardSpecBaseType.Template]: 'Build a card from a template',
                 }[baseType]
               }
             </Text.PageHeader>
           </Box>
           <Wizard
-            completionButtonLabel="Submit order"
+            completionButtonLabel="Continue to payment"
             currentStep={cardBuilderState.currentStep}
             handleStepTransition={handleWizardStepTransition}
             handleSubmit={handleWizardSubmit}
           >
-            {baseType === BaseType.Template && (
+            {baseType === CardSpecBaseType.Template && (
               <WizardStep
                 id="base"
                 icon="stack"
                 label="Base"
                 isReadyForNextStep={
                   {
-                    [BaseType.Custom]: true,
+                    [CardSpecBaseType.Custom]: true,
                     // For template base type, the template must have been chosen
-                    [BaseType.Template]: cardBuilderState.templateId != null,
+                    [CardSpecBaseType.Template]:
+                      cardBuilderState.templateId != null,
                   }[cardBuilderState.baseType]
                 }
               >
@@ -449,9 +397,10 @@ const CardBuilder = () => {
               isReadyForNextStep={
                 {
                   // For custom base type, at least the front design file must have been provided
-                  [BaseType.Custom]: cardBuilderState.frontDesignFile != null,
+                  [CardSpecBaseType.Custom]:
+                    cardBuilderState.frontDesignFile != null,
                   // TBD requirements for template
-                  [BaseType.Template]:
+                  [CardSpecBaseType.Template]:
                     cardBuilderState.templateId != null &&
                     templateLibrary[cardBuilderState.templateId].isComplete,
                 }[cardBuilderState.baseType]
@@ -459,13 +408,13 @@ const CardBuilder = () => {
             >
               {
                 {
-                  [BaseType.Custom]: (
+                  [CardSpecBaseType.Custom]: (
                     <CustomBuildStep
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}
                     />
                   ),
-                  [BaseType.Template]: (
+                  [CardSpecBaseType.Template]: (
                     <TemplateBuildStep
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}
@@ -475,39 +424,22 @@ const CardBuilder = () => {
               }
             </WizardStep>
             <WizardStep
-              id="checkout"
-              icon="cart"
-              label="Checkout"
-              isReadyForNextStep={[
-                formData.addressLine1,
-                formData.state,
-                formData.city,
-                formData.postalCode,
-                formData.name,
-                cardBuilderState.cardEntryComplete,
-                // If the current step isn't build, formState won't be valid since the form
-                // isn't mounted so we trust that it's valid since we were able to get off
-                // the build step in the first place
-                cardBuilderState.currentStep !== 'build' ||
-                  checkoutFormMethods.formState.isValid,
-              ].every(Boolean)}
+              id="review"
+              icon="checkO"
+              label="Review"
+              isReadyForNextStep={[cardBuilderState.quantity != null].every(
+                Boolean,
+              )}
             >
-              <CheckoutStep
-                cardBuilderState={cardBuilderState}
-                updateCardBuilderState={updateCardBuilderState}
-                checkoutFormMethods={checkoutFormMethods}
-              />
-            </WizardStep>
-            <WizardStep id="review" icon="checkO" label="Review">
               {
                 {
-                  [BaseType.Custom]: (
+                  [CardSpecBaseType.Custom]: (
                     <CustomReviewStep
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}
                     />
                   ),
-                  [BaseType.Template]: (
+                  [CardSpecBaseType.Template]: (
                     <TemplateReviewStep
                       cardBuilderState={cardBuilderState}
                       updateCardBuilderState={updateCardBuilderState}

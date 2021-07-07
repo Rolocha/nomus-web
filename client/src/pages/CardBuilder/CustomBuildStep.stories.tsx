@@ -1,13 +1,13 @@
 import { action } from '@storybook/addon-actions'
 import * as React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import Box from 'src/components/Box'
 import {
   cardBuilderReducer,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
 import CustomBuildStep from 'src/pages/CardBuilder/CustomBuildStep'
-import { BaseType } from 'src/pages/CardBuilder/types'
 
 export default {
   title: 'components/CardBuilder/Custom/BuildStep',
@@ -30,28 +30,11 @@ export const Primary = () => {
   const [cardBuilderState, updateCardBuilderState] = React.useReducer(
     cardBuilderReducer,
     {
-      ...initialStateOptions[BaseType.Template],
+      ...initialStateOptions[CardSpecBaseType.Template],
       cardVersionId: 'cardv_1234',
-      baseType: BaseType.Custom,
+      baseType: CardSpecBaseType.Custom,
       templateId: 'velia',
       quantity: 100,
-      formData: {
-        name: 'Spongebob',
-        addressLine1: '123 Pineapple St',
-        city: 'Bikini Bottom',
-        state: 'UW',
-        postalCode: '12345',
-      },
-      stripeToken: {
-        card: {
-          id: 'idk',
-          brand: 'Visa',
-          funding: 'credit',
-          last4: '4242',
-          // eslint-disable-next-line
-          address_zip: '94115',
-        },
-      } as any,
     },
   )
 

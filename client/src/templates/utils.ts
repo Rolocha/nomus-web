@@ -1,4 +1,6 @@
 import { colors } from 'src/styles'
+import templateLibrary from 'src/templates'
+import { TemplateID } from 'src/templates/types'
 
 export const createNFCTapIconSVG = ({
   color = colors.nomusBlue,
@@ -55,4 +57,23 @@ export const getNameForColorKey = (colorKey: string): string => {
     return colorKeyToNameMap[colorKey as keyof typeof colorKeyToNameMap]
   }
   return ''
+}
+
+export function isValidTemplateID(s: string): s is TemplateID {
+  return templateLibrary.hasOwnProperty(s)
+}
+
+export const getAllOmittedContactFields = (
+  templateId: TemplateID,
+  providedInfo: Record<string, string>,
+) => {
+  const selectedTemplate = templateLibrary[templateId]
+  const filledOutFields = Object.entries(providedInfo)
+    .filter(([k, v]) => !!v)
+    .map(([k, v]) => k)
+  return selectedTemplate.contactInfoFieldNames
+    .filter(
+      (contactInfoFieldName) => !filledOutFields.includes(contactInfoFieldName),
+    )
+    .map((fieldName) => `contactInfo.${fieldName}`)
 }

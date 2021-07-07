@@ -51,25 +51,22 @@ export default ({ order }: Props) => {
       </Text.Body3>
       <Box
         pt={2}
-        display="flex"
-        flexDirection={{ base: 'column', [bp]: 'row' }}
-        mx={{ base: -2, [bp]: -2 }}
-        my={{ base: -2, [bp]: -2 }}
+        display="grid"
+        gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr' }}
+        gridGap="16px"
       >
         {order.cardVersion.frontImageUrl && (
           <Image
-            p={2}
-            w={{ base: '100%', [bp]: '50%' }}
             src={order.cardVersion.frontImageUrl}
             alt={`front of business card from order ${order.id}`}
+            boxShadow="businessCard"
           />
         )}
         {order.cardVersion.backImageUrl && (
           <Image
-            p={2}
-            w={{ base: '100%', [bp]: '50%' }}
             src={order.cardVersion.backImageUrl}
             alt={`back of business card from order ${order.id}`}
+            boxShadow="businessCard"
           />
         )}
       </Box>

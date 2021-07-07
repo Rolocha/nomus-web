@@ -16,6 +16,8 @@ import { BaseModel } from './BaseModel'
 import { Address, OrderPrice } from './subschemas'
 import { EventualResult, Result } from 'src/util/error'
 import OrderEvent from './OrderEvent'
+import { postNewOrder, SlackChannel } from 'src/util/slack'
+import { DEPLOY_ENV } from 'src/config'
 
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
@@ -93,10 +95,16 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  // Stripe PaymentIntent id. For now, this is null but future work will replace this
+  // Stripe PaymentIntent id; may
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
+
+  // Stripe CheckoutSession id
+  // See https://stripe.com/docs/api/checkout/sessions/object
+  @prop({ required: false })
+  @Field({ nullable: true })
+  checkoutSession: string
 
   @prop({
     required: false,
@@ -113,6 +121,10 @@ class Order extends BaseModel({
   @prop({ required: false, description: 'URL pointing to the document to be printed' })
   @Field({ nullable: true })
   printSpecUrl: string
+
+  @prop({ required: false, description: 'The name of the person to ship the order to' })
+  @Field({ nullable: true })
+  shippingName: string
 
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
@@ -146,10 +158,17 @@ class Order extends BaseModel({
         })
         this.state = futureState
         await this.save()
-        return Result.ok(this)
       } catch (e) {
         return Result.fail('save-error')
       }
+      if (DEPLOY_ENV === 'production') {
+        try {
+          postNewOrder(SlackChannel.Orders, this)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+      return Result.ok(this)
     }
     return Result.fail('invalid-transition')
   }

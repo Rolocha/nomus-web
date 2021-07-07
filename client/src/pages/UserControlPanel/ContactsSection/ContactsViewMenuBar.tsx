@@ -158,7 +158,7 @@ const ContactCardsList = ({
                 nomus.me/{selectedContact.username}
               </Text.Body2>
               <Box>
-                <Icon of="externalLink" color="linkBlue" boxSize="0.8em" />
+                <Icon of="externalLink" color="linkBlue" />
               </Box>
             </Box>
           </Link>
