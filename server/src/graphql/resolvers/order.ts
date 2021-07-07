@@ -2,7 +2,7 @@ import { DocumentType, mongoose } from '@typegoose/typegoose'
 import { AuthenticationError } from 'apollo-server-errors'
 import { GraphQLUpload } from 'apollo-server-express'
 import { FileUpload } from 'graphql-upload'
-import { BASE_URL } from 'src/config'
+import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
 import {
@@ -452,7 +452,11 @@ class OrderResolver {
           // based on the shipping address the user enters
           // See https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-dynamic_tax_rates
           // @ts-ignore
-          dynamic_tax_rates: ['txr_1J5P6LGTbyReVwro0YiKRJns'],
+          dynamic_tax_rates: [
+            DEPLOY_ENV === 'production'
+              ? 'txr_1J5P6SGTbyReVwro2PPLKDBD'
+              : 'txr_1J5P6LGTbyReVwro0YiKRJns',
+          ],
         },
       ],
       payment_intent_data: {
