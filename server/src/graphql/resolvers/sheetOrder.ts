@@ -1,6 +1,7 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { Card, Sheet, SheetOrder } from 'src/models'
 import { doNTimes } from 'src/util/array'
+import { performTransaction } from 'src/util/db'
 import { Role, SheetState } from 'src/util/enums'
 import { Arg, Authorized, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql'
 
@@ -45,24 +46,21 @@ class SheetOrderResolver {
 
     sheets.forEach((sheet) => {
       // Create `NUM_CARDS_IN_SHEET` cards for each sheet
-      const cardsInSheet: DocumentType<Card>[] = doNTimes(
-        numCardsInSheet ?? DEFAULT_NUM_CARDS_IN_SHEET,
-        () => {
-          const card = new Card.mongo()
-          card.nfcId = `${sheet.id}-${card.id}`
-          return card
-        }
-      )
+      const cardsInSheet: DocumentType<Card>[] = doNTimes(numCardsInSheet, () => {
+        const card = new Card.mongo()
+        card.nfcId = `${sheet.id}-${card.id}`
+        return card
+      })
       sheet.cards = cardsInSheet
       documentsToSave.push(...cardsInSheet)
     })
 
-    await Promise.all(documentsToSave.map((document) => document.save()))
-    const sheetOrder = await SheetOrder.mongo.create({
-      sheets,
+    return await performTransaction(async () => {
+      await Promise.all(documentsToSave.map((document) => document.save()))
+      return SheetOrder.mongo.create({
+        sheets,
+      })
     })
-
-    return sheetOrder
   }
 
   @Authorized(Role.Admin)
@@ -76,17 +74,20 @@ class SheetOrderResolver {
     const sheetOrder = await SheetOrder.mongo.findById(sheetOrderId)
     const sheetIds = sheetOrder.sheets as string[]
 
-    await Sheet.mongo.updateMany(
-      {
-        _id: {
-          $in: sheetIds,
+    await performTransaction(async () =>
+      Sheet.mongo.updateMany(
+        {
+          _id: {
+            $in: sheetIds,
+          },
         },
-      },
-      {
-        state: futureState,
-      }
+        {
+          state: futureState,
+        }
+      )
     )
-    return sheetOrder
+
+    return SheetOrder.mongo.findById(sheetOrderId)
   }
 }
 export default SheetOrderResolver
