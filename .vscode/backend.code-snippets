@@ -1,0 +1,19 @@
+{
+  "New migration": {
+    "prefix": "migration:new",
+    "body": [
+      "import { createMigration } from './base-migration'",
+      "",
+      "export default createMigration({",
+      "  name: '$1',",
+      "  up: async () => {",
+      "      ${2:throw new Error('migrate up not yet implemented for $1')}",
+      "    },",
+      "    down: async () => {",
+      "      ${3:throw new Error('migrate up not yet implemented for $1')}",
+      "  },",
+      "})"
+    ],
+    "description": "The basics for a new React component from a blank file"
+  }
+}
