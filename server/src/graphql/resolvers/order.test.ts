@@ -672,7 +672,7 @@ describe('OrderResolver', () => {
         }),
       ])
 
-      expect(response.errors[0].message).toBe('Error: invalid-transition')
+      expect(response.errors[0].message).toBe('invalid-transition')
     })
   })
 })
