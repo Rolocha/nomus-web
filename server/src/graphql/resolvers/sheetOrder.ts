@@ -35,7 +35,8 @@ class SheetOrderResolver {
   })
   async createSheetOrder(
     @Arg('numSheets', { nullable: false }) numSheets: number,
-    @Arg('numCardsInSheet', { nullable: true }) numCardsInSheet: number | null
+    @Arg('numCardsInSheet', { nullable: true, defaultValue: DEFAULT_NUM_CARDS_IN_SHEET })
+    numCardsInSheet: number
   ): Promise<SheetOrder> {
     // Create {numSheets} many Sheet objects
     const sheets: DocumentType<Sheet>[] = doNTimes(numSheets, () => new Sheet.mongo())
