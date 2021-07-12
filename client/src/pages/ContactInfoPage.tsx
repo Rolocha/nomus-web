@@ -251,7 +251,7 @@ const ContactInfoPage = () => {
                   }[cardOrientation]}
                   src={contact.cardFrontImageUrl}
                   boxShadow="businessCard"
-                  alt={formatName(contact.name)}
+                  alt={`front of ${formatName(contact.name)}'s Nomus card`}
                 />
               )}
             </Box>
@@ -274,7 +274,7 @@ const ContactInfoPage = () => {
                 gridArea="businessCard"
                 src={contact.cardFrontImageUrl}
                 boxShadow="businessCard"
-                alt={formatName(contact.name)}
+                alt={`front of ${formatName(contact.name)}'s Nomus card`}
               />
             )}
 
