@@ -234,7 +234,10 @@ class ContactsResolver {
         existingConnection.meetingPlace = contactInfo.meetingPlace
       }
       if (contactInfo.tags != null) {
-        existingConnection.tags = contactInfo.tags
+        // remove whitespace and empty values
+        existingConnection.tags = contactInfo.tags.filter(function (el) {
+          return el
+        })
       }
       if (contactInfo.notes != null) {
         existingConnection.notes = contactInfo.notes
