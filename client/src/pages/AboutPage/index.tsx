@@ -580,7 +580,7 @@ const AboutPage = () => {
                       {formState.isSubmitted ? (
                         <Text.Plain>You're in the loop!</Text.Plain>
                       ) : (
-                        <Text.Plain>Keep me updated </Text.Plain>
+                        <Text.Plain>Keep me updated</Text.Plain>
                       )}
                     </Box>
                   </Button>
