@@ -5,7 +5,7 @@ import CardVersionResolver from './cardVersion'
 import ContactsResolver from './contacts'
 import OrderResolver from './order'
 import SheetResolver from './sheet'
-import ManufacturingResolver from './manufacturing'
+import SheetOrderResolver from './sheetOrder'
 import LinkerResolver from './linker'
 import OrderEventResolver from './orderEvent'
 
@@ -15,7 +15,7 @@ export default [
   CardVersionResolver,
   OrderResolver,
   SheetResolver,
-  ManufacturingResolver,
+  SheetOrderResolver,
   LinkerResolver,
   OrderEventResolver,
 ] as NonEmptyArray<Function>

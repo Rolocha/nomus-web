@@ -31,6 +31,7 @@ import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Connection } from 'src/models'
+import { performTransaction } from 'src/util/db'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -172,9 +173,7 @@ class UserResolver {
       $or: [{ from: context.user.id }, { to: context.user.id }],
     })
 
-    const session = await mongoose.startSession()
-    session.startTransaction()
-    try {
+    return performTransaction(async () => {
       const connectionBatchDeletionResult = await Connection.batchDelete(
         connections.map((connection) => connection.id)
       )
@@ -183,9 +182,7 @@ class UserResolver {
       if (userDeletionResult.isSuccess && connectionBatchDeletionResult.isSuccess === false) {
         throw new Error('Failed to delete user')
       }
-    } finally {
-      session.endSession()
-    }
+    })
   }
 
   @Authorized(Role.User)
