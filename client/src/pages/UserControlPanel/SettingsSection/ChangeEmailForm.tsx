@@ -67,7 +67,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
       } else {
         setError('email', {
           type: 'server',
-          message: 'Oops, something went wrong. Try again in a bit!',
+          message: 'Something went wrong with that email, try a different one',
         })
       }
     } else {
