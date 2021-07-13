@@ -6,10 +6,10 @@ import {
   ContactPageQueryVariables,
 } from 'src/apollo/types/ContactPageQuery'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
+import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import NotesEditingModal, {
@@ -27,6 +27,7 @@ import {
   getCurrentDateForDateInput,
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
+import { getImageDimensions, ImageDimensions } from 'src/utils/image'
 import { formatName } from 'src/utils/name'
 import FourOhFourPage from './FourOhFourPage'
 
@@ -45,6 +46,9 @@ const ContactInfoPage = () => {
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
+  const [businessCardDimensions, setBusinessCardDimensions] = React.useState<
+    ImageDimensions | 'determining' | null
+  >(null)
 
   const openNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(true)
@@ -111,6 +115,27 @@ const ContactInfoPage = () => {
     },
     [loggedIn, username],
   )
+
+  React.useEffect(() => {
+    if (publicContact?.cardFrontImageUrl && businessCardDimensions == null) {
+      setBusinessCardDimensions('determining')
+      getImageDimensions(publicContact?.cardFrontImageUrl).then(
+        setBusinessCardDimensions,
+      )
+    }
+  }, [publicContact, businessCardDimensions])
+
+  const cardOrientation = React.useMemo(() => {
+    if (
+      businessCardDimensions == null ||
+      businessCardDimensions === 'determining'
+    ) {
+      return 'unknown'
+    }
+    return businessCardDimensions.height > businessCardDimensions.width
+      ? 'vertical'
+      : 'horizontal'
+  }, [businessCardDimensions])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -194,11 +219,41 @@ const ContactInfoPage = () => {
             gridColumnGap={3}
             gridRowGap={3}
           >
-            <Box gridArea="profilePic" placeSelf="center" width="100%">
+            <Box
+              gridArea="profilePic"
+              placeSelf="center"
+              width="100%"
+              position="relative"
+            >
               <ProfilePicture
                 name={contact.name}
                 profilePicUrl={contact.profilePicUrl}
               />
+              {/* Small business card overlaid on corner of image for mobile view */}
+              {contact.cardFrontImageUrl && (
+                <Image
+                  display={{ base: 'block', [bp]: 'none' }}
+                  position="absolute"
+                  {...{
+                    vertical: {
+                      width: '25%',
+                      bottom: 0,
+                      right: 0,
+                      transform: 'rotateZ(15deg)',
+                    },
+                    horizontal: {
+                      width: '50%',
+                      bottom: '-5%',
+                      right: '-5%',
+                      transform: 'rotateZ(-15deg)',
+                    },
+                    unknown: {},
+                  }[cardOrientation]}
+                  src={contact.cardFrontImageUrl}
+                  boxShadow="businessCard"
+                  alt={`front of ${formatName(contact.name)}'s Nomus card`}
+                />
+              )}
             </Box>
 
             <Box
@@ -213,20 +268,14 @@ const ContactInfoPage = () => {
               <Text.Body2>{contact.headline}</Text.Body2>
             </Box>
 
-            {(contact.cardFrontImageUrl || contact.cardBackImageUrl) && (
-              <Box
+            {contact.cardFrontImageUrl && (
+              <Image
+                display={{ base: 'none', [bp]: 'block' }}
                 gridArea="businessCard"
-                width={{ base: '25%', [bp]: '100%' }}
-                mb={{ base: 0, [bp]: 2 }}
-                mr={{ base: 2, [bp]: 0 }}
-              >
-                <BusinessCardImage
-                  width="100%"
-                  frontImageUrl={contact.cardFrontImageUrl}
-                  backImageUrl={contact.cardBackImageUrl}
-                  nameForImageAlt={formatName(contact.name)}
-                />
-              </Box>
+                src={contact.cardFrontImageUrl}
+                boxShadow="businessCard"
+                alt={`front of ${formatName(contact.name)}'s Nomus card`}
+              />
             )}
 
             <Box gridArea="profileInfo">
