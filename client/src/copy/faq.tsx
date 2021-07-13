@@ -30,7 +30,7 @@ export const faqItems = [
   {
     question: 'How many can I order?',
     answer:
-      "Nomus offers 2 tiers: 100 cards and 250 cards. The more cards you buy in one order, the more you save. If you'd like to buy more than 250 cards at once, no worries. Just contact us at hi@nomus.me, and we'll sort it out for you.",
+      "Nomus offers three tiers: 25 cards, 100 cards, or 250 cards. The more cards you buy in one order, the more you save. If you'd like to buy more than 250 cards at once, no worries. Just contact us at hi@nomus.me, and we'll sort it out for you.",
   },
   {
     question: 'What size and material are the business cards?',
