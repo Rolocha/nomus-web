@@ -125,6 +125,7 @@ export default () => {
           px="24px"
           to={`/${data.user.username}`}
           buttonStyle="secondary"
+          target="_blank"
         >
           <Box
             display="flex"
