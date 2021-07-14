@@ -216,12 +216,14 @@ describe('Contact Info Page', () => {
       renderResult.queryByAltText(`profile picture of ${formattedName}`),
     ).toBeInTheDocument()
 
-    expect(
-      renderResult.queryByAltText(`front of ${formattedName}'s Nomus card`),
-    ).toBeInTheDocument()
-    expect(
-      renderResult.queryByAltText(`back of ${formattedName}'s Nomus card`),
-    ).toBeInTheDocument()
+    const frontOfCards = renderResult.queryAllByAltText(
+      `front of ${formattedName}'s Nomus card`,
+    )
+    // We render 2 copies of the front of the card:
+    // 1. shown in mobile (small, overlaid on corner of profile pic)
+    // 2. shown in desktop (large, below the picture)
+    expect(frontOfCards).toHaveLength(2)
+    frontOfCards.forEach((el) => expect(el).toBeInTheDocument())
   })
 
   describe('Save contact card button', () => {

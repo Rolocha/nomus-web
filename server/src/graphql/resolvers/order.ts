@@ -12,6 +12,7 @@ import {
   TemplateContactInfoFields,
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
+import { performTransaction } from 'src/util/db'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
@@ -258,34 +259,24 @@ class OrderResolver {
       throw new Error('no-user-specified')
     }
 
-    // start a mongoose Transaction, will only commit to db if all orders succeed.
-    // Any errors thrown will result in rollback and no commit to the db
-    const session = await mongoose.startSession()
-    session.startTransaction()
-    try {
-      const orders = await Order.mongo.find({ _id: { $in: orderIds } })
-      if (!orders) {
-        throw new Error('no-orders-found')
-      }
-      try {
-        const orderTransitionPromises = orders.map(async (order) => {
+    const orders = await Order.mongo.find({ _id: { $in: orderIds } })
+    if (!orders) {
+      throw new Error('no-orders-found')
+    }
+
+    await performTransaction(async () =>
+      Promise.all(
+        orders.map(async (order) => {
           const res = await order.transition(futureState, trigger)
           if (!res.isSuccess) {
             throw res.error
           }
+          return res.value
         })
-        await Promise.all(orderTransitionPromises)
-      } catch (err) {
-        throw new Error(err)
-      }
-      await session.commitTransaction()
-      return orders
-    } catch (err) {
-      await session.abortTransaction()
-      throw new Error(err)
-    } finally {
-      session.endSession()
-    }
+      )
+    )
+
+    return orders
   }
 
   // Get all orders for a User

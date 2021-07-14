@@ -18,6 +18,17 @@ registerEnumType(OrderState, {
   description: 'Current State in Order Tracking State Machine',
 })
 
+export enum SheetState {
+  Created = 'Created',
+  Received = 'Received',
+  Printed = 'Printed',
+}
+
+registerEnumType(SheetState, {
+  name: 'SheetState',
+  description: 'Current state in Sheet state machine',
+})
+
 // Triggers for OrderState changes, stored in OrderEvent collection
 export enum OrderEventTrigger {
   Nomus = 'Nomus', // nomus code performs a state transition

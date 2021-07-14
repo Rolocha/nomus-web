@@ -34,6 +34,6 @@ export const cardSet = [
   {
     header: 'Wallet-friendly',
     icon: <SVG.YellowWallet />,
-    text: `Since Nomus cards last longer than regular business cards, you'll get more bang for your buck. At a price as low as $1 per card, it's a no-brainer. Plus, who doesn't love free shipping?`,
+    text: `Since Nomus cards last longer than regular business cards, you'll get more bang for your buck. At a price as low as $2 per card, it's a no-brainer. Plus, who doesn't love free shipping?`,
   },
 ]
