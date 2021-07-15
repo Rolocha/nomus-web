@@ -267,6 +267,30 @@ describe('UserResolver', () => {
       }
     })
 
+    it('errors when an email is already in use', async () => {
+      const user = await createMockUser({})
+      await createMockUser({ email: 'foo@gmail.com' })
+      const updatePayload = {
+        email: 'foo@gmail.com',
+      }
+      const response = await execQuery({
+        source: `
+        mutation UpdateProfileTestQuery($updatedUser: ProfileUpdateInput!) {
+          updateProfile(updatedUser: $updatedUser) {
+            email
+          }
+        }
+        `,
+        variableValues: {
+          updatedUser: updatePayload,
+        },
+        contextUser: user,
+      })
+
+      expect(response.errors).not.toBeNull()
+      expect(response.errors[0].message).toBe('duplicate-email')
+    })
+
     it('de-verifies email and sends a verification email if email was changed', async () => {
       const user = await createMockUser({
         name: {
