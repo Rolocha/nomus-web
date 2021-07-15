@@ -235,9 +235,7 @@ class ContactsResolver {
       }
       if (contactInfo.tags != null) {
         // remove whitespace and empty values
-        existingConnection.tags = contactInfo.tags.filter(function (el) {
-          return el
-        })
+        existingConnection.tags = contactInfo.tags.filter(Boolean)
       }
       if (contactInfo.notes != null) {
         existingConnection.notes = contactInfo.notes
