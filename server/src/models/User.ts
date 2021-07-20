@@ -78,14 +78,6 @@ export class User extends BaseModel({
   @Field(() => UserPublicProfile, { nullable: true })
   publicProfile: Ref<UserPublicProfile>
 
-  @prop()
-  @Field({ nullable: true })
-  headline: string
-
-  @prop()
-  @Field({ nullable: true })
-  bio: string
-
   @Field({ nullable: true, description: "A URL pointing to the user's profile picture" })
   profilePicUrl: string
 
@@ -93,11 +85,6 @@ export class User extends BaseModel({
   // on profilePicUrl when sending to a client
   @prop()
   profilePicS3Key: string
-
-  // Follows E.164 format - https://en.wikipedia.org/wiki/E.164
-  @prop({ match: /^\+?[1-9]\d{1,14}$/ })
-  @Field({ nullable: true })
-  phoneNumber: string
 
   @prop({
     required: true,
@@ -134,10 +121,6 @@ export class User extends BaseModel({
   @prop({ required: false, ref: () => CardVersion, type: String })
   @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
-
-  @prop({ required: false })
-  @Field()
-  vcfUrl: string
 
   @prop({ default: [Role.User], enum: Role, type: String, required: true }, WhatIsIt.ARRAY)
   @Field((type) => [Role], { nullable: false })
