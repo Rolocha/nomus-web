@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import User, { UserModel } from 'src/models/User'
+import { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -8,7 +8,6 @@ import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPassword
 import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { Connection, UserPublicProfile } from 'src/models'
 import DeletedObject from 'src/models/DeletedObject'
-import { createMockUserPublicProfile } from 'src/__mocks__/models/UserPublicProfile'
 
 jest.mock('src/util/sendgrid')
 

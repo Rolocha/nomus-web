@@ -70,6 +70,7 @@ class UserResolver {
   // Performs any necessary changes to go from DB representation of User to public representation of User
   private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
     await user.populate('defaultCardVersion').execPopulate()
+    await user.populate('publicProfile').execPopulate()
     return {
       ...user.toObject(),
       profilePicUrl: await user.getProfilePicUrl(),
