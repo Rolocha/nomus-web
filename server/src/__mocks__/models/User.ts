@@ -1,7 +1,12 @@
 import { UserModel, User } from 'src/models/User'
 import { Role } from 'src/util/enums'
+import { createMockUserPublicProfile } from 'src/__mocks__/models/UserPublicProfile'
 
 export const createMockUser = async (userOverride: Partial<User> = {}) => {
+  const publicProfileInPayload = await createMockUserPublicProfile(
+    userOverride.publicProfile as Object
+  )
+
   const newUserPayload: Partial<User> = {
     name: {
       first: 'John',
@@ -10,9 +15,7 @@ export const createMockUser = async (userOverride: Partial<User> = {}) => {
     },
     email: `jqadams-${Math.random()}@usa.com`,
     password: 'give-me-liberty-or-give-me-death',
-    headline: 'Founding Father',
-    bio: 'No taxation without representation! #downwithtyranny',
-    phoneNumber: '5555555555',
+    publicProfile: publicProfileInPayload.id,
     roles: [Role.User],
     ...userOverride,
   }

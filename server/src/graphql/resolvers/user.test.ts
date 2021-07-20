@@ -1,12 +1,12 @@
 import bcrypt from 'bcryptjs'
-import { UserModel } from 'src/models/User'
+import User, { UserModel } from 'src/models/User'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPasswordToken'
 import { createMockConnection } from 'src/__mocks__/models/Connection'
-import { Connection } from 'src/models'
+import { Connection, UserPublicProfile } from 'src/models'
 import DeletedObject from 'src/models/DeletedObject'
 import { createMockUserPublicProfile } from 'src/__mocks__/models/UserPublicProfile'
 
@@ -83,8 +83,7 @@ describe('UserResolver', () => {
     })
 
     it('gets the information from UserPublicProfile', async () => {
-      const publicProfile = await createMockUserPublicProfile()
-      const user = await createMockUser({ publicProfile })
+      const user = await createMockUser()
 
       const response = await execQuery({
         source: `
@@ -98,6 +97,8 @@ describe('UserResolver', () => {
         `,
         contextUser: user,
       })
+
+      const publicProfile = await UserPublicProfile.mongo.findById(user.publicProfile)
       expect(response.data?.user?.publicProfile?.headline).toBe(publicProfile.headline)
     })
   })
