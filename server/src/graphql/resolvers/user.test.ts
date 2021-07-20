@@ -168,6 +168,9 @@ describe('UserResolver', () => {
   })
 
   describe('updateProfile', () => {
+    afterEach(async () => {
+      await dropAllCollections()
+    })
     it('updates the specified properties on the context user', async () => {
       const user = await createMockUser({
         name: {
@@ -182,7 +185,7 @@ describe('UserResolver', () => {
         middleName: 'M',
         lastName: 'G',
         headline: 'CEO at TestWriting, Inc.',
-        email: 'newone@gmail.com',
+        email: 'new1@gmail.com',
         phoneNumber: '1234567890',
         bio: 'this is my new bio',
       }

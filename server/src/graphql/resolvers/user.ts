@@ -149,7 +149,7 @@ class UserResolver {
     }
 
     if (userUpdatePayload.email && userUpdatePayload.email !== context.user.email) {
-      if (User.mongo.find({ email: context.user.email })) {
+      if (await User.mongo.findOne({ email: userUpdatePayload.email })) {
         throw new UserInputError('duplicate-email', {
           email: 'Please enter a different email',
         })
