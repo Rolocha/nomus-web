@@ -21,9 +21,6 @@ export class UserPublicProfile extends BaseModel({
   prefix: 'pubprof',
 }) {
   static mongo: ReturnModelType<typeof UserPublicProfile>
-  // A reference to the User object this profile belongs to
-  @prop({ required: true, ref: () => User, type: String })
-  user: Ref<User>
 
   @prop()
   @Field({ nullable: true })
@@ -112,7 +109,7 @@ export class UserPublicProfile extends BaseModel({
 }
 
 // Attach the mongoose model onto the core model itself
-export const UserProfileModel = getModelForClass(UserPublicProfile)
-UserPublicProfile.mongo = UserProfileModel
+export const UserPublicProfileModel = getModelForClass(UserPublicProfile)
+UserPublicProfile.mongo = UserPublicProfileModel
 
 export default UserPublicProfile

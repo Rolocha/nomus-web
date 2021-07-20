@@ -19,6 +19,7 @@ import {
   BASE_URL,
   EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
+import UserPublicProfile from 'src/models/UserPublicProfile'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
@@ -72,6 +73,10 @@ export class User extends BaseModel({
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
   name: PersonName
+
+  @prop({ required: false, ref: () => UserPublicProfile, type: String })
+  @Field(() => UserPublicProfile, { nullable: true })
+  publicProfile: Ref<UserPublicProfile>
 
   @prop()
   @Field({ nullable: true })

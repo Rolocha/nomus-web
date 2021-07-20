@@ -17,10 +17,12 @@ import {
   Authorized,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Mutation,
   Query,
   Resolver,
+  Root,
   UnauthorizedError,
 } from 'type-graphql'
 
@@ -30,7 +32,7 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import PasswordResetToken from 'src/models/PasswordResetToken'
 import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
-import { Connection } from 'src/models'
+import { Connection, UserPublicProfile } from 'src/models'
 import { performTransaction } from 'src/util/db'
 
 @InputType({ description: 'Input for udpating user profile' })
@@ -60,6 +62,11 @@ class ProfileUpdateInput implements Partial<User> {
 
 @Resolver()
 class UserResolver {
+  @FieldResolver()
+  async publicProfile(@Root() user: User) {
+    return UserPublicProfile.mongo.findById(user.publicProfile)
+  }
+
   // Performs any necessary changes to go from DB representation of User to public representation of User
   private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
     await user.populate('defaultCardVersion').execPopulate()
