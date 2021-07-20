@@ -65,7 +65,6 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
         reset({ email: formData.email ?? '' })
         setActive(false)
       } else if (response.errors[0].message === 'duplicate-email') {
-        console.log(response.errors)
         setError('email', {
           type: 'server',
           message: 'That email is unavailable, try a different one',
