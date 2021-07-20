@@ -8,6 +8,7 @@ import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPassword
 import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { Connection, UserPublicProfile } from 'src/models'
 import DeletedObject from 'src/models/DeletedObject'
+import { createMockUserPublicProfile } from 'src/__mocks__/models/UserPublicProfile'
 
 jest.mock('src/util/sendgrid')
 
@@ -195,7 +196,6 @@ describe('UserResolver', () => {
           last: 'A',
         },
         email: 'abc@gmail.com',
-        phoneNumber: '5555555555',
       })
       const updatePayload = {
         firstName: 'B',
@@ -229,24 +229,25 @@ describe('UserResolver', () => {
         contextUser: user,
       })
 
-      // We should assert on the DB user as well as the one on the GraphQL response
-      const updatedUser = await UserModel.findById(response.data.updateProfile.id)
-      for (const userObject of [updatedUser, response.data.updateProfile]) {
-        expect(userObject.name.first).toBe(updatePayload.firstName)
-        expect(userObject.name.middle).toBe(updatePayload.middleName)
-        expect(userObject.name.last).toBe(updatePayload.lastName)
-        expect(userObject.headline).toBe(updatePayload.headline)
+      const updatedUser = await UserModel.findById(response.data.updateProfile.id).populate(
+        'publicProfile'
+      )
+      const userPublicProfile = updatedUser.publicProfile as UserPublicProfile
+      expect(updatedUser.name.first).toBe(updatePayload.firstName)
+      expect(updatedUser.name.middle).toBe(updatePayload.middleName)
+      expect(updatedUser.name.last).toBe(updatePayload.lastName)
+      expect(updatedUser.email).toBe(updatePayload.email)
 
-        expect(userObject.email).toBe(updatePayload.email)
-        expect(userObject.phoneNumber).toBe(updatePayload.phoneNumber)
-        expect(userObject.bio).toBe(updatePayload.bio)
-      }
+      expect(userPublicProfile.headline).toBe(updatePayload.headline)
+      expect(userPublicProfile.phoneNumber).toBe(updatePayload.phoneNumber)
+      expect(userPublicProfile.bio).toBe(updatePayload.bio)
     })
 
     it('can perform a partial update', async () => {
-      const user = await createMockUser({})
+      const publicProfile = await createMockUserPublicProfile({ headline: 'headline' })
+      const user = await createMockUser({ publicProfile })
       const updatePayload = {
-        bio: user.bio + '; added some more stuff',
+        bio: 'added some more stuff',
       }
       const response = await execQuery({
         source: `
@@ -271,20 +272,21 @@ describe('UserResolver', () => {
         contextUser: user,
       })
 
-      // We should assert on the DB user as well as the one on the GraphQL response
-      const updatedUser = await UserModel.findById(response.data.updateProfile.id)
-      for (const userObject of [updatedUser, response.data.updateProfile]) {
-        // Expect the old data
-        expect(userObject.name.first).toBe(user.name.first)
-        expect(userObject.name.middle).toBe(user.name.middle)
-        expect(userObject.name.last).toBe(user.name.last)
-        expect(userObject.headline).toBe(user.headline)
-        expect(userObject.email).toBe(user.email)
-        expect(userObject.phoneNumber).toBe(user.phoneNumber)
+      const updatedUser = await UserModel.findById(response.data.updateProfile.id).populate(
+        'publicProfile'
+      )
+      const userPublicProfile = updatedUser.publicProfile as UserPublicProfile
 
-        // Expect the updated data
-        expect(userObject.bio).toBe(updatePayload.bio)
-      }
+      // Expect the old data
+      expect(updatedUser.name.first).toBe(user.name.first)
+      expect(updatedUser.name.middle).toBe(user.name.middle)
+      expect(updatedUser.name.last).toBe(user.name.last)
+      expect(updatedUser.email).toBe(user.email)
+      expect(userPublicProfile.headline).toBe(publicProfile.headline)
+      expect(userPublicProfile.phoneNumber).toBe(publicProfile.phoneNumber)
+
+      // Expect the updated data
+      expect(userPublicProfile.bio).toBe(updatePayload.bio)
     })
 
     it('de-verifies email and sends a verification email if email was changed', async () => {
@@ -294,7 +296,6 @@ describe('UserResolver', () => {
           last: 'A',
         },
         email: 'abc@gmail.com',
-        phoneNumber: '5555555555',
         isEmailVerified: true,
       })
       const updatePayload = {

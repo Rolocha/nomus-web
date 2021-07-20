@@ -69,10 +69,14 @@ class UserResolver {
 
   // Performs any necessary changes to go from DB representation of User to public representation of User
   private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
-    await user.populate('defaultCardVersion').execPopulate()
-    await user.populate('publicProfile').execPopulate()
+    const fullUser = await user
+      .populate('defaultCardVersion')
+      .populate('publicProfile')
+      .execPopulate()
+    // await user.populate('defaultCardVersion').execPopulate()
+    // await user.populate('publicProfile').execPopulate()
     return {
-      ...user.toObject(),
+      ...fullUser.toObject(),
       profilePicUrl: await user.getProfilePicUrl(),
     }
   }
@@ -165,11 +169,15 @@ class UserResolver {
       context.user.isEmailVerified = false
       await context.user.sendVerificationEmail()
     }
-    context.user.headline = userUpdatePayload.headline ?? context.user.headline
-    context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
-    context.user.bio = userUpdatePayload.bio ?? context.user.bio
     context.user.activated = userUpdatePayload.activated ?? context.user.activated
 
+    const publicProfile = await UserPublicProfile.mongo.findById(context.user.publicProfile)
+
+    publicProfile.headline = userUpdatePayload.headline ?? publicProfile.headline
+    publicProfile.phoneNumber = userUpdatePayload.phoneNumber ?? publicProfile.phoneNumber
+    publicProfile.bio = userUpdatePayload.bio ?? publicProfile.bio
+
+    await publicProfile.save()
     await context.user.save()
     return await this.userFromMongoDocument(context.user)
   }
