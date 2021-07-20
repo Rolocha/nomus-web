@@ -380,7 +380,7 @@ describe('ContactsResolver', () => {
       expect(response.data?.saveContact).toMatchObject(expectedData)
     })
 
-    it('saves tags without empty spaces', async () => {
+    it('saves tags without empty spaces for a new connection', async () => {
       const userA = await createMockUser({
         username: 'user_a',
       })
@@ -409,9 +409,58 @@ describe('ContactsResolver', () => {
             meetingDate: '2020-01-01',
             meetingPlace: 'UCLA',
             notes: 'more notes',
-            // disabling next line to explicitely test sparse arrays
-            // eslint-disable-next-line no-sparse-arrays
-            tags: ['these', 'are', 'cool', 'notes', ,],
+            tags: ['these', 'are', 'cool', 'notes', ''],
+          },
+        },
+        contextUser: userA,
+      })
+
+      const connection = await Connection.mongo
+        .findOne({
+          from: userA._id,
+          to: userB._id,
+        })
+        .lean()
+
+      expect(connection).not.toBeNull()
+
+      const expectedData = ['these', 'are', 'cool', 'notes']
+
+      expect(connection.tags).toEqual(expectedData)
+    })
+
+    it('saves tags without empty spaces for an existing connection', async () => {
+      const userA = await createMockUser({
+        username: 'user_a',
+      })
+      const userB = await createMockUser({
+        username: 'user_b',
+        name: { first: 'Jeff', middle: 'William', last: 'Winger' },
+        email: 'fake_lawyer@greendale.com',
+        password: 'save-greendale',
+      })
+      await createMockConnection({ to: userA._id, from: userB._id })
+      await createMockConnection({ to: userB._id, from: userA._id })
+
+      await execQuery({
+        source: `
+        mutation ContactTestQuery($username: String!, $contactInfo: ContactInfoInput) {
+          saveContact(username: $username, contactInfo: $contactInfo) {
+            id
+            meetingDate
+            meetingPlace
+            notes
+            tags
+          }
+        }
+        `,
+        variableValues: {
+          username: userB.username,
+          contactInfo: {
+            meetingDate: '2020-01-01',
+            meetingPlace: 'UCLA',
+            notes: 'more notes',
+            tags: ['these', 'are', 'cool', 'notes', ''],
           },
         },
         contextUser: userA,
