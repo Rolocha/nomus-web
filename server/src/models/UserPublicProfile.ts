@@ -6,10 +6,10 @@ import { User } from './User'
 
 // @ts-ignore
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
-export class UserProfile extends BaseModel({
-  prefix: 'userprof',
+export class UserPublicProfile extends BaseModel({
+  prefix: 'pubprof',
 }) {
-  static mongo: ReturnModelType<typeof UserProfile>
+  static mongo: ReturnModelType<typeof UserPublicProfile>
   // A reference to the User object this profile belongs to
   @prop({ required: true, ref: () => User, type: String })
   user: Ref<User>
@@ -36,7 +36,7 @@ export class UserProfile extends BaseModel({
 }
 
 // Attach the mongoose model onto the core model itself
-export const UserProfileModel = getModelForClass(UserProfile)
-UserProfile.mongo = UserProfileModel
+export const UserProfileModel = getModelForClass(UserPublicProfile)
+UserPublicProfile.mongo = UserProfileModel
 
-export default UserProfile
+export default UserPublicProfile
