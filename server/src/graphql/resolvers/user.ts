@@ -60,7 +60,7 @@ class ProfileUpdateInput implements Partial<User> {
   activated?: boolean
 }
 
-@Resolver()
+@Resolver((of) => User)
 class UserResolver {
   @FieldResolver()
   async publicProfile(@Root() user: User) {

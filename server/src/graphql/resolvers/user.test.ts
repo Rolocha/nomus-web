@@ -8,6 +8,7 @@ import { createMockPasswordResetToken } from 'src/__mocks__/models/ResetPassword
 import { createMockConnection } from 'src/__mocks__/models/Connection'
 import { Connection } from 'src/models'
 import DeletedObject from 'src/models/DeletedObject'
+import { createMockUserPublicProfile } from 'src/__mocks__/models/UserPublicProfile'
 
 jest.mock('src/util/sendgrid')
 
@@ -79,6 +80,25 @@ describe('UserResolver', () => {
       })
       expect(response.data?.user?.id).toBe(user.id)
       expect(response.data?.user?.email).toBe(user.email)
+    })
+
+    it('gets the information from UserPublicProfile', async () => {
+      const publicProfile = await createMockUserPublicProfile()
+      const user = await createMockUser({ publicProfile })
+
+      const response = await execQuery({
+        source: `
+          query GetUserTestQuery {
+            user {
+              publicProfile {
+                headline
+              }
+            }
+          }
+        `,
+        contextUser: user,
+      })
+      expect(response.data?.user?.publicProfile?.headline).toBe(publicProfile.headline)
     })
   })
 

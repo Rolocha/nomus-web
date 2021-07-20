@@ -74,7 +74,7 @@ export class User extends BaseModel({
   @Field(() => PersonName, { nullable: true })
   name: PersonName
 
-  @prop({ required: false, ref: () => UserPublicProfile, type: String })
+  @prop({ _id: false, required: false, ref: () => UserPublicProfile, type: String })
   @Field(() => UserPublicProfile, { nullable: true })
   publicProfile: Ref<UserPublicProfile>
 

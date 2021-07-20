@@ -5,11 +5,10 @@ import {
   ReturnModelType,
   DocumentType,
 } from '@typegoose/typegoose'
-import { Field } from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import { Ref } from './scalars'
-import { User } from './User'
 import * as S3 from 'src/util/s3'
 import { FileUpload } from 'graphql-upload'
 import { EventualResult, Result } from 'src/util/error'
@@ -17,6 +16,7 @@ import * as fs from 'fs'
 
 // @ts-ignore
 @modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
+@ObjectType()
 export class UserPublicProfile extends BaseModel({
   prefix: 'pubprof',
 }) {
