@@ -195,7 +195,7 @@ class ContactsResolver {
       meetingDate: contactInfo?.meetingDate ?? undefined,
       meetingPlace: contactInfo?.meetingPlace ?? undefined,
       notes: contactInfo?.notes ?? undefined,
-      tags: contactInfo?.tags ?? undefined,
+      tags: contactInfo.tags ? contactInfo?.tags.filter(Boolean) : undefined,
     })
 
     await connection.populate('from').populate('to').execPopulate()
@@ -234,7 +234,8 @@ class ContactsResolver {
         existingConnection.meetingPlace = contactInfo.meetingPlace
       }
       if (contactInfo.tags != null) {
-        existingConnection.tags = contactInfo.tags
+        // remove whitespace and empty values
+        existingConnection.tags = contactInfo.tags.filter(Boolean)
       }
       if (contactInfo.notes != null) {
         existingConnection.notes = contactInfo.notes
