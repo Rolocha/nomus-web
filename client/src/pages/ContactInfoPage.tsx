@@ -279,27 +279,32 @@ const ContactInfoPage = () => {
             )}
 
             <Box gridArea="profileInfo">
-              <Box mb={3}>
-                <Text.Label mb={1}>PHONE</Text.Label>
-                <Text.Body2>
-                  <Link to={`tel:${contact.phoneNumber}`}>
-                    {contact.phoneNumber}
-                  </Link>
-                </Text.Body2>
-              </Box>
+              {contact.phoneNumber && (
+                <Box mb={3}>
+                  <Text.Label mb={1}>PHONE</Text.Label>
+                  <Text.Body2>
+                    <Link to={`tel:${contact.phoneNumber}`}>
+                      {contact.phoneNumber}
+                    </Link>
+                  </Text.Body2>
+                </Box>
+              )}
 
-              <Box mb={3}>
-                <Text.Label>EMAIL</Text.Label>
+              {contact.email && (
+                <Box mb={3}>
+                  <Text.Label>EMAIL</Text.Label>
 
-                <Text.Body2>
-                  <Link to={`mailto:${contact.email}`}>{contact.email}</Link>
-                </Text.Body2>
-              </Box>
-
-              <Box>
-                <Text.Label>BIO</Text.Label>
-                <Text.Body2>{contact.bio}</Text.Body2>
-              </Box>
+                  <Text.Body2>
+                    <Link to={`mailto:${contact.email}`}>{contact.email}</Link>
+                  </Text.Body2>
+                </Box>
+              )}
+              {contact.bio && (
+                <Box>
+                  <Text.Label>BIO</Text.Label>
+                  <Text.Body2>{contact.bio}</Text.Body2>
+                </Box>
+              )}
             </Box>
           </Box>
 
