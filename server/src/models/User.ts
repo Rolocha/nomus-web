@@ -126,7 +126,7 @@ export class User extends BaseModel({
   @prop({ required: true })
   password: string
 
-  @prop({ required: false, ref: () => CardVersion, type: String })
+  @prop({ required: false, ref: 'CardVersion', type: String })
   @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
