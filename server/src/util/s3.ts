@@ -156,9 +156,9 @@ export const getSignedUrl = async (
   }
 }
 
-export const getBase64Url = async (
+export const getObject = async (
   key: string
-): EventualResult<string, 'failed-aws-connection' | 'failed-get-object'> => {
+): EventualResult<AWS.S3.GetObjectOutput, 'failed-aws-connection' | 'failed-get-object'> => {
   try {
     let s3Service: AWS.S3 | null
     try {
@@ -177,8 +177,7 @@ export const getBase64Url = async (
         throw new Error('failed-get-object')
       })
 
-    const base64Image = data.Body.toString('base64')
-    return Result.ok(base64Image)
+    return Result.ok(data)
   } catch (err) {
     return Result.fail(err.message)
   }
