@@ -11,6 +11,7 @@ export enum S3AssetCategory {
   CardVersions = 'card-versions',
   QRCodes = 'qr-codes',
   EncodingCSV = 'encoding-csv',
+  PrintSpecs = 'print-specs',
 }
 
 type UploadObjectFailureType =
