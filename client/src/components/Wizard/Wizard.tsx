@@ -146,7 +146,7 @@ function Wizard<ValidStepType extends string>({
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
         // Need these 2 to make pointy indicator show up
-        position="relative"
+        position={{ base: 'relative', [bp]: 'sticky' }}
         zIndex={20}
       >
         {allStepDetails.map((stepDetails, index) => {
