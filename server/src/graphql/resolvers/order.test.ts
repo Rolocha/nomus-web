@@ -566,6 +566,7 @@ describe('OrderResolver', () => {
             shippingLabelUrl: shippingLabelTestUrl,
             trackingNumber: trackingNumberTest,
             price: priceTest,
+            printSpecUrl: 'printTest',
             notes: 'test_notes',
           },
         },
@@ -577,7 +578,6 @@ describe('OrderResolver', () => {
         shippingLabelUrl: shippingLabelTestUrl,
         trackingNumber: trackingNumberTest,
         price: priceTest,
-        printSpecUrl: 'printTest',
         notes: 'test_notes',
       })
     })

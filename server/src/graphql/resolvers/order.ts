@@ -1,4 +1,4 @@
-import { DocumentType, mongoose } from '@typegoose/typegoose'
+import { DocumentType } from '@typegoose/typegoose'
 import { AuthenticationError } from 'apollo-server-errors'
 import { GraphQLUpload } from 'apollo-server-express'
 import { FileUpload } from 'graphql-upload'
@@ -145,6 +145,7 @@ class OrderResolver {
   async user(@Root() order: Order) {
     return User.mongo.findById(order.user)
   }
+
   @FieldResolver()
   async cardVersion(@Root() order: Order) {
     return CardVersion.mongo.findById(order.cardVersion)
@@ -322,6 +323,10 @@ class OrderResolver {
       cardVersion.id
     )
 
+    if (payload.quantity % 25 !== 0) {
+      throw new Error('Invalid quantity: not a multiple of 25')
+    }
+
     cardVersion.frontImageUrl = uploadedImageUrls.front
     if (uploadedImageUrls.back) {
       cardVersion.backImageUrl = uploadedImageUrls.back
@@ -334,6 +339,8 @@ class OrderResolver {
       cardVersion,
       payload,
     })
+
+    await order.updatePrintSpecPDF()
 
     // Update the user's default card version to the newly created one
     user.defaultCardVersion = cardVersion.id
@@ -397,6 +404,8 @@ class OrderResolver {
       cardVersion,
       payload,
     })
+
+    await order.updatePrintSpecPDF()
 
     // Update the user's default card version to the newly created one
     user.defaultCardVersion = cardVersion.id
@@ -476,9 +485,10 @@ class OrderResolver {
     cardVersionId: string
   ) {
     // Upload the front image and put the resulting S3 key on the card version
+    const frontImage = await imageFiles.front
     const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
-      await imageFiles.front,
-      `${cardVersionId}/front/${Date.now()}`,
+      frontImage,
+      `${cardVersionId}/front/${Date.now()}.${frontImage.mimetype.split('/')[1]}`,
       S3.S3AssetCategory.CardVersions
     )
 
@@ -488,23 +498,25 @@ class OrderResolver {
 
     let backImageUploadResult = null
     if (imageFiles.back) {
+      const backImage = await imageFiles.back
       backImageUploadResult = await S3.uploadGraphQLFileToS3(
-        await imageFiles.back,
-        `${cardVersionId}/back/${Date.now()}`,
+        backImage,
+        `${cardVersionId}/back/${Date.now()}.${backImage.mimetype.split('/')[1]}`,
         S3.S3AssetCategory.CardVersions
       )
       if (!backImageUploadResult.isSuccess) {
         throw new Error('Failed to upload back card image')
       }
     }
-
-    return {
+    const imageUrls = {
       front: S3.getObjectUrl(frontImageUploadResult.value),
       back: backImageUploadResult ? S3.getObjectUrl(backImageUploadResult.value) : null,
     }
+
+    return imageUrls
   }
 
-  async createOrUpdateExistingOrder({
+  private async createOrUpdateExistingOrder({
     user,
     cardVersion,
     payload,
