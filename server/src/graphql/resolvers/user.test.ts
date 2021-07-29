@@ -168,6 +168,9 @@ describe('UserResolver', () => {
   })
 
   describe('updateProfile', () => {
+    afterEach(async () => {
+      await dropAllCollections()
+    })
     it('updates the specified properties on the context user', async () => {
       const user = await createMockUser({
         name: {
@@ -182,7 +185,7 @@ describe('UserResolver', () => {
         middleName: 'M',
         lastName: 'G',
         headline: 'CEO at TestWriting, Inc.',
-        email: 'newone@gmail.com',
+        email: 'new1@gmail.com',
         phoneNumber: '1234567890',
         bio: 'this is my new bio',
       }
@@ -265,6 +268,30 @@ describe('UserResolver', () => {
         // Expect the updated data
         expect(userObject.bio).toBe(updatePayload.bio)
       }
+    })
+
+    it('errors when an email is already in use', async () => {
+      const user = await createMockUser({})
+      await createMockUser({ email: 'foo@gmail.com' })
+      const updatePayload = {
+        email: 'foo@gmail.com',
+      }
+      const response = await execQuery({
+        source: `
+        mutation UpdateProfileTestQuery($updatedUser: ProfileUpdateInput!) {
+          updateProfile(updatedUser: $updatedUser) {
+            email
+          }
+        }
+        `,
+        variableValues: {
+          updatedUser: updatePayload,
+        },
+        contextUser: user,
+      })
+
+      expect(response.errors).not.toBeNull()
+      expect(response.errors[0].message).toBe('duplicate-email')
     })
 
     it('de-verifies email and sends a verification email if email was changed', async () => {

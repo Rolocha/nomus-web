@@ -80,7 +80,7 @@ const EditableImage = ({
         fallbackImage
       )}
 
-      {editable && (
+      {editable && !updating && (
         <Box
           position="absolute"
           left="0"

@@ -149,14 +149,19 @@ class UserResolver {
       throw new UnauthorizedError()
     }
 
-    context.user.name.first = userUpdatePayload.firstName ?? context.user.name.first
-    context.user.name.middle = userUpdatePayload.middleName ?? context.user.name.middle
-    context.user.name.last = userUpdatePayload.lastName ?? context.user.name.last
     if (userUpdatePayload.email && userUpdatePayload.email !== context.user.email) {
+      if (await User.mongo.exists({ email: userUpdatePayload.email })) {
+        throw new UserInputError('duplicate-email', {
+          email: 'Please enter a different email',
+        })
+      }
       context.user.email = userUpdatePayload.email
       context.user.isEmailVerified = false
       await context.user.sendVerificationEmail()
     }
+    context.user.name.first = userUpdatePayload.firstName ?? context.user.name.first
+    context.user.name.middle = userUpdatePayload.middleName ?? context.user.name.middle
+    context.user.name.last = userUpdatePayload.lastName ?? context.user.name.last
     context.user.headline = userUpdatePayload.headline ?? context.user.headline
     context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
     context.user.bio = userUpdatePayload.bio ?? context.user.bio
