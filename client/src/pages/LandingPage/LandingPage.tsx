@@ -19,7 +19,8 @@ import dividerWave2 from 'src/images/divider-wave-2.svg'
 import dividerWave3 from 'src/images/divider-wave-3.svg'
 import footerIllustration from 'src/images/footer-illustration.svg'
 import freeShippingImage from 'src/images/free-shipping.svg'
-import heroBg from 'src/images/hero-bg.png'
+import heroBg from 'src/images/heroBg-min.jpg'
+import heroBgMobile from 'src/images/heroBgMobile-min.jpg'
 import heroCurvyFilter from 'src/images/hero-curvy-filter.svg'
 import humanServiceImage from 'src/images/human-service.svg'
 import professionalCardsImage from 'src/images/professional-cards.png'
@@ -71,7 +72,7 @@ const LandingPage = () => {
           // Include an additional white gradient overlay in mobile because we won't have the curvy filter
           // that we do in desktop
           bg={{
-            base: `linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%), bottom/cover no-repeat url(${heroBg})`,
+            base: `linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%), bottom/cover no-repeat url(${heroBgMobile})`,
             lg: `bottom/cover no-repeat url(${heroBg})`,
           }}
           height={{ base: '50%', lg: '80vh' }}
