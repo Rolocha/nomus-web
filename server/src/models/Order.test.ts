@@ -1,7 +1,21 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import * as fileUtil from 'src/util/file'
+import * as S3 from 'src/util/s3'
+import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
+import { mocked } from 'ts-jest/utils'
 import OrderEvent from './OrderEvent'
+import PrintSpec from 'src/lib/print-spec'
+import Order from 'src/models/Order'
+import { Result } from 'src/util/error'
+
+jest.mock('src/util/file')
+const mockedFileUtil = mocked(fileUtil)
+jest.mock('src/lib/print-spec')
+const mockedPrintSpec = mocked(PrintSpec)
+jest.mock('src/util/s3')
+const mockedS3Module = mocked(S3)
 
 beforeAll(async () => {
   await initDB()
@@ -118,6 +132,57 @@ describe('Order model', () => {
           trigger: OrderEventTrigger.Nomus,
         }),
       ])
+    })
+  })
+
+  describe('updatePrintSpecPDF', () => {
+    it('generates a print spec PDF and uploads to S3', async () => {
+      const cardVersion = await createMockCardVersion({
+        frontImageUrl: 'https://s3.com/front.png',
+        backImageUrl: 'https://s3.com/back.png',
+      })
+      const order = await createMockOrder({ cardVersion, quantity: 75 })
+      mockedFileUtil.downloadUrlToFile.mockImplementation((url, filename, tmpDirName) =>
+        Promise.resolve(`/tmp/${tmpDirName}/${filename}`)
+      )
+      const generatePDFSpy = jest
+        .spyOn(PrintSpec.prototype, 'generatePDF')
+        .mockResolvedValue('/path/to/print-spec.pdf')
+
+      const s3Key = `${order.shortId}-card-array.pdf`
+      mockedS3Module.uploadFileToS3.mockResolvedValue(Result.ok(s3Key))
+
+      // Make the call
+      await order.updatePrintSpecPDF()
+
+      expect(mockedFileUtil.downloadUrlToFile).toHaveBeenCalledWith(
+        cardVersion.frontImageUrl,
+        'front.png',
+        'card-images'
+      )
+      expect(mockedFileUtil.downloadUrlToFile).toHaveBeenCalledWith(
+        cardVersion.backImageUrl,
+        'back.png',
+        'card-images'
+      )
+
+      expect(mockedPrintSpec).toHaveBeenCalledWith(
+        expect.objectContaining({
+          frontImageLocalFilePath: expect.stringContaining('front.png'),
+          backImageLocalFilePath: expect.stringContaining('back.png'),
+          shortId: order.shortId,
+        })
+      )
+      expect(generatePDFSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          numSheets: 3,
+        })
+      )
+
+      expect(mockedS3Module.uploadFileToS3).toHaveBeenCalled()
+
+      const updatedOrder = await Order.mongo.findOne({ _id: order.id })
+      expect(updatedOrder.printSpecUrl).toBe(S3.getObjectUrl(s3Key))
     })
   })
 })

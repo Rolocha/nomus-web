@@ -1,23 +1,26 @@
 import {
+  DocumentType,
   getModelForClass,
   index,
   modelOptions,
   pre,
   prop,
   ReturnModelType,
-  DocumentType,
 } from '@typegoose/typegoose'
-import { CardVersion } from './CardVersion'
-import { User } from './User'
+import { DEPLOY_ENV } from 'src/config'
+import PrintSpec from 'src/lib/print-spec'
+import { EventualResult, Result } from 'src/util/error'
+import { downloadUrlToFile } from 'src/util/file'
+import * as S3 from 'src/util/s3'
+import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
 import { OrderEventTrigger, OrderState } from '../util/enums'
-import { Ref } from './scalars'
 import { BaseModel } from './BaseModel'
-import { Address, OrderPrice } from './subschemas'
-import { EventualResult, Result } from 'src/util/error'
+import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
-import { postNewOrder, SlackChannel } from 'src/util/slack'
-import { DEPLOY_ENV } from 'src/config'
+import { Ref } from './scalars'
+import { Address, OrderPrice } from './subschemas'
+import { User } from './User'
 
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
@@ -171,6 +174,50 @@ class Order extends BaseModel({
       return Result.ok(this)
     }
     return Result.fail('invalid-transition')
+  }
+
+  public async updatePrintSpecPDF(this: DocumentType<Order>) {
+    const cardVersion = await CardVersion.mongo.findOne({ _id: this.cardVersion as string })
+
+    // Use the same filename from the URL so that the extension (e.g. `.png`) persists.
+    // PDFKit will complain if the extension isn't present.
+    const frontImageFilename = `${cardVersion.frontImageUrl.split('/').slice(-1)[0]}`
+    const backImageFilename = `${cardVersion.backImageUrl.split('/').slice(-1)[0]}`
+    const frontImageLocalFilePath = await downloadUrlToFile(
+      cardVersion.frontImageUrl,
+      frontImageFilename,
+      'card-images'
+    )
+    const backImageLocalFilePath = await downloadUrlToFile(
+      cardVersion.backImageUrl,
+      backImageFilename,
+      'card-images'
+    )
+
+    const printSpec = new PrintSpec({
+      frontImageLocalFilePath,
+      backImageLocalFilePath,
+      shortId: this.shortId,
+    })
+
+    const printSpecFilePath = await printSpec.generatePDF({
+      numSheets: this.quantity / 25,
+    })
+
+    // Upload print spec PDF to S3
+    const printSpecUploadResult = await S3.uploadFileToS3(
+      printSpecFilePath,
+      // Grab the name from the end of the filepath
+      printSpecFilePath.split('/').slice(-1)[0],
+      S3.S3AssetCategory.PrintSpecs
+    )
+    if (printSpecUploadResult.error) {
+      console.log(printSpecUploadResult.error)
+      throw new Error('Failed to upload print spec')
+    }
+
+    this.printSpecUrl = S3.getObjectUrl(printSpecUploadResult.value)
+    return this.save()
   }
 }
 

@@ -1,4 +1,4 @@
-import { DocumentType, mongoose } from '@typegoose/typegoose'
+import { DocumentType } from '@typegoose/typegoose'
 import { AuthenticationError } from 'apollo-server-errors'
 import { GraphQLUpload } from 'apollo-server-express'
 import { FileUpload } from 'graphql-upload'
@@ -38,9 +38,9 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
-  previousOrder: string
+  previousOrder: string | null
 
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   quantity: number
 }
 
@@ -145,6 +145,7 @@ class OrderResolver {
   async user(@Root() order: Order) {
     return User.mongo.findById(order.user)
   }
+
   @FieldResolver()
   async cardVersion(@Root() order: Order) {
     return CardVersion.mongo.findById(order.cardVersion)
@@ -309,6 +310,8 @@ class OrderResolver {
       throw new AuthenticationError('No user')
     }
 
+    this.validateBaseSubmitOrderInput(payload)
+
     const cardVersion = new CardVersion.mongo({
       user: user.id,
       baseType: CardSpecBaseType.Custom,
@@ -335,6 +338,8 @@ class OrderResolver {
       payload,
     })
 
+    await order.updatePrintSpecPDF()
+
     // Update the user's default card version to the newly created one
     user.defaultCardVersion = cardVersion.id
     await user.save()
@@ -358,6 +363,8 @@ class OrderResolver {
     if (user == null) {
       throw new AuthenticationError('No user')
     }
+
+    this.validateBaseSubmitOrderInput(payload)
 
     const cardVersion = await CardVersion.mongo.findById(payload.cardVersionId)
     if (cardVersion == null) {
@@ -398,6 +405,8 @@ class OrderResolver {
       payload,
     })
 
+    await order.updatePrintSpecPDF()
+
     // Update the user's default card version to the newly created one
     user.defaultCardVersion = cardVersion.id
     await user.save()
@@ -411,6 +420,20 @@ class OrderResolver {
   /**
    * Private helpers
    */
+
+  async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
+    if (payload.previousOrder) {
+      const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.previousOrder })
+      if (!isValidPreviousOrder) {
+        throw new Error(
+          `Invalid previous order: could not find an order with id ${payload.previousOrder}`
+        )
+      }
+    }
+    if (payload.quantity % 25 !== 0) {
+      throw new Error('Invalid quantity: not a multiple of 25')
+    }
+  }
 
   // Creates a Checkout Session
   async createCheckoutSession(
@@ -476,9 +499,10 @@ class OrderResolver {
     cardVersionId: string
   ) {
     // Upload the front image and put the resulting S3 key on the card version
+    const frontImage = await imageFiles.front
     const frontImageUploadResult = await S3.uploadGraphQLFileToS3(
-      await imageFiles.front,
-      `${cardVersionId}/front/${Date.now()}`,
+      frontImage,
+      `${cardVersionId}/front/${Date.now()}.${frontImage.mimetype.split('/')[1]}`,
       S3.S3AssetCategory.CardVersions
     )
 
@@ -488,23 +512,25 @@ class OrderResolver {
 
     let backImageUploadResult = null
     if (imageFiles.back) {
+      const backImage = await imageFiles.back
       backImageUploadResult = await S3.uploadGraphQLFileToS3(
-        await imageFiles.back,
-        `${cardVersionId}/back/${Date.now()}`,
+        backImage,
+        `${cardVersionId}/back/${Date.now()}.${backImage.mimetype.split('/')[1]}`,
         S3.S3AssetCategory.CardVersions
       )
       if (!backImageUploadResult.isSuccess) {
         throw new Error('Failed to upload back card image')
       }
     }
-
-    return {
+    const imageUrls = {
       front: S3.getObjectUrl(frontImageUploadResult.value),
       back: backImageUploadResult ? S3.getObjectUrl(backImageUploadResult.value) : null,
     }
+
+    return imageUrls
   }
 
-  async createOrUpdateExistingOrder({
+  private async createOrUpdateExistingOrder({
     user,
     cardVersion,
     payload,
