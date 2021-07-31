@@ -1,4 +1,4 @@
-import { DocumentType, mongoose } from '@typegoose/typegoose'
+import { DocumentType } from '@typegoose/typegoose'
 import {
   ApolloError,
   AuthenticationError,
