@@ -256,21 +256,19 @@ export default ({
                 <Form.Label htmlFor="position">POSITION</Form.Label>
                 <Form.Input
                   name="position"
-                  ref={registerWithRef(fieldRefs.position, { required: true })}
-                  type="position"
+                  ref={registerWithRef(fieldRefs.position, { required: false })}
+                  type="text"
                   autoComplete="position"
                   error={errors.position}
                 />
                 <Form.FieldError fieldError={errors.position} />
               </Form.Item>
               <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
-                <Form.Label htmlFor="company" required>
-                  COMPANY
-                </Form.Label>
+                <Form.Label htmlFor="company">COMPANY</Form.Label>
                 <Form.Input
                   name="company"
-                  ref={registerWithRef(fieldRefs.company, { required: true })}
-                  type="company"
+                  ref={registerWithRef(fieldRefs.company, { required: false })}
+                  type="text"
                   autoComplete="company"
                   error={errors.company}
                 />

@@ -245,15 +245,20 @@ export default () => {
         </Box>
 
         <Box mb={3}>
-          <Text.Label mb={1}>ROLE</Text.Label>
-          {data.user.company ? (
-            <Text.Body2>{data.user.company}</Text.Body2>
+          <Text.Label>ROLE/COMPANY</Text.Label>
+          {console.log(data.user.position, data.user.company)}
+          {data.user.position || data.user.company ? (
+            <Text.Body2>
+              {data.user.position}
+              {data.user.position && data.user.company ? ' @ ' : ''}
+              {data.user.company}
+            </Text.Body2>
           ) : (
             <Form.FieldPrompt
               modalOpener={openProfileEditorModal}
-              fieldRef={phoneNumberFieldRef}
+              fieldRef={companyFieldRef}
             >
-              {formatPhoneNumber('+15551234567')}
+              Let people know where you work
             </Form.FieldPrompt>
           )}
         </Box>
@@ -318,6 +323,8 @@ export default () => {
           email: data?.user.email ?? '',
           bio: data?.user.bio ?? '',
           headline: data?.user.headline ?? '',
+          position: data?.user.position ?? '',
+          company: data?.user.company ?? '',
         }}
         fieldRefs={{
           firstName: firstNameFieldRef,
