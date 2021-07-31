@@ -61,6 +61,7 @@ contactRouter.get(
     if (contact.phoneNumber) vCard.cellPhone = contact.phoneNumber
     if (contact.email) vCard.email = contact.email
     if (contact.headline) vCard.title = contact.headline
+    if (contact.company) vCard.organization = contact.company
     vCard.url = `https://nomus.me/${contact.username}`
     vCard.source = `https://nomus.me/api/contact/vcf/${contact.username}`
     if (contactPhotoUrl) vCard.photo.embedFromString(contactPhotoUrl, 'image/png')
