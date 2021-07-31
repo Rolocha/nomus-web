@@ -279,6 +279,17 @@ const ContactInfoPage = () => {
             )}
 
             <Box gridArea="profileInfo">
+              {(contact.position || contact.company) && (
+                <Box mb={3}>
+                  <Text.Label>POSITION/COMPANY</Text.Label>
+                  <Text.Body2>
+                    {contact.position}
+                    {contact.position && contact.company ? ' @ ' : ''}
+                    {contact.company}
+                  </Text.Body2>
+                </Box>
+              )}
+
               {contact.phoneNumber && (
                 <Box mb={3}>
                   <Text.Label mb={1}>PHONE</Text.Label>

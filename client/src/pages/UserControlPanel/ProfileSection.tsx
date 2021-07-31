@@ -245,8 +245,7 @@ export default () => {
         </Box>
 
         <Box mb={3}>
-          <Text.Label>ROLE/COMPANY</Text.Label>
-          {console.log(data.user.position, data.user.company)}
+          <Text.Label>POSITION/COMPANY</Text.Label>
           {data.user.position || data.user.company ? (
             <Text.Body2>
               {data.user.position}
