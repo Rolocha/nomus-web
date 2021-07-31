@@ -38,9 +38,9 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
-  previousOrder: string
+  previousOrder: string | null
 
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   quantity: number
 }
 
@@ -310,6 +310,8 @@ class OrderResolver {
       throw new AuthenticationError('No user')
     }
 
+    this.validateBaseSubmitOrderInput(payload)
+
     const cardVersion = new CardVersion.mongo({
       user: user.id,
       baseType: CardSpecBaseType.Custom,
@@ -322,10 +324,6 @@ class OrderResolver {
       },
       cardVersion.id
     )
-
-    if (payload.quantity % 25 !== 0) {
-      throw new Error('Invalid quantity: not a multiple of 25')
-    }
 
     cardVersion.frontImageUrl = uploadedImageUrls.front
     if (uploadedImageUrls.back) {
@@ -365,6 +363,8 @@ class OrderResolver {
     if (user == null) {
       throw new AuthenticationError('No user')
     }
+
+    this.validateBaseSubmitOrderInput(payload)
 
     const cardVersion = await CardVersion.mongo.findById(payload.cardVersionId)
     if (cardVersion == null) {
@@ -420,6 +420,20 @@ class OrderResolver {
   /**
    * Private helpers
    */
+
+  async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
+    if (payload.previousOrder) {
+      const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.previousOrder })
+      if (!isValidPreviousOrder) {
+        throw new Error(
+          `Invalid previous order: could not find an order with id ${payload.previousOrder}`
+        )
+      }
+    }
+    if (payload.quantity % 25 !== 0) {
+      throw new Error('Invalid quantity: not a multiple of 25')
+    }
+  }
 
   // Creates a Checkout Session
   async createCheckoutSession(
