@@ -1,10 +1,9 @@
-import fs, { ReadStream } from 'fs'
-import stream, { Readable } from 'stream'
-import { promisify } from 'util'
 import AWS from 'aws-sdk'
 import * as AWSMock from 'aws-sdk-mock'
-import * as S3 from './s3'
+import fs from 'fs'
 import { Result } from 'src/util/error'
+import { promisify } from 'util'
+import * as S3 from './s3'
 
 jest.setTimeout(30000)
 
@@ -40,7 +39,7 @@ describe('s3 module', () => {
   })
 
   describe('uploadGraphQLFileToS3', () => {
-    it.only('writes the file to the /tmp directory, then passes in the filename to uploadFileToS3', async () => {
+    it('writes the file to the /tmp directory, then passes in the filename to uploadFileToS3', async () => {
       // For the sake of this test, we have to have the data be in a file on disk first
       // so we can create a readstream for it
       const filepath = '/tmp/test.txt'
@@ -73,6 +72,26 @@ describe('s3 module', () => {
       } else {
         console.warn("test.txt was supposed to get removed but it didn't exist!")
       }
+    })
+  })
+
+  describe('getSignedUrl', () => {
+    it('calls S3.getSignedUrl with the provided key and returns its result', async () => {
+      const key = 'my-key'
+      const signedUrl = 'https://here-it-is.com'
+      AWSMock.setSDKInstance(AWS)
+      const getSignedUrl = jest.fn().mockImplementation((action, options, callback) => {
+        callback(null, signedUrl)
+      })
+      AWSMock.mock('S3', 'getSignedUrl', getSignedUrl)
+
+      const result = await S3.getSignedUrl(key)
+
+      expect(getSignedUrl.mock.calls[0][0]).toBe('getObject')
+      expect(getSignedUrl.mock.calls[0][1].Key).toBe(key)
+      expect(getSignedUrl.mock.calls[0][1].Bucket).toBe('nomus-assets')
+
+      expect(result.value).toBe(signedUrl)
     })
   })
 })

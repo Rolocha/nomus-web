@@ -17,15 +17,15 @@ import hanadImage from 'src/images/crew/hanad.png'
 import dividerWave1 from 'src/images/divider-wave-1.svg'
 import dividerWave2 from 'src/images/divider-wave-2.svg'
 import dividerWave3 from 'src/images/divider-wave-3.svg'
-import footerIllustration from 'src/images/footer-illustration.svg'
-import freeShippingImage from 'src/images/free-shipping.svg'
+import constructionCrew from 'src/images/construction-crew.svg'
+import shippingPackageImage from 'src/images/shipping-package.svg'
 import heroBg from 'src/images/heroBg-min.jpg'
 import heroBgMobile from 'src/images/heroBgMobile-min.jpg'
 import heroCurvyFilter from 'src/images/hero-curvy-filter.svg'
-import humanServiceImage from 'src/images/human-service.svg'
+import personLaptopImage from 'src/images/person-with-laptop.svg'
 import professionalCardsImage from 'src/images/professional-cards.png'
-import qualityYouCanTrustImage from 'src/images/quality-you-can-trust.svg'
-import seamlessExperienceImage from 'src/images/seamless-experience.svg'
+import clipboardImage from 'src/images/clipboard.svg'
+import cardToPhoneImage from 'src/images/card-to-phone.svg'
 import wavyLoopImage from 'src/images/wavy-loop.svg'
 import yourDashboardDesktop from 'src/images/your-dashboard-desktop.png'
 import yourDashboardMobile from 'src/images/your-dashboard-mobile.png'
@@ -100,12 +100,11 @@ const LandingPage = () => {
         >
           <Box width={{ base: '100%', lg: '45%' }}>
             <Text.H1 color={colors.nomusBlue} mb="24px" fontWeight="300">
-              Tap. Connect. Network with purpose.
+              The business card for the digital age
             </Text.H1>
             <Text.Body>
-              Get your own personalized contactless card complete with the Nomus
-              digital product, built for accessing, managing, and expanding your
-              network.
+              Share your digital identity with the tap of a phone using the
+              business card designed for the next generation of business people.
             </Text.Body>
             <Box
               mt="24px"
@@ -121,7 +120,7 @@ const LandingPage = () => {
                     size="big"
                     rightIcon={<Icon of="arrowRight" />}
                   >
-                    Customize your card
+                    Design your card
                   </Button>
                 </Link>
               </Box>
@@ -139,7 +138,7 @@ const LandingPage = () => {
       {/* Our promises to you */}
       <Box container mt="40px">
         <Text.H1 color={colors.nomusBlue} mb="24px" fontWeight="300">
-          Our promises to you
+          How it works
         </Text.H1>
         <Box
           display="grid"
@@ -148,24 +147,24 @@ const LandingPage = () => {
           gridGap="8px"
         >
           <PromiseItem
-            title="Seamless experience"
-            description="From tapping your card to using our website, we keep it stress-free."
-            imageSrc={seamlessExperienceImage}
+            title="Get Nomus cards"
+            description="Jump in using our templates or upload your own design."
+            imageSrc={shippingPackageImage}
           />
           <PromiseItem
-            title="Human-to-human service"
-            description="No bots will be answering your questions. Just us."
-            imageSrc={humanServiceImage}
+            title="Shape your digital identity"
+            description="Personalize your Nomus contact page and show off who you are."
+            imageSrc={personLaptopImage}
           />
           <PromiseItem
-            title="Free shipping to your door"
-            description="Who wants to pay for delivery these days? Not us."
-            imageSrc={freeShippingImage}
+            title="Tap your cards"
+            description="No apps needed. Make it easy, leave an impression."
+            imageSrc={cardToPhoneImage}
           />
           <PromiseItem
-            title="Quality you can trust"
-            description="We can tell you about all the trials we went through to get you the best."
-            imageSrc={qualityYouCanTrustImage}
+            title="Grow your network"
+            description="Never lose a contact again. Build a richer contacts list with Nomus."
+            imageSrc={clipboardImage}
           />
         </Box>
       </Box>
@@ -209,10 +208,9 @@ const LandingPage = () => {
         />
         <Box gridArea="description" placeSelf="start">
           <Text.Body mb="24px">
-            Inside these business cards, there’s something that sets it apart
-            from all the others – an NFC (near-field communication) chip. With
-            the tap of your new business card to the back of a smartphone, share
-            your personal contact page digitally.
+            Inside every Nomus card is a little chip that lets you share your
+            contact information instantly and effortlessly. Just tap the card to
+            a smartphone and you're all set!
           </Text.Body>
           <Box display="grid" placeContent={{ base: 'stretch', lg: 'start' }}>
             <Link to="/shop">
@@ -222,7 +220,7 @@ const LandingPage = () => {
                 size="big"
                 rightIcon={<Icon of="arrowRight" />}
               >
-                Get a card
+                Get your own card
               </Button>
             </Link>
           </Box>
@@ -231,80 +229,9 @@ const LandingPage = () => {
 
       <Image w="100%" src={dividerWave1} />
 
-      {/* Your identity, wherever you go */}
-      <Box pt={{ base: '64px', lg: '80px' }} bg={ivoryGradientBg}>
-        <Box
-          container
-          display="grid"
-          gridTemplateColumns={{ base: '1fr', lg: '5fr 7fr' }}
-          gridTemplateRows={{ base: '', lg: 'auto auto 1fr' }}
-          gridTemplateAreas={{
-            base: `
-            "title"
-            "image"
-            "description"
-            "button"
-          `,
-            lg: `
-            "title image"
-            "description image"
-            "button image"
-          `,
-          }}
-          gridColumnGap="16px"
-          gridRowGap={{ base: '16px', lg: '24px' }}
-        >
-          <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
-            Your identity, wherever you go
-          </Text.H1>
-
-          <Text.Body gridArea="description">
-            Connect once, and your contacts can revisit your digital identity
-            whenever, wherever. Start leaving stronger, more memorable
-            impressions.
-          </Text.Body>
-
-          <Box
-            gridArea="button"
-            display="grid"
-            placeContent={{ base: 'stretch', lg: 'start' }}
-          >
-            <Link to="/register">
-              <Button
-                width="100%"
-                variant="golden"
-                size="big"
-                rightIcon={<Icon of="arrowRight" />}
-              >
-                Create your profile
-              </Button>
-            </Link>
-          </Box>
-
-          {/* margin-right exists to account for the offset absolute[right=-13%] applied to the mobile image below */}
-          <Box gridArea="image" position="relative" mr="13%">
-            <Image
-              src={yourDashboardDesktop}
-              borderRadius="4px"
-              boxShadow="card"
-              width="100%"
-              position="relative"
-            />
-            <Image
-              src={yourDashboardMobile}
-              borderRadius="8px"
-              boxShadow="card"
-              position="absolute"
-              bottom={0}
-              right="-13%"
-              height="90%"
-            />
-          </Box>
-        </Box>
-      </Box>
-
       {/* Mini card builder */}
       <Box
+        bg={ivoryGradientBg}
         container
         display="grid"
         gridTemplateColumns={{ base: '1fr', lg: '7fr 5fr' }}
@@ -326,7 +253,7 @@ const LandingPage = () => {
         }}
         gridColumnGap="52px"
         gridRowGap={{ base: '16px', lg: '24px' }}
-        mt="80px"
+        pt="80px"
       >
         <Box gridArea="cardPreview" flexShrink={0}>
           <MiniCardBuilder templateId="konawide" options={sampleCardOptions} />
@@ -337,9 +264,8 @@ const LandingPage = () => {
         </Text.H1>
 
         <Text.Body gridArea="description">
-          It’s easy to build your own beautiful, personalized card with our
-          templates. Pick a template, put in your info, choose some colors – all
-          you have to do now is give it a shot!
+          We make it easy to build a card with our beautiful templates. Enter
+          your name to get started!
         </Text.Body>
 
         <Box gridArea="input">
@@ -405,8 +331,8 @@ const LandingPage = () => {
           </Text.H1>
           <Box gridArea="description">
             <Text.Body mb="24px">
-              Keep your brand going strong while still tapping into the power of
-              Nomus.
+              Already have a design you love? Tap into the power of Nomus
+              without changing your look.
             </Text.Body>
             <Box display="grid" placeContent={{ base: 'stretch', lg: 'start' }}>
               <Link to="/card-studio/custom">
@@ -442,13 +368,13 @@ const LandingPage = () => {
 
       <Image w="100%" src={dividerWave2} />
 
-      {/* Maintain a richer contacts list */}
+      {/* Your identity, wherever you go */}
       <Box pt={{ base: '64px', lg: '80px' }} bg={ivoryGradientBg}>
         <Box
           container
           display="grid"
           gridTemplateColumns={{ base: '1fr', lg: '5fr 7fr' }}
-          gridTemplateRows={{ base: '1fr', lg: 'repeat(2, auto) 1fr' }}
+          gridTemplateRows={{ base: '', lg: 'auto auto 1fr' }}
           gridTemplateAreas={{
             base: `
             "title"
@@ -466,18 +392,85 @@ const LandingPage = () => {
           gridRowGap={{ base: '16px', lg: '24px' }}
         >
           <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
+            Your identity, just a tap away
+          </Text.H1>
+
+          <Text.Body gridArea="description">
+            Connect once, and your contacts can revisit your digital identity
+            whenever, wherever. Start leaving stronger, more memorable
+            impressions.
+          </Text.Body>
+
+          <Box
+            gridArea="button"
+            display="grid"
+            placeContent={{ base: 'stretch', lg: 'start' }}
+          >
+            <Link to="/register">
+              <Button
+                width="100%"
+                variant="golden"
+                size="big"
+                rightIcon={<Icon of="arrowRight" />}
+              >
+                Create your profile
+              </Button>
+            </Link>
+          </Box>
+
+          {/* margin-right exists to account for the offset absolute[right=-13%] applied to the mobile image below */}
+          <Box gridArea="image" position="relative" mr="13%">
+            <Image
+              src={yourDashboardDesktop}
+              borderRadius="4px"
+              boxShadow="card"
+              width="100%"
+              position="relative"
+            />
+            <Image
+              src={yourDashboardMobile}
+              borderRadius="8px"
+              boxShadow="card"
+              position="absolute"
+              bottom={0}
+              right="-13%"
+              height="90%"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Maintain a richer contacts list */}
+      <Box pt={{ base: '64px', lg: '80px' }} bg={colors.white}>
+        <Box
+          container
+          display="grid"
+          gridTemplateColumns={{ base: '1fr', lg: '7fr 5fr' }}
+          gridTemplateRows={{ base: '1fr', lg: 'repeat(2, auto) 1fr' }}
+          gridTemplateAreas={{
+            base: `
+            "title"
+            "image"
+            "description"
+            "button"
+          `,
+            lg: `
+            "image title"
+            "image description"
+            "image button"
+          `,
+          }}
+          gridColumnGap="16px"
+          gridRowGap={{ base: '16px', lg: '24px' }}
+        >
+          <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
             Maintain a richer contacts list
           </Text.H1>
 
           <Box gridArea="description">
             <Text.Body mb="24px">
               Collect contacts to your account for easy access to their digital
-              profiles and add your own notes to make your connections personal.
-            </Text.Body>
-
-            <Text.Body>
-              Congrats! You’re on your way to creating and expanding an
-              authentic network.
+              profiles. Add your own notes to make your connections personal.
             </Text.Body>
           </Box>
 
@@ -498,7 +491,7 @@ const LandingPage = () => {
             </Link>
           </Box>
           {/* Negative margin to get the right edge of the image to disappear off the right edge of the screen */}
-          <Box gridArea="image" mr={{ base: undefined, lg: '-100px' }}>
+          <Box gridArea="image" mr={{ base: undefined, lg: '10px' }}>
             <Image
               objectFit="cover"
               src={contactRollImage}
@@ -584,12 +577,12 @@ const LandingPage = () => {
         </Box>
       </Box>
 
-      <Image w="100%" src={dividerWave3} />
+      <Image w="100%" src={dividerWave3} h={{ base: '100px', lg: '300px' }} />
 
       {/* Let's get tappin' */}
       <Box
         container
-        py="80px"
+        pb="80px"
         bg={colors.ivory}
         display="flex"
         flexDirection="column"
@@ -599,7 +592,7 @@ const LandingPage = () => {
           Let's get tappin'
         </Text.H1>
 
-        <Image src={footerIllustration} mb="24px" />
+        <Image src={constructionCrew} mb="24px" />
 
         <Text.Body mb="24px" textAlign="center">
           What are you waiting for? It’s time to build your online presence and

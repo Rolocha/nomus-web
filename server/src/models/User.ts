@@ -126,7 +126,7 @@ export class User extends BaseModel({
   @prop({ required: true })
   password: string
 
-  @prop({ required: false, ref: () => CardVersion, type: String })
+  @prop({ required: false, ref: 'CardVersion', type: String })
   @Field(() => CardVersion, { nullable: true })
   defaultCardVersion: Ref<CardVersion>
 
@@ -245,8 +245,11 @@ export class User extends BaseModel({
 
   public async getProfilePicDataUrl(this: DocumentType<User>): Promise<string | null> {
     if (this.profilePicS3Key) {
-      const result = await S3.getBase64Url(this.profilePicS3Key)
-      return result.isSuccess ? result.value : null
+      const result = await S3.getObject(this.profilePicS3Key)
+      if (!result.isSuccess) {
+        return null
+      }
+      return result.value.Body.toString('base64')
     }
     return null
   }
