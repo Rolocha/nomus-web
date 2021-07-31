@@ -41,6 +41,8 @@ export default () => {
           phoneNumber
           email
           bio
+          position
+          company
         }
       }
     `,
@@ -80,6 +82,8 @@ export default () => {
   const phoneNumberFieldRef = React.useRef<HTMLInputElement | null>(null)
   const emailFieldRef = React.useRef<HTMLInputElement | null>(null)
   const bioFieldRef = React.useRef<HTMLInputElement | null>(null)
+  const positionFieldRef = React.useRef<HTMLInputElement | null>(null)
+  const companyFieldRef = React.useRef<HTMLInputElement | null>(null)
 
   if (loading || !data) {
     return <LoadingPage />
@@ -241,6 +245,19 @@ export default () => {
         </Box>
 
         <Box mb={3}>
+          <Text.Label mb={1}>ROLE</Text.Label>
+          {data.user.company ? (
+            <Text.Body2>{data.user.company}</Text.Body2>
+          ) : (
+            <Form.FieldPrompt
+              modalOpener={openProfileEditorModal}
+              fieldRef={phoneNumberFieldRef}
+            >
+              {formatPhoneNumber('+15551234567')}
+            </Form.FieldPrompt>
+          )}
+        </Box>
+        <Box mb={3}>
           <Text.Label mb={1}>PHONE</Text.Label>
           {data.user.phoneNumber ? (
             <Text.Body2>
@@ -308,6 +325,8 @@ export default () => {
           phoneNumber: phoneNumberFieldRef,
           email: emailFieldRef,
           bio: bioFieldRef,
+          position: positionFieldRef,
+          company: companyFieldRef,
         }}
       />
     </Box>

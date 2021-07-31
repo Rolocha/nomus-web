@@ -19,6 +19,8 @@ interface FormData {
   phoneNumber: string
   email: string
   bio: string
+  position: string
+  company: string
 }
 
 interface Props {
@@ -65,6 +67,8 @@ export default ({
           .email('Please enter a valid email address.')
           .required('Email is required.'),
         bio: yup.string(),
+        position: yup.string(),
+        company: yup.string(),
       }),
     ),
   })
@@ -234,6 +238,43 @@ export default ({
                   error={errors.email}
                 />
                 <Form.FieldError fieldError={errors.email} />
+              </Form.Item>
+            </Box>
+            <Box
+              display="flex"
+              flexDirection={{ base: 'column', md: 'row' }}
+              justifyContent="space-between"
+              mb={{ base: 0, md: 3 }}
+              mx={{ base: 0, md: -1 }}
+              sx={{
+                '& > *': {
+                  flexBasis: 'calc(100% / 2)',
+                },
+              }}
+            >
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
+                <Form.Label htmlFor="position">POSITION</Form.Label>
+                <Form.Input
+                  name="position"
+                  ref={registerWithRef(fieldRefs.position, { required: true })}
+                  type="position"
+                  autoComplete="position"
+                  error={errors.position}
+                />
+                <Form.FieldError fieldError={errors.position} />
+              </Form.Item>
+              <Form.Item px={{ base: 0, md: 1 }} mb={{ base: 3, md: 0 }}>
+                <Form.Label htmlFor="company" required>
+                  COMPANY
+                </Form.Label>
+                <Form.Input
+                  name="company"
+                  ref={registerWithRef(fieldRefs.company, { required: true })}
+                  type="company"
+                  autoComplete="company"
+                  error={errors.company}
+                />
+                <Form.FieldError fieldError={errors.company} />
               </Form.Item>
             </Box>
             <Form.Item>
