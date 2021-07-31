@@ -14,6 +14,8 @@ export interface Contact {
   email: string | null
   headline: string | null
   bio: string | null
+  position: string | null
+  company: string | null
   profilePicUrl: string | null
   //unique to the connections, notes taken by the user querying
   cardFrontImageUrl: string | null

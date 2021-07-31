@@ -91,13 +91,15 @@ const ContactsDetailView = ({
             base: `
             "profilePic nameplate"
             "cards cards"
+            "position position"
             "contactInfo contactInfo"
             "bio bio"
             "notes notes"
           `,
             [bp]: `
               "profilePic nameplate"
-              "profilePic contactInfo"
+              "profilePic position"
+              "cards contactInfo"
               "cards bio"
               "notes notes"
             `,
@@ -121,6 +123,27 @@ const ContactsDetailView = ({
             </Text.SectionSubheader>
             <Text.Body2>{selectedContact.headline}</Text.Body2>
           </Box>
+          <Box
+            gridArea="position"
+            alignSelf="start"
+            display="flex"
+            flexDirection="row"
+            mx={-3}
+          >
+            {selectedContact.position && (
+              <Box px={3}>
+                <Text.Label>POSITION</Text.Label>
+                <Text.Body2>{selectedContact.position}</Text.Body2>
+              </Box>
+            )}
+            {selectedContact.company && (
+              <Box px={3}>
+                <Text.Label>COMPANY</Text.Label>
+                <Text.Body2>{selectedContact.company}</Text.Body2>
+              </Box>
+            )}
+          </Box>
+
           <Box
             gridArea="contactInfo"
             alignSelf="start"
