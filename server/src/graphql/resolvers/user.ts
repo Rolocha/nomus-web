@@ -55,6 +55,9 @@ class ProfileUpdateInput implements Partial<User> {
   bio?: string
 
   @Field({ nullable: true })
+  position?: string
+
+  @Field({ nullable: true })
   company?: string
 
   @Field({ nullable: true })
@@ -168,6 +171,7 @@ class UserResolver {
     context.user.headline = userUpdatePayload.headline ?? context.user.headline
     context.user.phoneNumber = userUpdatePayload.phoneNumber ?? context.user.phoneNumber
     context.user.bio = userUpdatePayload.bio ?? context.user.bio
+    context.user.position = userUpdatePayload.position ?? context.user.position
     context.user.company = userUpdatePayload.company ?? context.user.company
     context.user.activated = userUpdatePayload.activated ?? context.user.activated
 
