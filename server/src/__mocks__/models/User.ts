@@ -13,6 +13,7 @@ export const createMockUser = async (userOverride: Partial<User> = {}) => {
     headline: 'Founding Father',
     bio: 'No taxation without representation! #downwithtyranny',
     phoneNumber: '5555555555',
+    company: 'Nomus',
     roles: [Role.User],
     ...userOverride,
   }
