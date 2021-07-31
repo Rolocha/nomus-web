@@ -11,7 +11,7 @@ const MEASUREMENTS_MM = {
   cardWidth: 93,
   cardHeight: 54,
   cardSheetWidth: 480,
-  cardSheetHeight: 325.4,
+  cardSheetHeight: 300,
   marginLeft: 7.5,
   marginTop: 15,
   cropmarkWidth: 4.1,
