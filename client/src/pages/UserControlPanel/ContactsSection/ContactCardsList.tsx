@@ -65,6 +65,7 @@ const ContactCardsList = ({
         : 'zzzzzz',
       [ContactsSortOption.Alphabetical]: formatName(c.name),
       [ContactsSortOption.MeetingPlace]: c.meetingPlace ?? '',
+      [ContactsSortOption.Company]: c.company ?? '',
     }[selectedContactSortOption])
   const groupedContacts = contacts.reduce<Record<string, Contact[]>>(
     (acc, contact) => {
@@ -78,6 +79,7 @@ const ContactCardsList = ({
         [ContactsSortOption.Alphabetical]: contact.name.first[0],
         [ContactsSortOption.MeetingPlace]:
           contact.meetingPlace || 'Unspecified Meeting Place',
+        [ContactsSortOption.Company]: contact.company || 'Unspecified Company',
       }[selectedContactSortOption]
 
       if (groupKey in acc) {
@@ -92,6 +94,7 @@ const ContactCardsList = ({
 
   const sortByDirection: SortDirection = {
     [ContactsSortOption.Alphabetical]: 'normal' as SortDirection,
+    [ContactsSortOption.Company]: 'normal' as SortDirection,
     [ContactsSortOption.MeetingDateNewest]: 'normal' as SortDirection,
     [ContactsSortOption.MeetingDateOldest]: 'reverse' as SortDirection,
     [ContactsSortOption.MeetingPlace]: 'normal' as SortDirection,
@@ -111,6 +114,7 @@ const ContactCardsList = ({
 
   const sortGroupsDirection: SortDirection = {
     [ContactsSortOption.Alphabetical]: 'normal' as SortDirection,
+    [ContactsSortOption.Company]: 'normal' as SortDirection,
     [ContactsSortOption.MeetingDateNewest]: 'normal' as SortDirection,
     [ContactsSortOption.MeetingDateOldest]: 'reverse' as SortDirection,
     [ContactsSortOption.MeetingPlace]: 'normal' as SortDirection,
