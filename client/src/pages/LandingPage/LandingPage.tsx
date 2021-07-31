@@ -17,7 +17,7 @@ import hanadImage from 'src/images/crew/hanad.png'
 import dividerWave1 from 'src/images/divider-wave-1.svg'
 import dividerWave2 from 'src/images/divider-wave-2.svg'
 import dividerWave3 from 'src/images/divider-wave-3.svg'
-import footerIllustration from 'src/images/footer-illustration.svg'
+import constructionCrew from 'src/images/construction-crew.svg'
 import shippingPackageImage from 'src/images/shipping-package.svg'
 import heroBg from 'src/images/heroBg-min.jpg'
 import heroBgMobile from 'src/images/heroBgMobile-min.jpg'
@@ -592,7 +592,7 @@ const LandingPage = () => {
           Let's get tappin'
         </Text.H1>
 
-        <Image src={footerIllustration} mb="24px" />
+        <Image src={constructionCrew} mb="24px" />
 
         <Text.Body mb="24px" textAlign="center">
           What are you waiting for? It’s time to build your online presence and
