@@ -152,6 +152,7 @@ const ContactCardsList = ({
               height: '100%',
               padding: '0px 16px',
             }}
+            target="_blank"
           >
             <Box display="flex" flexDirection="row" alignItems="center">
               <Text.Body2 mr={3} color="linkBlue">
