@@ -184,7 +184,7 @@ const ContactsDetailView = ({
 
           {selectedContact.bio && (
             <Box gridArea="bio">
-              <Text.Label>BIO</Text.Label>
+              <Text.Label>Bio</Text.Label>
               <Text.Body3>{selectedContact.bio}</Text.Body3>
             </Box>
           )}
