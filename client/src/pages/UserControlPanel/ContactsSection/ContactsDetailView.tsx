@@ -135,12 +135,12 @@ const ContactsDetailView = ({
           `}
           >
             <Box gridArea="position">
-              <Text.Label>POSITION</Text.Label>
+              <Text.Label>Position</Text.Label>
               <Text.Body2>{selectedContact.position}</Text.Body2>
             </Box>
 
             <Box gridArea="company">
-              <Text.Label>COMPANY</Text.Label>
+              <Text.Label>Company</Text.Label>
               <Text.Body2>{selectedContact.company}</Text.Body2>
             </Box>
 
