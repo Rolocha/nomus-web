@@ -281,11 +281,18 @@ const ContactInfoPage = () => {
             <Box gridArea="profileInfo">
               {(contact.position || contact.company) && (
                 <Box mb={3}>
-                  <Text.Label>POSITION/COMPANY</Text.Label>
+                  <Text.Label>
+                    {[
+                      contact.position ? 'POSITION' : null,
+                      contact.company ? 'COMPANY' : null,
+                    ]
+                      .filter(Boolean)
+                      .join('/')}
+                  </Text.Label>
                   <Text.Body2>
-                    {contact.position}
-                    {contact.position && contact.company ? ' @ ' : ''}
-                    {contact.company}
+                    {[contact.position, contact.company]
+                      .filter(Boolean)
+                      .join(' @ ')}
                   </Text.Body2>
                 </Box>
               )}

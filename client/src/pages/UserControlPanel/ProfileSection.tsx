@@ -245,12 +245,19 @@ export default () => {
         </Box>
 
         <Box mb={3}>
-          <Text.Label>POSITION/COMPANY</Text.Label>
+          <Text.Label>
+            {[
+              data.user.position ? 'POSITION' : null,
+              data.user.company ? 'COMPANY' : null,
+            ]
+              .filter(Boolean)
+              .join('/')}
+          </Text.Label>
           {data.user.position || data.user.company ? (
             <Text.Body2>
-              {data.user.position}
-              {data.user.position && data.user.company ? ' @ ' : ''}
-              {data.user.company}
+              {[data.user.position, data.user.company]
+                .filter(Boolean)
+                .join(' @ ')}
             </Text.Body2>
           ) : (
             <Form.FieldPrompt
