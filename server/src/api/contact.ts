@@ -60,16 +60,18 @@ contactRouter.get(
     // We don't really know for certain the user's phoneNumber is a cell number
     if (contact.phoneNumber) vCard.cellPhone = contact.phoneNumber
     if (contact.email) vCard.email = contact.email
-    if (contact.headline) vCard.title = contact.headline
+    if (contact.position) vCard.title = contact.position
     if (contact.company) vCard.organization = contact.company
     vCard.url = `https://nomus.me/${contact.username}`
     vCard.source = `https://nomus.me/api/contact/vcf/${contact.username}`
     if (contactPhotoUrl) vCard.photo.embedFromString(contactPhotoUrl, 'image/png')
     vCard.note = [
+      contact.headline != null ? contact.headline : null,
       meetingDate != null ? `Meeting Date: ${meetingDate}` : null,
       meetingPlace != null ? `Meeting Place: ${meetingPlace}` : null,
       tags ? `Tags: ${tags}` : null,
       notes ? `Additional notes:\n${notes}` : null,
+      'Get your own Nomus card at https://nomus.me/shop',
     ]
       .filter(Boolean)
       .join('\n')
