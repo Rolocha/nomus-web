@@ -258,7 +258,7 @@ export default ({
                   name="position"
                   ref={registerWithRef(fieldRefs.position, { required: false })}
                   type="text"
-                  autoComplete="position"
+                  autoComplete="organization-title"
                   error={errors.position}
                 />
                 <Form.FieldError fieldError={errors.position} />
@@ -269,7 +269,7 @@ export default ({
                   name="company"
                   ref={registerWithRef(fieldRefs.company, { required: false })}
                   type="text"
-                  autoComplete="company"
+                  autoComplete="organization"
                   error={errors.company}
                 />
                 <Form.FieldError fieldError={errors.company} />
