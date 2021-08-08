@@ -51,7 +51,7 @@ describe('GET /vcf/:username', () => {
     expect(vcfData.fn.valueOf()).toBe(
       [mockUser.name.first, mockUser.name.middle, mockUser.name.last].join(' ')
     )
-    expect(vcfData.title.valueOf()).toBe(mockUser.headline)
+    expect(vcfData.title.valueOf()).toBe(mockUser.position)
     expect(vcfData.url.valueOf()).toBe(`https://nomus.me/${mockUser.username}`)
     expect(vcfData.url.valueOf()).toBe(`https://nomus.me/${mockUser.username}`)
   })
