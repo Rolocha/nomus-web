@@ -23,6 +23,8 @@ export default gql`
       meetingPlace
       meetingDate
       connected
+      position
+      company
     }
   }
 `

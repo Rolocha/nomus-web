@@ -68,6 +68,8 @@ export default () => {
           email
           headline
           bio
+          position
+          company
           profilePicUrl
 
           cardFrontImageUrl

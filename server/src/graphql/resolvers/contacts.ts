@@ -34,6 +34,12 @@ class Contact {
   name: PersonName
 
   @Field({ nullable: true })
+  position: string
+
+  @Field({ nullable: true })
+  company: string
+
+  @Field({ nullable: true })
   phoneNumber: string
 
   @Field({ nullable: true })
@@ -106,6 +112,8 @@ const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
     cardBackImageUrl: (user.defaultCardVersion as CardVersion | null)?.backImageUrl,
     bio: user.bio,
     headline: user.headline,
+    position: user.position,
+    company: user.company,
     profilePicUrl: await user.getProfilePicUrl(),
     username: user.username,
   }
