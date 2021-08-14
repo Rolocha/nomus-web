@@ -81,6 +81,14 @@ export class User extends BaseModel({
   @Field({ nullable: true })
   bio: string
 
+  @prop()
+  @Field({ nullable: true })
+  position?: string | null
+
+  @prop()
+  @Field({ nullable: true })
+  company?: string | null
+
   @Field({ nullable: true, description: "A URL pointing to the user's profile picture" })
   profilePicUrl: string
 

@@ -55,6 +55,8 @@ export const UPDATE_PROFILE_MUTATION = gql`
       isEmailVerified
       bio
       activated
+      position
+      company
     }
   }
 `

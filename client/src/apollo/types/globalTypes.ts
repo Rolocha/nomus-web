@@ -50,6 +50,8 @@ export interface ProfileUpdateInput {
   email?: string | null
   headline?: string | null
   bio?: string | null
+  position?: string | null
+  company?: string | null
   activated?: boolean | null
 }
 

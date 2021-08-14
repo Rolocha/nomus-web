@@ -121,33 +121,48 @@ const ContactsDetailView = ({
             </Text.SectionSubheader>
             <Text.Body2>{selectedContact.headline}</Text.Body2>
           </Box>
+
           <Box
             gridArea="contactInfo"
-            alignSelf="start"
-            display="flex"
-            flexDirection="row"
-            mx={-3}
+            display="grid"
+            gridColumnGap={3}
+            gridRowGap={3}
+            gridTemplateColumns="1fr 1fr"
+            gridTemplateRows="1fr 1fr"
+            gridTemplateAreas={`
+            "position company"
+            "phone email"
+          `}
           >
-            {selectedContact.phoneNumber && (
-              <Box px={3}>
-                <Text.Label>Phone</Text.Label>
+            <Box gridArea="position">
+              <Text.Label>Position</Text.Label>
+              <Text.Body2>{selectedContact.position}</Text.Body2>
+            </Box>
+
+            <Box gridArea="company">
+              <Text.Label>Company</Text.Label>
+              <Text.Body2>{selectedContact.company}</Text.Body2>
+            </Box>
+
+            <Box gridArea="phone">
+              <Text.Label>Phone</Text.Label>
+              {selectedContact.phoneNumber && (
                 <Text.Body2>
                   <Link to={`tel:${selectedContact.phoneNumber}`}>
                     {formatPhoneNumber(selectedContact.phoneNumber)}
                   </Link>
                 </Text.Body2>
-              </Box>
-            )}
-            {selectedContact.email && (
-              <Box px={3}>
-                <Text.Label>Email</Text.Label>
-                <Text.Body2>
-                  <Link to={`tel:${selectedContact.email}`}>
-                    {selectedContact.email}
-                  </Link>
-                </Text.Body2>
-              </Box>
-            )}
+              )}
+            </Box>
+
+            <Box gridArea="email">
+              <Text.Label>Email</Text.Label>
+              <Text.Body2>
+                <Link to={`tel:${selectedContact.email}`}>
+                  {selectedContact.email}
+                </Link>
+              </Text.Body2>
+            </Box>
           </Box>
 
           {selectedContact.cardFrontImageUrl &&
@@ -167,10 +182,12 @@ const ContactsDetailView = ({
               </Box>
             )}
 
-          <Box gridArea="bio">
-            <Text.Label>BIO</Text.Label>
-            <Text.Body3>{selectedContact.bio}</Text.Body3>
-          </Box>
+          {selectedContact.bio && (
+            <Box gridArea="bio">
+              <Text.Label>Bio</Text.Label>
+              <Text.Body3>{selectedContact.bio}</Text.Body3>
+            </Box>
+          )}
 
           <Box
             gridArea="notes"
