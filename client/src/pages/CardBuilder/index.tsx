@@ -163,18 +163,28 @@ const CardBuilder = () => {
           return
         }
 
-        const result = await initializeCardBuilder({
-          variables: {
-            baseType: cardBuilderState.baseType,
-          },
-        })
-        if (result.errors) {
-          console.log(result.errors)
-          throw new Error('oh no!')
+        try {
+          const result = await initializeCardBuilder({
+            variables: {
+              baseType: cardBuilderState.baseType,
+            },
+          })
+          if (result.errors) {
+            Sentry.captureException(result.errors)
+            setFatalError(
+              'Our server is having a bad day. 😭 Please try again later!',
+            )
+          }
+          updateCardBuilderState({
+            cardVersionId: result.data?.createEmptyCardVersion.id,
+          })
+        } catch (err) {
+          Sentry.captureException(err)
+          setFatalError(
+            'Our server is having a bad day. 😭 Please try again later!',
+          )
         }
-        updateCardBuilderState({
-          cardVersionId: result.data?.createEmptyCardVersion.id,
-        })
+
         break
       }
       default:
@@ -395,11 +405,14 @@ const CardBuilder = () => {
               }
             </Text.PageHeader>
           </Box>
+
           <Wizard
             completionButtonLabel="Continue to payment"
             currentStep={cardBuilderState.currentStep}
             handleStepTransition={handleWizardStepTransition}
             handleSubmit={handleWizardSubmit}
+            readyToStart={cardBuilderState.cardVersionId != null}
+            fatalError={fatalError}
           >
             {baseType === CardSpecBaseType.Template && (
               <WizardStep
