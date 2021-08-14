@@ -66,12 +66,12 @@ contactRouter.get(
     vCard.source = `https://nomus.me/api/contact/vcf/${contact.username}`
     if (contactPhotoUrl) vCard.photo.embedFromString(contactPhotoUrl, 'image/png')
     vCard.note = [
-      contact.headline != null ? contact.headline : null,
+      contact.headline != null ? `Headline: ${contact.headline}` : null,
       meetingDate != null ? `Meeting Date: ${meetingDate}` : null,
       meetingPlace != null ? `Meeting Place: ${meetingPlace}` : null,
       tags ? `Tags: ${tags}` : null,
       notes ? `Additional notes:\n${notes}` : null,
-      'Get your own Nomus card at https://nomus.me/shop',
+      '---\nGet your own Nomus card at https://nomus.me/shop',
     ]
       .filter(Boolean)
       .join('\n')

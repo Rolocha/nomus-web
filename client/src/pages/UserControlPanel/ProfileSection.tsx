@@ -246,10 +246,7 @@ export default () => {
 
         <Box mb={3}>
           <Text.Label>
-            {[
-              data.user.position ? 'POSITION' : null,
-              data.user.company ? 'COMPANY' : null,
-            ]
+            {[data.user.position && 'POSITION', data.user.company && 'COMPANY']
               .filter(Boolean)
               .join('/')}
           </Text.Label>

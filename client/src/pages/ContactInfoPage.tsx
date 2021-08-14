@@ -283,8 +283,8 @@ const ContactInfoPage = () => {
                 <Box mb={3}>
                   <Text.Label>
                     {[
-                      contact.position ? 'POSITION' : null,
-                      contact.company ? 'COMPANY' : null,
+                      contact.position && 'POSITION',
+                      contact.company && 'COMPANY',
                     ]
                       .filter(Boolean)
                       .join('/')}
