@@ -3,6 +3,7 @@ import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Text from 'src/components/Text'
 import { ComplexCondition } from 'src/pages/CardBuilder/types'
+import LoadingPage from 'src/pages/LoadingPage'
 import { colors } from 'src/styles'
 import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import Icon from '../Icon'
@@ -20,11 +21,13 @@ interface Props<ValidStepType extends string> {
   completionButtonLabel?: string
   handleStepTransition: (goingToStep: string) => void | Promise<void>
   handleSubmit?: () => Promise<void>
+  fatalError?: string | null
+  readyToStart?: boolean
 }
 
 const bp = 'lg'
 
-const POINTY_TAB_INDICATOR = {
+const POINTY_TAB_INDICATOR = (enabled: boolean) => ({
   [mq[bp]]: {
     '&:after': {
       content: '""',
@@ -35,10 +38,10 @@ const POINTY_TAB_INDICATOR = {
       top: '50%',
       left: '100%',
       transform: 'translate(-50%, -50%) rotate(45deg)',
-      backgroundColor: `${colors.nomusBlue}`,
+      backgroundColor: `${enabled ? colors.nomusBlue : colors.secondaryBlue}`,
     },
   },
-}
+})
 
 // Method for properly handling complex conditions that are booleans or return booleans
 const checkComplexCondition = (complexCondition: ComplexCondition): boolean => {
@@ -57,6 +60,8 @@ function Wizard<ValidStepType extends string>({
   currentStep,
   handleStepTransition,
   handleSubmit,
+  fatalError,
+  readyToStart,
 }: Props<ValidStepType>): JSX.Element | null {
   const [
     processingNextTransition,
@@ -154,6 +159,8 @@ function Wizard<ValidStepType extends string>({
 
           const isCurrentSection = currentStep === id
           const isStepAccessible =
+            Boolean(readyToStart) &&
+            !fatalError &&
             isReadyToMoveForwardFromStepAtIndex(index - 1) &&
             !processingPreviousTransition &&
             !processingNextTransition
@@ -180,7 +187,11 @@ function Wizard<ValidStepType extends string>({
                 [bp]: 'auto',
               }}
               position="relative"
-              sx={isCurrentSection ? POINTY_TAB_INDICATOR : undefined}
+              sx={
+                isCurrentSection
+                  ? POINTY_TAB_INDICATOR(isStepAccessible)
+                  : undefined
+              }
               role="button"
               onClick={() => {
                 if (isStepAccessible) {
@@ -241,77 +252,100 @@ function Wizard<ValidStepType extends string>({
         <Box
           overflow="visible"
           height="100%"
+          minHeight="inherit"
           p={{ base: '24px', [bp]: '48px' }}
         >
-          {currentStepDetails.children}
+          {fatalError ? (
+            <Box
+              display="flex"
+              width="100%"
+              height="100%"
+              minHeight="inherit"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Icon of="exclamationO" color={colors.poppy} boxSize="3em" />
+              <Text.SectionHeader>
+                Uh oh, something went wrong.
+              </Text.SectionHeader>
+              <Text.Body2>{fatalError}</Text.Body2>
+            </Box>
+          ) : readyToStart ? (
+            currentStepDetails.children
+          ) : (
+            <LoadingPage />
+          )}
         </Box>
 
         {/* Previous/next buttons */}
-        <Box
-          position="relative"
-          p={{ base: '24px', [bp]: 0 }}
-          bg={{ base: colors.white, [bp]: undefined }}
-          display="grid"
-          gridTemplateColumns="3fr 6fr 3fr"
-          gridTemplateAreas={`"previousButton . nextButton"`}
-          borderBottomRightRadius="inherit"
-        >
-          {/* Previous step button */}
-          {!isFirstStep && (
-            <Button
-              gridArea="previousButton"
-              width="100%"
-              px={{ base: 2, [bp]: 4 }}
-              py={{ base: 1, [bp]: 3 }}
-              transform={{
-                base: undefined,
-                [bp]: 'translate(-16px, 16px)',
-              }}
-              size={isDesktop ? 'big' : 'normal'}
-              variant="primary"
-              isLoading={processingPreviousTransition}
-              disabled={processingPreviousTransition}
-              leftIcon={
-                <Icon
-                  of="arrowRight"
-                  transform="rotate(180deg)"
-                  color="white"
-                />
-              }
-              onClick={handleTransitionToStepAtIndex(currentStepIndex - 1)}
-            >
-              {`${isDesktop ? 'Previous step: ' : ''}${
-                allStepDetails[currentStepIndex - 1].label
-              }`}
-            </Button>
-          )}
-          {/* Next step (or submit) button */}
-          {isReadyToMoveForwardFromStepAtIndex(currentStepIndex) &&
-            (!isLastStep || completionButtonLabel) && (
+        {readyToStart && !fatalError && (
+          <Box
+            position="relative"
+            p={{ base: '24px', [bp]: 0 }}
+            bg={{ base: colors.white, [bp]: undefined }}
+            display="grid"
+            gridTemplateColumns="3fr 6fr 3fr"
+            gridTemplateAreas={`"previousButton . nextButton"`}
+            borderBottomRightRadius="inherit"
+          >
+            {/* Previous step button */}
+            {!isFirstStep && (
               <Button
-                gridArea="nextButton"
+                gridArea="previousButton"
                 width="100%"
                 px={{ base: 2, [bp]: 4 }}
                 py={{ base: 1, [bp]: 3 }}
                 transform={{
                   base: undefined,
-                  [bp]: 'translate(16px, 16px)',
+                  [bp]: 'translate(-16px, 16px)',
                 }}
                 size={isDesktop ? 'big' : 'normal'}
-                variant={isLastStep ? 'success' : 'primary'}
-                disabled={processingNextTransition}
-                isLoading={processingNextTransition}
-                rightIcon={<Icon of="arrowRight" color="white" />}
-                onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
+                variant="primary"
+                isLoading={processingPreviousTransition}
+                disabled={processingPreviousTransition}
+                leftIcon={
+                  <Icon
+                    of="arrowRight"
+                    transform="rotate(180deg)"
+                    color="white"
+                  />
+                }
+                onClick={handleTransitionToStepAtIndex(currentStepIndex - 1)}
               >
-                {isLastStep
-                  ? completionButtonLabel || ''
-                  : `${isDesktop ? 'Next step: ' : ''}${
-                      allStepDetails[currentStepIndex + 1].label
-                    }`}
+                {`${isDesktop ? 'Previous step: ' : ''}${
+                  allStepDetails[currentStepIndex - 1].label
+                }`}
               </Button>
             )}
-        </Box>
+            {/* Next step (or submit) button */}
+            {isReadyToMoveForwardFromStepAtIndex(currentStepIndex) &&
+              (!isLastStep || completionButtonLabel) && (
+                <Button
+                  gridArea="nextButton"
+                  width="100%"
+                  px={{ base: 2, [bp]: 4 }}
+                  py={{ base: 1, [bp]: 3 }}
+                  transform={{
+                    base: undefined,
+                    [bp]: 'translate(16px, 16px)',
+                  }}
+                  size={isDesktop ? 'big' : 'normal'}
+                  variant={isLastStep ? 'success' : 'primary'}
+                  disabled={processingNextTransition}
+                  isLoading={processingNextTransition}
+                  rightIcon={<Icon of="arrowRight" color="white" />}
+                  onClick={handleTransitionToStepAtIndex(currentStepIndex + 1)}
+                >
+                  {isLastStep
+                    ? completionButtonLabel || ''
+                    : `${isDesktop ? 'Next step: ' : ''}${
+                        allStepDetails[currentStepIndex + 1].label
+                      }`}
+                </Button>
+              )}
+          </Box>
+        )}
       </Box>
     </Box>
   )

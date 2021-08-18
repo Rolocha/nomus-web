@@ -1,6 +1,13 @@
 import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom'
+import * as Sentry from '@sentry/react'
+import {
+  Prompt,
+  Redirect,
+  useHistory,
+  useLocation,
+  useParams,
+} from 'react-router-dom'
 import { useMutation, useQuery } from 'src/apollo'
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { InitializeCardBuilder } from 'src/apollo/types/InitializeCardBuilder'
@@ -46,6 +53,8 @@ interface ParamsType {
   buildBaseType?: 'custom' | 'template' | 'success' | 'cancel' | string
 }
 
+const SURE_YOU_WANT_LEAVE_MESSAGE =
+  "Are you sure you want to leave? You'll lose the information you've entered so far."
 const bp = 'lg'
 
 const CardBuilder = () => {
@@ -54,6 +63,9 @@ const CardBuilder = () => {
   const history = useHistory()
   const isDesktop = useBreakpoint('lg')
   const orderIdSearchParam = new URLSearchParams(location.search).get('orderId')
+
+  const [fatalError, setFatalError] = React.useState<string | null>(null)
+  const [isNotSafeToRedirect, setIsNotSafeToRedirect] = React.useState(true)
 
   const baseType =
     baseTypeQueryParam === 'custom' || baseTypeQueryParam === 'template'
@@ -96,6 +108,16 @@ const CardBuilder = () => {
       orderId: orderIdSearchParam,
     },
   })
+
+  const handleBeforeUnload = React.useCallback(
+    (event: BeforeUnloadEvent) => {
+      if (isNotSafeToRedirect) {
+        event.preventDefault()
+        return (event.returnValue = SURE_YOU_WANT_LEAVE_MESSAGE)
+      }
+    },
+    [isNotSafeToRedirect],
+  )
 
   const initialize = React.useCallback(async () => {
     switch (baseTypeQueryParam) {
@@ -141,18 +163,28 @@ const CardBuilder = () => {
           return
         }
 
-        const result = await initializeCardBuilder({
-          variables: {
-            baseType: cardBuilderState.baseType,
-          },
-        })
-        if (result.errors) {
-          console.log(result.errors)
-          throw new Error('oh no!')
+        try {
+          const result = await initializeCardBuilder({
+            variables: {
+              baseType: cardBuilderState.baseType,
+            },
+          })
+          if (result.errors) {
+            Sentry.captureException(result.errors)
+            setFatalError(
+              'Our server is having a bad day. 😭 Please try again later!',
+            )
+          }
+          updateCardBuilderState({
+            cardVersionId: result.data?.createEmptyCardVersion.id,
+          })
+        } catch (err) {
+          Sentry.captureException(err)
+          setFatalError(
+            'Our server is having a bad day. 😭 Please try again later!',
+          )
         }
-        updateCardBuilderState({
-          cardVersionId: result.data?.createEmptyCardVersion.id,
-        })
+
         break
       }
       default:
@@ -174,7 +206,12 @@ const CardBuilder = () => {
 
   React.useEffect(() => {
     initialize()
-  }, [initialize])
+    // Set up the proper listeners to detect if user is leaving
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [initialize, handleBeforeUnload])
 
   const stripe = useStripe()
   const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
@@ -266,25 +303,30 @@ const CardBuilder = () => {
   }, [cardBuilderState, submitCustomOrder, submitTemplateOrder])
 
   const handleWizardSubmit = React.useCallback(async () => {
-    const submitOrderResult = await submitOrder()
+    setIsNotSafeToRedirect(false)
+    try {
+      const submitOrderResult = await submitOrder()
 
-    if (submitOrderResult == null) {
-      throw new Error('Failed to create order, submitOrderResult was null')
-    }
+      if (submitOrderResult == null) {
+        throw new Error('Failed to create order, submitOrderResult was null')
+      }
 
-    // Order successfully created, redirect to Stripe Checkout so we can get that moola
-    const result = await stripe?.redirectToCheckout({
-      sessionId: submitOrderResult.checkoutSession,
-    })
-    if (result?.error) {
-      updateCardBuilderState({
-        submissionError: {
-          message:
-            result.error.message || 'Unknown error while loading checkout',
-        },
+      // Order successfully created, redirect to Stripe Checkout so we can get that moola
+      const result = await stripe?.redirectToCheckout({
+        sessionId: submitOrderResult.checkoutSession,
       })
+      if (result?.error) {
+        updateCardBuilderState({
+          submissionError: {
+            message:
+              result.error.message || 'Unknown error while loading checkout',
+          },
+        })
+      }
+    } finally {
+      setIsNotSafeToRedirect(true)
     }
-  }, [submitOrder, stripe])
+  }, [submitOrder, stripe, setIsNotSafeToRedirect])
 
   const handleWizardStepTransition = async (_goingToStep: string) => {
     const comingFromStep = cardBuilderState.currentStep
@@ -363,11 +405,14 @@ const CardBuilder = () => {
               }
             </Text.PageHeader>
           </Box>
+
           <Wizard
             completionButtonLabel="Continue to payment"
             currentStep={cardBuilderState.currentStep}
             handleStepTransition={handleWizardStepTransition}
             handleSubmit={handleWizardSubmit}
+            readyToStart={cardBuilderState.cardVersionId != null}
+            fatalError={fatalError}
           >
             {baseType === CardSpecBaseType.Template && (
               <WizardStep
@@ -449,6 +494,11 @@ const CardBuilder = () => {
               }
             </WizardStep>
           </Wizard>
+
+          <Prompt
+            when={isNotSafeToRedirect}
+            message={SURE_YOU_WANT_LEAVE_MESSAGE}
+          />
         </Box>
       </Box>
     </Box>
