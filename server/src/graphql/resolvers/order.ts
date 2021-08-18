@@ -130,8 +130,35 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   backImageDataUrl?: Promise<FileUpload> | null
 }
 
+@InputType({ description: 'Input to submit a manual order from the admin panel' })
+class ManualOrderInput {
+  @Field({ nullable: false })
+  email: string
+
+  @Field({ nullable: false })
+  quantity: number
+
+  @Field((type) => GraphQLUpload, { nullable: false })
+  frontImageDataUrl: Promise<FileUpload>
+
+  @Field((type) => GraphQLUpload, { nullable: true })
+  backImageDataUrl?: Promise<FileUpload> | null
+
+  @Field()
+  paymentInfo?: string | null
+}
+
 @ObjectType()
 class SubmitOrderResponse {
+  @Field()
+  checkoutSession: string
+
+  @Field()
+  orderId: string
+}
+
+@ObjectType()
+class ManualOrderResponse {
   @Field()
   checkoutSession: string
 
@@ -417,10 +444,17 @@ class OrderResolver {
     }
   }
 
+  @Authorized(Role.Admin)
+  @Mutation((type) => ManualOrderResponse, {
+    description: 'Handles manual submission of an order from admin panel',
+  })
+  async submitManualOrder(
+    @Arg('payload', { nullable: false }) payload: ManualOrderInput
+  ): Promise<ManualOrderResponse> {}
+
   /**
    * Private helpers
    */
-
   async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
     if (payload.previousOrder) {
       const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.previousOrder })
