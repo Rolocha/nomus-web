@@ -8,6 +8,7 @@ import { CardVersion, Order } from 'src/models'
 import {
   Address,
   OrderPrice,
+  PersonName,
   TemplateColorScheme,
   TemplateContactInfoFields,
 } from 'src/models/subschemas'
@@ -134,6 +135,9 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
 class ManualOrderInput {
   @Field({ nullable: false })
   email: string
+
+  @Field((type) => PersonName, { nullable: true })
+  name: PersonName
 
   @Field({ nullable: false })
   quantity: number
@@ -450,7 +454,19 @@ class OrderResolver {
   })
   async submitManualOrder(
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
-  ): Promise<ManualOrderResponse> {}
+  ): Promise<ManualOrderResponse> {
+    const { email, name } = payload
+    let user = await User.mongo.findOne({ email })
+    if (!user) {
+      const password = Math.random().toString(36).slice(-8)
+      const res = await User.mongo.createNewUser({ email, name, password })
+      if (res.isSuccess) {
+        user = res.getValue()
+      } else {
+        throw new Error('Failed to create new user')
+      }
+    }
+  }
 
   /**
    * Private helpers

@@ -37,7 +37,7 @@ import { validateEmail, validateUsername, ValidateUsernameResult } from './valid
 
 export interface UserCreatePayload {
   id?: string
-  name: PersonName
+  name?: PersonName
   email: string
   password: string
   username?: string
