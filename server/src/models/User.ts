@@ -20,6 +20,7 @@ import {
   EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
 import NomusProSubscription from 'src/models/NomusProSubscription'
+import PasswordResetToken from 'src/models/PasswordResetToken'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
@@ -330,6 +331,34 @@ export class User extends BaseModel({
         firstName: this.name.first,
       },
     })
+  }
+
+  public static async sendPasswordResetEmail(email: string): Promise<void> {
+    const user = await User.mongo.findOne({ email })
+    if (user == null) {
+      return null
+    }
+
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
+    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
+
+    const passwordResetURLQueryParams = new URLSearchParams()
+    passwordResetURLQueryParams.set('token', preHashToken)
+    passwordResetURLQueryParams.set('userId', user.id)
+    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: user.email,
+      from: 'hi@nomus.me',
+      templateId: SendgridTemplate.ResetPassword,
+      dynamicTemplateData: {
+        passwordResetLink,
+        firstName: user.name.first,
+      },
+    })
+
+    return null
   }
 
   public async updateProfilePic(

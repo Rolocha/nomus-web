@@ -262,31 +262,7 @@ class UserResolver {
 
   @Mutation(() => Void, { nullable: true })
   async sendPasswordResetEmail(@Arg('email', { nullable: false }) email: string): Promise<void> {
-    const user = await User.mongo.findOne({ email })
-    if (user == null) {
-      return null
-    }
-
-    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
-    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
-    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
-
-    const passwordResetURLQueryParams = new URLSearchParams()
-    passwordResetURLQueryParams.set('token', preHashToken)
-    passwordResetURLQueryParams.set('userId', user.id)
-    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
-
-    await sgMail.send({
-      to: user.email,
-      from: 'hi@nomus.me',
-      templateId: SendgridTemplate.ResetPassword,
-      dynamicTemplateData: {
-        passwordResetLink,
-        firstName: user.name.first,
-      },
-    })
-
-    return null
+    return User.sendPasswordResetEmail(email)
   }
 
   @Query(() => Boolean, {

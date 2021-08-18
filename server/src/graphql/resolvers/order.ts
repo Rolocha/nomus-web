@@ -462,6 +462,7 @@ class OrderResolver {
       const res = await User.mongo.createNewUser({ email, name, password })
       if (res.isSuccess) {
         user = res.getValue()
+        User.sendPasswordResetEmail(email)
       } else {
         throw new Error('Failed to create new user')
       }
