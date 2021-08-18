@@ -467,6 +467,8 @@ class OrderResolver {
         throw new Error('Failed to create new user')
       }
     }
+
+    return { orderId: '', checkoutSession: '' }
   }
 
   /**
