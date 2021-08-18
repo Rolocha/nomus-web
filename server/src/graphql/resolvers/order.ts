@@ -15,7 +15,7 @@ import {
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
+import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
 import {
@@ -141,6 +141,12 @@ class ManualOrderInput {
 
   @Field({ nullable: false })
   quantity: number
+
+  @Field((type) => Address, { nullable: false })
+  shippingAddress: Address
+
+  @Field((type) => OrderPrice, { nullable: true })
+  price: OrderPrice
 
   @Field((type) => GraphQLUpload, { nullable: false })
   frontImageDataUrl: Promise<FileUpload>
@@ -455,7 +461,7 @@ class OrderResolver {
   async submitManualOrder(
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
   ): Promise<ManualOrderResponse> {
-    const { email, name } = payload
+    const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
     let user = await User.mongo.findOne({ email })
     if (!user) {
       const password = Math.random().toString(36).slice(-8)
@@ -466,6 +472,26 @@ class OrderResolver {
       } else {
         throw new Error('Failed to create new user')
       }
+    }
+
+    let price: OrderPrice
+    if (!payloadPrice) {
+      const costSummary = getCostSummary(quantity, shippingAddress.state)
+      if (costSummary == null) {
+        throw new Error(
+          'Failed to calculate pricing, likely due to an unsupported quantity being used'
+        )
+      }
+      price = {
+        subtotal: costSummary.subtotal,
+        shipping: costSummary.shipping,
+        // We don't know the cost of tax yet since that requires knowing the shipping address
+        // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
+      }
+    } else {
+      price = payloadPrice
     }
 
     return { orderId: '', checkoutSession: '' }
