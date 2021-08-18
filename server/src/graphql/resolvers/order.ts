@@ -15,7 +15,7 @@ import {
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
+import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
 import {
@@ -169,11 +169,8 @@ class SubmitOrderResponse {
 
 @ObjectType()
 class ManualOrderResponse {
-  @Field()
-  checkoutSession: string
-
-  @Field()
-  orderId: string
+  @Field((type) => Order)
+  order: DocumentType<Order>
 }
 
 @Resolver((of) => Order)
@@ -461,7 +458,15 @@ class OrderResolver {
   async submitManualOrder(
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
   ): Promise<ManualOrderResponse> {
-    const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
+    const {
+      email,
+      name,
+      price: payloadPrice,
+      quantity,
+      shippingAddress,
+      frontImageDataUrl,
+      backImageDataUrl,
+    } = payload
     let user = await User.mongo.findOne({ email })
     if (!user) {
       const password = Math.random().toString(36).slice(-8)
@@ -494,7 +499,31 @@ class OrderResolver {
       price = payloadPrice
     }
 
-    return { orderId: '', checkoutSession: '' }
+    const cv = new CardVersion.mongo()
+    cv.user = user?.id
+    cv.baseType = CardSpecBaseType.Custom
+    await cv.save()
+    await this.uploadCardImages({ front: frontImageDataUrl, back: backImageDataUrl }, cv.id)
+
+    const order = await Order.mongo.create({
+      user: user.id,
+      cardVersion: cv.id,
+      state: OrderState.Captured,
+      quantity,
+      price,
+      shippingAddress,
+      shippingName: [name.first, name.middle, name.last].join(' '),
+    })
+
+    // Create a new Stripe Checkout session regardless of whether a previous one
+    // existed since some details may have changed in this submission
+    const checkoutSession = await this.createCheckoutSession(order, cv, user, null)
+
+    order.checkoutSession = checkoutSession.id
+    order.paymentIntent = checkoutSession.payment_intent as string
+    await order.save()
+
+    return { order: order }
   }
 
   /**
