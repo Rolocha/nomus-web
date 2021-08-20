@@ -3,7 +3,7 @@ import deepEqual from 'deep-equal'
 import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
+import { UpdateProfileMutation } from 'src/apollo/types/UpdateProfileMutation'
 import Box from 'src/components/Box'
 import * as Form from 'src/components/Form'
 import Modal from 'src/components/Modal'
@@ -76,7 +76,7 @@ export default ({
       }),
     ),
   })
-  const [updateProfile] = useMutation<UpdateProfileQuery>(
+  const [updateProfile] = useMutation<UpdateProfileMutation>(
     UPDATE_PROFILE_MUTATION,
   )
 
