@@ -23,6 +23,7 @@
     "graphql-upload": "^11.0.0",
     "image-size": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "mongoose": "^5.10.9",
     "morgan": "^1.10.0",
     "pdfkit": "^0.12.1",

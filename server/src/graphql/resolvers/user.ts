@@ -7,31 +7,33 @@ import {
 } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
+import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
+import { NomusProAccessInfo } from 'src/graphql/resolvers/subtypes'
 import { IApolloContext } from 'src/graphql/types'
-import { User } from 'src/models/User'
+import { Connection, NomusProSubscription } from 'src/models'
 import CardVersion from 'src/models/CardVersion'
-import { Role } from 'src/util/enums'
+import PasswordResetToken from 'src/models/PasswordResetToken'
 import { Void } from 'src/models/scalars'
+import { isValidUserCheckpointKey } from 'src/models/subschemas'
+import { User } from 'src/models/User'
+import { performTransaction } from 'src/util/db'
+import { Role } from 'src/util/enums'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import {
   Arg,
   Authorized,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Mutation,
   Query,
   Resolver,
+  Root,
   UnauthorizedError,
 } from 'type-graphql'
-
 import zxcvbn from 'zxcvbn'
 import { AdminOnlyArgs } from '../auth'
-import { isValidUserCheckpointKey } from 'src/models/subschemas'
-import PasswordResetToken from 'src/models/PasswordResetToken'
-import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
-import { Connection } from 'src/models'
-import { performTransaction } from 'src/util/db'
 
 @InputType({ description: 'Input for udpating user profile' })
 class ProfileUpdateInput implements Partial<User> {
@@ -62,9 +64,11 @@ class ProfileUpdateInput implements Partial<User> {
 
   @Field({ nullable: true })
   activated?: boolean
-}
 
-@Resolver()
+  @Field({ nullable: true })
+  website?: string
+}
+@Resolver((of) => User)
 class UserResolver {
   // Performs any necessary changes to go from DB representation of User to public representation of User
   private async userFromMongoDocument(user: DocumentType<User>): Promise<User> {
@@ -73,6 +77,11 @@ class UserResolver {
       ...user.toObject(),
       profilePicUrl: await user.getProfilePicUrl(),
     }
+  }
+
+  @FieldResolver((of) => NomusProAccessInfo, { nullable: true })
+  async nomusProAccessInfo(@Root() user: User): Promise<NomusProAccessInfo | null> {
+    return NomusProSubscription.mongo.getAccessInfoForUser(user.id)
   }
 
   @Authorized(Role.User)
@@ -174,6 +183,7 @@ class UserResolver {
     context.user.position = userUpdatePayload.position ?? context.user.position
     context.user.company = userUpdatePayload.company ?? context.user.company
     context.user.activated = userUpdatePayload.activated ?? context.user.activated
+    context.user.website = userUpdatePayload.website ?? context.user.website
 
     await context.user.save()
     return await this.userFromMongoDocument(context.user)

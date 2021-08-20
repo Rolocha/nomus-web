@@ -1,5 +1,6 @@
 import { ObjectType, Field, InputType } from 'type-graphql'
 import { prop } from '@typegoose/typegoose'
+import { NomusProFeature } from 'src/util/enums'
 
 @InputType('PersonNameInput')
 @ObjectType()
@@ -35,6 +36,17 @@ export const USER_CHECKPOINT_KEYS: Array<UserCheckpointKey> = [
 
 export const isValidUserCheckpointKey = (s: string): s is UserCheckpointKey => {
   return (USER_CHECKPOINT_KEYS as string[]).includes(s)
+}
+
+@ObjectType({ description: 'The settings/states for Nomus Pro features' })
+export class NomusProFeatureSet implements Record<NomusProFeature, boolean> {
+  @prop({ default: false })
+  @Field()
+  [NomusProFeature.UseCustomTapLink]: boolean
+}
+
+export const EMPTY_FEATURE_SET: NomusProFeatureSet = {
+  [NomusProFeature.UseCustomTapLink]: false,
 }
 
 @InputType('AddressInput')

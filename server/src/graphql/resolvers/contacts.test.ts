@@ -28,11 +28,13 @@ describe('ContactsResolver', () => {
         name: { first: 'Jeff', middle: 'William', last: 'Winger' },
         email: 'fake_lawyer@greendale.com',
         password: 'save-greendale',
+        website: 'website1.com',
       })
       const userTo2 = await createMockUser({
         name: { first: 'Another', middle: 'Such', last: 'Person' },
         email: 'person2@greendale.com',
         password: 'save-greendale',
+        website: 'website2.com',
       })
       const connection1 = await createMockConnection({ from: userFrom._id, to: userTo1._id })
       const connection2 = await createMockConnection({ from: userFrom._id, to: userTo2._id })
@@ -53,36 +55,39 @@ describe('ContactsResolver', () => {
             cardFrontImageUrl
             cardBackImageUrl
             vcfUrl
+            website
           }
         }
         `,
         contextUser: userFrom,
       })
 
-      const expectedData = [
-        {
-          id: userTo1.id,
-          name: (userTo1.name as DocumentType<PersonName>).toObject(),
-          notes: connection1.notes ?? null,
-          phoneNumber: userTo1.phoneNumber ?? null,
-          email: userTo1.email,
-          cardFrontImageUrl: null,
-          cardBackImageUrl: null,
-          vcfUrl: userTo1.vcfUrl ?? null,
-        },
-        {
-          id: userTo2.id,
-          name: (userTo2.name as DocumentType<PersonName>).toObject(),
-          notes: connection2.notes ?? null,
-          phoneNumber: userTo2.phoneNumber ?? null,
-          email: userTo2.email,
-          cardFrontImageUrl: null,
-          cardBackImageUrl: null,
-          vcfUrl: userTo2.vcfUrl ?? null,
-        },
-      ]
-
-      expect(response.data?.contacts).toMatchObject(expectedData)
+      expect(response.data?.contacts).toEqual(
+        expect.arrayContaining([
+          {
+            id: userTo1.id,
+            name: (userTo1.name as DocumentType<PersonName>).toObject(),
+            notes: connection1.notes ?? null,
+            phoneNumber: userTo1.phoneNumber ?? null,
+            email: userTo1.email,
+            cardFrontImageUrl: null,
+            cardBackImageUrl: null,
+            vcfUrl: userTo1.vcfUrl ?? null,
+            website: 'website1.com',
+          },
+          {
+            id: userTo2.id,
+            name: (userTo2.name as DocumentType<PersonName>).toObject(),
+            notes: connection2.notes ?? null,
+            phoneNumber: userTo2.phoneNumber ?? null,
+            email: userTo2.email,
+            cardFrontImageUrl: null,
+            cardBackImageUrl: null,
+            vcfUrl: userTo2.vcfUrl ?? null,
+            website: 'website2.com',
+          },
+        ])
+      )
     })
 
     it('returns an empty list if no connections exists', async () => {
