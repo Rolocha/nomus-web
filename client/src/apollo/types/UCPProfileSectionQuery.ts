@@ -37,8 +37,22 @@ export interface UCPProfileSectionQuery_user {
   bio: string | null
   position: string | null
   company: string | null
+  website: string | null
+}
+
+export interface UCPProfileSectionQuery_nomusProAccessInfo_featureSet {
+  __typename: 'NomusProFeatureSet'
+  UseCustomTapLink: boolean
+}
+
+export interface UCPProfileSectionQuery_nomusProAccessInfo {
+  __typename: 'NomusProAccessInfo'
+  id: string
+  hasAccessUntil: number | null
+  featureSet: UCPProfileSectionQuery_nomusProAccessInfo_featureSet | null
 }
 
 export interface UCPProfileSectionQuery {
   user: UCPProfileSectionQuery_user
+  nomusProAccessInfo: UCPProfileSectionQuery_nomusProAccessInfo | null
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { UserControlPanelSkeletonQuery } from 'src/apollo/types/UserControlPanelSkeletonQuery'
 import Banner from 'src/components/Banner'
@@ -41,20 +41,46 @@ const ProfilePage = () => {
   )
 
   const location = useLocation()
-  const [showJustVerifiedEmail, setShowJustVerifiedEmail] = React.useState<
+  const history = useHistory()
+  const [didCheckParams, setDidCheckParams] = React.useState(false)
+  const [didUserJustVerifyEmail, setDidUserJustVerifyEmail] = React.useState<
     boolean | null
   >(null)
+  const [
+    didUserJustSubscribeToNomusPro,
+    setDidUserJustSubscribeToNomusPro,
+  ] = React.useState<boolean | null>(null)
+
   const [
     resentVerificationEmailSuccessfully,
     setResentVerificationEmailSuccessfully,
   ] = React.useState<null | boolean>(null)
+
   React.useEffect(() => {
+    // If we haven't yet, check for query params that indicate that the user
+    // is being redirected here from some other flow, e.g. just verifying their
+    // email or just finishing checkout for a Nomus Pro subscription
+    if (didCheckParams) return
     const params = new URLSearchParams(location.search)
-    // If we haven't set it yet, set showJustVerifiedEmail to whether it's in the URL query params
-    if (showJustVerifiedEmail == null) {
-      setShowJustVerifiedEmail(params.get('justVerifiedEmail') != null)
-    }
-  }, [showJustVerifiedEmail, location])
+
+    setDidUserJustVerifyEmail(params.get('justVerifiedEmail') != null)
+    setDidUserJustSubscribeToNomusPro(
+      params.get('completedNomusProSubscription') != null,
+    )
+    setDidCheckParams(true)
+
+    // Clean up the URL
+    history.replace({ search: undefined })
+  }, [
+    history,
+    didCheckParams,
+    setDidCheckParams,
+    didUserJustVerifyEmail,
+    setDidUserJustVerifyEmail,
+    didUserJustSubscribeToNomusPro,
+    setDidUserJustSubscribeToNomusPro,
+    location,
+  ])
 
   if (loading || !data) {
     return <LoadingPage fullscreen />
@@ -143,7 +169,7 @@ const ProfilePage = () => {
               )}
             </Box>
 
-            {data.user.isEmailVerified && showJustVerifiedEmail && (
+            {data.user.isEmailVerified && didUserJustVerifyEmail && (
               <Box mb="16px">
                 <Toast
                   type="success"
@@ -151,7 +177,21 @@ const ProfilePage = () => {
                   description="Successfully verified your email address."
                   autoCloseIn={8000}
                   onClickClose={() => {
-                    setShowJustVerifiedEmail(false)
+                    setDidUserJustVerifyEmail(false)
+                  }}
+                />
+              </Box>
+            )}
+
+            {didUserJustSubscribeToNomusPro && (
+              <Box mb="16px">
+                <Toast
+                  type="success"
+                  title="Subscribed to Nomus Pro"
+                  description="Congrats! You've unlocked the power of Nomus Pro!"
+                  autoCloseIn={8000}
+                  onClickClose={() => {
+                    setDidUserJustSubscribeToNomusPro(false)
                   }}
                 />
               </Box>

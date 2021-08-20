@@ -16,6 +16,13 @@ export enum CardSpecBaseType {
 }
 
 /**
+ * Features available in Nomus Pro
+ */
+export enum NomusProFeature {
+  UseCustomTapLink = 'UseCustomTapLink',
+}
+
+/**
  * Current State in Order Tracking State Machine
  */
 export enum OrderState {
@@ -53,6 +60,7 @@ export interface ProfileUpdateInput {
   position?: string | null
   company?: string | null
   activated?: boolean | null
+  website?: string | null
 }
 
 /**
@@ -60,7 +68,7 @@ export interface ProfileUpdateInput {
  */
 export interface SubmitCustomOrderInput {
   previousOrder?: string | null
-  quantity?: number | null
+  quantity: number
   frontImageDataUrl: any
   backImageDataUrl?: any | null
 }
@@ -70,7 +78,7 @@ export interface SubmitCustomOrderInput {
  */
 export interface SubmitTemplateOrderInput {
   previousOrder?: string | null
-  quantity?: number | null
+  quantity: number
   templateId: string
   templateName: string
   cardVersionId: string
@@ -105,6 +113,10 @@ export interface TemplateContactInfoFieldsInput {
   line4?: string | null
   headline?: string | null
   footer?: string | null
+}
+
+export interface UpdateNomusProFeatureSetInput {
+  UseCustomTapLink?: boolean | null
 }
 
 //==============================================================

@@ -6,20 +6,20 @@
 import { ProfileUpdateInput } from './globalTypes'
 
 // ====================================================
-// GraphQL mutation operation: UpdateProfileQuery
+// GraphQL mutation operation: UpdateProfileMutation
 // ====================================================
 
-export interface UpdateProfileQuery_updateProfile_name {
+export interface UpdateProfileMutation_updateProfile_name {
   __typename: 'PersonName'
   first: string
   middle: string | null
   last: string
 }
 
-export interface UpdateProfileQuery_updateProfile {
+export interface UpdateProfileMutation_updateProfile {
   __typename: 'User'
   id: string
-  name: UpdateProfileQuery_updateProfile_name | null
+  name: UpdateProfileMutation_updateProfile_name | null
   /**
    * A URL pointing to the user's profile picture
    */
@@ -32,12 +32,13 @@ export interface UpdateProfileQuery_updateProfile {
   activated: boolean
   position: string | null
   company: string | null
+  website: string | null
 }
 
-export interface UpdateProfileQuery {
-  updateProfile: UpdateProfileQuery_updateProfile
+export interface UpdateProfileMutation {
+  updateProfile: UpdateProfileMutation_updateProfile
 }
 
-export interface UpdateProfileQueryVariables {
+export interface UpdateProfileMutationVariables {
   updatedUser: ProfileUpdateInput
 }

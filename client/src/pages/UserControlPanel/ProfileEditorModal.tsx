@@ -19,6 +19,7 @@ interface FormData {
   phoneNumber: string
   email: string
   bio: string
+  website?: string
   position: string
   company: string
 }
@@ -67,6 +68,9 @@ export default ({
           .email('Please enter a valid email address.')
           .required('Email is required.'),
         bio: yup.string(),
+        website: yup
+          .string()
+          .url('Please enter a valid URL, starting with https://'),
         position: yup.string(),
         company: yup.string(),
       }),
@@ -240,6 +244,7 @@ export default ({
                 <Form.FieldError fieldError={errors.email} />
               </Form.Item>
             </Box>
+
             <Box
               display="flex"
               flexDirection={{ base: 'column', md: 'row' }}
@@ -275,6 +280,7 @@ export default ({
                 <Form.FieldError fieldError={errors.company} />
               </Form.Item>
             </Box>
+
             <Form.Item>
               <Form.Label htmlFor="bio">BIO</Form.Label>
               <Form.TextArea
@@ -285,6 +291,22 @@ export default ({
               />
             </Form.Item>
             <Form.FieldError fieldError={errors.bio} />
+
+            <Form.Item>
+              <Form.Label htmlFor="website">WEBSITE</Form.Label>
+              <Form.Input
+                id="website"
+                name="website"
+                rows={4}
+                type="text"
+                placeholder="https://my-website.com"
+                ref={registerWithRef(fieldRefs.website, {
+                  required: false,
+                })}
+                error={errors.website}
+              />
+            </Form.Item>
+            <Form.FieldError fieldError={errors.website} />
           </Form.Form>
         </Box>
       </Box>
