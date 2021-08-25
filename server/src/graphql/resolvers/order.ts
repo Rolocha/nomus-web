@@ -153,9 +153,6 @@ class ManualOrderInput {
 
   @Field((type) => GraphQLUpload, { nullable: true })
   backImageDataUrl?: Promise<FileUpload> | null
-
-  @Field()
-  paymentInfo?: string | null
 }
 
 @ObjectType()
@@ -473,7 +470,7 @@ class OrderResolver {
       const res = await User.mongo.createNewUser({ email, name, password })
       if (res.isSuccess) {
         user = res.getValue()
-        User.sendPasswordResetEmail(email)
+        User.sendPasswordResetEmail(email) // update this to instead tell them we made them an account
       } else {
         throw new Error('Failed to create new user')
       }
@@ -502,18 +499,24 @@ class OrderResolver {
     const cv = new CardVersion.mongo()
     cv.user = user?.id
     cv.baseType = CardSpecBaseType.Custom
+    const uploadedImageUrls = await this.uploadCardImages(
+      { front: frontImageDataUrl, back: backImageDataUrl },
+      cv.id
+    )
+    cv.frontImageUrl = uploadedImageUrls.front
+    cv.backImageUrl = uploadedImageUrls.back
     await cv.save()
-    await this.uploadCardImages({ front: frontImageDataUrl, back: backImageDataUrl }, cv.id)
 
     const order = await Order.mongo.create({
       user: user.id,
       cardVersion: cv.id,
-      state: OrderState.Captured,
+      state: OrderState.Paid, // Manual submissions need to be invoiced, so assuming the order has been paid for
       quantity,
       price,
       shippingAddress,
       shippingName: [name.first, name.middle, name.last].join(' '),
     })
+    await order.updatePrintSpecPDF()
 
     // Create a new Stripe Checkout session regardless of whether a previous one
     // existed since some details may have changed in this submission

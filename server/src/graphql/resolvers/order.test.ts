@@ -1,11 +1,25 @@
 import { Order } from 'src/models'
-import { OrderPrice } from 'src/models/subschemas'
+import { Address, OrderPrice } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
+import fs from 'fs'
+import * as S3 from 'src/util/s3'
+import { Result } from 'src/util/error'
+import * as fileUtil from 'src/util/file'
+import { mocked } from 'ts-jest/utils'
+import PrintSpec from 'src/lib/print-spec'
+
+jest.mock('src/util/file')
+const mockedFileUtil = mocked(fileUtil)
+jest.mock('src/lib/print-spec')
+const mockedPrintSpec = mocked(PrintSpec)
+jest.mock('src/util/s3')
+const mockedS3Module = mocked(S3)
+jest.setTimeout(30000)
 
 beforeAll(async () => {
   await initDB()
@@ -674,5 +688,136 @@ describe('OrderResolver', () => {
 
       expect(response.errors[0].message).toBe('invalid-transition')
     })
+  })
+  describe('submitManualOrder', () => {
+    it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
+      const user = await createMockUser()
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+      const price: OrderPrice = {
+        subtotal: 5000,
+        tax: 427,
+        shipping: 0,
+        total: 5452,
+      }
+      // For the sake of this test, we have to have the data be in a file on disk first
+      // so we can create a readstream for it
+      const frontFilePath = '/tmp/front.png'
+      fs.writeFileSync(frontFilePath, 'Hey there!')
+      const frontFile = {
+        filename: 'front.png',
+        mimetype: 'image/png',
+        encoding: 'utf-8',
+        createReadStream: () => fs.createReadStream(frontFilePath),
+      }
+      const backFilePath = '/tmp/back.png'
+      fs.writeFileSync(backFilePath, 'Hey there!')
+      const backFile = {
+        filename: 'back.png',
+        mimetype: 'image/png',
+        encoding: 'utf-8',
+        createReadStream: () => fs.createReadStream(backFilePath),
+      }
+      const frontImageDataUrl = frontFile
+      const backImageDataUrl = backFile
+
+      const uploadFileToS3Spy = jest
+        .spyOn(S3, 'uploadFileToS3')
+        .mockResolvedValue(Result.ok('s3-key.png'))
+      mockedFileUtil.downloadUrlToFile.mockImplementation((url, filename, tmpDirName) =>
+        Promise.resolve(`/tmp/${tmpDirName}/${filename}`)
+      )
+      const generatePDFSpy = jest
+        .spyOn(PrintSpec.prototype, 'generatePDF')
+        .mockResolvedValue('/path/to/print-spec.pdf')
+      const s3Key = `card-array.pdf`
+      mockedS3Module.uploadFileToS3.mockResolvedValue(Result.ok(s3Key))
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                order {
+                  id
+                  user {
+                    id
+                    email
+                    name {
+                      first
+                      middle
+                      last
+                    }
+                  }
+                  cardVersion {
+                    id
+                    user { 
+                      id
+                    }
+                    frontImageUrl
+                    backImageUrl
+                  }
+                  quantity
+                  price {
+                    subtotal
+                    tax
+                    shipping
+                    total
+                  }
+                  state
+                  trackingNumber
+                  paymentIntent
+                  checkoutSession
+                  shortId
+                  shippingName
+                  shippingAddress {
+                    line1
+                    line2
+                    city
+                    state
+                    postalCode
+                  }
+
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: user.email,
+            name: {
+              first: user.name.first,
+              middle: user.name.middle,
+              last: user.name.last,
+            },
+            quantity,
+            shippingAddress,
+            price,
+            frontImageDataUrl,
+            backImageDataUrl,
+          },
+        },
+        asAdmin: true,
+      })
+      // expect(uploadFileToS3Spy).toHaveBeenCalledWith(
+      //   expect.stringMatching(/^\/tmp\/nomus-s3-upload\/.*\/test.txt$/),
+      //   'test.txt',
+      //   S3.S3AssetCategory.CardVersions
+      // )
+      // if (fs.existsSync(filepath)) {
+      //   fs.unlinkSync(filepath)
+      // } else {
+      //   console.warn("test.txt was supposed to get removed but it didn't exist!")
+      // }
+      console.log(response)
+    })
+    it('properly creates a manual order for a new user and sends them an update email', async () => {})
+    it('calculates price based on shipping address and quantity if price is not included', async () => {})
+    it('properly creates a manual order for a new user and sends them an update email', async () => {})
   })
 })
