@@ -9,17 +9,8 @@ import { createMockUser } from 'src/__mocks__/models/User'
 import fs from 'fs'
 import * as S3 from 'src/util/s3'
 import { Result } from 'src/util/error'
-import * as fileUtil from 'src/util/file'
-import { mocked } from 'ts-jest/utils'
-import PrintSpec from 'src/lib/print-spec'
 import OrderResolver from 'src/graphql/resolvers/order'
 
-jest.mock('src/util/file')
-const mockedFileUtil = mocked(fileUtil)
-jest.mock('src/lib/print-spec')
-const mockedPrintSpec = mocked(PrintSpec)
-jest.mock('src/util/s3')
-const mockedS3Module = mocked(S3)
 jest.setTimeout(30000)
 
 beforeAll(async () => {
