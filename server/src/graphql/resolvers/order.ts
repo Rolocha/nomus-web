@@ -137,7 +137,7 @@ class ManualOrderInput {
   email: string
 
   @Field((type) => PersonName, { nullable: true })
-  name: PersonName
+  name?: PersonName | null
 
   @Field({ nullable: false })
   quantity: number
@@ -146,13 +146,13 @@ class ManualOrderInput {
   shippingAddress: Address
 
   @Field((type) => OrderPrice, { nullable: true })
-  price: OrderPrice
+  price?: OrderPrice | null
 
   @Field((type) => GraphQLUpload, { nullable: false })
   frontImageDataUrl: Promise<FileUpload>
 
-  @Field((type) => GraphQLUpload, { nullable: true })
-  backImageDataUrl?: Promise<FileUpload> | null
+  @Field((type) => GraphQLUpload, { nullable: false })
+  backImageDataUrl?: Promise<FileUpload>
 }
 
 @ObjectType()

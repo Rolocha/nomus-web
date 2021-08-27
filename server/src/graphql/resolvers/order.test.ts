@@ -7,8 +7,6 @@ import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import fs from 'fs'
-import * as S3 from 'src/util/s3'
-import { Result } from 'src/util/error'
 import OrderResolver from 'src/graphql/resolvers/order'
 
 jest.setTimeout(30000)
