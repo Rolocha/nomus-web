@@ -8,6 +8,7 @@ import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import fs from 'fs'
 import OrderResolver from 'src/graphql/resolvers/order'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 jest.setTimeout(30000)
 
@@ -680,6 +681,14 @@ describe('OrderResolver', () => {
     })
   })
   describe('submitManualOrder', () => {
+    let sgMailSendSpy = null
+    beforeEach(() => {
+      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+    })
     it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
       const user: User = await createMockUser()
       const quantity = 100
@@ -847,6 +856,8 @@ describe('OrderResolver', () => {
 
       expect(orderDetails.user?.id).toBe(user.id)
       expect(orderDetails.user?.email).toBe(user.email)
+
+      expect(sgMail.send).toBeCalledTimes(0)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})
     it('calculates price based on shipping address and quantity if price is not included', async () => {})
