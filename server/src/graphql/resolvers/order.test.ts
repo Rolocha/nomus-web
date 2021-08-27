@@ -719,9 +719,12 @@ describe('OrderResolver', () => {
       const frontImageDataUrl = frontFile
       const backImageDataUrl = backFile
 
-      const uploadFileToS3Spy = jest
-        .spyOn(S3, 'uploadGraphQLFileToS3')
-        .mockResolvedValue(Result.ok('s3-key.png'))
+      const uploadCardImagesSpy = jest
+        .spyOn(OrderResolver.prototype, 'uploadCardImages')
+        .mockResolvedValue({
+          front: 'https://nomus-assets.s3.amazonaws.com/front.png',
+          back: 'https://nomus-assets.s3.amazonaws.com/back.png',
+        })
       const generatePDFSpy = jest
         .spyOn(Order.mongo.prototype, 'updatePrintSpecPDF')
         .mockReturnValue(null)
