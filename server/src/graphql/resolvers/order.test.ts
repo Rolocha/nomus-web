@@ -731,9 +731,6 @@ describe('OrderResolver', () => {
       const uploadFileToS3Spy = jest
         .spyOn(S3, 'uploadGraphQLFileToS3')
         .mockResolvedValue(Result.ok('s3-key.png'))
-      mockedFileUtil.downloadUrlToFile.mockImplementation((url, filename, tmpDirName) =>
-        Promise.resolve(`/tmp/${tmpDirName}/${filename}`)
-      )
       const generatePDFSpy = jest
         .spyOn(Order.mongo.prototype, 'updatePrintSpecPDF')
         .mockReturnValue(null)
@@ -767,8 +764,6 @@ describe('OrderResolver', () => {
           total_details: null,
           /* eslint-enable camelcase */
         })
-      const s3Key = `card-array.pdf`
-      mockedS3Module.uploadFileToS3.mockResolvedValue(Result.ok(s3Key))
 
       const response = await execQuery({
         source: `
