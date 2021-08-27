@@ -361,6 +361,36 @@ export class User extends BaseModel({
     return null
   }
 
+  public static async sendManualSubmitEmail(email: string): Promise<void> {
+    const user = await User.mongo.findOne({ email })
+    if (user == null) {
+      return null
+    }
+
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
+    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
+
+    const passwordResetURLQueryParams = new URLSearchParams()
+    passwordResetURLQueryParams.set('token', preHashToken)
+    passwordResetURLQueryParams.set('userId', user.id)
+    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: user.email,
+      from: 'hi@nomus.me',
+      templateId: SendgridTemplate.ManualSubmission,
+      dynamicTemplateData: {
+        passwordResetLink,
+        firstName: user.name.first,
+      },
+    })
+    user.isEmailVerified = true
+    await user.save()
+
+    return null
+  }
+
   public async updateProfilePic(
     this: DocumentType<User>,
     file: FileUpload

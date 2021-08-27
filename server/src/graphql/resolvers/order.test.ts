@@ -12,6 +12,7 @@ import { Result } from 'src/util/error'
 import * as fileUtil from 'src/util/file'
 import { mocked } from 'ts-jest/utils'
 import PrintSpec from 'src/lib/print-spec'
+import OrderResolver from 'src/graphql/resolvers/order'
 
 jest.mock('src/util/file')
 const mockedFileUtil = mocked(fileUtil)
@@ -704,7 +705,7 @@ describe('OrderResolver', () => {
         subtotal: 5000,
         tax: 427,
         shipping: 0,
-        total: 5452,
+        total: 5427,
       }
       // For the sake of this test, we have to have the data be in a file on disk first
       // so we can create a readstream for it
@@ -728,14 +729,44 @@ describe('OrderResolver', () => {
       const backImageDataUrl = backFile
 
       const uploadFileToS3Spy = jest
-        .spyOn(S3, 'uploadFileToS3')
+        .spyOn(S3, 'uploadGraphQLFileToS3')
         .mockResolvedValue(Result.ok('s3-key.png'))
       mockedFileUtil.downloadUrlToFile.mockImplementation((url, filename, tmpDirName) =>
         Promise.resolve(`/tmp/${tmpDirName}/${filename}`)
       )
       const generatePDFSpy = jest
-        .spyOn(PrintSpec.prototype, 'generatePDF')
-        .mockResolvedValue('/path/to/print-spec.pdf')
+        .spyOn(Order.mongo.prototype, 'updatePrintSpecPDF')
+        .mockReturnValue(null)
+      const checkoutSessionSpy = jest
+        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
+        .mockResolvedValue({
+          id: 'cs_12345',
+          object: 'checkout.session',
+          /* eslint-disable camelcase */
+          allow_promotion_codes: true,
+          amount_subtotal: null,
+          amount_total: null,
+          billing_address_collection: null,
+          cancel_url: 'https://nomus.me',
+          client_reference_id: null,
+          currency: 'usd',
+          customer: null,
+          customer_email: null,
+          livemode: null,
+          locale: null,
+          metadata: null,
+          mode: null,
+          payment_intent: 'pi_1234',
+          payment_method_types: [],
+          setup_intent: null,
+          shipping: null,
+          shipping_address_collection: null,
+          submit_type: null,
+          subscription: null,
+          success_url: 'https://nomus.me',
+          total_details: null,
+          /* eslint-enable camelcase */
+        })
       const s3Key = `card-array.pdf`
       mockedS3Module.uploadFileToS3.mockResolvedValue(Result.ok(s3Key))
 
@@ -809,12 +840,17 @@ describe('OrderResolver', () => {
       //   'test.txt',
       //   S3.S3AssetCategory.CardVersions
       // )
-      // if (fs.existsSync(filepath)) {
-      //   fs.unlinkSync(filepath)
-      // } else {
-      //   console.warn("test.txt was supposed to get removed but it didn't exist!")
-      // }
-      console.log(response)
+      if (fs.existsSync(frontFilePath)) {
+        fs.unlinkSync(frontFilePath)
+      } else {
+        console.warn("test.txt was supposed to get removed but it didn't exist!")
+      }
+      if (fs.existsSync(backFilePath)) {
+        fs.unlinkSync(backFilePath)
+      } else {
+        console.warn("test.txt was supposed to get removed but it didn't exist!")
+      }
+      expect(response.data?.submitManualOrder?.order?.user?.id).toBe(user.id)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})
     it('calculates price based on shipping address and quantity if price is not included', async () => {})
