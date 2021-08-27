@@ -1,5 +1,5 @@
-import { Order } from 'src/models'
-import { Address, OrderPrice } from 'src/models/subschemas'
+import { Order, User } from 'src/models'
+import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
@@ -681,7 +681,7 @@ describe('OrderResolver', () => {
   })
   describe('submitManualOrder', () => {
     it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
-      const user = await createMockUser()
+      const user: User = await createMockUser()
       const quantity = 100
       const shippingAddress: Address = {
         line1: '1600 Pennsylvania Ave.',
@@ -837,7 +837,16 @@ describe('OrderResolver', () => {
       } else {
         console.warn("test.txt was supposed to get removed but it didn't exist!")
       }
-      expect(response.data?.submitManualOrder?.order?.user?.id).toBe(user.id)
+
+      const orderDetails = response.data?.submitManualOrder?.order
+
+      expect(orderDetails.id).not.toBeNull()
+      expect(orderDetails.quantity).toBe(quantity)
+      expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
+      expect(orderDetails.price).toMatchObject(price)
+
+      expect(orderDetails.user?.id).toBe(user.id)
+      expect(orderDetails.user?.email).toBe(user.email)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})
     it('calculates price based on shipping address and quantity if price is not included', async () => {})

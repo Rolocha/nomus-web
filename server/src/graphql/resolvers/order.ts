@@ -496,9 +496,10 @@ class OrderResolver {
       price = payloadPrice
     }
 
-    const cv = new CardVersion.mongo()
-    cv.user = user?.id
-    cv.baseType = CardSpecBaseType.Custom
+    const cv = await CardVersion.mongo.create({
+      user: user.id,
+      baseType: CardSpecBaseType.Custom,
+    })
     const uploadedImageUrls = await this.uploadCardImages(
       { front: frontImageDataUrl, back: backImageDataUrl },
       cv.id
