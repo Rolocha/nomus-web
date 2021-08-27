@@ -1,6 +1,7 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { NomusProFeature } from 'src/util/enums'
 import { createMockNomusProSubscription } from 'src/__mocks__/models/NomusProSubscription'
+import { DateTime } from 'luxon'
 
 beforeAll(async () => {
   await initDB()
@@ -15,22 +16,23 @@ describe('NomusProSubscription model', () => {
     await dropAllCollections()
   })
 
+  const now = DateTime.now()
+
   describe('isActive', () => {
     it('returns false if the currentPeriodEndsAt is in the past', async () => {
-      const nowInSeconds = new Date().getTime() / 1000
       const sub = await createMockNomusProSubscription({
-        currentPeriodStartsAt: nowInSeconds - 200000,
-        currentPeriodEndsAt: nowInSeconds - 100000,
+        currentPeriodStartsAt: now.minus({ days: 10 }).toSeconds(),
+        currentPeriodEndsAt: now.minus({ days: 5 }).toSeconds(),
       })
 
       expect(sub.isActive()).toBe(false)
     })
 
-    it('returns false if the currentPeriodEndsAt is in the future', async () => {
-      const nowInSeconds = new Date().getTime() / 1000
+    it('returns true if the currentPeriodEndsAt is in the future', async () => {
+      const now = DateTime.now()
       const sub = await createMockNomusProSubscription({
-        currentPeriodStartsAt: nowInSeconds - 200000,
-        currentPeriodEndsAt: nowInSeconds + 100000,
+        currentPeriodStartsAt: now.minus({ days: 1 }).toSeconds(),
+        currentPeriodEndsAt: now.plus({ days: 1 }).toSeconds(),
       })
 
       expect(sub.isActive()).toBe(true)
@@ -39,8 +41,8 @@ describe('NomusProSubscription model', () => {
 
   describe('getAccessInfo', () => {
     it('returns the access info', async () => {
-      const nowInSeconds = new Date().getTime() / 1000
-      const currentPeriodEndsAt = nowInSeconds + 100000
+      const now = DateTime.now()
+      const currentPeriodEndsAt = now.plus({ days: 1 }).toSeconds()
       const sub = await createMockNomusProSubscription({
         currentPeriodStartsAt: 0,
         currentPeriodEndsAt,
