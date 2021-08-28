@@ -1,6 +1,10 @@
+import { FormControl, Switch, Tooltip } from '@chakra-ui/react'
 import * as React from 'react'
+import { formatPhoneNumber } from 'react-phone-number-input'
 import { gql, useMutation, useQuery } from 'src/apollo'
+import { NomusProFeature } from 'src/apollo/types/globalTypes'
 import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
+import { UpdateNomusProFeatureSet } from 'src/apollo/types/UpdateNomusProFeatureSet'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardImage from 'src/components/BusinessCardImage'
@@ -9,12 +13,14 @@ import EditableImage from 'src/components/EditableImage'
 import * as Form from 'src/components/Form'
 import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
+import NomusProBadge from 'src/components/NomusProBadge'
+import NomusProModal from 'src/components/NomusProModal'
 import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
+import { UPDATE_NOMUS_PRO_FEATURES } from 'src/pages/UserControlPanel/mutations'
 import { colors } from 'src/styles'
 import { formatName } from 'src/utils/name'
-import { formatPhoneNumber } from 'react-phone-number-input'
 import ProfileEditorModal from './ProfileEditorModal'
 
 const bp = 'md'
@@ -43,6 +49,15 @@ export default () => {
           bio
           position
           company
+          website
+        }
+
+        nomusProAccessInfo {
+          id
+          hasAccessUntil
+          featureSet {
+            UseCustomTapLink
+          }
         }
       }
     `,
@@ -59,6 +74,11 @@ export default () => {
     `,
   )
 
+  const [
+    updateNomusProFeatureSet,
+    updateNomusProFeatureSetResult,
+  ] = useMutation<UpdateNomusProFeatureSet>(UPDATE_NOMUS_PRO_FEATURES)
+
   const handleProfilePictureUpdate = async (image: File) => {
     await updateProfilePicture({
       variables: {
@@ -66,6 +86,8 @@ export default () => {
       },
     })
   }
+
+  const [isNomusProModalOpen, setIsNomusProModalOpen] = React.useState(false)
 
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false)
 
@@ -84,11 +106,59 @@ export default () => {
   const bioFieldRef = React.useRef<HTMLInputElement | null>(null)
   const positionFieldRef = React.useRef<HTMLInputElement | null>(null)
   const companyFieldRef = React.useRef<HTMLInputElement | null>(null)
+  const websiteFieldRef = React.useRef<HTMLInputElement | null>(null)
+
+  const hasNomusProAccess = React.useMemo(() => {
+    if (data?.nomusProAccessInfo?.hasAccessUntil == null) {
+      return false
+    }
+    const hasAccessUntil = new Date(
+      data?.nomusProAccessInfo?.hasAccessUntil * 1000,
+    ).getTime()
+    const now = new Date().getTime()
+    return hasAccessUntil > now
+  }, [data])
+
+  const handleRouteTapsToWebsiteSwitchChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    // If user is trying to toglge on the custom link routing feature
+    // but doesn't have Nomus Pro access yet, open the modal prompting
+    // them to subscribe
+    if (event.target.checked && !hasNomusProAccess) {
+      setIsNomusProModalOpen(true)
+    } else {
+      // Looks like they do have access: fire off the mutation to turn the
+      // feature on for them
+      updateNomusProFeatureSet({
+        variables: {
+          featureSetUpdate: {
+            UseCustomTapLink: event.target.checked,
+          },
+        },
+      })
+    }
+  }
+
+  const useCustomLinkRouting =
+    hasNomusProAccess &&
+    data?.nomusProAccessInfo?.featureSet?.UseCustomTapLink &&
+    data?.user.website
+
+  const cardTapLink = useCustomLinkRouting
+    ? { url: data!.user.website, label: data!.user.website }
+    : {
+        url: `/${data?.user.username}`,
+        label: `nomus.me/${data?.user.username}`,
+      }
+
+  const cardTapLinkExplanation = useCustomLinkRouting
+    ? `Because you're subscribed to Nomus Pro and have enabled custom link routing, when someone taps your Nomus card or scans the QR code, they will be sent directly to your website.`
+    : `When someone taps your Nomus card or scans the QR code, they will be sent to your Nomus profile page.`
 
   if (loading || !data) {
     return <LoadingPage />
   }
-
   return (
     <Box
       display="grid"
@@ -102,14 +172,12 @@ export default () => {
       }}
       gridTemplateAreas={{
         base: `
-        "topBar topBar topBar"
         "profilePic nameplate nameplate"
         "cards cards cards"
         "profileInfo profileInfo profileInfo"
       `,
         [bp]: `
-        "topBar topBar topBar topBar"
-        "profilePic nameplate nameplate nameplate"
+        "profilePic nameplate nameplate editProfile"
         "cards profileInfo profileInfo profileInfo"
     `,
       }}
@@ -117,43 +185,6 @@ export default () => {
       gridRowGap={3}
       p={{ base: '24px', [bp]: '48px' }}
     >
-      <Box
-        gridArea="topBar"
-        justifySelf={{ base: 'stretch', [bp]: 'stretch' }}
-        display="flex"
-        alignItems="flex-start"
-        justifyContent="space-between"
-      >
-        <Link
-          display="inline-block"
-          px="24px"
-          to={`/${data.user.username}`}
-          buttonStyle="secondary"
-          target="_blank"
-        >
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            px={2}
-          >
-            <Text.Body2 color="linkBlue">{`nomus.me/${data.user.username}`}</Text.Body2>
-            <Icon of="externalLink" color={colors.linkBlue} />
-          </Box>
-        </Link>
-        <Box display={{ base: 'none', [bp]: 'block' }}>
-          <Button
-            variant="tertiary"
-            leftIcon={<Icon of="pen" />}
-            onClick={openProfileEditorModal}
-          >
-            <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
-              Edit profile
-            </Box>
-          </Button>
-        </Box>
-      </Box>
-
       <Box gridArea="profilePic" placeSelf="center" width="100%">
         {data.user.name && (
           <EditableImage
@@ -165,11 +196,52 @@ export default () => {
         )}
       </Box>
 
-      <Box gridArea="nameplate" alignSelf={{ base: 'start', [bp]: 'center' }}>
+      <Box
+        gridArea="nameplate"
+        alignSelf={{ base: 'start', [bp]: 'center' }}
+        display="flex"
+        flexDirection="column"
+        alignItems="flex-start"
+      >
+        {/* Tap/scan route indicator */}
+        <Box>
+          <Tooltip
+            hasArrow
+            placement="top"
+            label={cardTapLinkExplanation}
+            aria-label={cardTapLinkExplanation}
+          >
+            <span>
+              <Link
+                to={cardTapLink.url}
+                target="_blank"
+                display="flex"
+                alignItems="center"
+              >
+                <Icon of="nfc" mr="4px" color={colors.linkBlue} />
+                <Text.Body2 color={colors.linkBlue}>
+                  {cardTapLink.label}
+                </Text.Body2>
+              </Link>
+            </span>
+          </Tooltip>
+        </Box>
         {data.user.name ? (
-          <Text.SectionHeader mb={1} mt={0}>
-            {formatName(data.user.name)}
-          </Text.SectionHeader>
+          <Box
+            display="flex"
+            flexDirection={{ base: 'column', [bp]: 'row' }}
+            alignItems={{ base: 'flex-start', [bp]: 'center' }}
+          >
+            <Text.SectionHeader mb={1} mt={0}>
+              {formatName(data.user.name)}
+            </Text.SectionHeader>
+
+            {hasNomusProAccess && (
+              <Box ml={{ base: 0, [bp]: '8px' }}>
+                <NomusProBadge />
+              </Box>
+            )}
+          </Box>
         ) : (
           // This should virtually never be seen since the user should have a name when they sign up and can't remove it but including it just to be safe.
           <Form.FieldPrompt
@@ -191,6 +263,18 @@ export default () => {
             Add a descriptive headline to let the world know who you are.
           </Form.FieldPrompt>
         )}
+      </Box>
+
+      <Box gridArea="editProfile" display={{ base: 'none', [bp]: 'block' }}>
+        <Button
+          variant="tertiary"
+          leftIcon={<Icon of="pen" />}
+          onClick={openProfileEditorModal}
+        >
+          <Box as="span" display={{ base: 'none', [bp]: 'inline' }}>
+            Edit profile
+          </Box>
+        </Button>
       </Box>
 
       <Box gridArea="cards">
@@ -246,9 +330,14 @@ export default () => {
 
         <Box mb={3}>
           <Text.Label>
-            {[data.user.position && 'POSITION', data.user.company && 'COMPANY']
-              .filter(Boolean)
-              .join('/')}
+            {data.user.position == null && data.user.company == null
+              ? 'Position/Company'
+              : [
+                  data.user.position && 'POSITION',
+                  data.user.company && 'COMPANY',
+                ]
+                  .filter(Boolean)
+                  .join('/')}
           </Text.Label>
           {data.user.position || data.user.company ? (
             <Text.Body2>
@@ -311,7 +400,48 @@ export default () => {
             </Form.FieldPrompt>
           )}
         </Box>
+
+        <Box mb={3}>
+          <Text.Label>Website</Text.Label>
+          {data.user.website ? (
+            <Box>
+              <Text.Body2>
+                <Link to={data.user.website}>{data.user.website}</Link>
+              </Text.Body2>
+              <FormControl display="flex" alignItems="center" mt="4px">
+                <Switch
+                  onChange={handleRouteTapsToWebsiteSwitchChange}
+                  isDisabled={updateNomusProFeatureSetResult.loading}
+                  isChecked={
+                    data?.nomusProAccessInfo?.featureSet?.UseCustomTapLink ??
+                    false
+                  }
+                  id="custom-tap-route"
+                />
+                <Text.Body3 as="label" htmlFor="custom-tap-route" ml="4px">
+                  Send my contacts here when they tap my cards.
+                </Text.Body3>
+              </FormControl>
+            </Box>
+          ) : (
+            <Form.FieldPrompt
+              modalOpener={openProfileEditorModal}
+              fieldRef={websiteFieldRef}
+            >
+              Add a website
+            </Form.FieldPrompt>
+          )}
+        </Box>
       </Box>
+
+      {/* No need to even invisibly render the NomusPro modal if the user already has access  */}
+      {!hasNomusProAccess && (
+        <NomusProModal
+          triggerFeature={NomusProFeature.UseCustomTapLink}
+          isOpen={isNomusProModalOpen}
+          onCancel={() => setIsNomusProModalOpen(false)}
+        />
+      )}
 
       <ProfileEditorModal
         isOpen={isProfileEditorOpen}
@@ -326,6 +456,7 @@ export default () => {
           email: data?.user.email ?? '',
           bio: data?.user.bio ?? '',
           headline: data?.user.headline ?? '',
+          website: data?.user.website ?? '',
           position: data?.user.position ?? '',
           company: data?.user.company ?? '',
         }}
@@ -335,6 +466,7 @@ export default () => {
           phoneNumber: phoneNumberFieldRef,
           email: emailFieldRef,
           bio: bioFieldRef,
+          website: websiteFieldRef,
           position: positionFieldRef,
           company: companyFieldRef,
         }}

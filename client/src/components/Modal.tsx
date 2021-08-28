@@ -228,7 +228,7 @@ const Modal = ({
                               p={{ base: 3, md: 4 }}
                               borderBottom={`1px solid ${colors.superlightGray}`}
                             >
-                              <Text.CardHeader mb={3}>
+                              <Text.CardHeader mb={header.subtitle ? 3 : 0}>
                                 {header.title}
                               </Text.CardHeader>
                               {header.subtitle && (

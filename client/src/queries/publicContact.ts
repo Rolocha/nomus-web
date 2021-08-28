@@ -14,6 +14,7 @@ export default gql`
       email
       headline
       bio
+      website
       profilePicUrl
       cardFrontImageUrl
       cardBackImageUrl

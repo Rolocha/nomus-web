@@ -92,12 +92,14 @@ const ContactsDetailView = ({
             "profilePic nameplate"
             "cards cards"
             "contactInfo contactInfo"
+            "website website"
             "bio bio"
             "notes notes"
           `,
             [bp]: `
               "profilePic nameplate"
               "profilePic contactInfo"
+              "cards website"
               "cards bio"
               "notes notes"
             `,
@@ -182,9 +184,20 @@ const ContactsDetailView = ({
               </Box>
             )}
 
+          {selectedContact.website && (
+            <Box mb={3} gridArea="website">
+              <Text.Label>WEBSITE</Text.Label>
+              <Text.Body2>
+                <Link to={selectedContact.website}>
+                  {selectedContact.website}
+                </Link>
+              </Text.Body2>
+            </Box>
+          )}
+
           {selectedContact.bio && (
             <Box gridArea="bio">
-              <Text.Label>Bio</Text.Label>
+              <Text.Label>BIO</Text.Label>
               <Text.Body3>{selectedContact.bio}</Text.Body3>
             </Box>
           )}

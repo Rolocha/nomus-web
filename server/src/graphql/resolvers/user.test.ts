@@ -188,6 +188,7 @@ describe('UserResolver', () => {
         email: 'new1@gmail.com',
         phoneNumber: '1234567890',
         bio: 'this is my new bio',
+        website: 'https://mynewwebsite.com',
       }
       const response = await execQuery({
         source: `
@@ -203,6 +204,7 @@ describe('UserResolver', () => {
             email
             phoneNumber
             bio
+            website
           }
         }
         `,
@@ -223,6 +225,7 @@ describe('UserResolver', () => {
         expect(userObject.email).toBe(updatePayload.email)
         expect(userObject.phoneNumber).toBe(updatePayload.phoneNumber)
         expect(userObject.bio).toBe(updatePayload.bio)
+        expect(userObject.website).toBe(updatePayload.website)
       }
     })
 

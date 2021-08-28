@@ -14,6 +14,14 @@ export const CHANGE_ACTIVE_CARD_VERSION = gql`
   }
 `
 
+export const CREATE_NOMUS_PRO_CHECKOUT_SESSION = gql`
+  mutation CreateNomusProCheckoutSession($triggerFeature: NomusProFeature) {
+    createNomusProCheckoutSession(triggerFeature: $triggerFeature) {
+      url
+    }
+  }
+`
+
 export const UPDATE_USER_CHECKPOINTS = gql`
   mutation UpdateUserCheckpoints($checkpointsReached: [String!]!) {
     updateUserCheckpoints(checkpointsReached: $checkpointsReached) {
@@ -40,7 +48,7 @@ export const CHANGE_PASSWORD_MUTATION = gql`
 `
 
 export const UPDATE_PROFILE_MUTATION = gql`
-  mutation UpdateProfileQuery($updatedUser: ProfileUpdateInput!) {
+  mutation UpdateProfileMutation($updatedUser: ProfileUpdateInput!) {
     updateProfile(updatedUser: $updatedUser) {
       id
       name {
@@ -57,6 +65,21 @@ export const UPDATE_PROFILE_MUTATION = gql`
       activated
       position
       company
+      website
+    }
+  }
+`
+
+export const UPDATE_NOMUS_PRO_FEATURES = gql`
+  mutation UpdateNomusProFeatureSet(
+    $featureSetUpdate: UpdateNomusProFeatureSetInput!
+  ) {
+    updateNomusProFeatureSet(featureSetUpdate: $featureSetUpdate) {
+      id
+      hasAccessUntil
+      featureSet {
+        UseCustomTapLink
+      }
     }
   }
 `

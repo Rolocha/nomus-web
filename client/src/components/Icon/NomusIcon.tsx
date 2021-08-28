@@ -1,7 +1,7 @@
 import { createIcon } from './utils'
 
 export default createIcon({
-  displayName: 'DownloadIcon',
+  displayName: 'NomusIcon',
   viewBox: '0 0 32 32',
   path: (
     <>

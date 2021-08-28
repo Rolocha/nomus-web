@@ -75,3 +75,12 @@ registerEnumType(CardInteractionType, {
   name: 'CardInteractionType',
   description: 'How a card was interacted with by the receiver',
 })
+
+export enum NomusProFeature {
+  UseCustomTapLink = 'UseCustomTapLink',
+}
+
+registerEnumType(NomusProFeature, {
+  name: 'NomusProFeature',
+  description: 'Features available in Nomus Pro',
+})

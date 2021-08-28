@@ -14,6 +14,7 @@ export interface Contact {
   email: string | null
   headline: string | null
   bio: string | null
+  website: string | null
   position: string | null
   company: string | null
   profilePicUrl: string | null

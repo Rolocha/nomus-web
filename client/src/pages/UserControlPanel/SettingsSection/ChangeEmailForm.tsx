@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'src/apollo'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
+import { UpdateProfileMutation } from 'src/apollo/types/UpdateProfileMutation'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -44,7 +44,7 @@ const ChangeEmailForm = ({ email, isEmailVerified }: Props) => {
     ),
   })
 
-  const [updateProfile] = useMutation<UpdateProfileQuery>(
+  const [updateProfile] = useMutation<UpdateProfileMutation>(
     UPDATE_PROFILE_MUTATION,
     { errorPolicy: 'all' },
   )

@@ -229,7 +229,7 @@ const CardBuilder = () => {
       | Partial<SubmitCustomOrderMutationVariables['payload']>
       | Partial<SubmitTemplateOrderMutationVariables['payload']> = {
       previousOrder,
-      quantity,
+      quantity: quantity ?? undefined,
     }
 
     let result = null
