@@ -2,10 +2,12 @@ import { isValidStateAbr, StateCode } from 'src/util/states'
 
 // Sync with client/src/utils/pricing.ts
 export const QUANTITY_TO_PRICE = {
-  25: 7500,
-  100: 25000,
-  250: 50000,
-}
+  25: 4000,
+  50: 7500,
+  100: 12000,
+} as const
+
+export type CardQuantityOption = keyof typeof QUANTITY_TO_PRICE
 
 export const isValidQuantity = (quantity: number) => {
   return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))

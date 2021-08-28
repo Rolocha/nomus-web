@@ -3,12 +3,12 @@ import Box from 'src/components/Box'
 import Link from 'src/components/Link'
 import PricingTiers from 'src/components/PricingTiers'
 import * as Text from 'src/components/Text'
-import { OrderQuantityOption } from 'src/pages/CardBuilder/types'
 import { createMailtoURL } from 'src/utils/email'
+import { CardQuantityOption } from 'src/utils/pricing'
 
 interface Props {
-  quantity: OrderQuantityOption | null
-  onChange: (newQuantity: OrderQuantityOption) => void
+  quantity: CardQuantityOption | null
+  onChange: (newQuantity: CardQuantityOption) => void
 }
 
 const OrderQuantitySelector = ({ quantity, onChange }: Props) => {

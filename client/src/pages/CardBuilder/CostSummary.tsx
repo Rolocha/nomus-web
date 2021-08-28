@@ -1,12 +1,11 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import * as Text from 'src/components/Text'
-import { OrderQuantityOption } from 'src/pages/CardBuilder/types'
 import { formatDollarAmount } from 'src/utils/money'
-import { getCostSummary } from 'src/utils/pricing'
+import { CardQuantityOption, getCostSummary } from 'src/utils/pricing'
 
 interface Props {
-  quantity: OrderQuantityOption | null
+  quantity: CardQuantityOption | null
   state?: string
 }
 
