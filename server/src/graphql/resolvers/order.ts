@@ -5,7 +5,6 @@ import { FileUpload } from 'graphql-upload'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
-import OrderEvent from 'src/models/OrderEvent'
 import {
   Address,
   OrderPrice,
