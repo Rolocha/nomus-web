@@ -361,6 +361,25 @@ export class User extends BaseModel({
     return null
   }
 
+  public static async getOrCreateUser(
+    email: string,
+    name: PersonName
+  ): Promise<DocumentType<User>> {
+    let user = await User.mongo.findOne({ email })
+    if (!user) {
+      const password = Math.random().toString(36).slice(-8)
+      const res = await User.mongo.createNewUser({ email, name, password })
+      if (res.isSuccess) {
+        user = res.getValue()
+        User.sendManualSubmitEmail(email)
+      } else {
+        throw new Error('Failed to create new user')
+      }
+    }
+
+    return user
+  }
+
   public static async sendManualSubmitEmail(email: string): Promise<void> {
     const user = await User.mongo.findOne({ email })
     if (user == null) {

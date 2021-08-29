@@ -464,17 +464,7 @@ class OrderResolver {
       frontImageDataUrl,
       backImageDataUrl,
     } = payload
-    let user = await User.mongo.findOne({ email })
-    if (!user) {
-      const password = Math.random().toString(36).slice(-8)
-      const res = await User.mongo.createNewUser({ email, name, password })
-      if (res.isSuccess) {
-        user = res.getValue()
-        User.sendPasswordResetEmail(email) // update this to instead tell them we made them an account
-      } else {
-        throw new Error('Failed to create new user')
-      }
-    }
+    const user = await User.getOrCreateUser(email, name)
 
     let price: OrderPrice
     if (!payloadPrice) {
