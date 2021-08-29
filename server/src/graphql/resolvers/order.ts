@@ -518,12 +518,6 @@ class OrderResolver {
     order.paymentIntent = checkoutSession.payment_intent as string
     await order.save()
 
-    await OrderEvent.mongo.create({
-      order: order.id,
-      trigger: OrderEventTrigger.Internal,
-      state: OrderState.Captured,
-    })
-
     return { order: order }
   }
 
