@@ -5,6 +5,7 @@ import { FileUpload } from 'graphql-upload'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
+import OrderEvent from 'src/models/OrderEvent'
 import {
   Address,
   OrderPrice,
@@ -501,7 +502,7 @@ class OrderResolver {
     const order = await Order.mongo.create({
       user: user.id,
       cardVersion: cv.id,
-      state: OrderState.Paid, // Manual submissions need to be invoiced, so assuming the order has been paid for
+      state: OrderState.Captured,
       quantity,
       price,
       shippingAddress,
@@ -516,6 +517,12 @@ class OrderResolver {
     order.checkoutSession = checkoutSession.id
     order.paymentIntent = checkoutSession.payment_intent as string
     await order.save()
+
+    await OrderEvent.mongo.create({
+      order: order.id,
+      trigger: OrderEventTrigger.Internal,
+      state: OrderState.Captured,
+    })
 
     return { order: order }
   }
