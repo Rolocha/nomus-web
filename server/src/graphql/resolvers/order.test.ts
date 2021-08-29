@@ -1,5 +1,5 @@
 import { Order, User } from 'src/models'
-import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
+import { Address, OrderPrice } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
@@ -8,7 +8,7 @@ import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import fs from 'fs'
 import OrderResolver from 'src/graphql/resolvers/order'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { sgMail } from 'src/util/sendgrid'
 
 jest.setTimeout(30000)
 
@@ -735,6 +735,7 @@ describe('OrderResolver', () => {
       const generatePDFSpy = jest
         .spyOn(Order.mongo.prototype, 'updatePrintSpecPDF')
         .mockReturnValue(null)
+
       const checkoutSessionSpy = jest
         .spyOn(OrderResolver.prototype, 'createCheckoutSession')
         .mockResolvedValue({
@@ -799,7 +800,6 @@ describe('OrderResolver', () => {
                   state
                   trackingNumber
                   paymentIntent
-                  checkoutSession
                   shortId
                   shippingName
                   shippingAddress {
@@ -809,7 +809,6 @@ describe('OrderResolver', () => {
                     state
                     postalCode
                   }
-
                 }
               }
             }
@@ -831,11 +830,7 @@ describe('OrderResolver', () => {
         },
         asAdmin: true,
       })
-      // expect(uploadFileToS3Spy).toHaveBeenCalledWith(
-      //   expect.stringMatching(/^\/tmp\/nomus-s3-upload\/.*\/test.txt$/),
-      //   'test.txt',
-      //   S3.S3AssetCategory.CardVersions
-      // )
+
       if (fs.existsSync(frontFilePath)) {
         fs.unlinkSync(frontFilePath)
       } else {
@@ -850,14 +845,37 @@ describe('OrderResolver', () => {
       const orderDetails = response.data?.submitManualOrder?.order
 
       expect(orderDetails.id).not.toBeNull()
+      expect(orderDetails.trackingNumber).toBeNull()
+      expect(orderDetails.shortId).not.toBeNull()
       expect(orderDetails.quantity).toBe(quantity)
+      expect(orderDetails.shippingName).toBe(
+        [user.name.first, user.name.middle, user.name.last].join(' ')
+      )
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
+      expect(orderDetails.state).toBe(OrderState.Paid)
+      expect(orderDetails.paymentIntent).toBe('pi_1234')
 
-      expect(orderDetails.user?.id).toBe(user.id)
-      expect(orderDetails.user?.email).toBe(user.email)
+      expect(orderDetails.user.id).toBe(user.id)
+      expect(orderDetails.user.email).toBe(user.email)
+      expect(JSON.stringify(orderDetails.user.name)).toEqual(JSON.stringify(user.name))
+
+      expect(orderDetails.cardVersion.id).not.toBeNull()
+      expect(orderDetails.cardVersion.user.id).toBe(user.id)
+      expect(orderDetails.cardVersion.frontImageUrl).toBe(
+        'https://nomus-assets.s3.amazonaws.com/front.png'
+      )
+      expect(orderDetails.cardVersion.backImageUrl).toBe(
+        'https://nomus-assets.s3.amazonaws.com/back.png'
+      )
 
       expect(sgMail.send).toBeCalledTimes(0)
+      expect(uploadCardImagesSpy).toHaveBeenCalledWith(
+        { front: frontImageDataUrl, back: backImageDataUrl },
+        orderDetails.cardVersion.id
+      )
+      expect(generatePDFSpy).toBeCalledTimes(1)
+      expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})
     it('calculates price based on shipping address and quantity if price is not included', async () => {})
