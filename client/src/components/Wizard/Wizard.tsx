@@ -147,9 +147,8 @@ function Wizard<ValidStepType extends string>({
         overflow="visible"
         // Need these 2 to make pointy indicator show up
         position={{ base: 'relative', [bp]: 'sticky' }}
+        top="0px"
         zIndex={20}
-        className="yerr"
-        top={0}
       >
         {allStepDetails.map((stepDetails, index) => {
           const { id, icon, label } = stepDetails

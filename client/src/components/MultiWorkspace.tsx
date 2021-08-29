@@ -66,6 +66,8 @@ const MultiWorkspace = ({ children: tabs }: Props) => {
         borderBottomLeftRadius={{ base: 'none', [bp]: 'xl' }}
         // Needed to ensure the current-tab caret indicator is visible
         overflow="visible"
+        position={{ base: 'relative', [bp]: 'sticky' }}
+        top="0px"
       >
         {tabs.map(({ linkPath, key, icon, label }, index) => {
           const sectionPath = `${routeMatch.url}/${linkPath ?? key}`
