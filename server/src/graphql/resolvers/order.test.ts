@@ -919,6 +919,7 @@ describe('OrderResolver', () => {
       expect(orderDetails.user.id).toBe(user.id)
       expect(orderDetails.user.email).toBe(user.email)
       expect(JSON.stringify(orderDetails.user.name)).toEqual(JSON.stringify(user.name))
+      expect(user.isEmailVerified).toBeTruthy()
 
       expect(orderDetails.cardVersion.id).not.toBeNull()
       expect(orderDetails.cardVersion.user.id).toBe(user.id)
