@@ -862,19 +862,14 @@ describe('OrderResolver', () => {
 
       expect(orderDetails.cardVersion.id).not.toBeNull()
       expect(orderDetails.cardVersion.user.id).toBe(user.id)
-      expect(orderDetails.cardVersion.frontImageUrl).toBe(
-        'https://nomus-assets.s3.amazonaws.com/front.png'
-      )
-      expect(orderDetails.cardVersion.backImageUrl).toBe(
-        'https://nomus-assets.s3.amazonaws.com/back.png'
-      )
+      expect(orderDetails.cardVersion.frontImageUrl).toBeNull()
+      expect(orderDetails.cardVersion.backImageUrl).toBeNull()
 
       expect(sgMail.send).toBeCalledTimes(0)
       expect(uploadCardImagesSpy).toHaveBeenCalledWith(
         { front: frontImageDataUrl, back: backImageDataUrl },
         orderDetails.cardVersion.id
       )
-      expect(generatePDFSpy).toBeCalledTimes(1)
       expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})

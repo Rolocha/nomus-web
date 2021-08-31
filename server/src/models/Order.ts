@@ -178,6 +178,10 @@ class Order extends BaseModel({
 
   public async updatePrintSpecPDF(this: DocumentType<Order>) {
     const cardVersion = await CardVersion.mongo.findOne({ _id: this.cardVersion as string })
+    // If cardversion is incomplete, do not update print spec
+    if (!(cardVersion.frontImageUrl && cardVersion.backImageUrl)) {
+      return
+    }
 
     // Use the same filename from the URL so that the extension (e.g. `.png`) persists.
     // PDFKit will complain if the extension isn't present.

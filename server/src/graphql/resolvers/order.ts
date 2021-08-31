@@ -449,21 +449,23 @@ class OrderResolver {
   }
 
   @Authorized(Role.Admin)
+  @Mutation((type) => null, {
+    description:
+      'updates the print spec of an order, used in admin panel on update of front and back card',
+  })
+  async updatePrintSpec(@Arg('orderId', { nullable: false }) orderId: string): Promise<void> {
+    const order = await Order.mongo.findOne({ id: orderId })
+    await order.updatePrintSpecPDF
+  }
+
+  @Authorized(Role.Admin)
   @Mutation((type) => ManualOrderResponse, {
     description: 'Handles manual submission of an order from admin panel',
   })
   async submitManualOrder(
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
   ): Promise<ManualOrderResponse> {
-    const {
-      email,
-      name,
-      price: payloadPrice,
-      quantity,
-      shippingAddress,
-      frontImageDataUrl,
-      backImageDataUrl,
-    } = payload
+    const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
     const user = await User.getOrCreateUser(email, name)
 
     let price: OrderPrice
@@ -490,13 +492,6 @@ class OrderResolver {
       user: user.id,
       baseType: CardSpecBaseType.Custom,
     })
-    const uploadedImageUrls = await this.uploadCardImages(
-      { front: frontImageDataUrl, back: backImageDataUrl },
-      cv.id
-    )
-    cv.frontImageUrl = uploadedImageUrls.front
-    cv.backImageUrl = uploadedImageUrls.back
-    await cv.save()
 
     const order = await Order.mongo.create({
       user: user.id,
@@ -507,7 +502,6 @@ class OrderResolver {
       shippingAddress,
       shippingName: [name.first, name.middle, name.last].join(' '),
     })
-    await order.updatePrintSpecPDF()
 
     // Create a new Stripe Checkout session regardless of whether a previous one
     // existed since some details may have changed in this submission
