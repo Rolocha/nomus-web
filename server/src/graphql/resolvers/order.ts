@@ -445,7 +445,7 @@ class OrderResolver {
   })
   async updatePrintSpec(@Arg('orderId', { nullable: false }) orderId: string): Promise<void> {
     const order = await Order.mongo.findOne({ id: orderId })
-    await order.updatePrintSpecPDF
+    await order.updatePrintSpecPDF()
   }
 
   @Authorized(Role.Admin)
