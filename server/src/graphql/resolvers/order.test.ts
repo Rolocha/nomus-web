@@ -705,26 +705,6 @@ describe('OrderResolver', () => {
         shipping: 0,
         total: 5427,
       }
-      // For the sake of this test, we have to have the data be in a file on disk first
-      // so we can create a readstream for it
-      const frontFilePath = '/tmp/front.png'
-      fs.writeFileSync(frontFilePath, 'Hey there!')
-      const frontFile = {
-        filename: 'front.png',
-        mimetype: 'image/png',
-        encoding: 'utf-8',
-        createReadStream: () => fs.createReadStream(frontFilePath),
-      }
-      const backFilePath = '/tmp/back.png'
-      fs.writeFileSync(backFilePath, 'Hey there!')
-      const backFile = {
-        filename: 'back.png',
-        mimetype: 'image/png',
-        encoding: 'utf-8',
-        createReadStream: () => fs.createReadStream(backFilePath),
-      }
-      const frontImageDataUrl = frontFile
-      const backImageDataUrl = backFile
 
       const checkoutSessionSpy = jest
         .spyOn(OrderResolver.prototype, 'createCheckoutSession')
@@ -814,23 +794,10 @@ describe('OrderResolver', () => {
             quantity,
             shippingAddress,
             price,
-            frontImageDataUrl,
-            backImageDataUrl,
           },
         },
         asAdmin: true,
       })
-
-      if (fs.existsSync(frontFilePath)) {
-        fs.unlinkSync(frontFilePath)
-      } else {
-        console.warn("test.txt was supposed to get removed but it didn't exist!")
-      }
-      if (fs.existsSync(backFilePath)) {
-        fs.unlinkSync(backFilePath)
-      } else {
-        console.warn("test.txt was supposed to get removed but it didn't exist!")
-      }
 
       const orderDetails = response.data?.submitManualOrder?.order
 

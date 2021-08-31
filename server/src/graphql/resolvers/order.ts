@@ -148,12 +148,6 @@ class ManualOrderInput {
 
   @Field((type) => OrderPrice, { nullable: true })
   price?: OrderPrice | null
-
-  @Field((type) => GraphQLUpload, { nullable: false })
-  frontImageDataUrl: Promise<FileUpload>
-
-  @Field((type) => GraphQLUpload, { nullable: false })
-  backImageDataUrl?: Promise<FileUpload>
 }
 
 @ObjectType()
