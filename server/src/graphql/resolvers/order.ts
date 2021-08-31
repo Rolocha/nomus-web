@@ -5,6 +5,7 @@ import { FileUpload } from 'graphql-upload'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
+import { Void } from 'src/models/scalars'
 import {
   Address,
   OrderPrice,
@@ -449,7 +450,8 @@ class OrderResolver {
   }
 
   @Authorized(Role.Admin)
-  @Mutation((type) => null, {
+  @Mutation((type) => Void, {
+    nullable: true,
     description:
       'updates the print spec of an order, used in admin panel on update of front and back card',
   })

@@ -726,16 +726,6 @@ describe('OrderResolver', () => {
       const frontImageDataUrl = frontFile
       const backImageDataUrl = backFile
 
-      const uploadCardImagesSpy = jest
-        .spyOn(OrderResolver.prototype, 'uploadCardImages')
-        .mockResolvedValue({
-          front: 'https://nomus-assets.s3.amazonaws.com/front.png',
-          back: 'https://nomus-assets.s3.amazonaws.com/back.png',
-        })
-      const generatePDFSpy = jest
-        .spyOn(Order.mongo.prototype, 'updatePrintSpecPDF')
-        .mockReturnValue(null)
-
       const checkoutSessionSpy = jest
         .spyOn(OrderResolver.prototype, 'createCheckoutSession')
         .mockResolvedValue({
@@ -866,10 +856,6 @@ describe('OrderResolver', () => {
       expect(orderDetails.cardVersion.backImageUrl).toBeNull()
 
       expect(sgMail.send).toBeCalledTimes(0)
-      expect(uploadCardImagesSpy).toHaveBeenCalledWith(
-        { front: frontImageDataUrl, back: backImageDataUrl },
-        orderDetails.cardVersion.id
-      )
       expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {})
