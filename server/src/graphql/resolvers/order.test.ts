@@ -682,31 +682,10 @@ describe('OrderResolver', () => {
   })
   describe('submitManualOrder', () => {
     let sgMailSendSpy = null
+    let checkoutSessionSpy = null
     beforeEach(() => {
       sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
-    })
-
-    afterEach(() => {
-      sgMailSendSpy.mockClear()
-    })
-    it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
-      const user: User = await createMockUser()
-      const quantity = 100
-      const shippingAddress: Address = {
-        line1: '1600 Pennsylvania Ave.',
-        line2: 'Red Room',
-        city: 'Washington',
-        state: 'DC',
-        postalCode: '20502',
-      }
-      const price: OrderPrice = {
-        subtotal: 5000,
-        tax: 427,
-        shipping: 0,
-        total: 5427,
-      }
-
-      const checkoutSessionSpy = jest
+      checkoutSessionSpy = jest
         .spyOn(OrderResolver.prototype, 'createCheckoutSession')
         .mockResolvedValue({
           id: 'cs_12345',
@@ -736,49 +715,69 @@ describe('OrderResolver', () => {
           total_details: null,
           /* eslint-enable camelcase */
         })
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+      checkoutSessionSpy.mockClear()
+    })
+    it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
+      const user: User = await createMockUser()
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+      const price: OrderPrice = {
+        subtotal: 5000,
+        tax: 427,
+        shipping: 0,
+        total: 5427,
+      }
 
       const response = await execQuery({
         source: `
             mutation ManualOrder($payload: ManualOrderInput!) {
               submitManualOrder(payload: $payload) {
-                order {
+                id
+                user {
                   id
-                  user {
+                  email
+                  name {
+                    first
+                    middle
+                    last
+                  }
+                }
+                cardVersion {
+                  id
+                  user { 
                     id
-                    email
-                    name {
-                      first
-                      middle
-                      last
-                    }
                   }
-                  cardVersion {
-                    id
-                    user { 
-                      id
-                    }
-                    frontImageUrl
-                    backImageUrl
-                  }
-                  quantity
-                  price {
-                    subtotal
-                    tax
-                    shipping
-                    total
-                  }
+                  frontImageUrl
+                  backImageUrl
+                }
+                quantity
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
+                }
+                state
+                trackingNumber
+                paymentIntent
+                shortId
+                shippingName
+                shippingAddress {
+                  line1
+                  line2
+                  city
                   state
-                  trackingNumber
-                  paymentIntent
-                  shortId
-                  shippingName
-                  shippingAddress {
-                    line1
-                    line2
-                    city
-                    state
-                    postalCode
-                  }
+                  postalCode
                 }
               }
             }
@@ -799,7 +798,7 @@ describe('OrderResolver', () => {
         asAdmin: true,
       })
 
-      const orderDetails = response.data?.submitManualOrder?.order
+      const orderDetails = response.data?.submitManualOrder
 
       expect(orderDetails.id).not.toBeNull()
       expect(orderDetails.trackingNumber).toBeNull()
@@ -847,79 +846,46 @@ describe('OrderResolver', () => {
         total: 5427,
       }
 
-      const checkoutSessionSpy = jest
-        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
-        .mockResolvedValue({
-          id: 'cs_12345',
-          object: 'checkout.session',
-          /* eslint-disable camelcase */
-          allow_promotion_codes: true,
-          amount_subtotal: null,
-          amount_total: null,
-          billing_address_collection: null,
-          cancel_url: 'https://nomus.me',
-          client_reference_id: null,
-          currency: 'usd',
-          customer: null,
-          customer_email: null,
-          livemode: null,
-          locale: null,
-          metadata: null,
-          mode: null,
-          payment_intent: 'pi_1234',
-          payment_method_types: [],
-          setup_intent: null,
-          shipping: null,
-          shipping_address_collection: null,
-          submit_type: null,
-          subscription: null,
-          success_url: 'https://nomus.me',
-          total_details: null,
-          /* eslint-enable camelcase */
-        })
-
       const response = await execQuery({
         source: `
             mutation ManualOrder($payload: ManualOrderInput!) {
               submitManualOrder(payload: $payload) {
-                order {
+                id
+                user {
                   id
-                  user {
+                  email
+                  name {
+                    first
+                    middle
+                    last
+                  }
+                }
+                cardVersion {
+                  id
+                  user { 
                     id
-                    email
-                    name {
-                      first
-                      middle
-                      last
-                    }
                   }
-                  cardVersion {
-                    id
-                    user { 
-                      id
-                    }
-                    frontImageUrl
-                    backImageUrl
-                  }
-                  quantity
-                  price {
-                    subtotal
-                    tax
-                    shipping
-                    total
-                  }
+                  frontImageUrl
+                  backImageUrl
+                }
+                quantity
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
+                }
+                state
+                trackingNumber
+                paymentIntent
+                shortId
+                shippingName
+                shippingAddress {
+                  line1
+                  line2
+                  city
                   state
-                  trackingNumber
-                  paymentIntent
-                  shortId
-                  shippingName
-                  shippingAddress {
-                    line1
-                    line2
-                    city
-                    state
-                    postalCode
-                  }
+                  postalCode
                 }
               }
             }
@@ -936,7 +902,7 @@ describe('OrderResolver', () => {
         asAdmin: true,
       })
 
-      const orderDetails = response.data?.submitManualOrder?.order
+      const orderDetails = response.data?.submitManualOrder
 
       const user = (await User.mongo.findOne({ email: userEmail })) as User
 
@@ -981,49 +947,16 @@ describe('OrderResolver', () => {
         postalCode: '20502',
       }
 
-      const checkoutSessionSpy = jest
-        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
-        .mockResolvedValue({
-          id: 'cs_12345',
-          object: 'checkout.session',
-          /* eslint-disable camelcase */
-          allow_promotion_codes: true,
-          amount_subtotal: null,
-          amount_total: null,
-          billing_address_collection: null,
-          cancel_url: 'https://nomus.me',
-          client_reference_id: null,
-          currency: 'usd',
-          customer: null,
-          customer_email: null,
-          livemode: null,
-          locale: null,
-          metadata: null,
-          mode: null,
-          payment_intent: 'pi_1234',
-          payment_method_types: [],
-          setup_intent: null,
-          shipping: null,
-          shipping_address_collection: null,
-          submit_type: null,
-          subscription: null,
-          success_url: 'https://nomus.me',
-          total_details: null,
-          /* eslint-enable camelcase */
-        })
-
       const response = await execQuery({
         source: `
             mutation ManualOrder($payload: ManualOrderInput!) {
               submitManualOrder(payload: $payload) {
-                order {
-                  id
-                  price {
-                    subtotal
-                    tax
-                    shipping
-                    total
-                  }
+                id
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
                 }
               }
             }
@@ -1043,7 +976,7 @@ describe('OrderResolver', () => {
         asAdmin: true,
       })
 
-      const orderDetails = response.data?.submitManualOrder?.order
+      const orderDetails = response.data?.submitManualOrder
 
       const costSummary = getCostSummary(quantity, shippingAddress.state)
       expect(orderDetails.price).toMatchObject({

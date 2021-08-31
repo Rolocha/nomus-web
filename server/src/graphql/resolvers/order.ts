@@ -159,12 +159,6 @@ class SubmitOrderResponse {
   orderId: string
 }
 
-@ObjectType()
-class ManualOrderResponse {
-  @Field((type) => Order)
-  order: DocumentType<Order>
-}
-
 @Resolver((of) => Order)
 class OrderResolver {
   @FieldResolver()
@@ -455,12 +449,12 @@ class OrderResolver {
   }
 
   @Authorized(Role.Admin)
-  @Mutation((type) => ManualOrderResponse, {
+  @Mutation((type) => Order, {
     description: 'Handles manual submission of an order from admin panel',
   })
   async submitManualOrder(
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
-  ): Promise<ManualOrderResponse> {
+  ): Promise<Order> {
     const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
     const user = await User.getOrCreateUser(email, name)
 
@@ -507,7 +501,7 @@ class OrderResolver {
     order.paymentIntent = checkoutSession.payment_intent as string
     await order.save()
 
-    return { order: order }
+    return order
   }
 
   /**
