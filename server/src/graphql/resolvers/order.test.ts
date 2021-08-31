@@ -1,14 +1,13 @@
 import { Order, User } from 'src/models'
-import { Address, OrderPrice } from 'src/models/subschemas'
+import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
-import fs from 'fs'
 import OrderResolver from 'src/graphql/resolvers/order'
-import { sgMail } from 'src/util/sendgrid'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 
 jest.setTimeout(30000)
 
@@ -825,8 +824,235 @@ describe('OrderResolver', () => {
       expect(sgMail.send).toBeCalledTimes(0)
       expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
-    it('properly creates a manual order for a new user and sends them an update email', async () => {})
-    it('calculates price based on shipping address and quantity if price is not included', async () => {})
-    it('properly creates a manual order for a new user and sends them an update email', async () => {})
+    it('properly creates a manual order for a new user and sends them an update email', async () => {
+      const userEmail = 'coolboi@a24.com'
+      const userName: PersonName = {
+        first: 'coolest',
+        middle: 'ever',
+        last: 'boi',
+      }
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+      const price: OrderPrice = {
+        subtotal: 5000,
+        tax: 427,
+        shipping: 0,
+        total: 5427,
+      }
+
+      const checkoutSessionSpy = jest
+        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
+        .mockResolvedValue({
+          id: 'cs_12345',
+          object: 'checkout.session',
+          /* eslint-disable camelcase */
+          allow_promotion_codes: true,
+          amount_subtotal: null,
+          amount_total: null,
+          billing_address_collection: null,
+          cancel_url: 'https://nomus.me',
+          client_reference_id: null,
+          currency: 'usd',
+          customer: null,
+          customer_email: null,
+          livemode: null,
+          locale: null,
+          metadata: null,
+          mode: null,
+          payment_intent: 'pi_1234',
+          payment_method_types: [],
+          setup_intent: null,
+          shipping: null,
+          shipping_address_collection: null,
+          submit_type: null,
+          subscription: null,
+          success_url: 'https://nomus.me',
+          total_details: null,
+          /* eslint-enable camelcase */
+        })
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                order {
+                  id
+                  user {
+                    id
+                    email
+                    name {
+                      first
+                      middle
+                      last
+                    }
+                  }
+                  cardVersion {
+                    id
+                    user { 
+                      id
+                    }
+                    frontImageUrl
+                    backImageUrl
+                  }
+                  quantity
+                  price {
+                    subtotal
+                    tax
+                    shipping
+                    total
+                  }
+                  state
+                  trackingNumber
+                  paymentIntent
+                  shortId
+                  shippingName
+                  shippingAddress {
+                    line1
+                    line2
+                    city
+                    state
+                    postalCode
+                  }
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: userEmail,
+            name: userName,
+            quantity,
+            shippingAddress,
+            price,
+          },
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder?.order
+
+      const user = (await User.mongo.findOne({ email: userEmail })) as User
+
+      expect(orderDetails.id).not.toBeNull()
+      expect(orderDetails.trackingNumber).toBeNull()
+      expect(orderDetails.shortId).not.toBeNull()
+      expect(orderDetails.quantity).toBe(quantity)
+      expect(orderDetails.shippingName).toBe(
+        [user.name.first, user.name.middle, user.name.last].join(' ')
+      )
+      expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
+      expect(orderDetails.price).toMatchObject(price)
+      expect(orderDetails.state).toBe(OrderState.Captured)
+      expect(orderDetails.paymentIntent).toBe('pi_1234')
+
+      expect(orderDetails.user.id).toBe(user.id)
+      expect(orderDetails.user.email).toBe(user.email)
+      expect(JSON.stringify(orderDetails.user.name)).toEqual(JSON.stringify(user.name))
+
+      expect(orderDetails.cardVersion.id).not.toBeNull()
+      expect(orderDetails.cardVersion.user.id).toBe(user.id)
+
+      expect(sgMail.send).toBeCalledWith({
+        to: user.email,
+        from: 'hi@nomus.me',
+        templateId: SendgridTemplate.ManualSubmission,
+        dynamicTemplateData: {
+          passwordResetLink: expect.stringMatching(/reset-password\?/),
+          firstName: user.name.first,
+        },
+      })
+      expect(checkoutSessionSpy).toBeCalledTimes(1)
+    })
+    it('calculates price based on shipping address and quantity if price is not included', async () => {
+      const user: User = await createMockUser()
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+
+      const checkoutSessionSpy = jest
+        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
+        .mockResolvedValue({
+          id: 'cs_12345',
+          object: 'checkout.session',
+          /* eslint-disable camelcase */
+          allow_promotion_codes: true,
+          amount_subtotal: null,
+          amount_total: null,
+          billing_address_collection: null,
+          cancel_url: 'https://nomus.me',
+          client_reference_id: null,
+          currency: 'usd',
+          customer: null,
+          customer_email: null,
+          livemode: null,
+          locale: null,
+          metadata: null,
+          mode: null,
+          payment_intent: 'pi_1234',
+          payment_method_types: [],
+          setup_intent: null,
+          shipping: null,
+          shipping_address_collection: null,
+          submit_type: null,
+          subscription: null,
+          success_url: 'https://nomus.me',
+          total_details: null,
+          /* eslint-enable camelcase */
+        })
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                order {
+                  id
+                  price {
+                    subtotal
+                    tax
+                    shipping
+                    total
+                  }
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: user.email,
+            name: {
+              first: user.name.first,
+              middle: user.name.middle,
+              last: user.name.last,
+            },
+            quantity,
+            shippingAddress,
+          },
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder?.order
+
+      expect(orderDetails.price).toMatchObject({
+        shipping: 0,
+        subtotal: 12000,
+        tax: 0,
+        total: 12000,
+      })
+
+      expect(sgMail.send).toBeCalledTimes(0)
+      expect(checkoutSessionSpy).toBeCalledTimes(1)
+    })
   })
 })
