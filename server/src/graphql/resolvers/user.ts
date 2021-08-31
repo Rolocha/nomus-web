@@ -262,7 +262,9 @@ class UserResolver {
   @Mutation(() => Void, { nullable: true })
   async sendPasswordResetEmail(@Arg('email', { nullable: false }) email: string): Promise<void> {
     const user = (await User.mongo.findOne({ email })) as User
-    return user.sendPasswordResetEmail()
+    if (user) {
+      return user.sendPasswordResetEmail()
+    }
   }
 
   @Query(() => Boolean, {
