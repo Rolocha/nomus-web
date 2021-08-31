@@ -5,8 +5,6 @@ export type CardBuilderStep =
   | 'checkout'
   | 'complete'
 
-export type OrderQuantityOption = 25 | 100 | 250
-
 export type ComplexCondition = boolean | (() => boolean) | null
 
 // A list of Card Builder fields that could cause errors that are only
