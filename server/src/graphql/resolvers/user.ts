@@ -7,7 +7,7 @@ import {
 } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
-import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
+import { MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { NomusProAccessInfo } from 'src/graphql/resolvers/subtypes'
 import { IApolloContext } from 'src/graphql/types'
 import { Connection, NomusProSubscription } from 'src/models'
@@ -18,7 +18,6 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import { Role } from 'src/util/enums'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import {
   Arg,
   Authorized,
