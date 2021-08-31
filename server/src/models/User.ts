@@ -75,6 +75,33 @@ export class User extends BaseModel({
   @Field(() => PersonName, { nullable: true })
   name: PersonName
 
+  public get fullName() {
+    return [this.name.first, this.name.middle, this.name.last].join(' ')
+  }
+
+  public set fullName(full) {
+    const splitName = full.split(' ')
+    switch (splitName.length) {
+      case 0:
+      case 1:
+        throw new Error('Too few names to set fullName')
+      case 2:
+        this.name.first = splitName[0]
+        this.name.last = splitName[1]
+        break
+      case 3:
+        this.name.first = splitName[0]
+        this.name.middle = splitName[1]
+        this.name.last = splitName[2]
+        break
+      default:
+        // it's possible to have multiple middle names, assign the rest here
+        this.name.first = splitName.shift()
+        this.name.last = splitName.pop()
+        this.name.middle = splitName.join(' ')
+    }
+  }
+
   @prop()
   @Field({ nullable: true })
   headline: string

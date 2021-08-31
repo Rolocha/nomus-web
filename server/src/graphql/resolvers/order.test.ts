@@ -804,9 +804,7 @@ describe('OrderResolver', () => {
       expect(orderDetails.trackingNumber).toBeNull()
       expect(orderDetails.shortId).not.toBeNull()
       expect(orderDetails.quantity).toBe(quantity)
-      expect(orderDetails.shippingName).toBe(
-        [user.name.first, user.name.middle, user.name.last].join(' ')
-      )
+      expect(orderDetails.shippingName).toBe(user.fullName)
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
       expect(orderDetails.state).toBe(OrderState.Captured)

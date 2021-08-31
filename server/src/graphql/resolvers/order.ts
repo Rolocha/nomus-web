@@ -490,7 +490,7 @@ class OrderResolver {
       quantity,
       price,
       shippingAddress,
-      shippingName: [name.first, name.middle, name.last].join(' '),
+      shippingName: user.fullName,
     })
 
     // Create a new Stripe Checkout session regardless of whether a previous one
