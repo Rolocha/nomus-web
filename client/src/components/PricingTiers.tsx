@@ -3,7 +3,11 @@ import Card from 'src/components/Card'
 import * as SVG from 'src/components/SVG'
 import { colors } from 'src/styles'
 import { formatDollarAmount } from 'src/utils/money'
-import { CardQuantityOption, QUANTITY_TO_PRICE } from 'src/utils/pricing'
+import {
+  CardQuantityOption,
+  QUANTITY_OPTIONS,
+  QUANTITY_TO_PRICE,
+} from 'src/utils/pricing'
 
 const bp = 'lg'
 
@@ -18,10 +22,6 @@ const PricingTiers = ({
   selectedQuantity,
   onChangeSelectedQuantity,
 }: Props) => {
-  const quantities = (Object.keys(QUANTITY_TO_PRICE)
-    .map(Number)
-    .sort((a, b) => a - b) as unknown) as CardQuantityOption[]
-
   return (
     <Box
       display="grid"
@@ -31,21 +31,21 @@ const PricingTiers = ({
     >
       {([
         {
-          quantity: quantities[0],
+          quantity: QUANTITY_OPTIONS[0],
           icon: <SVG.Smile1 />,
           description:
             'Just enough to get you started in the NFC business cards game.',
           topBarColor: colors.cyanProcess,
         },
         {
-          quantity: quantities[1],
+          quantity: QUANTITY_OPTIONS[1],
           icon: <SVG.Smile2 />,
           description:
             'You’ll be perfectly stocked for your next event or conference.',
           topBarColor: colors.gold,
         },
         {
-          quantity: quantities[2],
+          quantity: QUANTITY_OPTIONS[2],
           icon: <SVG.Smile3 />,
           description: 'Somebody’s popular! Or planning ahead. Or both.',
           topBarColor: colors.brightCoral,

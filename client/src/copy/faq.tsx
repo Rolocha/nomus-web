@@ -1,4 +1,11 @@
 import Link from 'src/components/Link'
+import { QUANTITY_OPTIONS } from 'src/utils/pricing'
+
+const commaSeparatedClause = (items: string[], separator: string = 'or') => {
+  const nMinusOneItems = items.slice(0, -1)
+  const lastItem = items[items.length - 1]
+  return `${nMinusOneItems.join(', ')}, ${separator} ${lastItem}`
+}
 
 export const faqItems = [
   {
@@ -29,8 +36,12 @@ export const faqItems = [
   },
   {
     question: 'How many can I order?',
-    answer:
-      "Nomus offers three tiers: 25 cards, 100 cards, or 250 cards. The more cards you buy in one order, the more you save. If you'd like to buy more than 250 cards at once, no worries. Just contact us at hi@nomus.me, and we'll sort it out for you.",
+    answer: `Nomus offers three tiers: ${commaSeparatedClause(
+      QUANTITY_OPTIONS.map((q) => `${q} cards`),
+      'or',
+    )}. The more cards you buy in one order, the more you save. If you'd like to buy more than ${
+      QUANTITY_OPTIONS[QUANTITY_OPTIONS.length - 1]
+    } cards at once, no worries. Just contact us at hi@nomus.me, and we'll sort it out for you.`,
   },
   {
     question: 'What size and material are the business cards?',
@@ -44,7 +55,7 @@ export const faqItems = [
   },
   {
     question: 'Can I get a sample?',
-    answer: 'We offer sample boxes of 25 cards for purchase.',
+    answer: `We offer sample boxes of ${QUANTITY_OPTIONS[0]} cards for purchase.`,
   },
   {
     question: 'How long will my cards take to get to me?',

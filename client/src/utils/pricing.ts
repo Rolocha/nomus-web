@@ -7,6 +7,10 @@ export const QUANTITY_TO_PRICE = {
   100: 12000,
 } as const
 
+export const QUANTITY_OPTIONS = (Object.keys(QUANTITY_TO_PRICE)
+  .map(Number)
+  .sort((a, b) => a - b) as unknown) as CardQuantityOption[]
+
 export type CardQuantityOption = keyof typeof QUANTITY_TO_PRICE
 
 export const isValidQuantity = (quantity: number) => {
