@@ -8,6 +8,7 @@ import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import OrderResolver from 'src/graphql/resolvers/order'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { getCostSummary } from 'src/util/pricing'
 
 jest.setTimeout(30000)
 
@@ -1044,11 +1045,12 @@ describe('OrderResolver', () => {
 
       const orderDetails = response.data?.submitManualOrder?.order
 
+      const costSummary = getCostSummary(quantity, shippingAddress.state)
       expect(orderDetails.price).toMatchObject({
-        shipping: 0,
-        subtotal: 12000,
-        tax: 0,
-        total: 12000,
+        shipping: costSummary.shipping,
+        subtotal: costSummary.subtotal,
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
       })
 
       expect(sgMail.send).toBeCalledTimes(0)
