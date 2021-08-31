@@ -58,6 +58,7 @@ registerEnumType(Role, {
 export enum CardSpecBaseType {
   Custom = 'Custom',
   Template = 'Template',
+  Manual = 'Manual',
 }
 
 registerEnumType(CardSpecBaseType, {

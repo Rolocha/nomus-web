@@ -480,7 +480,7 @@ class OrderResolver {
 
     const cv = await CardVersion.mongo.create({
       user: user.id,
-      baseType: CardSpecBaseType.Custom,
+      baseType: CardSpecBaseType.Manual,
     })
 
     const order = await Order.mongo.create({
