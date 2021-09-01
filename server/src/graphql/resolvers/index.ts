@@ -8,6 +8,7 @@ import SheetResolver from './sheet'
 import SheetOrderResolver from './sheetOrder'
 import LinkerResolver from './linker'
 import OrderEventResolver from './orderEvent'
+import NomusProSubscriptionResolver from './nomusProSubscription'
 
 export default [
   ContactsResolver,
@@ -18,4 +19,5 @@ export default [
   SheetOrderResolver,
   LinkerResolver,
   OrderEventResolver,
+  NomusProSubscriptionResolver,
 ] as NonEmptyArray<Function>

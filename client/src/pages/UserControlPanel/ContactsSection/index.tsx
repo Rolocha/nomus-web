@@ -71,6 +71,7 @@ export default () => {
           position
           company
           profilePicUrl
+          website
 
           cardFrontImageUrl
           cardBackImageUrl

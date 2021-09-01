@@ -317,6 +317,14 @@ const ContactInfoPage = () => {
                   </Text.Body2>
                 </Box>
               )}
+              {contact.website && (
+                <Box mb={3}>
+                  <Text.Label>WEBSITE</Text.Label>
+                  <Text.Body2>
+                    <Link to={contact.website}>{contact.website}</Link>
+                  </Text.Body2>
+                </Box>
+              )}
               {contact.bio && (
                 <Box>
                   <Text.Label>BIO</Text.Label>

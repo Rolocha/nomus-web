@@ -19,6 +19,7 @@ import {
   BASE_URL,
   EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
+import NomusProSubscription from 'src/models/NomusProSubscription'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
@@ -154,6 +155,10 @@ export class User extends BaseModel({
   @Field(() => UserCheckpoints, { nullable: false })
   checkpoints: UserCheckpoints
 
+  @prop({ required: false })
+  @Field({ nullable: true })
+  website?: string
+
   public static async createNewUser(
     this: ReturnModelType<typeof User>,
     userInfo: UserCreatePayload
@@ -239,6 +244,23 @@ export class User extends BaseModel({
     // to send it to the client
     const { preHashToken } = await RefreshToken.mongo.createNewTokenForUser(this.id)
     return preHashToken
+  }
+
+  // Get the URL we should redirect to when a card tap for this user comes in
+  public async getCardTapLink(): Promise<string> {
+    const contactInfoPageForUser = `/${this.username}`
+    // If they don't have a website, the only option is the Nomus contact info page
+    if (!this.website) {
+      return contactInfoPageForUser
+    }
+
+    // So they do have a website, now we need to check if they (1) have Nomus Pro and (2) want to route to it.
+    const nomusProSubscription = await NomusProSubscription.mongo.findOne({ user: this.id })
+    return nomusProSubscription &&
+      nomusProSubscription.isActive() &&
+      nomusProSubscription.featureSet.UseCustomTapLink
+      ? this.website
+      : contactInfoPageForUser
   }
 
   public async getProfilePicUrl(this: DocumentType<User>): Promise<string | null> {

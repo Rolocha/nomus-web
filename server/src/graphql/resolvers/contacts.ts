@@ -52,6 +52,9 @@ class Contact {
   bio: string
 
   @Field({ nullable: true })
+  website: string
+
+  @Field({ nullable: true })
   profilePicUrl: string
 
   @Field({ nullable: true })
@@ -111,6 +114,7 @@ const userToContact = async (user: DocumentType<User>): Promise<Contact> => {
     cardFrontImageUrl: (user.defaultCardVersion as CardVersion | null)?.frontImageUrl,
     cardBackImageUrl: (user.defaultCardVersion as CardVersion | null)?.backImageUrl,
     bio: user.bio,
+    website: user.website,
     headline: user.headline,
     position: user.position,
     company: user.company,

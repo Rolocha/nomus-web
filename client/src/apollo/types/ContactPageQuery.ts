@@ -23,6 +23,7 @@ export interface ContactPageQuery_publicContact {
   email: string | null
   headline: string | null
   bio: string | null
+  website: string | null
   profilePicUrl: string | null
   cardFrontImageUrl: string | null
   cardBackImageUrl: string | null

@@ -6,11 +6,8 @@ import { TemplateID } from 'src/templates/types'
 import { isValidTemplateID } from 'src/templates/utils'
 import { FileItem } from 'src/types/files'
 import { imageUrlToFile } from 'src/utils/image'
-import {
-  CardBuilderStep,
-  CardBuilderSubmissionError,
-  OrderQuantityOption,
-} from './types'
+import { CardBuilderStep, CardBuilderSubmissionError } from './types'
+import { CardQuantityOption } from 'src/utils/pricing'
 
 export type CardBuilderState = {
   // If we come back to Card Builder, from say Stripe Checkout, we
@@ -21,7 +18,7 @@ export type CardBuilderState = {
   currentStep: CardBuilderStep
 
   baseType: CardSpecBaseType
-  quantity: OrderQuantityOption | null
+  quantity: CardQuantityOption | null
   cardVersionId: string | null
 
   // Template details
@@ -64,7 +61,7 @@ export const createCardBuilderStateFromExistingOrder = async (
     previousOrder: order.id,
     ...(cv.baseType && { baseType: cv.baseType }),
     ...(order.quantity && {
-      quantity: order.quantity as OrderQuantityOption,
+      quantity: order.quantity as CardQuantityOption,
     }),
     ...(cv.id && { cardVersionId: cv.id }),
 

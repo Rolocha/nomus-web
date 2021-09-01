@@ -106,7 +106,8 @@ cardRouter.get(
     }
 
     if (cardUser) {
-      res.redirect(307, `/${cardUser.username}`)
+      const redirectUrl = await cardUser.getCardTapLink()
+      res.redirect(307, redirectUrl)
     } else if (interactionType === CardInteractionType.Tap) {
       // When a card has yet to be linked, go here.
       // Most likely initiated by someone performing the linking process

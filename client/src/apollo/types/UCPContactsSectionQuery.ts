@@ -26,6 +26,7 @@ export interface UCPContactsSectionQuery_contacts {
   position: string | null
   company: string | null
   profilePicUrl: string | null
+  website: string | null
   cardFrontImageUrl: string | null
   cardBackImageUrl: string | null
   notes: string | null

@@ -1,4 +1,10 @@
 import * as SVG from 'src/components/SVG'
+import { formatDollarAmount } from 'src/utils/money'
+import { QUANTITY_OPTIONS, QUANTITY_TO_PRICE } from 'src/utils/pricing'
+
+const lowestCostPerCard = formatDollarAmount(
+  QUANTITY_TO_PRICE[QUANTITY_OPTIONS[0]] / QUANTITY_OPTIONS[0],
+)
 
 export const cardSet = [
   {
@@ -34,6 +40,6 @@ export const cardSet = [
   {
     header: 'Wallet-friendly',
     icon: <SVG.YellowWallet />,
-    text: `Since Nomus cards last longer than regular business cards, you'll get more bang for your buck. At a price as low as $2 per card, it's a no-brainer. Plus, who doesn't love free shipping?`,
+    text: `Since Nomus cards last longer than regular business cards, you'll get more bang for your buck. At a price as low as ${lowestCostPerCard} per card, it's a no-brainer. Plus, who doesn't love free shipping?`,
   },
 ]

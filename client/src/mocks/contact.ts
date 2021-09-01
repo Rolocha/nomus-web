@@ -14,6 +14,7 @@ export const createMockContact = (contact: Partial<Contact> = {}): Contact => {
     phoneNumber: '5551234567',
     email: 'someemail@emailserver.com',
     headline: 'chief mock contact',
+    website: 'https://nomus.me',
     position: 'Storyteller',
     company: 'Nomus',
     profilePicUrl: 'https://placehold.it/300x300',

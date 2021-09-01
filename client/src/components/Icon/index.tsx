@@ -1,6 +1,5 @@
 import { IconProps } from '@chakra-ui/icons'
 import * as React from 'react'
-import NFCIcon from 'src/components/Icon/NFCIcon'
 import ArrowRightIcon from './ArrowRightIcon'
 import ArrowRightOIcon from './ArrowRightOIcon'
 import CardsIcon from './CardsIcon'
@@ -23,6 +22,9 @@ import InstagramIcon from './InstagramIcon'
 import ListIcon from './ListIcon'
 import MenuIcon from './MenuIcon'
 import MinusIcon from './MinusIcon'
+import NFCIcon from './NFCIcon'
+import NomusIcon from './NomusIcon'
+import NomusProIcon from './NomusProIcon'
 import OptionsIcon from './OptionsIcon'
 import OrdersIcon from './OrdersIcon'
 import PenIcon from './PenIcon'
@@ -37,7 +39,6 @@ import SwitchSidesIcon from './SwitchSidesIcon'
 import SyncIcon from './SyncIcon'
 import TwitterIcon from './TwitterIcon'
 import UploadIcon from './UploadIcon'
-import NomusIcon from 'src/components/Icon/NomusIcon'
 
 const iconLibrary = {
   arrowRight: ArrowRightIcon,
@@ -63,6 +64,8 @@ const iconLibrary = {
   menu: MenuIcon,
   minus: MinusIcon,
   nfc: NFCIcon,
+  nomus: NomusIcon,
+  nomusPro: NomusProIcon,
   options: OptionsIcon,
   orders: OrdersIcon,
   pen: PenIcon,
@@ -77,7 +80,6 @@ const iconLibrary = {
   sync: SyncIcon,
   twitter: TwitterIcon,
   upload: UploadIcon,
-  nomus: NomusIcon,
 } as const
 
 export type IconName = keyof typeof iconLibrary

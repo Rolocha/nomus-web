@@ -1,5 +1,5 @@
 import { useMutation } from 'src/apollo'
-import { UpdateProfileQuery } from 'src/apollo/types/UpdateProfileQuery'
+import { UpdateProfileMutation } from 'src/apollo/types/UpdateProfileMutation'
 import { UPDATE_PROFILE_MUTATION } from './mutations'
 import Box from 'src/components/Box'
 import * as React from 'react'
@@ -14,7 +14,7 @@ interface Props {
 
 export default ({ activatedValue, pageSizeBp }: Props) => {
   const [isConfirming, setIsConfirming] = React.useState(false)
-  const [updateProfile] = useMutation<UpdateProfileQuery>(
+  const [updateProfile] = useMutation<UpdateProfileMutation>(
     UPDATE_PROFILE_MUTATION,
   )
 
