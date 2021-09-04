@@ -6,7 +6,6 @@ import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
-import OrderResolver from 'src/graphql/resolvers/order'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { getCostSummary } from 'src/util/pricing'
 
@@ -682,44 +681,12 @@ describe('OrderResolver', () => {
   })
   describe('submitManualOrder', () => {
     let sgMailSendSpy = null
-    let checkoutSessionSpy = null
     beforeEach(() => {
       sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
-      checkoutSessionSpy = jest
-        .spyOn(OrderResolver.prototype, 'createCheckoutSession')
-        .mockResolvedValue({
-          id: 'cs_12345',
-          object: 'checkout.session',
-          /* eslint-disable camelcase */
-          allow_promotion_codes: true,
-          amount_subtotal: null,
-          amount_total: null,
-          billing_address_collection: null,
-          cancel_url: 'https://nomus.me',
-          client_reference_id: null,
-          currency: 'usd',
-          customer: null,
-          customer_email: null,
-          livemode: null,
-          locale: null,
-          metadata: null,
-          mode: null,
-          payment_intent: 'pi_1234',
-          payment_method_types: [],
-          setup_intent: null,
-          shipping: null,
-          shipping_address_collection: null,
-          submit_type: null,
-          subscription: null,
-          success_url: 'https://nomus.me',
-          total_details: null,
-          /* eslint-enable camelcase */
-        })
     })
 
     afterEach(() => {
       sgMailSendSpy.mockClear()
-      checkoutSessionSpy.mockClear()
     })
     it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
       const user: User = await createMockUser()
@@ -737,6 +704,7 @@ describe('OrderResolver', () => {
         shipping: 0,
         total: 5427,
       }
+      const paymentIntent = 'pi_1234'
 
       const response = await execQuery({
         source: `
@@ -793,6 +761,7 @@ describe('OrderResolver', () => {
             quantity,
             shippingAddress,
             price,
+            paymentIntent,
           },
         },
         asAdmin: true,
@@ -820,7 +789,6 @@ describe('OrderResolver', () => {
       expect(orderDetails.cardVersion.backImageUrl).toBeNull()
 
       expect(sgMail.send).toBeCalledTimes(0)
-      expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {
       const userEmail = 'coolboi@a24.com'
@@ -914,7 +882,6 @@ describe('OrderResolver', () => {
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
       expect(orderDetails.state).toBe(OrderState.Captured)
-      expect(orderDetails.paymentIntent).toBe('pi_1234')
 
       expect(orderDetails.user.id).toBe(user.id)
       expect(orderDetails.user.email).toBe(user.email)
@@ -933,7 +900,6 @@ describe('OrderResolver', () => {
           firstName: user.name.first,
         },
       })
-      expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
     it('calculates price based on shipping address and quantity if price is not included', async () => {
       const user: User = await createMockUser()
@@ -986,7 +952,6 @@ describe('OrderResolver', () => {
       })
 
       expect(sgMail.send).toBeCalledTimes(0)
-      expect(checkoutSessionSpy).toBeCalledTimes(1)
     })
   })
 })

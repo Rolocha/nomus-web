@@ -148,6 +148,9 @@ class ManualOrderInput {
 
   @Field((type) => OrderPrice, { nullable: true })
   price?: OrderPrice | null
+
+  @Field({ nullable: true })
+  paymentIntent?: string
 }
 
 @ObjectType()
@@ -493,12 +496,7 @@ class OrderResolver {
       shippingName: user.fullName,
     })
 
-    // Create a new Stripe Checkout session regardless of whether a previous one
-    // existed since some details may have changed in this submission
-    const checkoutSession = await this.createCheckoutSession(order, cv, user, null)
-
-    order.checkoutSession = checkoutSession.id
-    order.paymentIntent = checkoutSession.payment_intent as string
+    order.paymentIntent = payload.paymentIntent
     await order.save()
 
     return order
