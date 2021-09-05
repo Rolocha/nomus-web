@@ -1,6 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { GraphQLUpload, UserInputError } from 'apollo-server-express'
-import crypto from 'crypto'
 import { FileUpload } from 'graphql-upload'
 import { setAuthCookies } from 'src/auth'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
@@ -15,7 +14,6 @@ import {
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
-import { Result } from 'src/util/error'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
@@ -636,6 +634,9 @@ class OrderResolver {
 
       order.quantity = quantity
       order.price = price
+      order.state = OrderState.Captured
+      order.cardVersion = cardVersion.id
+      order.user = user?.id
     } else {
       // No previous order existed; create a new one
       order = await Order.mongo.create({
