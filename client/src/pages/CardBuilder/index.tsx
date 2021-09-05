@@ -8,7 +8,7 @@ interface State {
   fatalError: Error | null
 }
 
-class CardBuilderWrapper extends React.Component<Props, State> {
+class CardBuilder extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { fatalError: null }
@@ -33,4 +33,4 @@ class CardBuilderWrapper extends React.Component<Props, State> {
   }
 }
 
-export default CardBuilderWrapper
+export default CardBuilder

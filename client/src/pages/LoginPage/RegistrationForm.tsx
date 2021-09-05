@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useLocation, Redirect } from 'react-router-dom'
+import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -70,11 +71,18 @@ const RegistrationForm = () => {
 
   const { loggedIn, signUp } = useAuth()
 
-  const location = useLocation<{ from: Location }>()
+  const location = useLocation<{
+    from: Location
+    linkingOrder?: string | null
+  }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
     [location],
   )
+
+  // The user may have ended up here from running through CardBuilder while logged out
+  // If this is the case, the redirect would have passed a `linkingOrder` property along
+  const linkingOrder = location.state?.linkingOrder
 
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [submittingForm, setSubmittingForm] = React.useState(false)
@@ -139,6 +147,13 @@ const RegistrationForm = () => {
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
+      {linkingOrder && (
+        <Banner
+          type="info"
+          title="Almost there!"
+          description="Your Nomus card order has been created but you'll need to create an account to complete your order."
+        />
+      )}
       <Text.BrandHeader>
         {formState.isSubmitSuccessful ? 'Thank you!' : 'Get started'}
       </Text.BrandHeader>
@@ -174,8 +189,8 @@ const RegistrationForm = () => {
             )}
           </Box>
           <Link mt={3} to={redirectUrl} buttonStyle="primary" buttonSize="big">
-            Continue{' '}
-            {redirectUrl.startsWith('/dashboard/') ? 'to your dashboard' : ''}
+            Continue
+            {redirectUrl.startsWith('/dashboard/') ? ' to your dashboard' : ''}
           </Link>
         </>
       ) : (

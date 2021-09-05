@@ -117,7 +117,7 @@ const LoginPage = () => {
           >
             {infoLines.map((line) => [
               <Box px="8px" key="check" placeSelf="start end">
-                <Icon of="check" color={colors.midnightGray} boxSize="32" />
+                <Icon of="check" color={colors.midnightGray} boxSize="32px" />
               </Box>,
               <Box key="content">
                 <Text.SectionSubheader mb={2}>

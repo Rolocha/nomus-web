@@ -34,10 +34,7 @@ import templateLibrary from 'src/templates'
 import { getAllOmittedContactFields } from 'src/templates/utils'
 import { useAuth } from 'src/utils/auth'
 
-interface ParamsType {
-  subroute?: string
-}
-
+const ROUTE_REGEX = /\/card-studio\/([^/]*)\/?/
 const VALID_SUBROUTES = ['custom', 'template'] as const
 type ValidSubroute = typeof VALID_SUBROUTES[number]
 const isValidSubroute = (subroute: string): subroute is ValidSubroute =>
@@ -53,8 +50,9 @@ interface Props {
 }
 
 const CardBuilder = ({ fatalError, setFatalError }: Props) => {
-  const { subroute: subrouteParam } = useParams<ParamsType>()
   const location = useLocation<CardBuilderLocationState | undefined>()
+  const locationMatch = location.pathname.match(ROUTE_REGEX)
+  const subrouteParam = locationMatch ? locationMatch[1] : null
   const history = useHistory()
   const isDesktop = useBreakpoint('lg')
   const { loggedIn } = useAuth()
@@ -168,14 +166,16 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
       }
 
       // User isn't logged in; redirect them to the registration page first so
-      // they can create an account or log in and come back to finish their order
+      // they can create an account or log in to link this order to their account
       if (!loggedIn) {
-        const redirectUrl = `/card-studio/authenticated?orderId=${cardBuilderState.orderId}`
+        const redirectUrl = `/card-studio/authenticated/${cardBuilderState.orderId}`
         const searchParams = new URLSearchParams({
           // eslint-disable-next-line camelcase
           redirect_url: redirectUrl,
         })
-        history.push(`/register?${searchParams.toString()}`)
+        history.push(`/register?${searchParams.toString()}`, {
+          linkingOrder: cardBuilderState.orderId,
+        })
         return
       }
 

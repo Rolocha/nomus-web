@@ -158,10 +158,6 @@ export const routes: Array<RouteType> = [
     Component: CardBuilder,
   },
   {
-    path: '/card-studio/template',
-    Component: CardBuilder,
-  },
-  {
     path: '/card-studio/cancel/:orderId',
     Component: CardBuilderCanceledCheckout,
   },

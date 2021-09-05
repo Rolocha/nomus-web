@@ -325,13 +325,22 @@ class OrderResolver {
   ): Promise<SubmitOrderResponse> {
     const user = context.user
     if (user == null) {
-      throw new Error('Missing user')
+      throw new UnauthorizedError()
     }
 
     const order = await Order.mongo.findById(orderId).populate('cardVersion')
     if (order == null) {
-      throw new Error(`No order found with that ID: ${orderId}`)
+      throw new UserInputError(`No order found with that ID: ${orderId}`, {
+        code: 'order-not-found',
+      })
     }
+
+    if (order.user) {
+      throw new UserInputError('This card has already been linked!', {
+        code: 'already-linked',
+      })
+    }
+
     order.user = user.id
     const cardVersion = order.cardVersion as DocumentType<CardVersion>
     cardVersion.user = user.id
