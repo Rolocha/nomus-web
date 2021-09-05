@@ -2,6 +2,7 @@ import { ApolloServer } from 'apollo-server-express'
 import { DEPLOY_ENV } from 'src/config'
 
 import schema from 'src/graphql/schema'
+import { IApolloContext } from 'src/graphql/types'
 
 export const server = new ApolloServer({
   schema,
@@ -17,8 +18,12 @@ export const server = new ApolloServer({
       : false,
   introspection: DEPLOY_ENV !== 'production',
   context: ({ req }) => {
-    if (req.user) {
-      return { user: req.user }
+    const ctx: Partial<IApolloContext> = {
+      req,
     }
+    if (req.user) {
+      ctx.user = req.user
+    }
+    return ctx
   },
 })

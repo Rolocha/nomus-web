@@ -8,7 +8,7 @@ interface Props {
   children: React.ReactNode
   requiredAuthLevel: AuthLevel
   exact?: boolean
-  path?: string
+  path?: string | string[]
 }
 
 const ProtectedRoute = ({ requiredAuthLevel, children, ...rest }: Props) => {

@@ -3,6 +3,7 @@ import { registerEnumType } from 'type-graphql'
 //Current State in Order Tracking State Machine
 //https://www.notion.so/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 export enum OrderState {
+  Initialized = 'Initialized',
   Captured = 'Captured',
   Paid = 'Paid',
   Reviewed = 'Reviewed',

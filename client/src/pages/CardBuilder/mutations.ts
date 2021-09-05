@@ -20,8 +20,20 @@ export const SUBMIT_TEMPLATE_ORDER_MUTATION = gql`
 
 export const INITIALIZE_CARD_BUILDER_MUTATION = gql`
   mutation InitializeCardBuilder($baseType: CardSpecBaseType!) {
-    createEmptyCardVersion(baseType: $baseType) {
+    createEmptyOrderForCardBuilder(baseType: $baseType) {
       id
+      cardVersion {
+        id
+      }
+    }
+  }
+`
+
+export const LINK_ORDER_TO_USER_MUTATION = gql`
+  mutation LinkOrderToUser($orderId: String!) {
+    linkOrderToUser(orderId: $orderId) {
+      orderId
+      checkoutSession
     }
   }
 `

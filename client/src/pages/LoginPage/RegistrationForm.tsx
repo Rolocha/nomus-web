@@ -112,16 +112,21 @@ const RegistrationForm = () => {
     setResentEmailSuccessfully(result.ok)
   }
 
-  const redirectUrl = React.useMemo(
-    () =>
-      searchParams.get('redirect_url') ??
-      location.state?.from.pathname ??
-      '/dashboard',
+  const explicitRedirectUrl = React.useMemo(
+    () => searchParams.get('redirect_url') ?? location.state?.from.pathname,
     [searchParams, location],
   )
+  const redirectUrl = React.useMemo(() => explicitRedirectUrl ?? '/dashboard', [
+    explicitRedirectUrl,
+  ])
 
-  // Redirect if the user is logged in when landing on the page
-  if (loggedIn && !formState.isSubmitted) {
+  if (
+    // Redirect if the user is logged in when landing on the page
+    (loggedIn && !formState.isSubmitted) ||
+    // Or immediately after the login completes if there is an explicit redirect URL
+    // (i.e. skip the "We sent an email to your inbox" message screen)
+    (!loggedIn && formState.isSubmitSuccessful && explicitRedirectUrl)
+  ) {
     if (redirectUrl.startsWith('/')) {
       return <Redirect to={redirectUrl} />
     } else {

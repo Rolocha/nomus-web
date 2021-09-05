@@ -123,23 +123,25 @@ export default ({ order }: Props) => {
             <Box>
               <Text.Body2>Subtotal</Text.Body2>
               <Text.Body2>
-                {formatDollarAmount(order.price.subtotal)}
+                {order.price ? formatDollarAmount(order.price.subtotal) : '-'}
               </Text.Body2>
             </Box>
             <Box>
               <Text.Body2>Tax</Text.Body2>
-              <Text.Body2>{formatDollarAmount(order.price.tax)}</Text.Body2>
+              <Text.Body2>
+                {order.price ? formatDollarAmount(order.price.tax) : '-'}
+              </Text.Body2>
             </Box>
             <Box>
               <Text.Body2>Shipping</Text.Body2>
               <Text.Body2>
-                {formatDollarAmount(order.price.shipping)}
+                {order.price ? formatDollarAmount(order.price.shipping) : '-'}
               </Text.Body2>
             </Box>
             <Box>
               <Text.Body2 fontWeight="500">Total</Text.Body2>
               <Text.Body2 fontWeight="500">
-                {formatDollarAmount(order.price.total)}
+                {order.price ? formatDollarAmount(order.price.total) : '-'}
               </Text.Body2>
             </Box>
           </Box>

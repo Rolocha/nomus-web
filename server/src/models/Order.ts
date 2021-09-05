@@ -69,9 +69,9 @@ class Order extends BaseModel({
   @Field()
   createdAt: Date
 
-  // User who ordered the cards
-  @prop({ required: true, ref: () => User, type: String })
-  @Field(() => User, { nullable: false })
+  // User who ordered the cards, we may not have one while the order is being created in Card Builder
+  @prop({ required: false, ref: () => User, type: String })
+  @Field(() => User, { nullable: true })
   user: Ref<User>
 
   // Card Version that was ordered
@@ -84,12 +84,12 @@ class Order extends BaseModel({
   @Field({ nullable: false })
   quantity: number
 
-  @prop({ _id: false, required: true })
-  @Field(() => OrderPrice, { nullable: false })
+  @prop({ _id: false, required: false })
+  @Field(() => OrderPrice, { nullable: true })
   price: OrderPrice
 
   // This correlates with OrderState at server/src/util/enums.ts
-  @prop({ enum: OrderState, type: String, required: true })
+  @prop({ enum: OrderState, type: String, required: true, default: OrderState.Initialized })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 

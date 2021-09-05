@@ -10,27 +10,26 @@ import { CardBuilderStep, CardBuilderSubmissionError } from './types'
 import { CardQuantityOption } from 'src/utils/pricing'
 
 export type CardBuilderState = {
+  // Card builder metadata
+
   // If we come back to Card Builder, from say Stripe Checkout, we
   // will have already created an order and can avoid creating a new one
   // on the next "Submit"
-  previousOrder?: string
-
-  currentStep: CardBuilderStep
-
-  baseType: CardSpecBaseType
-  quantity: CardQuantityOption | null
+  orderId: string | null
   cardVersionId: string | null
+  currentStep: CardBuilderStep
+  baseType: CardSpecBaseType
+  submissionError?: CardBuilderSubmissionError | null
+  quantity: CardQuantityOption | null
 
-  // Template details
+  // Template base type details
   templateId: TemplateID | null
   templateCustomization: Record<string, any> | null
   omittedOptionalFields: Array<string>
 
-  // Custom details
+  // Custom base type details
   frontDesignFile: FileItem | null
   backDesignFile: FileItem | null
-
-  submissionError?: CardBuilderSubmissionError | null
 }
 
 const createInitialState = (baseType: CardSpecBaseType): CardBuilderState => ({
@@ -40,6 +39,7 @@ const createInitialState = (baseType: CardSpecBaseType): CardBuilderState => ({
   } as const)[baseType],
   baseType,
   quantity: 100,
+  orderId: null,
   cardVersionId: null,
   templateId: ({
     [CardSpecBaseType.Custom]: null,
@@ -58,7 +58,7 @@ export const createCardBuilderStateFromExistingOrder = async (
   return {
     ...initialStateOptions[order.cardVersion.baseType],
     currentStep: 'review',
-    previousOrder: order.id,
+    orderId: order.id,
     ...(cv.baseType && { baseType: cv.baseType }),
     ...(order.quantity && {
       quantity: order.quantity as CardQuantityOption,
@@ -116,4 +116,7 @@ export const cardBuilderReducer = (
     ...state,
     ...action,
   }
+}
+export interface CardBuilderLocationState {
+  cardBuilderState?: CardBuilderState
 }

@@ -32,6 +32,7 @@ export enum OrderState {
   Creating = 'Creating',
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
+  Initialized = 'Initialized',
   Paid = 'Paid',
   Reviewed = 'Reviewed',
 }
@@ -67,7 +68,7 @@ export interface ProfileUpdateInput {
  * Payload for submitting a card builder order with a custom design
  */
 export interface SubmitCustomOrderInput {
-  previousOrder?: string | null
+  orderId?: string | null
   quantity: number
   frontImageDataUrl: any
   backImageDataUrl?: any | null
@@ -77,10 +78,9 @@ export interface SubmitCustomOrderInput {
  * Payload for submitting a card builder order with a template-based design
  */
 export interface SubmitTemplateOrderInput {
-  previousOrder?: string | null
+  orderId?: string | null
   quantity: number
   templateId: string
-  templateName: string
   cardVersionId: string
   colorScheme: TemplateColorSchemeInput
   contactInfo: TemplateContactInfoFieldsInput

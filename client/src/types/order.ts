@@ -11,7 +11,7 @@ export interface OrderPrice {
 export interface Order {
   id: string
   cardVersion: CardVersion
-  price: OrderPrice
+  price: OrderPrice | null
   quantity: number
   state: OrderState
   createdAt: Date

@@ -148,20 +148,5 @@ class CardVersionResolver {
       numTaps: interactions[index],
     }))
   }
-
-  @Authorized(Role.User)
-  @Mutation(() => CardVersion, {
-    description: 'Initializes a bare card version for use in the Card Builder UI',
-  })
-  async createEmptyCardVersion(
-    @Arg('baseType', () => CardSpecBaseType, { nullable: false }) baseType: CardSpecBaseType,
-    @Ctx() context: IApolloContext
-  ) {
-    const cv = new CardVersion.mongo()
-    cv.user = context.user?.id
-    cv.baseType = baseType
-    await cv.save()
-    return cv
-  }
 }
 export default CardVersionResolver
