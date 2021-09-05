@@ -634,7 +634,6 @@ class OrderResolver {
 
       order.quantity = quantity
       order.price = price
-      order.state = OrderState.Captured
       order.cardVersion = cardVersion.id
       order.user = user?.id
     } else {
@@ -642,11 +641,12 @@ class OrderResolver {
       order = await Order.mongo.create({
         user: user?.id,
         cardVersion: cardVersion.id,
-        state: OrderState.Captured,
         quantity,
         price,
       })
     }
+
+    order.transition(OrderState.Captured)
 
     // Only if we know the user already (i.e. submitter of order is logged in), create a Stripe Checkout
     // session -- otherwise, we'll redirect them to login/register first

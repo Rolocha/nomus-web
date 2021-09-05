@@ -24,6 +24,8 @@ export enum OrderState {
   Canceled = 'Canceled',
 }
 
+export const INITIAL_ORDER_STATE = OrderState.Initialized
+
 registerEnumType(OrderState, {
   name: 'OrderState',
   description: 'Current State in Order Tracking State Machine',

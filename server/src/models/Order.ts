@@ -14,7 +14,7 @@ import { downloadUrlToFile } from 'src/util/file'
 import * as S3 from 'src/util/s3'
 import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderEventTrigger, OrderState } from '../util/enums'
+import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
@@ -25,6 +25,7 @@ import { User } from './User'
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
+  [OrderState.Initialized]: [OrderState.Captured],
   [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
   [OrderState.Paid]: [OrderState.Reviewed, OrderState.Canceled],
   [OrderState.Reviewed]: [OrderState.Creating, OrderState.Canceled],
@@ -51,7 +52,7 @@ const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
     // Creates a new OrderEvent at creation time
     await OrderEvent.mongo.create({
       order: this.id,
-      state: OrderState.Captured,
+      state: INITIAL_ORDER_STATE,
       trigger: OrderEventTrigger.Nomus,
     })
     next()
@@ -89,7 +90,7 @@ class Order extends BaseModel({
   price: OrderPrice
 
   // This correlates with OrderState at server/src/util/enums.ts
-  @prop({ enum: OrderState, type: String, required: true, default: OrderState.Initialized })
+  @prop({ enum: OrderState, type: String, required: true, default: INITIAL_ORDER_STATE })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 
