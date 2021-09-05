@@ -1,12 +1,6 @@
 import { useStripe } from '@stripe/react-stripe-js'
 import * as React from 'react'
-import {
-  Prompt,
-  Redirect,
-  useHistory,
-  useLocation,
-  useParams,
-} from 'react-router-dom'
+import { Prompt, Redirect, useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'src/apollo'
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 import { InitializeCardBuilder } from 'src/apollo/types/InitializeCardBuilder'
@@ -33,7 +27,6 @@ import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { getAllOmittedContactFields } from 'src/templates/utils'
 import { useAuth } from 'src/utils/auth'
-
 const ROUTE_REGEX = /\/card-studio\/([^/]*)\/?/
 const VALID_SUBROUTES = ['custom', 'template'] as const
 type ValidSubroute = typeof VALID_SUBROUTES[number]
