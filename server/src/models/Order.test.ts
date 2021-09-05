@@ -1,5 +1,5 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
-import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from 'src/util/enums'
 import * as fileUtil from 'src/util/file'
 import * as S3 from 'src/util/s3'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
@@ -65,7 +65,7 @@ describe('Order model', () => {
   describe('transitionState', () => {
     it('Goes through full Order State Machine', async () => {
       const order = await createMockOrder()
-      expect(order.state).toBe(OrderState.Captured)
+      expect(order.state).toBe(INITIAL_ORDER_STATE)
 
       await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
       expect(order.state).toBe(OrderState.Paid)
@@ -89,7 +89,7 @@ describe('Order model', () => {
       const orderEvents = await OrderEvent.mongo.find({ order: order.id }).sort({ createdAt: 1 })
       expect(orderEvents).toEqual([
         expect.objectContaining({
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
           trigger: OrderEventTrigger.Nomus,
         }),
         expect.objectContaining({
@@ -121,14 +121,14 @@ describe('Order model', () => {
     it('Tries to do an improper state transition and fails', async () => {
       const order = await createMockOrder()
       const res = await order.transition(OrderState.Fulfilled)
-      expect(order.state).toBe(OrderState.Captured)
+      expect(order.state).toBe(INITIAL_ORDER_STATE)
       expect(res.isSuccess).toBe(false)
       expect(res.error.name).toBe('invalid-transition')
 
       const orderEvents = await OrderEvent.mongo.find({ order: order.id }).sort({ createdAt: 1 })
       expect(orderEvents).toEqual([
         expect.objectContaining({
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
           trigger: OrderEventTrigger.Nomus,
         }),
       ])

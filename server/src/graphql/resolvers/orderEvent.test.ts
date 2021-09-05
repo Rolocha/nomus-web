@@ -1,6 +1,6 @@
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderState, Role } from 'src/util/enums'
+import { INITIAL_ORDER_STATE, OrderState, Role } from 'src/util/enums'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockOrderEvent } from 'src/__mocks__/models/OrderEvent'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -74,7 +74,7 @@ describe('OrderEventResolver', () => {
       expect(response.data?.orderEventsForOrder).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            state: OrderState.Captured,
+            state: INITIAL_ORDER_STATE,
           }),
           expect.objectContaining({
             state: OrderState.Paid,

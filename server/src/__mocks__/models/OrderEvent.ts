@@ -1,5 +1,5 @@
 import OrderEvent from 'src/models/OrderEvent'
-import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockOrder } from './Order'
 
 export const createMockOrderEvent = async (override: Partial<OrderEvent> = {}) => {
@@ -8,7 +8,7 @@ export const createMockOrderEvent = async (override: Partial<OrderEvent> = {}) =
   const newOrderPayload: Partial<OrderEvent> = {
     order: override.order ?? orderInPayload,
     trigger: override.trigger ?? OrderEventTrigger.Nomus,
-    state: override.state ?? OrderState.Captured,
+    state: override.state ?? INITIAL_ORDER_STATE,
     ...override,
   }
 
