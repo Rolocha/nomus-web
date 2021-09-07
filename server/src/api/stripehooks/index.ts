@@ -1,7 +1,6 @@
 import bodyParser from 'body-parser'
 import express from 'express'
 import { STRIPE_WEBHOOK_ENDPOINT_SECRET } from 'src/config'
-import { User } from 'src/models'
 import { stripe } from 'src/util/stripe'
 import { Stripe } from 'stripe'
 import handleCardOrderCheckoutCompleted from './card-order-checkout-completed'

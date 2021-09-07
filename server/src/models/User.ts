@@ -76,7 +76,7 @@ export class User extends BaseModel({
   name: PersonName
 
   public get fullName() {
-    return [this.name.first, this.name.middle, this.name.last].join(' ')
+    return [this.name.first, this.name.middle, this.name.last].filter(Boolean).join(' ')
   }
 
   @prop()
