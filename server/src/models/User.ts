@@ -362,11 +362,11 @@ export class User extends BaseModel({
 
   public static async getOrCreateUser(
     email: string,
-    name: PersonName
+    name: PersonName,
+    password: string = Math.random().toString(36).slice(-8) // Password required for creating a user
   ): Promise<DocumentType<User>> {
     let user = await User.mongo.findOne({ email })
     if (!user) {
-      const password = Math.random().toString(36).slice(-8)
       const res = await User.mongo.createNewUser({ email, name, password })
       if (res.isSuccess) {
         user = res.getValue()
@@ -400,8 +400,6 @@ export class User extends BaseModel({
         firstName: this.name.first,
       },
     })
-
-    return null
   }
 
   public async updateProfilePic(
