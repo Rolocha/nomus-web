@@ -170,7 +170,7 @@ class Order extends BaseModel({
       }
       if (DEPLOY_ENV === 'production') {
         try {
-          postNewOrder(SlackChannel.Orders, this)
+          await postNewOrder(SlackChannel.Orders, this)
         } catch (e) {
           console.error(e)
         }
