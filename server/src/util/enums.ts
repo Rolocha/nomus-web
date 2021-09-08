@@ -85,3 +85,7 @@ registerEnumType(NomusProFeature, {
   name: 'NomusProFeature',
   description: 'Features available in Nomus Pro',
 })
+
+export enum BillableProduct {
+  NomusPro = 'NomusPro',
+}

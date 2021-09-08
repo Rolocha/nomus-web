@@ -5,14 +5,15 @@ import { stripe } from 'src/util/stripe'
 import { Stripe } from 'stripe'
 import handleCardOrderCheckoutCompleted from './card-order-checkout-completed'
 import handleNomusProCheckoutCompleted from './nomus-pro-checkout-completed'
-import handleInvoicePaid from './invoice-paid'
-import handleInvoicePaymentFailed from './invoice-payment-failed'
+import handleNomusProInvoicePaid from './nomus-pro-invoice-paid'
+import handleNomusProInvoicePaymentFailed from './nomus-pro-invoice-payment-failed'
+import { BillableProduct } from 'src/util/enums'
 
 export enum StripehookScenario {
   CardOrderCheckoutCompleted,
   NomusProCheckoutCompleted,
-  invoicePaid,
-  invoicePaymentFailed,
+  NomusProInvoicePaid,
+  NomusProInvoicePaymentFailed,
 }
 
 type StripehookHandler = (event: any) => Promise<any>
@@ -20,8 +21,8 @@ type StripehookHandler = (event: any) => Promise<any>
 export const stripehookHandlers: Record<StripehookScenario, StripehookHandler> = {
   [StripehookScenario.CardOrderCheckoutCompleted]: handleCardOrderCheckoutCompleted,
   [StripehookScenario.NomusProCheckoutCompleted]: handleNomusProCheckoutCompleted,
-  [StripehookScenario.invoicePaid]: handleInvoicePaid,
-  [StripehookScenario.invoicePaymentFailed]: handleInvoicePaymentFailed,
+  [StripehookScenario.NomusProInvoicePaid]: handleNomusProInvoicePaid,
+  [StripehookScenario.NomusProInvoicePaymentFailed]: handleNomusProInvoicePaymentFailed,
 }
 
 export const stripeWebhooksRouter = express.Router()
@@ -34,14 +35,24 @@ const determineStriphookScenario = (event: any): StripehookScenario | null => {
         return StripehookScenario.CardOrderCheckoutCompleted
       } else if (checkoutSession.mode === 'subscription') {
         return StripehookScenario.NomusProCheckoutCompleted
-      } else {
-        return null
       }
+      break
     }
-    case 'invoice.paid':
-      return StripehookScenario.invoicePaid
+    case 'invoice.paid': {
+      const invoice = event.data.object as Stripe.Invoice
+      if (invoice.metadata.billableProduct === BillableProduct.NomusPro) {
+        return StripehookScenario.NomusProInvoicePaid
+      }
+      break
+    }
     case 'invoice.payment_failed':
-      return StripehookScenario.invoicePaymentFailed
+      const invoice = event.data.object as Stripe.Invoice
+      if (invoice.metadata.billableProduct === BillableProduct.NomusPro) {
+        return StripehookScenario.NomusProInvoicePaymentFailed
+      }
+      break
+    default:
+      return null
   }
 }
 

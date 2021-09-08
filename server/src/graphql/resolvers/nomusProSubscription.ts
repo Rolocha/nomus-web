@@ -3,7 +3,7 @@ import { NomusProAccessInfo } from 'src/graphql/resolvers/subtypes'
 import { IApolloContext } from 'src/graphql/types'
 import { NomusProSubscription } from 'src/models'
 import { NomusProFeatureSet } from 'src/models/subschemas'
-import { NomusProFeature, Role } from 'src/util/enums'
+import { BillableProduct, NomusProFeature, Role } from 'src/util/enums'
 import { stripe } from 'src/util/stripe'
 import {
   Arg,
@@ -99,6 +99,7 @@ class NomusProSubscriptionResolver {
         // Store the ID of the feature which prompted the user to sign up
         // This is useful for product analytics and also lets us enable that feature when the user completes payment
         triggerFeature,
+        billableProduct: BillableProduct.NomusPro,
       },
       /* eslint-enable camelcase */
     })

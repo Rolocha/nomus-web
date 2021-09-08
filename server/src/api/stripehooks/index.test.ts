@@ -65,7 +65,7 @@ describe('Stripe webhook router', () => {
   })
 
   it('routes to the NomusProInvoicePaid handler when appropriate', async () => {
-    const handler = (stripehookHandlers[StripehookScenario.invoicePaid] = jest.fn())
+    const handler = (stripehookHandlers[StripehookScenario.NomusProInvoicePaid] = jest.fn())
 
     await agent.post('/api/stripehooks').send({
       type: 'invoice.paid',
@@ -75,7 +75,9 @@ describe('Stripe webhook router', () => {
   })
 
   it('routes to the NomusProInvoicePaymentFailed handler when appropriate', async () => {
-    const handler = (stripehookHandlers[StripehookScenario.invoicePaymentFailed] = jest.fn())
+    const handler = (stripehookHandlers[
+      StripehookScenario.NomusProInvoicePaymentFailed
+    ] = jest.fn())
 
     await agent.post('/api/stripehooks').send({
       type: 'invoice.payment_failed',
