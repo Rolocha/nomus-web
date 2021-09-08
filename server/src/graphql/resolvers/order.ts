@@ -494,10 +494,8 @@ class OrderResolver {
       price,
       shippingAddress,
       shippingName: user.fullName,
+      paymentIntent: payload.paymentIntent,
     })
-
-    order.paymentIntent = payload.paymentIntent
-    await order.save()
 
     return order
   }

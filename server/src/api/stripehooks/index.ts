@@ -5,14 +5,14 @@ import { stripe } from 'src/util/stripe'
 import { Stripe } from 'stripe'
 import handleCardOrderCheckoutCompleted from './card-order-checkout-completed'
 import handleNomusProCheckoutCompleted from './nomus-pro-checkout-completed'
-import handleNomusProInvoicePaid from './nomus-pro-invoice-paid'
-import handleNomusProInvoicePaymentFailed from './nomus-pro-invoice-payment-failed'
+import handleInvoicePaid from './invoice-paid'
+import handleInvoicePaymentFailed from './invoice-payment-failed'
 
 export enum StripehookScenario {
   CardOrderCheckoutCompleted,
   NomusProCheckoutCompleted,
-  NomusProInvoicePaid,
-  NomusProInvoicePaymentFailed,
+  invoicePaid,
+  invoicePaymentFailed,
 }
 
 type StripehookHandler = (event: any) => Promise<any>
@@ -20,8 +20,8 @@ type StripehookHandler = (event: any) => Promise<any>
 export const stripehookHandlers: Record<StripehookScenario, StripehookHandler> = {
   [StripehookScenario.CardOrderCheckoutCompleted]: handleCardOrderCheckoutCompleted,
   [StripehookScenario.NomusProCheckoutCompleted]: handleNomusProCheckoutCompleted,
-  [StripehookScenario.NomusProInvoicePaid]: handleNomusProInvoicePaid,
-  [StripehookScenario.NomusProInvoicePaymentFailed]: handleNomusProInvoicePaymentFailed,
+  [StripehookScenario.invoicePaid]: handleInvoicePaid,
+  [StripehookScenario.invoicePaymentFailed]: handleInvoicePaymentFailed,
 }
 
 export const stripeWebhooksRouter = express.Router()
@@ -39,9 +39,9 @@ const determineStriphookScenario = (event: any): StripehookScenario | null => {
       }
     }
     case 'invoice.paid':
-      return StripehookScenario.NomusProInvoicePaid
+      return StripehookScenario.invoicePaid
     case 'invoice.payment_failed':
-      return StripehookScenario.NomusProInvoicePaymentFailed
+      return StripehookScenario.invoicePaymentFailed
   }
 }
 

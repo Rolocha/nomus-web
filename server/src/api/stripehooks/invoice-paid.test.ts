@@ -1,8 +1,10 @@
 import { app } from 'src/app'
-import { NomusProSubscription, User } from 'src/models'
+import { NomusProSubscription, Order, User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { OrderState } from 'src/util/enums'
 import { stripe } from 'src/util/stripe'
 import { createMockNomusProSubscription } from 'src/__mocks__/models/NomusProSubscription'
+import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import request from 'supertest'
 
@@ -15,7 +17,7 @@ afterEach(async () => {
   await dropAllCollections()
 })
 
-describe('NomusProInvoicePaid Stripe webhook handler', () => {
+describe('InvoicePaid Stripe webhook handler', () => {
   let requestingUser: User
   let agent: request.SuperAgentTest
   beforeEach(async (done) => {
@@ -31,6 +33,7 @@ describe('NomusProInvoicePaid Stripe webhook handler', () => {
     })
 
     jest.spyOn(stripe.webhooks, 'constructEvent').mockImplementation((e: any) => e)
+
     done()
   })
 
@@ -77,5 +80,35 @@ describe('NomusProInvoicePaid Stripe webhook handler', () => {
     expect(updatedNps).toBeDefined()
     expect(updatedNps.currentPeriodStartsAt).toBe(now)
     expect(updatedNps.currentPeriodEndsAt).toBe(oneMonthFromNow)
+  })
+
+  it('updates and transitions a paid order once the invoice is paid', async () => {
+    const user = await createMockUser()
+    const order = await createMockOrder({
+      user: user.id,
+      paymentIntent: 'pi_1234',
+      state: OrderState.Captured,
+    })
+
+    await agent
+      .post('/api/stripehooks')
+      .send({
+        /* eslint-disable camelcase */
+        type: 'invoice.paid',
+        data: {
+          object: {
+            id: 'invoice.id',
+            payment_intent: {
+              id: 'pi_1234',
+            },
+          },
+        },
+        /* eslint-enable camelcase */
+      })
+      .set('Accept', 'application/json')
+      .expect(200)
+
+    const updatedOrder = await Order.mongo.findById(order.id)
+    expect(updatedOrder.state).toBe(OrderState.Paid)
   })
 })
