@@ -1,5 +1,5 @@
 import { BASE_URL } from 'src/config'
-import { User, NomusProSubscription } from 'src/models'
+import { NomusProSubscription, User } from 'src/models'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Stripe, stripe } from 'src/util/stripe'
 
@@ -10,9 +10,7 @@ export default async (event: any) => {
   const stripeSubscriptionId = invoice.subscription as string
 
   if (!stripeSubscriptionId) {
-    throw new Error(
-      'Received a Nomus Pro invoice paid webhook with an empty `subscription` property'
-    )
+    throw new Error('Nomus Pro Invoice failed without stripe subscription id')
   }
 
   const nomusProSubscription = await NomusProSubscription.mongo

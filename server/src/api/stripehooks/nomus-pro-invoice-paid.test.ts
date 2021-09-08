@@ -1,6 +1,7 @@
 import { app } from 'src/app'
 import { NomusProSubscription, User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { BillableProduct } from 'src/util/enums'
 import { stripe } from 'src/util/stripe'
 import { createMockNomusProSubscription } from 'src/__mocks__/models/NomusProSubscription'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -15,7 +16,7 @@ afterEach(async () => {
   await dropAllCollections()
 })
 
-describe('NomusProInvoicePaid Stripe webhook handler', () => {
+describe('InvoicePaid Stripe webhook handler', () => {
   let requestingUser: User
   let agent: request.SuperAgentTest
   beforeEach(async (done) => {
@@ -31,6 +32,7 @@ describe('NomusProInvoicePaid Stripe webhook handler', () => {
     })
 
     jest.spyOn(stripe.webhooks, 'constructEvent').mockImplementation((e: any) => e)
+
     done()
   })
 
@@ -66,6 +68,9 @@ describe('NomusProInvoicePaid Stripe webhook handler', () => {
           object: {
             id: 'invoice.id',
             subscription: 'sub_1234',
+            metadata: {
+              billableProduct: BillableProduct.NomusPro,
+            },
           },
         },
         /* eslint-enable camelcase */

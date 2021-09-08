@@ -5,15 +5,23 @@ import { FileUpload } from 'graphql-upload'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
+import { Void } from 'src/models/scalars'
 import {
   Address,
   OrderPrice,
+  PersonName,
   TemplateColorScheme,
   TemplateContactInfoFields,
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
-import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
+import {
+  CardSpecBaseType,
+  OrderCreatedBy,
+  OrderEventTrigger,
+  OrderState,
+  Role,
+} from 'src/util/enums'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
@@ -128,6 +136,27 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
 
   @Field((type) => GraphQLUpload, { nullable: true })
   backImageDataUrl?: Promise<FileUpload> | null
+}
+
+@InputType({ description: 'Input to submit a manual order from the admin panel' })
+class ManualOrderInput {
+  @Field({ nullable: false })
+  email: string
+
+  @Field((type) => PersonName, { nullable: true })
+  name?: PersonName | null
+
+  @Field({ nullable: false })
+  quantity: number
+
+  @Field((type) => Address, { nullable: false })
+  shippingAddress: Address
+
+  @Field((type) => OrderPrice, { nullable: true })
+  price?: OrderPrice | null
+
+  @Field({ nullable: true })
+  paymentIntent?: string | null
 }
 
 @ObjectType()
@@ -332,7 +361,7 @@ class OrderResolver {
 
     await cardVersion.save()
 
-    const order = await this.createOrUpdateExistingOrder({
+    const order = await this.createOrUpdateCardBuilderOrder({
       user,
       cardVersion,
       payload,
@@ -399,7 +428,7 @@ class OrderResolver {
     }
     await cardVersion.save()
 
-    const order = await this.createOrUpdateExistingOrder({
+    const order = await this.createOrUpdateCardBuilderOrder({
       user,
       cardVersion,
       payload,
@@ -417,10 +446,70 @@ class OrderResolver {
     }
   }
 
+  @Authorized(Role.Admin)
+  @Mutation((type) => Void, {
+    nullable: true,
+    description:
+      'updates the print spec of an order, used in admin panel on update of front and back card',
+  })
+  async updatePrintSpec(@Arg('orderId', { nullable: false }) orderId: string): Promise<void> {
+    const order = await Order.mongo.findOne({ id: orderId })
+    await order.updatePrintSpecPDF()
+  }
+
+  @Authorized(Role.Admin)
+  @Mutation((type) => Order, {
+    description: 'Handles manual submission of an order from admin panel',
+  })
+  async submitManualOrder(
+    @Arg('payload', { nullable: false }) payload: ManualOrderInput
+  ): Promise<Order> {
+    const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
+    const user = await User.getOrCreateUser(email, name)
+
+    let price: OrderPrice
+    if (!payloadPrice) {
+      const costSummary = getCostSummary(quantity, shippingAddress.state)
+      if (costSummary == null) {
+        throw new Error(
+          'Failed to calculate pricing, likely due to an unsupported quantity being used'
+        )
+      }
+      price = {
+        subtotal: costSummary.subtotal,
+        shipping: costSummary.shipping,
+        // We don't know the cost of tax yet since that requires knowing the shipping address
+        // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
+      }
+    } else {
+      price = payloadPrice
+    }
+
+    const cv = await CardVersion.mongo.create({
+      user: user.id,
+      baseType: CardSpecBaseType.Custom,
+    })
+
+    const order = await Order.mongo.create({
+      user: user.id,
+      cardVersion: cv.id,
+      state: OrderState.Actionable,
+      quantity,
+      price,
+      shippingAddress,
+      shippingName: user.fullName,
+      paymentIntent: payload.paymentIntent,
+      createdBy: OrderCreatedBy.Manual,
+    })
+
+    return order
+  }
+
   /**
    * Private helpers
    */
-
   async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
     if (payload.previousOrder) {
       const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.previousOrder })
@@ -530,7 +619,7 @@ class OrderResolver {
     return imageUrls
   }
 
-  private async createOrUpdateExistingOrder({
+  private async createOrUpdateCardBuilderOrder({
     user,
     cardVersion,
     payload,
@@ -576,6 +665,7 @@ class OrderResolver {
         state: OrderState.Captured,
         quantity,
         price,
+        createdBy: OrderCreatedBy.CardBuilder,
       })
     }
 

@@ -6,7 +6,7 @@ export const getUserFacingOrderState = (
 ): UserFacingOrderState => {
   switch (state) {
     case OrderState.Captured:
-    case OrderState.Paid:
+    case OrderState.Actionable:
     case OrderState.Reviewed:
     case OrderState.Creating:
     case OrderState.Created:
