@@ -2,6 +2,7 @@ import { stripehookHandlers, StripehookScenario } from 'src/api/stripehooks'
 import { app } from 'src/app'
 import { User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { BillableProduct } from 'src/util/enums'
 import { stripe } from 'src/util/stripe'
 import { createMockUser } from 'src/__mocks__/models/User'
 import request from 'supertest'
@@ -69,6 +70,14 @@ describe('Stripe webhook router', () => {
 
     await agent.post('/api/stripehooks').send({
       type: 'invoice.paid',
+      data: {
+        object: {
+          id: 'in_1234',
+          metadata: {
+            billableProduct: BillableProduct.NomusPro,
+          },
+        },
+      },
     })
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -81,6 +90,14 @@ describe('Stripe webhook router', () => {
 
     await agent.post('/api/stripehooks').send({
       type: 'invoice.payment_failed',
+      data: {
+        object: {
+          id: 'in_1234',
+          metadata: {
+            billableProduct: BillableProduct.NomusPro,
+          },
+        },
+      },
     })
 
     expect(handler).toHaveBeenCalledTimes(1)
