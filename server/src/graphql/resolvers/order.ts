@@ -150,7 +150,7 @@ class ManualOrderInput {
   price?: OrderPrice | null
 
   @Field({ nullable: true })
-  paymentIntent?: string
+  paymentIntent?: string | null
 }
 
 @ObjectType()
