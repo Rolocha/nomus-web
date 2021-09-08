@@ -15,7 +15,13 @@ import {
 } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
-import { CardSpecBaseType, OrderEventTrigger, OrderState, Role } from 'src/util/enums'
+import {
+  CardSpecBaseType,
+  OrderCreatedBy,
+  OrderEventTrigger,
+  OrderState,
+  Role,
+} from 'src/util/enums'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
@@ -355,7 +361,7 @@ class OrderResolver {
 
     await cardVersion.save()
 
-    const order = await this.createOrUpdateExistingOrder({
+    const order = await this.createOrUpdateCardBuilderOrder({
       user,
       cardVersion,
       payload,
@@ -422,7 +428,7 @@ class OrderResolver {
     }
     await cardVersion.save()
 
-    const order = await this.createOrUpdateExistingOrder({
+    const order = await this.createOrUpdateCardBuilderOrder({
       user,
       cardVersion,
       payload,
@@ -483,7 +489,7 @@ class OrderResolver {
 
     const cv = await CardVersion.mongo.create({
       user: user.id,
-      baseType: CardSpecBaseType.Manual,
+      baseType: CardSpecBaseType.Custom,
     })
 
     const order = await Order.mongo.create({
@@ -495,6 +501,7 @@ class OrderResolver {
       shippingAddress,
       shippingName: user.fullName,
       paymentIntent: payload.paymentIntent,
+      createdBy: OrderCreatedBy.Manual,
     })
 
     return order
@@ -612,7 +619,7 @@ class OrderResolver {
     return imageUrls
   }
 
-  private async createOrUpdateExistingOrder({
+  private async createOrUpdateCardBuilderOrder({
     user,
     cardVersion,
     payload,
@@ -658,6 +665,7 @@ class OrderResolver {
         state: OrderState.Captured,
         quantity,
         price,
+        createdBy: OrderCreatedBy.CardBuilder,
       })
     }
 

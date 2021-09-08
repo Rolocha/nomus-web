@@ -12,7 +12,6 @@
  */
 export enum CardSpecBaseType {
   Custom = 'Custom',
-  Manual = 'Manual',
   Template = 'Template',
 }
 

@@ -43,6 +43,11 @@ registerEnumType(OrderEventTrigger, {
   description: 'Triggers for OrderState stored in OrderEvent collection',
 })
 
+export enum OrderCreatedBy {
+  CardBuilder = 'CardBuilder',
+  Manual = 'Manual',
+}
+
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
   User = 'user',
@@ -58,7 +63,6 @@ registerEnumType(Role, {
 export enum CardSpecBaseType {
   Custom = 'Custom',
   Template = 'Template',
-  Manual = 'Manual',
 }
 
 registerEnumType(CardSpecBaseType, {

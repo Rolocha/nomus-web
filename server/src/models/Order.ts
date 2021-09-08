@@ -14,7 +14,7 @@ import { downloadUrlToFile } from 'src/util/file'
 import * as S3 from 'src/util/s3'
 import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderEventTrigger, OrderState } from '../util/enums'
+import { OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
@@ -133,6 +133,9 @@ class Order extends BaseModel({
   @prop({ _id: false, required: false, description: 'Address to ship this order to' })
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
+
+  @prop({ enum: OrderCreatedBy, type: String, required: false })
+  createdBy: OrderCreatedBy
 
   @prop({ required: false, description: 'Notes about the order' })
   @Field({ nullable: true })
