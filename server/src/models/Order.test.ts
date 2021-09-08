@@ -40,7 +40,7 @@ describe('Order model', () => {
   })
 
   describe('cancelOrder', () => {
-    it.each([OrderState.Captured, OrderState.Paid, OrderState.Reviewed])(
+    it.each([OrderState.Captured, OrderState.Actionable, OrderState.Reviewed])(
       `successfully cancels the order if it's in the %s state`,
       async (initialState) => {
         const order = await createMockOrder({ state: initialState })
@@ -67,8 +67,8 @@ describe('Order model', () => {
       const order = await createMockOrder()
       expect(order.state).toBe(OrderState.Captured)
 
-      await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
-      expect(order.state).toBe(OrderState.Paid)
+      await order.transition(OrderState.Actionable, OrderEventTrigger.Payment)
+      expect(order.state).toBe(OrderState.Actionable)
 
       await order.transition(OrderState.Reviewed, OrderEventTrigger.Internal)
       expect(order.state).toBe(OrderState.Reviewed)
@@ -93,7 +93,7 @@ describe('Order model', () => {
           trigger: OrderEventTrigger.Nomus,
         }),
         expect.objectContaining({
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           trigger: OrderEventTrigger.Payment,
         }),
         expect.objectContaining({

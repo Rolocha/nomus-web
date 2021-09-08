@@ -489,7 +489,7 @@ class OrderResolver {
     const order = await Order.mongo.create({
       user: user.id,
       cardVersion: cv.id,
-      state: OrderState.Captured,
+      state: OrderState.Actionable,
       quantity,
       price,
       shippingAddress,

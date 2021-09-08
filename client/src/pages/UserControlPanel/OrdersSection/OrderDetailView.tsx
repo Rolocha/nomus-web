@@ -147,7 +147,7 @@ export default ({ order }: Props) => {
       </Box>
 
       <Box mt={4} display="flex" mx={-3}>
-        {[OrderState.Captured, OrderState.Paid].includes(order.state) && (
+        {[OrderState.Captured, OrderState.Actionable].includes(order.state) && (
           <Box px={3}>
             <Button
               variant="danger"

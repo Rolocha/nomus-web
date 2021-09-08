@@ -109,6 +109,6 @@ describe('InvoicePaid Stripe webhook handler', () => {
       .expect(200)
 
     const updatedOrder = await Order.mongo.findById(order.id)
-    expect(updatedOrder.state).toBe(OrderState.Paid)
+    expect(updatedOrder.state).toBe(OrderState.Actionable)
   })
 })

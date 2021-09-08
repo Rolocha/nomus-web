@@ -175,7 +175,7 @@ describe('OrderResolver', () => {
       const order = await createMockOrder({
         user: user,
         cardVersion: cardVersion,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
       })
 
       const response = await execQuery({
@@ -197,7 +197,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid],
+            states: [OrderState.Actionable],
           },
         },
         asAdmin: true,
@@ -207,7 +207,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).toEqual([
         expect.objectContaining({
           id: order.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           user: {
             name: {
               first: user.name.first,
@@ -263,7 +263,7 @@ describe('OrderResolver', () => {
     it('fetches orders from a list of states', async () => {
       const user = await createMockUser()
       const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
-      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Actionable })
       const notInQueryOrder = await createMockOrder({ user: user })
 
       const response = await execQuery({
@@ -277,7 +277,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid, OrderState.Creating],
+            states: [OrderState.Actionable, OrderState.Creating],
           },
         },
         asAdmin: true,
@@ -291,7 +291,7 @@ describe('OrderResolver', () => {
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
         }),
       ])
       expect(response.data?.orders).not.toContain(
@@ -308,7 +308,7 @@ describe('OrderResolver', () => {
         email: 'fakelawyer@greendale.com',
       })
       const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
-      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Actionable })
       const notInQueryOrder = await createMockOrder({ user: userJeff })
 
       const response = await execQuery({
@@ -346,7 +346,7 @@ describe('OrderResolver', () => {
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           user: {
             name: {
               first: 'John',
@@ -430,19 +430,19 @@ describe('OrderResolver', () => {
       })
       const order1 = await createMockOrder({
         user: user,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: null,
         trackingNumber: null,
       })
       const order2 = await createMockOrder({
         user: user,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: null,
         trackingNumber: null,
       })
       const notInQueryOrder = await createMockOrder({
         user: userJeff,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: 'AAAA',
         trackingNumber: 'BBBB',
       })
@@ -460,7 +460,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid],
+            states: [OrderState.Actionable],
             shippingLabelUrl: null,
             trackingNumber: null,
           },
@@ -472,13 +472,13 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).toEqual([
         expect.objectContaining({
           id: order1.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: null,
           trackingNumber: null,
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: null,
           trackingNumber: null,
         }),
@@ -486,7 +486,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: 'AAAA',
           trackingNumber: 'BBBB',
         })
@@ -593,8 +593,8 @@ describe('OrderResolver', () => {
         name: { first: 'Jeff', last: 'Winger' },
         email: 'fakelawyer@greendale.com',
       })
-      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
-      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Paid })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Actionable })
+      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Actionable })
 
       const response = await execQuery({
         source: `
@@ -643,7 +643,7 @@ describe('OrderResolver', () => {
         name: { first: 'Jeff', last: 'Winger' },
         email: 'fakelawyer@greendale.com',
       })
-      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Actionable })
       const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Created })
 
       const response = await execQuery({
@@ -668,7 +668,7 @@ describe('OrderResolver', () => {
       expect(orders).toEqual([
         expect.objectContaining({
           id: orderJohn.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
         }),
         expect.objectContaining({
           id: orderJeff.id,

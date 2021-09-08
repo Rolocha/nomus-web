@@ -25,6 +25,6 @@ export default async (event: any) => {
     if (!relatedOrder) {
       throw new Error('Received an invoice paid webhook with no related order or subscription ID')
     }
-    await relatedOrder.transition(OrderState.Paid, OrderEventTrigger.Payment)
+    await relatedOrder.transition(OrderState.Actionable, OrderEventTrigger.Payment)
   }
 }

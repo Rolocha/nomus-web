@@ -25,8 +25,8 @@ import { User } from './User'
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
-  [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
-  [OrderState.Paid]: [OrderState.Reviewed, OrderState.Canceled],
+  [OrderState.Captured]: [OrderState.Actionable, OrderState.Canceled],
+  [OrderState.Actionable]: [OrderState.Reviewed, OrderState.Canceled],
   [OrderState.Reviewed]: [OrderState.Creating, OrderState.Canceled],
   [OrderState.Creating]: [OrderState.Created],
   [OrderState.Created]: [OrderState.Enroute],
@@ -98,7 +98,8 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  // Stripe PaymentIntent id; may
+  // Stripe PaymentIntent id; may be 1 Intent: n orders
+  // ex: One invoice from customer for 12 orders
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string

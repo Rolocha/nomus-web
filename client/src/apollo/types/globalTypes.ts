@@ -12,6 +12,7 @@
  */
 export enum CardSpecBaseType {
   Custom = 'Custom',
+  Manual = 'Manual',
   Template = 'Template',
 }
 
@@ -26,13 +27,13 @@ export enum NomusProFeature {
  * Current State in Order Tracking State Machine
  */
 export enum OrderState {
+  Actionable = 'Actionable',
   Canceled = 'Canceled',
   Captured = 'Captured',
   Created = 'Created',
   Creating = 'Creating',
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
-  Paid = 'Paid',
   Reviewed = 'Reviewed',
 }
 
