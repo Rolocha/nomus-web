@@ -776,7 +776,7 @@ describe('OrderResolver', () => {
       expect(orderDetails.shippingName).toBe(user.fullName)
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
-      expect(orderDetails.state).toBe(OrderState.Captured)
+      expect(orderDetails.state).toBe(OrderState.Actionable)
       expect(orderDetails.paymentIntent).toBe('pi_1234')
 
       expect(orderDetails.user.id).toBe(user.id)
@@ -881,7 +881,7 @@ describe('OrderResolver', () => {
       )
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
-      expect(orderDetails.state).toBe(OrderState.Captured)
+      expect(orderDetails.state).toBe(OrderState.Actionable)
 
       expect(orderDetails.user.id).toBe(user.id)
       expect(orderDetails.user.email).toBe(user.email)
