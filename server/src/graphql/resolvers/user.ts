@@ -7,7 +7,7 @@ import {
 } from 'apollo-server-express'
 import bcrypt from 'bcryptjs'
 import { FileUpload } from 'graphql-upload'
-import { BASE_URL, MINIMUM_PASSWORD_STRENGTH } from 'src/config'
+import { MINIMUM_PASSWORD_STRENGTH } from 'src/config'
 import { NomusProAccessInfo } from 'src/graphql/resolvers/subtypes'
 import { IApolloContext } from 'src/graphql/types'
 import { Connection, NomusProSubscription } from 'src/models'
@@ -18,7 +18,6 @@ import { isValidUserCheckpointKey } from 'src/models/subschemas'
 import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import { Role } from 'src/util/enums'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import {
   Arg,
   Authorized,
@@ -262,31 +261,10 @@ class UserResolver {
 
   @Mutation(() => Void, { nullable: true })
   async sendPasswordResetEmail(@Arg('email', { nullable: false }) email: string): Promise<void> {
-    const user = await User.mongo.findOne({ email })
-    if (user == null) {
-      return null
+    const user = (await User.mongo.findOne({ email })) as User
+    if (user) {
+      return user.sendPasswordResetEmail()
     }
-
-    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
-    await PasswordResetToken.mongo.invalidateAllForUser(user.id)
-    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(user.id)
-
-    const passwordResetURLQueryParams = new URLSearchParams()
-    passwordResetURLQueryParams.set('token', preHashToken)
-    passwordResetURLQueryParams.set('userId', user.id)
-    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
-
-    await sgMail.send({
-      to: user.email,
-      from: 'hi@nomus.me',
-      templateId: SendgridTemplate.ResetPassword,
-      dynamicTemplateData: {
-        passwordResetLink,
-        firstName: user.name.first,
-      },
-    })
-
-    return null
   }
 
   @Query(() => Boolean, {

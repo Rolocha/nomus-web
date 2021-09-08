@@ -1,11 +1,15 @@
-import { Order } from 'src/models'
-import { OrderPrice } from 'src/models/subschemas'
+import { Order, User } from 'src/models'
+import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { getCostSummary } from 'src/util/pricing'
+
+jest.setTimeout(30000)
 
 beforeAll(async () => {
   await initDB()
@@ -171,7 +175,7 @@ describe('OrderResolver', () => {
       const order = await createMockOrder({
         user: user,
         cardVersion: cardVersion,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
       })
 
       const response = await execQuery({
@@ -193,7 +197,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid],
+            states: [OrderState.Actionable],
           },
         },
         asAdmin: true,
@@ -203,7 +207,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).toEqual([
         expect.objectContaining({
           id: order.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           user: {
             name: {
               first: user.name.first,
@@ -259,7 +263,7 @@ describe('OrderResolver', () => {
     it('fetches orders from a list of states', async () => {
       const user = await createMockUser()
       const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
-      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Actionable })
       const notInQueryOrder = await createMockOrder({ user: user })
 
       const response = await execQuery({
@@ -273,7 +277,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid, OrderState.Creating],
+            states: [OrderState.Actionable, OrderState.Creating],
           },
         },
         asAdmin: true,
@@ -287,7 +291,7 @@ describe('OrderResolver', () => {
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
         }),
       ])
       expect(response.data?.orders).not.toContain(
@@ -304,7 +308,7 @@ describe('OrderResolver', () => {
         email: 'fakelawyer@greendale.com',
       })
       const order1 = await createMockOrder({ user: user, state: OrderState.Creating })
-      const order2 = await createMockOrder({ user: user, state: OrderState.Paid })
+      const order2 = await createMockOrder({ user: user, state: OrderState.Actionable })
       const notInQueryOrder = await createMockOrder({ user: userJeff })
 
       const response = await execQuery({
@@ -342,7 +346,7 @@ describe('OrderResolver', () => {
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           user: {
             name: {
               first: 'John',
@@ -426,19 +430,19 @@ describe('OrderResolver', () => {
       })
       const order1 = await createMockOrder({
         user: user,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: null,
         trackingNumber: null,
       })
       const order2 = await createMockOrder({
         user: user,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: null,
         trackingNumber: null,
       })
       const notInQueryOrder = await createMockOrder({
         user: userJeff,
-        state: OrderState.Paid,
+        state: OrderState.Actionable,
         shippingLabelUrl: 'AAAA',
         trackingNumber: 'BBBB',
       })
@@ -456,7 +460,7 @@ describe('OrderResolver', () => {
         `,
         variableValues: {
           params: {
-            states: [OrderState.Paid],
+            states: [OrderState.Actionable],
             shippingLabelUrl: null,
             trackingNumber: null,
           },
@@ -468,13 +472,13 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).toEqual([
         expect.objectContaining({
           id: order1.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: null,
           trackingNumber: null,
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: null,
           trackingNumber: null,
         }),
@@ -482,7 +486,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
           shippingLabelUrl: 'AAAA',
           trackingNumber: 'BBBB',
         })
@@ -589,8 +593,8 @@ describe('OrderResolver', () => {
         name: { first: 'Jeff', last: 'Winger' },
         email: 'fakelawyer@greendale.com',
       })
-      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
-      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Paid })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Actionable })
+      const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Actionable })
 
       const response = await execQuery({
         source: `
@@ -639,7 +643,7 @@ describe('OrderResolver', () => {
         name: { first: 'Jeff', last: 'Winger' },
         email: 'fakelawyer@greendale.com',
       })
-      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Paid })
+      const orderJohn = await createMockOrder({ user: userJohn, state: OrderState.Actionable })
       const orderJeff = await createMockOrder({ user: userJeff, state: OrderState.Created })
 
       const response = await execQuery({
@@ -664,7 +668,7 @@ describe('OrderResolver', () => {
       expect(orders).toEqual([
         expect.objectContaining({
           id: orderJohn.id,
-          state: OrderState.Paid,
+          state: OrderState.Actionable,
         }),
         expect.objectContaining({
           id: orderJeff.id,
@@ -673,6 +677,281 @@ describe('OrderResolver', () => {
       ])
 
       expect(response.errors[0].message).toBe('invalid-transition')
+    })
+  })
+  describe('submitManualOrder', () => {
+    let sgMailSendSpy = null
+    beforeEach(() => {
+      sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    })
+
+    afterEach(() => {
+      sgMailSendSpy.mockClear()
+    })
+    it('properly creates a manual order that sets up all the requirements for an existing user', async () => {
+      const user: User = await createMockUser()
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+      const price: OrderPrice = {
+        subtotal: 5000,
+        tax: 427,
+        shipping: 0,
+        total: 5427,
+      }
+      const paymentIntent = 'pi_1234'
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                id
+                user {
+                  id
+                  email
+                  name {
+                    first
+                    middle
+                    last
+                  }
+                }
+                cardVersion {
+                  id
+                  user { 
+                    id
+                  }
+                  frontImageUrl
+                  backImageUrl
+                }
+                quantity
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
+                }
+                state
+                trackingNumber
+                paymentIntent
+                shortId
+                shippingName
+                shippingAddress {
+                  line1
+                  line2
+                  city
+                  state
+                  postalCode
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: user.email,
+            name: {
+              first: user.name.first,
+              middle: user.name.middle,
+              last: user.name.last,
+            },
+            quantity,
+            shippingAddress,
+            price,
+            paymentIntent,
+          },
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder
+
+      expect(orderDetails.id).not.toBeNull()
+      expect(orderDetails.trackingNumber).toBeNull()
+      expect(orderDetails.shortId).not.toBeNull()
+      expect(orderDetails.quantity).toBe(quantity)
+      expect(orderDetails.shippingName).toBe(user.fullName)
+      expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
+      expect(orderDetails.price).toMatchObject(price)
+      expect(orderDetails.state).toBe(OrderState.Actionable)
+      expect(orderDetails.paymentIntent).toBe('pi_1234')
+
+      expect(orderDetails.user.id).toBe(user.id)
+      expect(orderDetails.user.email).toBe(user.email)
+      expect(JSON.stringify(orderDetails.user.name)).toEqual(JSON.stringify(user.name))
+
+      expect(orderDetails.cardVersion.id).not.toBeNull()
+      expect(orderDetails.cardVersion.user.id).toBe(user.id)
+      expect(orderDetails.cardVersion.frontImageUrl).toBeNull()
+      expect(orderDetails.cardVersion.backImageUrl).toBeNull()
+
+      expect(sgMail.send).toBeCalledTimes(0)
+    })
+    it('properly creates a manual order for a new user and sends them an update email', async () => {
+      const userEmail = 'coolboi@a24.com'
+      const userName: PersonName = {
+        first: 'coolest',
+        middle: 'ever',
+        last: 'boi',
+      }
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+      const price: OrderPrice = {
+        subtotal: 5000,
+        tax: 427,
+        shipping: 0,
+        total: 5427,
+      }
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                id
+                user {
+                  id
+                  email
+                  name {
+                    first
+                    middle
+                    last
+                  }
+                }
+                cardVersion {
+                  id
+                  user { 
+                    id
+                  }
+                  frontImageUrl
+                  backImageUrl
+                }
+                quantity
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
+                }
+                state
+                trackingNumber
+                paymentIntent
+                shortId
+                shippingName
+                shippingAddress {
+                  line1
+                  line2
+                  city
+                  state
+                  postalCode
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: userEmail,
+            name: userName,
+            quantity,
+            shippingAddress,
+            price,
+          },
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder
+
+      const user = (await User.mongo.findOne({ email: userEmail })) as User
+
+      expect(orderDetails.id).not.toBeNull()
+      expect(orderDetails.trackingNumber).toBeNull()
+      expect(orderDetails.shortId).not.toBeNull()
+      expect(orderDetails.quantity).toBe(quantity)
+      expect(orderDetails.shippingName).toBe(
+        [user.name.first, user.name.middle, user.name.last].join(' ')
+      )
+      expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
+      expect(orderDetails.price).toMatchObject(price)
+      expect(orderDetails.state).toBe(OrderState.Actionable)
+
+      expect(orderDetails.user.id).toBe(user.id)
+      expect(orderDetails.user.email).toBe(user.email)
+      expect(JSON.stringify(orderDetails.user.name)).toEqual(JSON.stringify(user.name))
+      expect(user.isEmailVerified).toBeTruthy()
+
+      expect(orderDetails.cardVersion.id).not.toBeNull()
+      expect(orderDetails.cardVersion.user.id).toBe(user.id)
+
+      expect(sgMail.send).toBeCalledWith({
+        to: user.email,
+        from: 'hi@nomus.me',
+        templateId: SendgridTemplate.ManualSubmission,
+        dynamicTemplateData: {
+          passwordResetLink: expect.stringMatching(/reset-password\?/),
+          firstName: user.name.first,
+        },
+      })
+    })
+    it('calculates price based on shipping address and quantity if price is not included', async () => {
+      const user: User = await createMockUser()
+      const quantity = 100
+      const shippingAddress: Address = {
+        line1: '1600 Pennsylvania Ave.',
+        line2: 'Red Room',
+        city: 'Washington',
+        state: 'DC',
+        postalCode: '20502',
+      }
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                id
+                price {
+                  subtotal
+                  tax
+                  shipping
+                  total
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload: {
+            email: user.email,
+            name: {
+              first: user.name.first,
+              middle: user.name.middle,
+              last: user.name.last,
+            },
+            quantity,
+            shippingAddress,
+          },
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder
+
+      const costSummary = getCostSummary(quantity, shippingAddress.state)
+      expect(orderDetails.price).toMatchObject({
+        shipping: costSummary.shipping,
+        subtotal: costSummary.subtotal,
+        tax: costSummary.estimatedTaxes,
+        total: costSummary.total,
+      })
+
+      expect(sgMail.send).toBeCalledTimes(0)
     })
   })
 })

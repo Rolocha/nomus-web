@@ -1,13 +1,13 @@
 import bodyParser from 'body-parser'
 import express from 'express'
 import { STRIPE_WEBHOOK_ENDPOINT_SECRET } from 'src/config'
-import { User } from 'src/models'
 import { stripe } from 'src/util/stripe'
 import { Stripe } from 'stripe'
 import handleCardOrderCheckoutCompleted from './card-order-checkout-completed'
 import handleNomusProCheckoutCompleted from './nomus-pro-checkout-completed'
 import handleNomusProInvoicePaid from './nomus-pro-invoice-paid'
 import handleNomusProInvoicePaymentFailed from './nomus-pro-invoice-payment-failed'
+import { BillableProduct } from 'src/util/enums'
 
 export enum StripehookScenario {
   CardOrderCheckoutCompleted,
@@ -35,14 +35,24 @@ const determineStriphookScenario = (event: any): StripehookScenario | null => {
         return StripehookScenario.CardOrderCheckoutCompleted
       } else if (checkoutSession.mode === 'subscription') {
         return StripehookScenario.NomusProCheckoutCompleted
-      } else {
-        return null
       }
+      break
     }
-    case 'invoice.paid':
-      return StripehookScenario.NomusProInvoicePaid
+    case 'invoice.paid': {
+      const invoice = event.data.object as Stripe.Invoice
+      if (invoice.metadata.billableProduct === BillableProduct.NomusPro) {
+        return StripehookScenario.NomusProInvoicePaid
+      }
+      break
+    }
     case 'invoice.payment_failed':
-      return StripehookScenario.NomusProInvoicePaymentFailed
+      const invoice = event.data.object as Stripe.Invoice
+      if (invoice.metadata.billableProduct === BillableProduct.NomusPro) {
+        return StripehookScenario.NomusProInvoicePaymentFailed
+      }
+      break
+    default:
+      return null
   }
 }
 

@@ -4,7 +4,7 @@ import { registerEnumType } from 'type-graphql'
 //https://www.notion.so/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 export enum OrderState {
   Captured = 'Captured',
-  Paid = 'Paid',
+  Actionable = 'Actionable',
   Reviewed = 'Reviewed',
   Creating = 'Creating',
   Created = 'Created',
@@ -42,6 +42,11 @@ registerEnumType(OrderEventTrigger, {
   name: 'OrderEventTrigger',
   description: 'Triggers for OrderState stored in OrderEvent collection',
 })
+
+export enum OrderCreatedBy {
+  CardBuilder = 'CardBuilder',
+  Manual = 'Manual',
+}
 
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
@@ -84,3 +89,7 @@ registerEnumType(NomusProFeature, {
   name: 'NomusProFeature',
   description: 'Features available in Nomus Pro',
 })
+
+export enum BillableProduct {
+  NomusPro = 'NomusPro',
+}

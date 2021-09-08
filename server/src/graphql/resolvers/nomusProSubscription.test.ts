@@ -2,7 +2,7 @@ import { NOMUS_PRO_PRICE_ID } from 'src/graphql/resolvers/nomusProSubscription'
 import { NomusProSubscription } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { NomusProFeature } from 'src/util/enums'
+import { BillableProduct, NomusProFeature } from 'src/util/enums'
 import { stripe } from 'src/util/stripe'
 import { createMockNomusProSubscription } from 'src/__mocks__/models/NomusProSubscription'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -134,6 +134,7 @@ describe('NomusProSubscription resolver', () => {
           metadata: {
             userId: user.id,
             triggerFeature: NomusProFeature.UseCustomTapLink,
+            billableProduct: BillableProduct.NomusPro,
           },
           /* eslint-enable camelcase */
         })
