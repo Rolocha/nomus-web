@@ -453,7 +453,7 @@ class OrderResolver {
       'updates the print spec of an order, used in admin panel on update of front and back card',
   })
   async updatePrintSpec(@Arg('orderId', { nullable: false }) orderId: string): Promise<void> {
-    const order = await Order.mongo.findOne({ id: orderId })
+    const order = await Order.mongo.findById(orderId)
     await order.updatePrintSpecPDF()
   }
 
