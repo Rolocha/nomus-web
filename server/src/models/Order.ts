@@ -14,7 +14,7 @@ import { downloadUrlToFile } from 'src/util/file'
 import * as S3 from 'src/util/s3'
 import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
-import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from '../util/enums'
+import { INITIAL_ORDER_STATE, OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
@@ -25,9 +25,9 @@ import { User } from './User'
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
-  [OrderState.Initialized]: [OrderState.Captured, OrderState.Paid, OrderState.Canceled],
-  [OrderState.Captured]: [OrderState.Paid, OrderState.Canceled],
-  [OrderState.Paid]: [OrderState.Reviewed, OrderState.Canceled],
+  [OrderState.Initialized]: [OrderState.Captured, OrderState.Actionable, OrderState.Canceled],
+  [OrderState.Captured]: [OrderState.Actionable, OrderState.Canceled],
+  [OrderState.Actionable]: [OrderState.Reviewed, OrderState.Canceled],
   [OrderState.Reviewed]: [OrderState.Creating, OrderState.Canceled],
   [OrderState.Creating]: [OrderState.Created],
   [OrderState.Created]: [OrderState.Enroute],
@@ -99,7 +99,8 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber: string
 
-  // Stripe PaymentIntent id; may
+  // Stripe PaymentIntent id; may be 1 Intent: n orders
+  // ex: One invoice from customer for 12 orders
   @prop({ required: false })
   @Field({ nullable: true })
   paymentIntent: string
@@ -134,6 +135,9 @@ class Order extends BaseModel({
   @Field(() => Address, { nullable: true })
   shippingAddress: Address
 
+  @prop({ enum: OrderCreatedBy, type: String, required: false })
+  createdBy: OrderCreatedBy
+
   @prop({ required: false, description: 'Notes about the order' })
   @Field({ nullable: true })
   notes: string
@@ -167,7 +171,7 @@ class Order extends BaseModel({
       }
       if (DEPLOY_ENV === 'production') {
         try {
-          postNewOrder(SlackChannel.Orders, this)
+          await postNewOrder(SlackChannel.Orders, this)
         } catch (e) {
           console.error(e)
         }
@@ -179,6 +183,10 @@ class Order extends BaseModel({
 
   public async updatePrintSpecPDF(this: DocumentType<Order>) {
     const cardVersion = await CardVersion.mongo.findOne({ _id: this.cardVersion as string })
+    // If cardversion is incomplete, do not update print spec
+    if (!(cardVersion.frontImageUrl && cardVersion.backImageUrl)) {
+      return
+    }
 
     // Use the same filename from the URL so that the extension (e.g. `.png`) persists.
     // PDFKit will complain if the extension isn't present.

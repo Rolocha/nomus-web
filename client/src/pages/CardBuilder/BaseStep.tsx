@@ -93,7 +93,10 @@ const BaseStep = ({
                         key={templateId}
                         role="button"
                         onClick={() => {
-                          updateCardBuilderState({ templateId })
+                          updateCardBuilderState({
+                            templateId,
+                            currentStep: 'build',
+                          })
                         }}
                         cursor="pointer"
                         borderRadius="16px"

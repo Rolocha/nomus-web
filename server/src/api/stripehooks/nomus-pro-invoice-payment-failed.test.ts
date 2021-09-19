@@ -1,6 +1,7 @@
 import { app } from 'src/app'
 import { User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { BillableProduct } from 'src/util/enums'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { stripe } from 'src/util/stripe'
 import { createMockNomusProSubscription } from 'src/__mocks__/models/NomusProSubscription'
@@ -74,6 +75,9 @@ describe('NomusProInvoicePaymentFailed Stripe webhook handler', () => {
             subscription: 'sub_1234',
             charge: 'ch_1234',
             total: 501,
+            metadata: {
+              billableProduct: BillableProduct.NomusPro,
+            },
           },
         },
         /* eslint-enable camelcase */

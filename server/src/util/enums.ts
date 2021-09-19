@@ -8,8 +8,8 @@ export enum OrderState {
   Initialized = 'Initialized',
   // The user is done creating the order and it has been captured into our system
   Captured = 'Captured',
-  // The order has been paid for
-  Paid = 'Paid',
+  // The order has been completed by the user and is ready for us to action
+  Actionable = 'Actionable',
   // The order has been reviewed and is approved to move to creation phase
   Reviewed = 'Reviewed',
   // The order has been sent to our printing partner
@@ -56,6 +56,11 @@ registerEnumType(OrderEventTrigger, {
   description: 'Triggers for OrderState stored in OrderEvent collection',
 })
 
+export enum OrderCreatedBy {
+  CardBuilder = 'CardBuilder',
+  Manual = 'Manual',
+}
+
 // Needs to stay in sync with the enum at client/src/utils/auth/index.ts
 export enum Role {
   User = 'user',
@@ -97,3 +102,7 @@ registerEnumType(NomusProFeature, {
   name: 'NomusProFeature',
   description: 'Features available in Nomus Pro',
 })
+
+export enum BillableProduct {
+  NomusPro = 'NomusPro',
+}

@@ -20,6 +20,7 @@ import {
   EMAIL_VERIFICATION_TOKEN_LIFESPAN,
 } from 'src/config'
 import NomusProSubscription from 'src/models/NomusProSubscription'
+import PasswordResetToken from 'src/models/PasswordResetToken'
 import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
@@ -73,6 +74,10 @@ export class User extends BaseModel({
   @prop({ _id: false, required: true })
   @Field(() => PersonName, { nullable: true })
   name: PersonName
+
+  public get fullName() {
+    return [this.name.first, this.name.middle, this.name.last].filter(Boolean).join(' ')
+  }
 
   @prop()
   @Field({ nullable: true })
@@ -327,6 +332,71 @@ export class User extends BaseModel({
       templateId: SendgridTemplate.VerifyEmail,
       dynamicTemplateData: {
         verificationURL,
+        firstName: this.name.first,
+      },
+    })
+  }
+
+  public async sendPasswordResetEmail(): Promise<void> {
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(this.id)
+    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(this.id)
+
+    const passwordResetURLQueryParams = new URLSearchParams()
+    passwordResetURLQueryParams.set('token', preHashToken)
+    passwordResetURLQueryParams.set('userId', this.id)
+    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: this.email,
+      from: 'hi@nomus.me',
+      templateId: SendgridTemplate.ResetPassword,
+      dynamicTemplateData: {
+        passwordResetLink,
+        firstName: this.name.first,
+      },
+    })
+
+    return null
+  }
+
+  public static async getOrCreateUser(
+    email: string,
+    name: PersonName,
+    password: string = Math.random().toString(36).slice(-8) // Password required for creating a user
+  ): Promise<DocumentType<User>> {
+    let user = await User.mongo.findOne({ email })
+    if (!user) {
+      const res = await User.mongo.createNewUser({ email, name, password })
+      if (res.isSuccess) {
+        user = res.getValue()
+        user.sendManualSubmitEmail()
+        user.isEmailVerified = true
+        await user.save()
+      } else {
+        throw new Error('Failed to create new user')
+      }
+    }
+
+    return user
+  }
+
+  public async sendManualSubmitEmail(): Promise<void> {
+    // Invalidate existing password reset tokens before creating a new one so there's only ever one functioning reset link per user
+    await PasswordResetToken.mongo.invalidateAllForUser(this.id)
+    const { preHashToken } = await PasswordResetToken.mongo.createNewTokenForUser(this.id)
+
+    const passwordResetURLQueryParams = new URLSearchParams()
+    passwordResetURLQueryParams.set('token', preHashToken)
+    passwordResetURLQueryParams.set('userId', this.id)
+    const passwordResetLink = `${BASE_URL}/reset-password?${passwordResetURLQueryParams.toString()}`
+
+    await sgMail.send({
+      to: this.email,
+      from: 'hi@nomus.me',
+      templateId: SendgridTemplate.ManualSubmission,
+      dynamicTemplateData: {
+        passwordResetLink,
         firstName: this.name.first,
       },
     })

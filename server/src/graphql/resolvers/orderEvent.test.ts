@@ -51,7 +51,7 @@ describe('OrderEventResolver', () => {
     it('Gets OrderEvents from an OrderID', async () => {
       const user = await createMockUser({ roles: [Role.Admin] })
       const order = await createMockOrder({ user: user })
-      await createMockOrderEvent({ order: order, state: OrderState.Paid })
+      await createMockOrderEvent({ order: order, state: OrderState.Actionable })
       await createMockOrderEvent({ order: order, state: OrderState.Creating })
 
       const response = await execQuery({
@@ -77,7 +77,7 @@ describe('OrderEventResolver', () => {
             state: INITIAL_ORDER_STATE,
           }),
           expect.objectContaining({
-            state: OrderState.Paid,
+            state: OrderState.Actionable,
           }),
           expect.objectContaining({
             state: OrderState.Creating,

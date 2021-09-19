@@ -41,7 +41,7 @@ export default async (event: any) => {
   }
 
   // Transition the order to the Paid state
-  const transitionResult = await order.transition(OrderState.Paid, OrderEventTrigger.Payment)
+  const transitionResult = await order.transition(OrderState.Actionable, OrderEventTrigger.Payment)
   if (!transitionResult.isSuccess) {
     console.error('Transitioning the order failed with an error: ' + transitionResult.error)
   }

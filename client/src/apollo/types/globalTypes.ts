@@ -26,6 +26,7 @@ export enum NomusProFeature {
  * Current State in Order Tracking State Machine
  */
 export enum OrderState {
+  Actionable = 'Actionable',
   Canceled = 'Canceled',
   Captured = 'Captured',
   Created = 'Created',
@@ -33,7 +34,6 @@ export enum OrderState {
   Enroute = 'Enroute',
   Fulfilled = 'Fulfilled',
   Initialized = 'Initialized',
-  Paid = 'Paid',
   Reviewed = 'Reviewed',
 }
 
