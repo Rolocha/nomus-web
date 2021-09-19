@@ -46,7 +46,7 @@ export default ({ order }: Props) => {
   return (
     <Box>
       <Text.H4>Your {getFormattedFullDate(order.createdAt)} order</Text.H4>
-      <Text.Body3 color={colors.lightGray}>
+      <Text.Body3 color={colors.africanElephant}>
         <CopyableText copyText={order.id}>{order.id}</CopyableText>
       </Text.Body3>
       <Box

@@ -94,7 +94,7 @@ const LoginForm = () => {
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
-      <Text.BrandHeader>Sign In</Text.BrandHeader>
+      <Text.BrandHeader>Sign in</Text.BrandHeader>
       <Form.Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Item mb="20px">
           <Form.Label htmlFor="email">EMAIL</Form.Label>
@@ -143,10 +143,6 @@ const LoginForm = () => {
           <Box my={2}>{renderSubmissionError(submissionError)}</Box>
         )}
       </Form.Form>
-      <Text.Body2 mt={3}>
-        Don't have an account yet?{' '}
-        <Link to={`/register?${searchParams.toString()}`}>Get started.</Link>
-      </Text.Body2>
     </Box>
   )
 }

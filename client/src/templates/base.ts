@@ -60,7 +60,6 @@ export default class CardTemplate {
 
   private _renderFront: CardTemplateDefinition['renderFront']
   private _renderBack: CardTemplateDefinition['renderBack']
-  private userSpecifiedOptions: CardTemplateRenderOptions | null = null
 
   constructor(templateDefinition: CardTemplateDefinition) {
     this.name = templateDefinition.name
@@ -90,14 +89,13 @@ export default class CardTemplate {
     return Object.keys(this.colorSchemeSpec) as any[]
   }
 
-  public get isComplete(): boolean {
+  public isComplete(options: CardTemplateRenderOptions): boolean {
     return this.contactInfoFieldNames.every(
       (field) =>
         // Either the spec says this field is not required
         !this.contactInfoSpec[field].required ||
         // or the field is present in the user-specified options
-        (this.userSpecifiedOptions &&
-          this.userSpecifiedOptions.contactInfo[field]),
+        (options && options.contactInfo[field]),
     )
   }
 
@@ -139,12 +137,11 @@ export default class CardTemplate {
     canvas: HTMLCanvasElement,
     options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
-    this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
     canvas.width = this.proportionalizedWidth
     await this._renderFront(canvas, options)
     return {
-      isComplete: this.isComplete,
+      isComplete: this.isComplete(options),
     }
   }
 
@@ -154,12 +151,11 @@ export default class CardTemplate {
     canvas: HTMLCanvasElement,
     options: CardTemplateRenderOptions,
   ): Promise<RenderResponse> {
-    this.userSpecifiedOptions = options
     canvas.height = this.proportionalizedHeight
     canvas.width = this.proportionalizedWidth
     await this._renderBack(canvas, options)
     return {
-      isComplete: this.isComplete,
+      isComplete: this.isComplete(options),
     }
   }
 

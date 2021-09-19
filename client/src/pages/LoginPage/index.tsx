@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { useLocation } from 'react-router-dom'
+import Banner from 'src/components/Banner'
 import Box from 'src/components/Box'
 import Icon from 'src/components/Icon'
 import Image from 'src/components/Image'
+import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import logoFull from 'src/images/nomus-logo-full.svg'
 import { colors } from 'src/styles'
@@ -14,14 +16,27 @@ import signInSwoosh from './sign-in-swoosh.svg'
 const bp = 'lg'
 
 const LoginPage = () => {
-  const location = useLocation<{ from: Location }>()
+  const location = useLocation<{
+    from: Location
+    linkingOrder?: string | null
+  }>()
+
+  // The user may have ended up here from running through CardBuilder while logged out
+  // If this is the case, the redirect would have passed a `linkingOrder` property along
+  const linkingOrder = location.state?.linkingOrder
 
   // Guaranteed to be either register or login since those are the only routes this page should be rendered for
   const mode = location.pathname.substr(1) as 'register' | 'login'
+  const locationData = {
+    state: location.state,
+    search: location.search,
+  }
 
-  const infoLines =
-    {
-      login: [
+  const pageDependentData = {
+    login: {
+      Form: LoginForm,
+      swoosh: signInSwoosh,
+      infoLines: [
         {
           title: 'See your network expand',
           subtitle:
@@ -38,7 +53,19 @@ const LoginPage = () => {
             'Edit your contact info, set preferences, and temporarily hide your public profile',
         },
       ],
-      register: [
+      changeModeCopy: (
+        <>
+          Don't have an account yet?{' '}
+          <Link to={{ ...locationData, pathname: '/register' }}>
+            Get started.
+          </Link>
+        </>
+      ),
+    },
+    register: {
+      Form: RegistrationForm,
+      swoosh: registrationSwoosh,
+      infoLines: [
         {
           title: 'Leverage NFC technology',
           subtitle:
@@ -55,7 +82,15 @@ const LoginPage = () => {
             'Sort through your contacts easily and add meeting details, notes, and tags for each contact',
         },
       ],
-    }[mode] || []
+      changeModeCopy: (
+        <>
+          Have an account?{' '}
+          <Link to={{ ...locationData, pathname: '/login' }}>Sign in.</Link>
+        </>
+      ),
+    },
+  }
+  const { infoLines, swoosh, changeModeCopy, Form } = pageDependentData[mode]
 
   return (
     <Box
@@ -77,7 +112,7 @@ const LoginPage = () => {
         width={{ login: '60vw', register: '65vw' }[mode]}
       >
         <Image
-          src={{ login: signInSwoosh, register: registrationSwoosh }[mode]}
+          src={swoosh}
           w="100%"
           h="100%"
           objectFit="cover"
@@ -93,12 +128,15 @@ const LoginPage = () => {
       >
         {/* Left-hand side */}
         <Box gridColumn="2/3" minWidth="300px">
-          {
-            {
-              login: <LoginForm />,
-              register: <RegistrationForm />,
-            }[mode]
-          }
+          {linkingOrder && (
+            <Banner
+              type="info"
+              title="Almost there!"
+              description="Your Nomus card order has been created but you'll need to create an account or log in to complete your order."
+            />
+          )}
+          {<Form />}
+          <Text.Body2 mt={3}>{changeModeCopy}</Text.Body2>
         </Box>
 
         {/* Right-hand side */}

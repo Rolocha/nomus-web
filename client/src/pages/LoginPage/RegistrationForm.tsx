@@ -73,16 +73,11 @@ const RegistrationForm = () => {
 
   const location = useLocation<{
     from: Location
-    linkingOrder?: string | null
   }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
     [location],
   )
-
-  // The user may have ended up here from running through CardBuilder while logged out
-  // If this is the case, the redirect would have passed a `linkingOrder` property along
-  const linkingOrder = location.state?.linkingOrder
 
   const [passwordVisible, setPasswordVisible] = React.useState(false)
   const [submittingForm, setSubmittingForm] = React.useState(false)
@@ -147,13 +142,6 @@ const RegistrationForm = () => {
 
   return (
     <Box display="flex" flexDirection="column" mt={4}>
-      {linkingOrder && (
-        <Banner
-          type="info"
-          title="Almost there!"
-          description="Your Nomus card order has been created but you'll need to create an account to complete your order."
-        />
-      )}
       <Text.BrandHeader>
         {formState.isSubmitSuccessful ? 'Thank you!' : 'Get started'}
       </Text.BrandHeader>
@@ -272,10 +260,6 @@ const RegistrationForm = () => {
             By clicking Create free account, you agree to our{' '}
             <Link to="terms-of-service">Terms of Service</Link> and{' '}
             <Link to="privacy-policy">Privacy Policy</Link>.
-          </Text.Body2>
-          <Text.Body2 mt={3}>
-            Have an account?{' '}
-            <Link to={`/login?${searchParams.toString()}`}>Sign in.</Link>
           </Text.Body2>
         </>
       )}

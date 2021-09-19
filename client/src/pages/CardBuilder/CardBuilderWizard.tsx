@@ -313,7 +313,10 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
                   // TBD requirements for template
                   [CardSpecBaseType.Template]:
                     cardBuilderState.templateId != null &&
-                    templateLibrary[cardBuilderState.templateId].isComplete,
+                    cardBuilderState.templateCustomization != null &&
+                    templateLibrary[cardBuilderState.templateId].isComplete(
+                      cardBuilderState.templateCustomization as any,
+                    ),
                 }[cardBuilderState.baseType]
               }
             >
