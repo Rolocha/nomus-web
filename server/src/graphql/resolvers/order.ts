@@ -1,7 +1,7 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { AuthenticationError } from 'apollo-server-errors'
-import { GraphQLUpload } from 'apollo-server-express'
+import { GraphQLUpload, UserInputError } from 'apollo-server-express'
 import { FileUpload } from 'graphql-upload'
+import { setAuthCookies } from 'src/auth'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
@@ -25,6 +25,7 @@ import {
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { Stripe, stripe } from 'src/util/stripe'
+import { getTemplateName } from 'src/util/templates'
 import {
   Arg,
   Authorized,
@@ -46,7 +47,7 @@ import { AdminOnlyArgs } from '../auth'
 })
 class BaseSubmitOrderInput {
   @Field({ nullable: true })
-  previousOrder: string | null
+  orderId: string | null
 
   @Field({ nullable: false })
   quantity: number
@@ -110,12 +111,6 @@ class SubmitTemplateOrderInput extends BaseSubmitOrderInput {
   @Field({ nullable: false })
   templateId: string
 
-  @Field({
-    nullable: false,
-    description: 'The human-readable, user-presentable name of the template',
-  })
-  templateName: string
-
   @Field({ nullable: false })
   cardVersionId: string
 
@@ -161,8 +156,8 @@ class ManualOrderInput {
 
 @ObjectType()
 class SubmitOrderResponse {
-  @Field()
-  checkoutSession: string
+  @Field({ nullable: true })
+  checkoutSession: string | null
 
   @Field()
   orderId: string
@@ -191,6 +186,9 @@ class OrderResolver {
       return await Order.mongo.findById(orderId)
     } else {
       const order = await Order.mongo.findById(orderId).populate('user')
+      if (order == null) {
+        throw new UserInputError(`No order found with ID: ${orderId}`)
+      }
       if ((order.user as User).id === context.user.id) {
         return order as Order
       } else {
@@ -325,7 +323,71 @@ class OrderResolver {
     return orders
   }
 
+  // No @Authorized() decorator - we want a logged-out client to be able to
+  // call this mutation to initialize Card Builder
+  @Mutation(() => Order, {
+    description:
+      'Initializes a new order and associated card version for use in the Card Builder UI',
+  })
+  async createEmptyOrderForCardBuilder(
+    @Arg('baseType', () => CardSpecBaseType, { nullable: false }) baseType: CardSpecBaseType,
+    @Ctx() context: IApolloContext
+  ) {
+    const cardVersion = await CardVersion.mongo.create({
+      baseType,
+      user: context.user?.id ?? undefined,
+    })
+    return Order.mongo.create({
+      cardVersion,
+    })
+  }
+
   @Authorized(Role.User)
+  @Mutation(() => SubmitOrderResponse, {
+    description: 'Links an orphan order to a user',
+  })
+  async linkOrderToUser(
+    @Arg('orderId', { nullable: false }) orderId: string,
+    @Ctx() context: IApolloContext
+  ): Promise<SubmitOrderResponse> {
+    const user = context.user
+    if (user == null) {
+      throw new UnauthorizedError()
+    }
+
+    const order = await Order.mongo.findById(orderId).populate('cardVersion')
+    if (order == null) {
+      throw new UserInputError(`No order found with that ID: ${orderId}`, {
+        code: 'order-not-found',
+      })
+    }
+
+    if (order.user) {
+      throw new UserInputError('This card has already been linked!', {
+        code: 'already-linked',
+      })
+    }
+
+    order.user = user.id
+    const cardVersion = order.cardVersion as DocumentType<CardVersion>
+    cardVersion.user = user.id
+
+    await Promise.all([order.save(), cardVersion.save()])
+
+    // Create a new Stripe Checkout session regardless of whether a previous one
+    // existed since some details may have changed in this submission
+    const checkoutSession = await this.createCheckoutSession(order, cardVersion, user)
+    order.checkoutSession = checkoutSession.id
+    order.paymentIntent = checkoutSession.payment_intent as string
+
+    return {
+      checkoutSession: order.checkoutSession,
+      orderId: order.id,
+    }
+  }
+
+  // No @Authorized() decorator - we want a logged-out client to be able to
+  // call this mutation to submit Card Builder
   @Mutation((type) => SubmitOrderResponse, {
     description:
       'Handles submission of an order created via the Card Builder UI for a custom user design',
@@ -334,15 +396,12 @@ class OrderResolver {
     @Arg('payload', { nullable: false }) payload: SubmitCustomOrderInput,
     @Ctx() context: IApolloContext
   ): Promise<SubmitOrderResponse> {
-    const { user } = context
-    if (user == null) {
-      throw new AuthenticationError('No user')
-    }
+    const user: DocumentType<User> | undefined = context.user
 
     this.validateBaseSubmitOrderInput(payload)
 
     const cardVersion = new CardVersion.mongo({
-      user: user.id,
+      user: user?.id,
       baseType: CardSpecBaseType.Custom,
     })
 
@@ -370,8 +429,16 @@ class OrderResolver {
     await order.updatePrintSpecPDF()
 
     // Update the user's default card version to the newly created one
-    user.defaultCardVersion = cardVersion.id
-    await user.save()
+    if (user) {
+      user.defaultCardVersion = cardVersion.id
+      await user.save()
+    }
+
+    // If the User object was just created during this mutation,
+    // set the auth cookies so the user is now logged in
+    if (context.user == null) {
+      await setAuthCookies(user, context.req.res)
+    }
 
     return {
       orderId: order.id,
@@ -379,7 +446,8 @@ class OrderResolver {
     }
   }
 
-  @Authorized(Role.User)
+  // No @Authorized() decorator - we want a logged-out client to be able to
+  // call this mutation to submit Card Builder
   @Mutation((type) => SubmitOrderResponse, {
     description:
       'Handles submission of an order created via the Card Builder UI for a template-based design',
@@ -388,10 +456,7 @@ class OrderResolver {
     @Arg('payload', { nullable: false }) payload: SubmitTemplateOrderInput,
     @Ctx() context: IApolloContext
   ): Promise<SubmitOrderResponse> {
-    const { user } = context
-    if (user == null) {
-      throw new AuthenticationError('No user')
-    }
+    const user: DocumentType<User> | undefined = context.user
 
     this.validateBaseSubmitOrderInput(payload)
 
@@ -436,9 +501,11 @@ class OrderResolver {
 
     await order.updatePrintSpecPDF()
 
-    // Update the user's default card version to the newly created one
-    user.defaultCardVersion = cardVersion.id
-    await user.save()
+    if (user) {
+      // Update the user's default card version to the newly created one
+      user.defaultCardVersion = cardVersion.id
+      await user.save()
+    }
 
     return {
       orderId: order.id,
@@ -510,12 +577,12 @@ class OrderResolver {
   /**
    * Private helpers
    */
-  async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
-    if (payload.previousOrder) {
-      const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.previousOrder })
+  private async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
+    if (payload.orderId) {
+      const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.orderId })
       if (!isValidPreviousOrder) {
         throw new Error(
-          `Invalid previous order: could not find an order with id ${payload.previousOrder}`
+          `Invalid previous order: could not find an order with id ${payload.orderId}`
         )
       }
     }
@@ -525,12 +592,12 @@ class OrderResolver {
   }
 
   // Creates a Checkout Session
-  async createCheckoutSession(
+  private async createCheckoutSession(
     order: DocumentType<Order>,
     cardVersion: DocumentType<CardVersion>,
-    user: DocumentType<User>,
-    templateName: string
+    user: DocumentType<User>
   ): Promise<Stripe.Checkout.Session> {
+    const templateName = getTemplateName(cardVersion.templateId)
     const productName = {
       [CardSpecBaseType.Custom]: `Nomus card - custom design (${order.quantity} pack)`,
       [CardSpecBaseType.Template]: `Nomus card - ${templateName} template (${order.quantity} pack)`,
@@ -573,8 +640,8 @@ class OrderResolver {
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
-      success_url: `${BASE_URL}/card-studio/success?orderId=${order.id}`,
-      cancel_url: `${BASE_URL}/card-studio/cancel?orderId=${order.id}`,
+      success_url: `${BASE_URL}/card-studio/success/${order.id}`,
+      cancel_url: `${BASE_URL}/card-studio/cancel/${order.id}`,
       metadata: {
         orderId: order.id,
         cardVersionId: cardVersion.id,
@@ -583,7 +650,7 @@ class OrderResolver {
     /* eslint-enable camelcase */
   }
 
-  async uploadCardImages(
+  private async uploadCardImages(
     imageFiles: { front: Promise<FileUpload>; back?: Promise<FileUpload> },
     cardVersionId: string
   ) {
@@ -624,7 +691,7 @@ class OrderResolver {
     cardVersion,
     payload,
   }: {
-    user: DocumentType<User>
+    user?: DocumentType<User> | null
     cardVersion: DocumentType<CardVersion>
     payload: SubmitTemplateOrderInput | SubmitCustomOrderInput
   }): Promise<DocumentType<Order>> {
@@ -647,9 +714,9 @@ class OrderResolver {
 
     let order: DocumentType<Order> | null = null
     // Check if the payload includes the id of a previous Order object
-    if (payload.previousOrder) {
+    if (payload.orderId) {
       // If so, use that Order (with updates applied) rather than creating a new one
-      order = await Order.mongo.findOne({ _id: payload.previousOrder, user: user.id })
+      order = await Order.mongo.findOne({ _id: payload.orderId })
 
       if (!order) {
         throw new Error('Paylod specified a previous order but that order could not be found')
@@ -657,29 +724,31 @@ class OrderResolver {
 
       order.quantity = quantity
       order.price = price
+      order.cardVersion = cardVersion.id
+      order.user = user?.id
     } else {
       // No previous order existed; create a new one
       order = await Order.mongo.create({
-        user: user.id,
+        user: user?.id,
         cardVersion: cardVersion.id,
-        state: OrderState.Captured,
         quantity,
         price,
         createdBy: OrderCreatedBy.CardBuilder,
       })
     }
 
-    // Create a new Stripe Checkout session regardless of whether a previous one
-    // existed since some details may have changed in this submission
-    const checkoutSession = await this.createCheckoutSession(
-      order,
-      cardVersion,
-      user,
-      'templateName' in payload ? payload.templateName : null
-    )
+    order.transition(OrderState.Captured)
 
-    order.checkoutSession = checkoutSession.id
-    order.paymentIntent = checkoutSession.payment_intent as string
+    // Only if we know the user already (i.e. submitter of order is logged in), create a Stripe Checkout
+    // session -- otherwise, we'll redirect them to login/register first
+    if (user) {
+      // Create a new Stripe Checkout session regardless of whether a previous one
+      // existed since some details may have changed in this submission
+      const checkoutSession = await this.createCheckoutSession(order, cardVersion, user)
+      order.checkoutSession = checkoutSession.id
+      order.paymentIntent = checkoutSession.payment_intent as string
+    }
+
     await order.save()
     return order
   }

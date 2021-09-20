@@ -23,9 +23,12 @@ import ShopFront from 'src/pages/ShopFront'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import AboutPage from 'src/pages/AboutPage'
+import CardBuilderAuthenticated from 'src/pages/CardBuilder/CardBuilderAuthenticated'
+import CardBuilderSuccessfulCheckout from 'src/pages/CardBuilder/CardBuilderSuccessfulCheckout'
+import CardBuilderCanceledCheckout from 'src/pages/CardBuilder/CardBuilderCanceledCheckout'
 
 interface RouteCommon {
-  path: string | null // null to handle 404
+  path: string | string[] | null // null to handle 404
   exact?: boolean // default is false
   exclude?: boolean
 }
@@ -33,7 +36,7 @@ interface ComponentRouteType extends RouteCommon {
   requiredAuthLevel?: AuthLevel
   // Annotation for pages that are totally public and thus have no need for user to be authenticated (e.g. landing page)
   noLoginRequired?: boolean
-  Component: (...args: any) => JSX.Element | null
+  Component: any
 }
 
 interface RedirectRouteType extends RouteCommon {
@@ -149,10 +152,22 @@ export const routes: Array<RouteType> = [
     path: '/shop',
     Component: ShopFront,
   },
+  // Card studio routes
   {
-    path: '/card-studio/:buildBaseType?',
+    path: ['/card-studio/custom', '/card-studio/template'],
     Component: CardBuilder,
-    requiredAuthLevel: Role.User,
+  },
+  {
+    path: '/card-studio/cancel/:orderId',
+    Component: CardBuilderCanceledCheckout,
+  },
+  {
+    path: '/card-studio/success/:orderId',
+    Component: CardBuilderSuccessfulCheckout,
+  },
+  {
+    path: '/card-studio/authenticated/:orderId',
+    Component: CardBuilderAuthenticated,
   },
   {
     path: '/admin/linker/:routeStr',
@@ -237,12 +252,16 @@ export const PageRouter = () => {
 
               const routeElement =
                 requiredAuthLevel == null ? (
-                  <Route key={path ?? '404'} path={path ?? undefined} {...rest}>
+                  <Route
+                    key={path?.toString() ?? '404'}
+                    path={path ?? undefined}
+                    {...rest}
+                  >
                     {componentToRender}
                   </Route>
                 ) : (
                   <ProtectedRoute
-                    key={path}
+                    key={path?.toString()}
                     path={path ?? undefined}
                     requiredAuthLevel={requiredAuthLevel}
                     {...rest}

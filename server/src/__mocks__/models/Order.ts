@@ -1,5 +1,5 @@
 import { Order } from 'src/models'
-import { OrderState } from 'src/util/enums'
+import { INITIAL_ORDER_STATE } from 'src/util/enums'
 import { createMockCardVersion } from './CardVersion'
 import { createMockUser } from './User'
 
@@ -17,7 +17,7 @@ export const createMockOrder = async (override: Partial<Order> = {}) => {
       shipping: 500,
       total: 3199,
     },
-    state: override.state ?? OrderState.Captured,
+    state: override.state ?? INITIAL_ORDER_STATE,
     trackingNumber: override.trackingNumber ?? '0000000000000',
     shortId: override.shortId ?? 'SJC123',
     shippingAddress: {

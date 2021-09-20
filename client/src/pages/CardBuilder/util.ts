@@ -1,9 +1,24 @@
+import { useMutation } from 'src/apollo'
 import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
+import {
+  SubmitCustomOrderMutation,
+  SubmitCustomOrderMutationVariables,
+} from 'src/apollo/types/SubmitCustomOrderMutation'
+import {
+  SubmitTemplateOrderMutation,
+  SubmitTemplateOrderMutationVariables,
+} from 'src/apollo/types/SubmitTemplateOrderMutation'
 import {
   CardBuilderState,
   initialStateOptions,
 } from 'src/pages/CardBuilder/card-builder-state'
+import {
+  SUBMIT_CUSTOM_ORDER_MUTATION,
+  SUBMIT_TEMPLATE_ORDER_MUTATION,
+} from 'src/pages/CardBuilder/mutations'
 import { colors } from 'src/styles'
+import templateLibrary from 'src/templates'
+import { dataURItoBlob } from 'src/utils/image'
 
 export const sampleCardBuilderState: CardBuilderState = {
   ...initialStateOptions[CardSpecBaseType.Template],
@@ -40,4 +55,110 @@ export const sampleCardBuilderState: CardBuilderState = {
   //   message: 'The security code you entered is incorrect.',
   //   backlinkToStep: 'checkout',
   // },
+}
+
+type UseSubmitOrderResponse = {
+  checkoutSession: string
+} | null
+export const useSubmitOrder = () => {
+  const [submitCustomOrder] = useMutation<SubmitCustomOrderMutation>(
+    SUBMIT_CUSTOM_ORDER_MUTATION,
+  )
+  const [submitTemplateOrder] = useMutation<SubmitTemplateOrderMutation>(
+    SUBMIT_TEMPLATE_ORDER_MUTATION,
+  )
+
+  const submit = async (cardBuilderState: CardBuilderState) => {
+    const { quantity, orderId } = cardBuilderState
+    if (quantity == null) {
+      throw new Error('Missing quantity')
+    }
+    if (orderId == null) {
+      throw new Error('Missing orderId')
+    }
+
+    // The parameters needed for both custom and template-based orders
+    const basePayload:
+      | Partial<SubmitCustomOrderMutationVariables['payload']>
+      | Partial<SubmitTemplateOrderMutationVariables['payload']> = {
+      orderId,
+      quantity,
+    }
+
+    let result = null
+    switch (cardBuilderState.baseType) {
+      case CardSpecBaseType.Custom:
+        const customResult = await submitCustomOrder({
+          variables: {
+            payload: {
+              ...basePayload,
+              frontImageDataUrl: cardBuilderState.frontDesignFile?.file,
+              backImageDataUrl: cardBuilderState.backDesignFile?.file,
+            },
+          },
+        })
+        if (customResult.errors || !customResult.data) {
+          throw new Error('Failed to submit template order')
+        }
+        result = customResult.data.submitCustomOrder
+        break
+      case CardSpecBaseType.Template:
+        const { templateId } = cardBuilderState
+        if (!templateId) {
+          throw new Error(
+            'Sumbitting a template order without a templateId defined',
+          )
+        }
+
+        const template = templateLibrary[templateId]
+        const cardImageDataUrls = await template.renderBothSidesToDataUrls(
+          template.createOptionsFromFormFields(
+            cardBuilderState.templateCustomization!,
+            cardBuilderState.omittedOptionalFields as any[],
+          ),
+        )
+
+        const templateSpecificRequiredPayload = {
+          templateId: cardBuilderState.templateId,
+          cardVersionId: cardBuilderState.cardVersionId,
+          colorScheme: cardBuilderState.templateCustomization?.colorScheme,
+          contactInfo: cardBuilderState.templateCustomization?.contactInfo,
+          qrCodeUrl: cardBuilderState.templateCustomization?.qrCodeUrl,
+          frontImageDataUrl: dataURItoBlob(cardImageDataUrls.front),
+          backImageDataUrl: dataURItoBlob(cardImageDataUrls.back),
+        }
+
+        const templateSpecificOptionalPayload = {
+          graphic: cardBuilderState.templateCustomization?.graphic?.file,
+        }
+
+        const templateSpecificPayload = {
+          ...templateSpecificRequiredPayload,
+          ...templateSpecificOptionalPayload,
+        }
+
+        if (!Object.values(templateSpecificRequiredPayload).every(Boolean)) {
+          throw new Error('Missing required fields')
+        }
+
+        const templateResult = await submitTemplateOrder({
+          variables: {
+            payload: {
+              ...basePayload,
+              ...templateSpecificPayload,
+            },
+          },
+        })
+        if (templateResult.errors || !templateResult.data) {
+          throw new Error('Failed to submit template order')
+        }
+        result = templateResult.data.submitTemplateOrder
+        break
+      default:
+        throw new Error('Submitted Card Builder with invalid base type')
+    }
+    return result as UseSubmitOrderResponse
+  }
+
+  return submit
 }

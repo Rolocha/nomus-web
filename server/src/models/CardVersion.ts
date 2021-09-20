@@ -32,8 +32,8 @@ export class CardVersion extends BaseModel({
   @Field((type) => CardSpecBaseType, { nullable: false })
   baseType: CardSpecBaseType
 
-  @prop({ required: true, ref: 'User', type: String })
-  @Field(() => User, { nullable: false })
+  @prop({ required: false, ref: 'User', type: String })
+  @Field(() => User, { nullable: true })
   user: Ref<User>
 
   /**

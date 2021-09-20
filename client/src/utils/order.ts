@@ -5,6 +5,7 @@ export const getUserFacingOrderState = (
   state: OrderState,
 ): UserFacingOrderState => {
   switch (state) {
+    case OrderState.Initialized:
     case OrderState.Captured:
     case OrderState.Actionable:
     case OrderState.Reviewed:

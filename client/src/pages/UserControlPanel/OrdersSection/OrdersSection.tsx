@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { Redirect, useHistory, useParams } from 'react-router-dom'
 import { gql, useQuery } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
 import { UCPOrdersSectionQuery } from 'src/apollo/types/UCPOrdersSectionQuery'
@@ -57,8 +57,6 @@ export default () => {
     return null
   }
 
-  const selectedOrder = userOrders.find((order) => order.id === params.orderId)
-
   const currentOrders = userOrders
     .filter((order) => order.state !== OrderState.Fulfilled)
     .sort((a, b) => b.createdAt - a.createdAt)
@@ -66,6 +64,12 @@ export default () => {
   const previousOrders = userOrders
     .filter((order) => order.state === OrderState.Fulfilled)
     .sort((a, b) => b.createdAt - a.createdAt)
+
+  const selectedOrder = userOrders.find((order) => order.id === params.orderId)
+
+  if (params.orderId && selectedOrder == null) {
+    return <Redirect to="/dashboard/orders" />
+  }
 
   return (
     <Box p={{ base: '24px', md: '48px' }} height="100%" overflowY="scroll">

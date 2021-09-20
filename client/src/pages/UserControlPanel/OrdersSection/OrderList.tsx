@@ -119,7 +119,9 @@ const OrderList = ({ orders }: Props) => {
               <Box display={{ base: 'block', [bp]: 'none' }}>
                 <Text.Label>Price</Text.Label>
               </Box>
-              <Text.Body2>{formatDollarAmount(order.price.total)}</Text.Body2>
+              <Text.Body2>
+                {order.price ? formatDollarAmount(order.price.total) : '-'}
+              </Text.Body2>
             </Box>
 
             <Box

@@ -8,9 +8,10 @@ import { colors } from 'src/styles'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 import CardBuilderPreviewLegend from './CardBuilderPreviewLegend'
 import { specs } from './copy'
+import { CardSpecBaseType } from 'src/apollo/types/globalTypes'
 
 interface Props {
-  selectedBaseType: string | undefined
+  selectedBaseType: CardSpecBaseType | undefined
   cardBuilderState: CardBuilderState
   updateCardBuilderState: React.Dispatch<CardBuilderAction>
 }
@@ -22,9 +23,10 @@ const BaseStep = ({
 }: Props) => {
   return (
     <Box height="100%">
-      {selectedBaseType === 'custom' || selectedBaseType === 'template'
+      {selectedBaseType === CardSpecBaseType.Custom ||
+      selectedBaseType === CardSpecBaseType.Template
         ? {
-            custom: (
+            [CardSpecBaseType.Custom]: (
               <Box
                 pt={4}
                 display="grid"
@@ -66,7 +68,7 @@ const BaseStep = ({
                 </Text.Body2>
               </Box>
             ),
-            template: (
+            [CardSpecBaseType.Template]: (
               <Box pt={4}>
                 <Text.SectionSubheader mb="24px">
                   Pick your favorite template to customize
