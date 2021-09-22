@@ -21,7 +21,7 @@ interface Props<ValidStepType extends string> {
   completionButtonLabel?: string
   handleStepTransition: (goingToStep: string) => void | Promise<void>
   handleSubmit?: () => Promise<void>
-  fatalError?: string | null
+  fatalError?: Error | null
   readyToStart?: boolean
 }
 
@@ -270,7 +270,7 @@ function Wizard<ValidStepType extends string>({
               <Text.SectionHeader>
                 Uh oh, something went wrong.
               </Text.SectionHeader>
-              <Text.Body2>{fatalError}</Text.Body2>
+              <Text.Body2>{fatalError.message}</Text.Body2>
             </Box>
           ) : readyToStart ? (
             currentStepDetails.children

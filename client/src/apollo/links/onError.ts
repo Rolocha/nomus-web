@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react'
 import { onError } from '@apollo/client/link/error'
 import { Observable } from '@apollo/client/core'
 
@@ -6,15 +7,17 @@ import { ensureActiveToken, logOutAndClearData } from 'src/utils/auth'
 export default onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     if (networkError) {
-      console.log(`[Network error]: ${networkError}`)
+      Sentry.captureException(networkError)
     }
 
     if (graphQLErrors) {
-      graphQLErrors.forEach(({ message, locations, path }) =>
+      graphQLErrors.forEach((error) => {
+        const { message, locations, path } = error
+        Sentry.captureException(error)
         console.log(
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        ),
-      )
+        )
+      })
     }
 
     if (
@@ -37,11 +40,12 @@ export default onError(
                 complete: observer.complete.bind(observer),
               })
             } else {
-              throw new Error('Token refresh failed')
+              Sentry.captureException(new Error('Token refresh failed'))
             }
           })
           .catch((err) => {
             observer.error(err)
+            Sentry.captureException(err)
             logOutAndClearData()
           })
       })

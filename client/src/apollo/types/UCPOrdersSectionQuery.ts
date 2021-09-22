@@ -3,37 +3,37 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { OrderState } from "./globalTypes";
+import { OrderState } from './globalTypes'
 
 // ====================================================
 // GraphQL query operation: UCPOrdersSectionQuery
 // ====================================================
 
 export interface UCPOrdersSectionQuery_userOrders_cardVersion {
-  __typename: "CardVersion";
-  frontImageUrl: string | null;
-  backImageUrl: string | null;
+  __typename: 'CardVersion'
+  frontImageUrl: string | null
+  backImageUrl: string | null
 }
 
 export interface UCPOrdersSectionQuery_userOrders_price {
-  __typename: "OrderPrice";
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
+  __typename: 'OrderPrice'
+  subtotal: number
+  tax: number
+  shipping: number
+  total: number
 }
 
 export interface UCPOrdersSectionQuery_userOrders {
-  __typename: "Order";
-  id: string;
-  cardVersion: UCPOrdersSectionQuery_userOrders_cardVersion;
-  price: UCPOrdersSectionQuery_userOrders_price;
-  quantity: number;
-  state: OrderState;
-  createdAt: any;
-  trackingNumber: string | null;
+  __typename: 'Order'
+  id: string
+  cardVersion: UCPOrdersSectionQuery_userOrders_cardVersion
+  price: UCPOrdersSectionQuery_userOrders_price | null
+  quantity: number
+  state: OrderState
+  createdAt: any
+  trackingNumber: string | null
 }
 
 export interface UCPOrdersSectionQuery {
-  userOrders: UCPOrdersSectionQuery_userOrders[] | null;
+  userOrders: UCPOrdersSectionQuery_userOrders[] | null
 }

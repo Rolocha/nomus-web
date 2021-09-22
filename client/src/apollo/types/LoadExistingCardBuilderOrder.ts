@@ -75,7 +75,7 @@ export interface LoadExistingCardBuilderOrder_order {
   quantity: number
   shippingName: string | null
   shippingAddress: LoadExistingCardBuilderOrder_order_shippingAddress | null
-  user: LoadExistingCardBuilderOrder_order_user
+  user: LoadExistingCardBuilderOrder_order_user | null
   cardVersion: LoadExistingCardBuilderOrder_order_cardVersion
 }
 

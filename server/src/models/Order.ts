@@ -14,7 +14,7 @@ import { downloadUrlToFile } from 'src/util/file'
 import * as S3 from 'src/util/s3'
 import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
-import { OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
+import { INITIAL_ORDER_STATE, OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
@@ -25,6 +25,7 @@ import { User } from './User'
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
+  [OrderState.Initialized]: [OrderState.Captured, OrderState.Actionable, OrderState.Canceled],
   [OrderState.Captured]: [OrderState.Actionable, OrderState.Canceled],
   [OrderState.Actionable]: [OrderState.Reviewed, OrderState.Canceled],
   [OrderState.Reviewed]: [OrderState.Creating, OrderState.Canceled],
@@ -51,7 +52,7 @@ const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
     // Creates a new OrderEvent at creation time
     await OrderEvent.mongo.create({
       order: this.id,
-      state: OrderState.Captured,
+      state: INITIAL_ORDER_STATE,
       trigger: OrderEventTrigger.Nomus,
     })
     next()
@@ -69,9 +70,9 @@ class Order extends BaseModel({
   @Field()
   createdAt: Date
 
-  // User who ordered the cards
-  @prop({ required: true, ref: () => User, type: String })
-  @Field(() => User, { nullable: false })
+  // User who ordered the cards, we may not have one while the order is being created in Card Builder
+  @prop({ required: false, ref: () => User, type: String })
+  @Field(() => User, { nullable: true })
   user: Ref<User>
 
   // Card Version that was ordered
@@ -84,12 +85,12 @@ class Order extends BaseModel({
   @Field({ nullable: false })
   quantity: number
 
-  @prop({ _id: false, required: true })
-  @Field(() => OrderPrice, { nullable: false })
+  @prop({ _id: false, required: false })
+  @Field(() => OrderPrice, { nullable: true })
   price: OrderPrice
 
   // This correlates with OrderState at server/src/util/enums.ts
-  @prop({ enum: OrderState, type: String, required: true })
+  @prop({ enum: OrderState, type: String, required: true, default: INITIAL_ORDER_STATE })
   @Field((type) => OrderState, { nullable: false })
   state: OrderState
 

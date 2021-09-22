@@ -27,27 +27,39 @@ interface AuthResponse {
   }
 }
 
+interface SetAuthCookiesOptions {
+  omitRefreshToken?: boolean
+}
+
+export const setAuthCookies = async (
+  user: User,
+  res: express.Response,
+  options: SetAuthCookiesOptions = {}
+) => {
+  const accessToken = user.generateAccessToken()
+  const refreshToken = options.omitRefreshToken ? null : await user.generateRefreshToken()
+
+  // TODO: Add secure: true once we have HTTPS set up
+  res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+    httpOnly: true,
+    maxAge: ACCESS_TOKEN_LIFESPAN,
+  })
+  if (!options.omitRefreshToken && refreshToken) {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+      httpOnly: true,
+      path: '/auth/refresh',
+      maxAge: REFRESH_TOKEN_LIFESPAN,
+    })
+  }
+  return { accessToken, refreshToken }
+}
+
 const getAuthDataForAccessToken = (accessToken: string) => {
   const accessTokenBody = jwt.decode(accessToken) as TokenBody
   return {
     tokenExp: accessTokenBody.exp,
     roles: accessTokenBody.roles,
     id: accessTokenBody._id,
-  }
-}
-
-const setCookies = (res: express.Response, accessToken: string, refreshToken?: string) => {
-  // TODO: Add secure: true once we have HTTPS set up
-  res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
-    httpOnly: true,
-    maxAge: ACCESS_TOKEN_LIFESPAN,
-  })
-  if (refreshToken) {
-    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-      httpOnly: true,
-      path: '/auth/refresh',
-      maxAge: REFRESH_TOKEN_LIFESPAN,
-    })
   }
 }
 
@@ -67,10 +79,7 @@ authRouter.post('/login', async (req, res: express.Response<AuthResponse>) => {
       }
     }
     const user = userResult.getValue()
-    const accessToken = user.generateAccessToken()
-    const refreshToken = await user.generateRefreshToken()
-
-    setCookies(res, accessToken, refreshToken)
+    const { accessToken } = await setAuthCookies(user, res)
     res.json({ data: getAuthDataForAccessToken(accessToken) })
   } catch (err) {
     console.log(err)
@@ -113,10 +122,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
       }
     }
     const user = createUserResult.value
-    const accessToken = user.generateAccessToken()
-    const refreshToken = await user.generateRefreshToken()
-
-    setCookies(res, accessToken, refreshToken)
+    const { accessToken } = await setAuthCookies(user, res)
     res
       .status(201)
       .json({ data: getAuthDataForAccessToken(accessToken) })
@@ -182,7 +188,9 @@ const refreshToken = async (req: express.Request, res: express.Response<AuthResp
   }
 
   const accessToken = user.generateAccessToken()
-  setCookies(res, accessToken)
+  setAuthCookies(user, res, {
+    omitRefreshToken: true,
+  })
   res.json({ data: getAuthDataForAccessToken(accessToken) })
 }
 

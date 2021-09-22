@@ -3,15 +3,28 @@ import { registerEnumType } from 'type-graphql'
 //Current State in Order Tracking State Machine
 //https://www.notion.so/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 export enum OrderState {
+  // The order object was initialized during a Card Builder flow
+  // At this point, it is likely missing most of the information needed to begin processing it
+  Initialized = 'Initialized',
+  // The user is done creating the order and it has been captured into our system
   Captured = 'Captured',
+  // The order has been completed by the user and is ready for us to action
   Actionable = 'Actionable',
+  // The order has been reviewed and is approved to move to creation phase
   Reviewed = 'Reviewed',
+  // The order has been sent to our printing partner
   Creating = 'Creating',
+  // All sheets in the order have been printed
   Created = 'Created',
+  // The order are enroute to the customer
   Enroute = 'Enroute',
+  // The order have reached the customer
   Fulfilled = 'Fulfilled',
+  // The order has been canceled
   Canceled = 'Canceled',
 }
+
+export const INITIAL_ORDER_STATE = OrderState.Initialized
 
 registerEnumType(OrderState, {
   name: 'OrderState',

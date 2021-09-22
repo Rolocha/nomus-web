@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useLocation, Redirect } from 'react-router-dom'
+import { Redirect, useLocation } from 'react-router-dom'
 import Box from 'src/components/Box'
 import Button from 'src/components/Button'
 import * as Form from 'src/components/Form'
@@ -70,7 +70,9 @@ const RegistrationForm = () => {
 
   const { loggedIn, signUp } = useAuth()
 
-  const location = useLocation<{ from: Location }>()
+  const location = useLocation<{
+    from: Location
+  }>()
   const searchParams = React.useMemo(
     () => new URLSearchParams(location.search),
     [location],
@@ -112,16 +114,21 @@ const RegistrationForm = () => {
     setResentEmailSuccessfully(result.ok)
   }
 
-  const redirectUrl = React.useMemo(
-    () =>
-      searchParams.get('redirect_url') ??
-      location.state?.from.pathname ??
-      '/dashboard',
+  const explicitRedirectUrl = React.useMemo(
+    () => searchParams.get('redirect_url') ?? location.state?.from.pathname,
     [searchParams, location],
   )
+  const redirectUrl = React.useMemo(() => explicitRedirectUrl ?? '/dashboard', [
+    explicitRedirectUrl,
+  ])
 
-  // Redirect if the user is logged in when landing on the page
-  if (loggedIn && !formState.isSubmitted) {
+  if (
+    // Redirect if the user is logged in when landing on the page
+    (loggedIn && !formState.isSubmitted) ||
+    // Or immediately after the login completes if there is an explicit redirect URL
+    // (i.e. skip the "We sent an email to your inbox" message screen)
+    (!loggedIn && formState.isSubmitSuccessful && explicitRedirectUrl)
+  ) {
     if (redirectUrl.startsWith('/')) {
       return <Redirect to={redirectUrl} />
     } else {
@@ -169,8 +176,8 @@ const RegistrationForm = () => {
             )}
           </Box>
           <Link mt={3} to={redirectUrl} buttonStyle="primary" buttonSize="big">
-            Continue{' '}
-            {redirectUrl.startsWith('/dashboard/') ? 'to your dashboard' : ''}
+            Continue
+            {redirectUrl.startsWith('/dashboard/') ? ' to your dashboard' : ''}
           </Link>
         </>
       ) : (
@@ -252,10 +259,6 @@ const RegistrationForm = () => {
             By clicking Create free account, you agree to our{' '}
             <Link to="terms-of-service">Terms of Service</Link> and{' '}
             <Link to="privacy-policy">Privacy Policy</Link>.
-          </Text.Body2>
-          <Text.Body2 mt={3}>
-            Have an account?{' '}
-            <Link to={`/login?${searchParams.toString()}`}>Sign in.</Link>
           </Text.Body2>
         </>
       )}

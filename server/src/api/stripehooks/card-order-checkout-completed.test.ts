@@ -1,6 +1,7 @@
 import { app } from 'src/app'
 import { Order, User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
+import { OrderState } from 'src/util/enums'
 import { getCostSummary } from 'src/util/pricing'
 import { stripe } from 'src/util/stripe'
 import { createMockOrder } from 'src/__mocks__/models/Order'
@@ -38,6 +39,7 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
   it('updates the order with the new cost/shipping details', async () => {
     const costSummary = getCostSummary(25)
     const order = await createMockOrder({
+      state: OrderState.Captured,
       quantity: 25,
       price: {
         subtotal: costSummary.subtotal,

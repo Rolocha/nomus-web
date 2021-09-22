@@ -2,7 +2,7 @@ import { Order, User } from 'src/models'
 import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { OrderEventTrigger, OrderState } from 'src/util/enums'
+import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from 'src/util/enums'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
@@ -257,17 +257,17 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).toEqual([
         expect.objectContaining({
           id: order1.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
         }),
         expect.objectContaining({
           id: order2.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
         }),
       ])
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
         })
       )
     })
@@ -308,7 +308,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
         })
       )
     })
@@ -368,7 +368,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
           user: {
             name: {
               first: 'Jeff',
@@ -423,7 +423,7 @@ describe('OrderResolver', () => {
       expect(response.data?.orders).not.toContain(
         expect.objectContaining({
           id: notInQueryOrder.id,
-          state: OrderState.Captured,
+          state: INITIAL_ORDER_STATE,
         })
       )
       expect(response.data?.orders).not.toContain(
@@ -589,7 +589,7 @@ describe('OrderResolver', () => {
       })
       expect(response.data?.updateOrder).toMatchObject({
         id: order.id,
-        state: OrderState.Captured,
+        state: INITIAL_ORDER_STATE,
         shippingLabelUrl: shippingLabelTestUrl,
         trackingNumber: trackingNumberTest,
         price: priceTest,
