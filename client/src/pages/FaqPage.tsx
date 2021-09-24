@@ -4,6 +4,7 @@ import * as Text from 'src/components/Text'
 import Accordion from 'src/components/Accordion'
 import * as Form from 'src/components/Form'
 import Navbar from 'src/components/Navbar'
+import Footer from 'src/components/Footer'
 import Button from 'src/components/Button'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -158,6 +159,7 @@ export default () => {
           </Box>
         </Box>
       </Box>
+      <Footer colorScheme="light" />
     </Box>
   )
 }
