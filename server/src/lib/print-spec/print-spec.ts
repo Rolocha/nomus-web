@@ -5,6 +5,8 @@ import path from 'path'
 import PDFDocument from 'pdfkit'
 
 const SHORT_ID_SIZE = 0.4
+const NUM_ROWS = 5
+const NUM_COLS = 5
 
 // Define core measurements in millimeters
 const MEASUREMENTS_MM = {
@@ -16,7 +18,7 @@ const MEASUREMENTS_MM = {
   marginTop: 15,
   cropmarkWidth: 4.1,
   cropmarkHeight: 3.2,
-  bleedStrokeWidth: 0.1,
+  bleedStrokeWidth: 0.2,
 }
 
 // In testing, keep resolution low to keep snapshot tests quick
@@ -163,7 +165,7 @@ export default class PrintSpec {
 
   private printShortId() {
     // Print the short IDs on the bottom
-    const yEndOfCards = marginTop + cardHeight * 5
+    const yEndOfCards = marginTop + cardHeight * NUM_ROWS
     const yEndOfDoc = cardSheetHeight
     const ySpaceForShortId = yEndOfDoc - yEndOfCards
     const shortIdFontSize = Math.round(ySpaceForShortId * SHORT_ID_SIZE)
@@ -209,20 +211,32 @@ export default class PrintSpec {
     cropmarkWidth: number,
     cropmarkHeight: number
   ) {
+    const halfWidth = cropmarkWidth / 2
+    const halfHeight = cropmarkHeight / 2
+
+    // Apply a "corner buffer" so that the cropmark isn't a closed box but has open corners instead
+    // This enables the print tech to cut the cards out from the sheet while ensuring the trim marks
+    // don't appear on the cut-out cards
+    const cornerWidthBuffer = halfWidth * 0.5
+    const cornerHeightBuffer = halfHeight * 0.5
     this.doc
-      // top line
-      .moveTo(x - cropmarkWidth / 2 + bleedStrokeWidth, y - cropmarkHeight / 2)
-      .lineTo(x + cropmarkWidth / 2 - bleedStrokeWidth, y - cropmarkHeight / 2)
-      // right line
-      .moveTo(x + cropmarkWidth / 2, y - cropmarkHeight / 2 + bleedStrokeWidth)
-      .lineTo(x + cropmarkWidth / 2, y + cropmarkHeight / 2 - bleedStrokeWidth)
-      // bottom line
-      .moveTo(x + cropmarkWidth / 2 - bleedStrokeWidth, y + cropmarkHeight / 2)
-      .lineTo(x - cropmarkWidth / 2 + bleedStrokeWidth, y + cropmarkHeight / 2)
-      // left line
-      .moveTo(x - cropmarkWidth / 2, y + cropmarkHeight / 2 - bleedStrokeWidth)
-      .lineTo(x - cropmarkWidth / 2, y - cropmarkHeight / 2 + bleedStrokeWidth)
       .lineWidth(bleedStrokeWidth)
+      .strokeColor('#000000')
+      // top line
+      .moveTo(x - halfWidth + cornerWidthBuffer, y - halfHeight)
+      .lineTo(x + halfWidth - cornerWidthBuffer, y - halfHeight)
+      .stroke()
+      // bottom line
+      .moveTo(x - halfWidth + cornerWidthBuffer, y + halfHeight)
+      .lineTo(x + halfWidth - cornerWidthBuffer, y + halfHeight)
+      .stroke()
+      // right line
+      .moveTo(x + halfWidth, y - halfHeight + cornerHeightBuffer)
+      .lineTo(x + halfWidth, y + halfHeight - cornerHeightBuffer)
+      .stroke()
+      // left line
+      .moveTo(x - halfWidth, y - halfHeight + cornerHeightBuffer)
+      .lineTo(x - halfWidth, y + halfHeight - cornerHeightBuffer)
       .stroke()
   }
 
@@ -237,13 +251,16 @@ export default class PrintSpec {
       horizontal: [cropmarkWidth, cropmarkHeight],
     }[this.orientation]
 
+    // Helper methods to calculate the position of the top-left corner of a card
+    // in a particular column or row
+    const xForCardInColumn = (c: number) => startX + imageWidth * c
+    const yForCardInRow = (r: number) => startY + imageHeight * r
+
     // Print the grid of card images
-    let i = 0
-    let j = 0
-    for (i = 0; i < 5; i += 1) {
-      for (j = 0; j < 5; j += 1) {
-        const x = startX + imageWidth * i
-        const y = startY + imageHeight * j
+    for (let i = 0; i < NUM_COLS; i += 1) {
+      for (let j = 0; j < NUM_ROWS; j += 1) {
+        const x = xForCardInColumn(i)
+        const y = yForCardInRow(j)
 
         this.doc.image(image, x, y, {
           align: 'center',
@@ -254,29 +271,20 @@ export default class PrintSpec {
         })
 
         // Only for debugging: outline each card so we can tell where it starts and ends
-        // this.doc.rect(x, y, imageWidth, imageHeight).stroke()
+        // this.doc.strokeColor('#ff0000').rect(x, y, imageWidth, imageHeight).stroke()
+      }
+    }
 
-        if (!omitCropmarks) {
-          // Crop mark top left
-          this.createCropmarkAtPoint(x, y, cropmarkWidthHeightArgs[0], cropmarkWidthHeightArgs[1])
-          // Crop mark top right
+    if (!omitCropmarks) {
+      // Draw the cropmarks, we have to iterate to N + 1 for rows/columns
+      // since the cropmarks (which we place at the top-left of each card)
+      // need to also be present on the bottom/right corners of the cards
+      // in the final row/columns.
+      for (let i = 0; i < NUM_COLS + 1; i += 1) {
+        for (let j = 0; j < NUM_ROWS + 1; j += 1) {
           this.createCropmarkAtPoint(
-            x + imageWidth,
-            y,
-            cropmarkWidthHeightArgs[0],
-            cropmarkWidthHeightArgs[1]
-          )
-          // Crop mark bottom right
-          this.createCropmarkAtPoint(
-            x + imageWidth,
-            y + imageHeight,
-            cropmarkWidthHeightArgs[0],
-            cropmarkWidthHeightArgs[1]
-          )
-          // Crop mark bottom left
-          this.createCropmarkAtPoint(
-            x,
-            y + imageHeight,
+            xForCardInColumn(i),
+            yForCardInRow(j),
             cropmarkWidthHeightArgs[0],
             cropmarkWidthHeightArgs[1]
           )
