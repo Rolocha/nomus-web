@@ -116,7 +116,7 @@ class Order extends BaseModel({
     unique: true,
     description: 'ID printed onto a sheet for the print tech to link a user',
   })
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   shortId: string
 
   @prop({ required: false, description: 'URL pointing to shipping label document' })
