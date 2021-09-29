@@ -20,6 +20,7 @@ export interface UCPOrdersSectionQuery_userOrders_price {
   subtotal: number
   tax: number
   shipping: number
+  discount: number
   total: number
 }
 

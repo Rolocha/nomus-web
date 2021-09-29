@@ -5,6 +5,7 @@ export interface OrderPrice {
   subtotal: number
   tax: number
   shipping: number
+  discount: number
   total: number
 }
 

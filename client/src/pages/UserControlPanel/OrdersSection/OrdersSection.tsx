@@ -36,6 +36,7 @@ export default () => {
             subtotal
             tax
             shipping
+            discount
             total
           }
           quantity
