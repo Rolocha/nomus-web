@@ -15,11 +15,6 @@ interface Props {
   orders: Array<Order>
 }
 
-const shortenOrderId = (orderId: string) => {
-  const id = orderId.split('_')[1]
-  return [id.substr(0, 4), id.substr(-4)].join('...')
-}
-
 const bp = 'md'
 
 const OrderList = ({ orders }: Props) => {
@@ -95,11 +90,11 @@ const OrderList = ({ orders }: Props) => {
             </Box>
             <Box gridArea="orderNumber" placeSelf="center start">
               <Box display={{ base: 'block', [bp]: 'none' }}>
-                <Text.Label>Order #</Text.Label>
+                <Text.Label>Order ID</Text.Label>
               </Box>
               <Text.Body2>
-                <CopyableText copyText={order.id}>
-                  {shortenOrderId(order.id)}
+                <CopyableText copyText={order.shortId}>
+                  {order.shortId}
                 </CopyableText>
               </Text.Body2>
             </Box>
