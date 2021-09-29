@@ -45,6 +45,7 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
         subtotal: costSummary.subtotal,
         tax: costSummary.estimatedTaxes,
         shipping: costSummary.shipping,
+        discount: costSummary.discount,
         total: costSummary.total,
       },
     })

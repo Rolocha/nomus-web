@@ -46,11 +46,13 @@ export const getCostSummary = (quantity: number, state?: string) => {
   }
 
   const shipping = 0
+  const discount = 0
 
   return {
     subtotal,
     estimatedTaxes,
     shipping,
-    total: subtotal + (estimatedTaxes ?? 0) + shipping,
+    discount,
+    total: subtotal + (estimatedTaxes ?? 0) + shipping - (discount ?? 0),
   }
 }
