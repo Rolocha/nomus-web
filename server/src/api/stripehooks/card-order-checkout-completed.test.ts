@@ -71,6 +71,7 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
             amount_subtotal: costSummaryInCali.subtotal,
             total_details: {
               amount_tax: costSummaryInCali.estimatedTaxes,
+              amount_discount: costSummaryInCali.discount,
             },
             amount_total: costSummaryInCali.total,
             shipping: {
@@ -104,6 +105,7 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
       subtotal: costSummaryInCali.subtotal,
       tax: costSummaryInCali.estimatedTaxes,
       shipping: costSummaryInCali.shipping,
+      discount: costSummaryInCali.discount,
       total: costSummaryInCali.total,
     })
   })
