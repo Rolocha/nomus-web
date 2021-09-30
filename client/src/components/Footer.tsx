@@ -273,12 +273,12 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
             flexDirection="row"
             mt={{ base: '24px', [bp]: '0px' }}
           >
-            <Link to="/terms-of-service">
+            <Link to="/terms-of-service" target="_blank">
               <Text.Body2 color={colorPalette.accent} mr={'32px'}>
                 Terms of service
               </Text.Body2>
             </Link>
-            <Link to="/privacy-policy">
+            <Link to="/privacy-policy" target="_blank">
               <Text.Body2 color={colorPalette.accent}>
                 Privacy policy
               </Text.Body2>
