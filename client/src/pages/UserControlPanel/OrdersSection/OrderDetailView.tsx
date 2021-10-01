@@ -138,12 +138,14 @@ export default ({ order }: Props) => {
                 {order.price ? formatDollarAmount(order.price.shipping) : '-'}
               </Text.Body2>
             </Box>
-            <Box>
-              <Text.Body2>Discount</Text.Body2>
-              <Text.Body2>
-                {order.price ? formatDollarAmount(order.price.discount) : '-'}
-              </Text.Body2>
-            </Box>
+            {!!order.price?.discount && (
+              <Box>
+                <Text.Body2>Discount</Text.Body2>
+                <Text.Body2>
+                  {formatDollarAmount(order.price.discount)}
+                </Text.Body2>
+              </Box>
+            )}
             <Box>
               <Text.Body2 fontWeight="500">Total</Text.Body2>
               <Text.Body2 fontWeight="500">
