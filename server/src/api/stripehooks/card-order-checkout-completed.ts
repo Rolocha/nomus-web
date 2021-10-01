@@ -23,6 +23,7 @@ export default async (event: any) => {
   // Update all the Order data that we newly received
   order.price.subtotal = checkoutSession.amount_subtotal
   order.price.tax = checkoutSession.total_details.amount_tax
+  order.price.discount = checkoutSession.total_details.amount_discount
   order.price.total = checkoutSession.amount_total
   order.shippingName = checkoutSession.shipping.name
   order.shippingAddress = {

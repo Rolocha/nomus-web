@@ -89,6 +89,10 @@ export class OrderPrice {
   @Field({ nullable: false })
   shipping: number
 
+  @prop({ required: true, default: 0 })
+  @Field({ nullable: false })
+  discount: number
+
   @prop({ required: true })
   @Field({ nullable: false })
   total: number

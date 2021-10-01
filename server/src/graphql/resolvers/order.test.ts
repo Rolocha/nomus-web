@@ -550,10 +550,11 @@ describe('OrderResolver', () => {
       const shippingLabelTestUrl = 'this-is-a-url.com'
       const trackingNumberTest = 'woooo'
       const priceTest: OrderPrice = {
-        subtotal: 5,
-        tax: 1,
-        shipping: 3.75,
-        total: 100,
+        subtotal: 500,
+        tax: 100,
+        shipping: 375,
+        discount: 375,
+        total: 600,
       }
 
       const response = await execQuery({
@@ -570,6 +571,7 @@ describe('OrderResolver', () => {
                 subtotal,
                 tax,
                 shipping,
+                discount,
                 total
               }
             }
@@ -713,7 +715,8 @@ describe('OrderResolver', () => {
         subtotal: 5000,
         tax: 427,
         shipping: 0,
-        total: 5427,
+        discount: 100,
+        total: 5327,
       }
       const paymentIntent = 'pi_1234'
 
@@ -744,6 +747,7 @@ describe('OrderResolver', () => {
                   subtotal
                   tax
                   shipping
+                  discount
                   total
                 }
                 state
@@ -820,7 +824,8 @@ describe('OrderResolver', () => {
         subtotal: 5000,
         tax: 427,
         shipping: 0,
-        total: 5427,
+        discount: 100,
+        total: 5327,
       }
 
       const response = await execQuery({
@@ -851,6 +856,7 @@ describe('OrderResolver', () => {
                   tax
                   shipping
                   total
+                  discount
                 }
                 state
                 trackingNumber

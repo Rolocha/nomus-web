@@ -548,6 +548,7 @@ class OrderResolver {
         // We don't know the cost of tax yet since that requires knowing the shipping address
         // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
         tax: costSummary.estimatedTaxes,
+        discount: costSummary.discount,
         total: costSummary.total,
       }
     } else {
@@ -709,6 +710,7 @@ class OrderResolver {
       // We don't know the cost of tax yet since that requires knowing the shipping address
       // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
       tax: costSummary.estimatedTaxes,
+      discount: costSummary.discount,
       total: costSummary.total,
     }
 

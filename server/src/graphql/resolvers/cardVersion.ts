@@ -18,7 +18,7 @@ import { AdminOnlyArgs } from '../auth'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion } from 'src/models/CardVersion'
 import { User } from 'src/models/User'
-import { CardSpecBaseType, Role } from 'src/util/enums'
+import { Role } from 'src/util/enums'
 import { Card, CardInteraction } from 'src/models'
 
 @ObjectType()
