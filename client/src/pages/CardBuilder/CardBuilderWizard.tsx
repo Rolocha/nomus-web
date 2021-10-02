@@ -160,7 +160,7 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
 
       // User isn't logged in; redirect them to the registration page first so
       // they can create an account or log in to link this order to their account
-      if (!loggedIn) {
+      if (!loggedIn || submitOrderResult.checkoutSession == null) {
         const redirectUrl = `/card-studio/authenticated/${cardBuilderState.orderId}`
         const searchParams = new URLSearchParams({
           // eslint-disable-next-line camelcase

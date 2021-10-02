@@ -175,26 +175,28 @@ class OrderResolver {
     return CardVersion.mongo.findById(order.cardVersion)
   }
 
-  //Get a single order
+  // Get a single order
   @Authorized(Role.User)
-  @Query(() => Order, { nullable: true })
+  @Query(() => Order, { nullable: false })
   async order(
     @Arg('orderId', { nullable: true }) orderId: string | null,
     @Ctx() context: IApolloContext
   ): Promise<Order | Error> {
-    if (context.user.roles.includes(Role.Admin)) {
-      return await Order.mongo.findById(orderId)
-    } else {
-      const order = await Order.mongo.findById(orderId).populate('user')
-      if (order == null) {
-        throw new UserInputError(`No order found with ID: ${orderId}`)
-      }
-      if ((order.user as User).id === context.user.id) {
-        return order as Order
-      } else {
-        return Error('User is not authorized to access order')
-      }
+    // An admin can query for any order while a non-admin can only
+    // query for orders corresponding to their user ID
+    const findQuery = context.user.roles.includes(Role.Admin)
+      ? {
+          _id: orderId,
+        }
+      : {
+          _id: orderId,
+          user: context.user.id,
+        }
+    const order = await Order.mongo.findOne(findQuery)
+    if (order == null) {
+      throw new UserInputError(`No order found with ID: ${orderId}`)
     }
+    return order
   }
 
   // Get multiple orders with flexible queries

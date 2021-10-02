@@ -80,7 +80,7 @@ export interface LoadExistingCardBuilderOrder_order {
 }
 
 export interface LoadExistingCardBuilderOrder {
-  order: LoadExistingCardBuilderOrder_order | null
+  order: LoadExistingCardBuilderOrder_order
 }
 
 export interface LoadExistingCardBuilderOrderVariables {

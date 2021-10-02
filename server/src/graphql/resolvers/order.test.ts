@@ -56,7 +56,8 @@ describe('OrderResolver', () => {
 
       expect(response.data?.order?.id).toBe(order.id)
     })
-    it('fails to fetch a single order for non-admin user', async () => {
+
+    it('fails to fetch an order for a different user', async () => {
       const user = await createMockUser()
       const order = await createMockOrder({ user: user })
       const userHacker = await createMockUser({
@@ -79,7 +80,7 @@ describe('OrderResolver', () => {
         contextUser: userHacker,
       })
 
-      expect(response.errors[0]?.message).toBe('User is not authorized to access order')
+      expect(response.errors[0]?.message).toBe(`No order found with ID: ${order.id}`)
     })
     it('fetches a single order for admin user', async () => {
       const order = await createMockOrder()

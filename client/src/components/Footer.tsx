@@ -58,7 +58,7 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
     'unsubmitted' | 'submitting' | 'success' | 'failure'
   >('unsubmitted')
   return (
-    <Box bg={colorPalette.background} my={{ base: '24px', [bp]: '80px' }}>
+    <Box bg={colorPalette.background} py={{ base: '24px', [bp]: '80px' }}>
       <Box container>
         <Box
           display="grid"
@@ -72,10 +72,6 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
           }}
           gridColumnGap={'22px'}
           alignItems="center"
-          // flexDirection={{ base: 'column', [bp]: 'row' }}
-
-          // alignItems={{ base: 'flex-start', [bp]: 'center' }}
-          // justifyContent={{ base: 'flex-start', [bp]: 'space-between' }}
         >
           <Box
             gridColumn="span 2"
