@@ -18,8 +18,6 @@ interface Props {
   orderId: string
 }
 
-const bp = 'md'
-
 export default ({ orderId }: Props) => {
   const { data, loading, error } = useQuery(
     gql`
@@ -117,13 +115,23 @@ export default ({ orderId }: Props) => {
         <Box
           gridArea="cards"
           display="flex"
-          alignItems="center"
+          flexDirection="column"
+          alignItems="flex-start"
           justifyContent="center"
         >
           <BusinessCardFan
             frontImageUrl={order.cardVersion.frontImageUrl}
             backImageUrl={order.cardVersion.backImageUrl}
           />
+          <Link
+            mt="16px"
+            // TODO: Redesign /cards so that it's possible to link to a specific card version
+            // This won't really be a problem until users have many (like 5+) card versions
+            to="/dashboard/cards"
+            buttonStyle="tertiary"
+          >
+            View in card library
+          </Link>
         </Box>
         <Box
           gridArea="details"
