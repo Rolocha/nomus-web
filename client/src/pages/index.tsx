@@ -164,6 +164,7 @@ export const routes: Array<RouteType> = [
   {
     path: '/card-studio/success/:orderId',
     Component: CardBuilderSuccessfulCheckout,
+    requiredAuthLevel: Role.User,
   },
   {
     path: '/card-studio/authenticated/:orderId',

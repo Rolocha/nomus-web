@@ -56,7 +56,8 @@ describe('OrderResolver', () => {
 
       expect(response.data?.order?.id).toBe(order.id)
     })
-    it('fails to fetch a single order for non-admin user', async () => {
+
+    it('fails to fetch an order for a different user', async () => {
       const user = await createMockUser()
       const order = await createMockOrder({ user: user })
       const userHacker = await createMockUser({
@@ -79,7 +80,7 @@ describe('OrderResolver', () => {
         contextUser: userHacker,
       })
 
-      expect(response.errors[0]?.message).toBe('User is not authorized to access order')
+      expect(response.errors[0]?.message).toBe(`No order found with ID: ${order.id}`)
     })
     it('fetches a single order for admin user', async () => {
       const order = await createMockOrder()
@@ -550,10 +551,11 @@ describe('OrderResolver', () => {
       const shippingLabelTestUrl = 'this-is-a-url.com'
       const trackingNumberTest = 'woooo'
       const priceTest: OrderPrice = {
-        subtotal: 5,
-        tax: 1,
-        shipping: 3.75,
-        total: 100,
+        subtotal: 500,
+        tax: 100,
+        shipping: 375,
+        discount: 375,
+        total: 600,
       }
 
       const response = await execQuery({
@@ -570,6 +572,7 @@ describe('OrderResolver', () => {
                 subtotal,
                 tax,
                 shipping,
+                discount,
                 total
               }
             }
@@ -713,7 +716,8 @@ describe('OrderResolver', () => {
         subtotal: 5000,
         tax: 427,
         shipping: 0,
-        total: 5427,
+        discount: 100,
+        total: 5327,
       }
       const paymentIntent = 'pi_1234'
 
@@ -744,6 +748,7 @@ describe('OrderResolver', () => {
                   subtotal
                   tax
                   shipping
+                  discount
                   total
                 }
                 state
@@ -820,7 +825,8 @@ describe('OrderResolver', () => {
         subtotal: 5000,
         tax: 427,
         shipping: 0,
-        total: 5427,
+        discount: 100,
+        total: 5327,
       }
 
       const response = await execQuery({
@@ -851,6 +857,7 @@ describe('OrderResolver', () => {
                   tax
                   shipping
                   total
+                  discount
                 }
                 state
                 trackingNumber
