@@ -53,12 +53,15 @@ const UnifiedReviewStep = ({
         Everything look okay?
       </Text.SectionSubheader>
       {cardDetails.orientation && (
-        <CardDesignReview
-          cardBuilderState={cardBuilderState}
-          orientation={cardDetails.orientation}
-          metadata={cardDetails.metadata}
-          cardImages={cardDetails.images}
-        />
+        <Box>
+          <CardDesignReview
+            cardBuilderState={cardBuilderState}
+            orientation={cardDetails.orientation}
+            metadata={cardDetails.metadata}
+            cardImages={cardDetails.images}
+          />
+          <Text.Body3>* Discount code available at checkout</Text.Body3>
+        </Box>
       )}
 
       {cardBuilderState.submissionError && (
