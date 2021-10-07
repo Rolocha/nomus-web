@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react'
+import { DateTime } from 'luxon'
 import * as React from 'react'
 import { gql, useMutation, useQuery } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
@@ -6,6 +7,7 @@ import Box from 'src/components/Box'
 import BusinessCardFan from 'src/components/BusinessCardFan'
 import Button from 'src/components/Button'
 import CopyableText from 'src/components/CopyableText'
+import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
@@ -125,23 +127,27 @@ export default ({ orderId }: Props) => {
           />
           <Link
             mt="16px"
+            ml="auto"
             // TODO: Redesign /cards so that it's possible to link to a specific card version
             // This won't really be a problem until users have many (like 5+) card versions
             to="/dashboard/cards"
-            buttonStyle="tertiary"
           >
-            View in card library
+            <Button variant="tertiary" rightIcon={<Icon of="arrowRight" />}>
+              View in card library
+            </Button>
           </Link>
         </Box>
         <Box
           gridArea="details"
           display="grid"
           gridTemplateColumns="1fr"
+          gridTemplateRows="repeat(4, 0fr)"
           gridRowGap={3}
           gridTemplateAreas={`
             "status" 
-            "orderDate"
             "quantity"
+            "orderDate"
+            "deliveryEta"
             "shippingAddress"
           `}
         >
@@ -149,13 +155,25 @@ export default ({ orderId }: Props) => {
             <Text.Label>Status</Text.Label>
             <Text.Body2>{getUserFacingOrderState(order.state)}</Text.Body2>
           </Box>
-          <Box gridArea="orderDate">
-            <Text.Label>Date Ordered</Text.Label>
-            <Text.Body2>{getFormattedFullDate(order.createdAt)}</Text.Body2>
-          </Box>
           <Box gridArea="quantity">
             <Text.Label>Quantity</Text.Label>
             <Text.Body2>{`${order.quantity} cards`}</Text.Body2>
+          </Box>
+          <Box gridArea="orderDate">
+            <Text.Label>Ordered On</Text.Label>
+            <Text.Body2>
+              {DateTime.fromMillis(order.createdAt).toLocaleString(
+                DateTime.DATE_FULL,
+              )}
+            </Text.Body2>
+          </Box>
+          <Box gridArea="deliveryEta">
+            <Text.Label>Delivery ETA</Text.Label>
+            <Text.Body2>
+              {DateTime.fromMillis(order.createdAt)
+                .plus({ days: 21 })
+                .toLocaleString(DateTime.DATE_FULL)}
+            </Text.Body2>
           </Box>
           <Box gridArea="shippingAddress">
             <Text.Label>Shipping Address</Text.Label>
