@@ -16,9 +16,6 @@ export class CardVersion extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof CardVersion>
 
-  @Field()
-  createdAt: Date
-
   @prop()
   @Field({ nullable: true })
   cardSlug: string

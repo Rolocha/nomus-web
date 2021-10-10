@@ -67,9 +67,6 @@ class Order extends BaseModel({
 }) {
   static mongo: ReturnModelType<typeof Order>
 
-  @Field()
-  createdAt: Date
-
   // User who ordered the cards, we may not have one while the order is being created in Card Builder
   @prop({ required: false, ref: () => User, type: String })
   @Field(() => User, { nullable: true })
