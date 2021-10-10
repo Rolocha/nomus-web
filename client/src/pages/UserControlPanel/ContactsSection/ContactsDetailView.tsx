@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { formatPhoneNumber } from 'react-phone-number-input'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
+import BusinessCardFan from 'src/components/BusinessCardFan'
 import Button from 'src/components/Button'
 import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
@@ -172,12 +172,9 @@ const ContactsDetailView = ({
               <Box
                 gridArea="cards"
                 width={{ base: '100%', [bp]: '100%' }}
-                display="flex"
                 px={2}
-                flexDirection={{ base: 'row', [bp]: 'column' }}
               >
-                <BusinessCardImage
-                  width="100%"
+                <BusinessCardFan
                   frontImageUrl={selectedContact.cardFrontImageUrl}
                   backImageUrl={selectedContact.cardBackImageUrl}
                 />
