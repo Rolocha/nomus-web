@@ -31,6 +31,7 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
       // @ts-ignore Bad types from typegoose here falsely require a boolean
       _id: String,
       timestamps: true,
+      usePushEach: true,
     },
   })
   @ObjectType()

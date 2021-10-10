@@ -1,6 +1,7 @@
 import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
+// We can't use/extend BaseModel in here because BaseModel imports this class and that results in a circular dependency
+@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 class DeletedObject {
   static mongo: ReturnModelType<typeof DeletedObject>
 

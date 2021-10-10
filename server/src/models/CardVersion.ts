@@ -1,4 +1,4 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { CardSpecBaseType } from 'src/util/enums'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
@@ -7,7 +7,6 @@ import { TemplateColorScheme, TemplateContactInfoFields } from './subschemas'
 import { User } from './User'
 
 // @ts-ignore
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 @ObjectType({
   description: 'Represents a single card design which may result in numerous printed Cards',
 })

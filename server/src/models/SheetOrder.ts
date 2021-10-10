@@ -1,10 +1,4 @@
-import {
-  DocumentType,
-  getModelForClass,
-  modelOptions,
-  prop,
-  ReturnModelType,
-} from '@typegoose/typegoose'
+import { DocumentType, getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
@@ -12,7 +6,6 @@ import { Card } from './Card'
 import { Ref } from './scalars'
 import { Sheet } from './Sheet'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType({
   description: 'Represents an order sent to our sheets supplier',
 })

@@ -1,11 +1,10 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import Order from './Order'
 import { Ref } from './scalars'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 class OrderEvent extends BaseModel({
   prefix: 'ordev',
