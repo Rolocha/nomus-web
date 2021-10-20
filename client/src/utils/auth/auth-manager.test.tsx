@@ -260,7 +260,7 @@ describe('AuthManager', () => {
       expect(activeTokenExists).toBe(false)
     })
 
-    it('if refresh fails with invalid-refresht-token, logs the user out and redirects to /login', async () => {
+    it('if refresh fails with invalid-refresh-token, logs the user out and redirects to /login', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
       const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
         tokenExp: DateTime.now().plus({ days: 10 }).toSeconds(),
