@@ -21,13 +21,12 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
-import { getImageDimensions, ImageDimensions } from 'src/utils/image'
 import { formatName } from 'src/utils/name'
 import FourOhFourPage from './FourOhFourPage'
 
@@ -46,6 +45,7 @@ const ContactInfoPage = () => {
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
+  const isDesktop = useBreakpoint('lg')
 
   const openNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(true)
@@ -205,7 +205,7 @@ const ContactInfoPage = () => {
                 name={contact.name}
                 profilePicUrl={contact.profilePicUrl}
                 // Small business card overlaid on corner of image for mobile view
-                cardImage={contact.cardFrontImageUrl}
+                cardImage={isDesktop ? null : contact.cardFrontImageUrl}
               />
             </Box>
 
