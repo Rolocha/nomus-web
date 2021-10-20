@@ -193,11 +193,15 @@ export class AuthManager<
             response.error.code,
           )
         ) {
+          await this.logOutAndClearData()
           // It looks like the refresh token expired or is otherwise incorrect, the user will need
           // to log in again. Let's clear their auth data and redirect them to
           // the login page
-          await this.logOutAndClearData()
-          window.location.replace('/login')
+          const searchParams = new URLSearchParams({
+            // eslint-disable-next-line camelcase
+            redirect_url: window.location.href,
+          })
+          window.location.replace(`/login?${searchParams.toString()}`)
         } else {
           Sentry.captureException(
             new Error(
