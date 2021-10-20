@@ -72,7 +72,7 @@ export interface LoadExistingCardBuilderOrder_order_cardVersion {
 export interface LoadExistingCardBuilderOrder_order {
   __typename: 'Order'
   id: string
-  quantity: number
+  quantity: number | null
   shippingName: string | null
   shippingAddress: LoadExistingCardBuilderOrder_order_shippingAddress | null
   user: LoadExistingCardBuilderOrder_order_user | null

@@ -30,7 +30,7 @@ export interface UCPOrdersSectionQuery_userOrders {
   shortId: string
   cardVersion: UCPOrdersSectionQuery_userOrders_cardVersion
   price: UCPOrdersSectionQuery_userOrders_price | null
-  quantity: number
+  quantity: number | null
   state: OrderState
   createdAt: any
   trackingNumber: string | null

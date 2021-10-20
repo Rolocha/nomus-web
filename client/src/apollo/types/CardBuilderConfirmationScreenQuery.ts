@@ -46,7 +46,7 @@ export interface CardBuilderConfirmationScreenQuery_order {
   shippingName: string | null
   shippingAddress: CardBuilderConfirmationScreenQuery_order_shippingAddress | null
   cardVersion: CardBuilderConfirmationScreenQuery_order_cardVersion
-  quantity: number
+  quantity: number | null
   price: CardBuilderConfirmationScreenQuery_order_price | null
   user: CardBuilderConfirmationScreenQuery_order_user | null
 }
