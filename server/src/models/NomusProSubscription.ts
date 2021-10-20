@@ -1,10 +1,4 @@
-import {
-  DocumentType,
-  getModelForClass,
-  modelOptions,
-  prop,
-  ReturnModelType,
-} from '@typegoose/typegoose'
+import { DocumentType, getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { NomusProAccessInfo } from 'src/graphql/resolvers/subtypes'
 import { EMPTY_FEATURE_SET, NomusProFeatureSet } from 'src/models/subschemas'
 import { Field } from 'type-graphql'
@@ -12,7 +6,6 @@ import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 import { User } from './User'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 export class NomusProSubscription extends BaseModel({
   prefix: 'nprosub',
 }) {

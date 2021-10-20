@@ -1,4 +1,4 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { CardInteractionType } from 'src/util/enums'
 import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
@@ -6,7 +6,6 @@ import Card from './Card'
 import CardVersion from './CardVersion'
 import { Ref } from './scalars'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 class CardInteraction extends BaseModel({
   prefix: 'ctap',

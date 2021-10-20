@@ -1,13 +1,12 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import { Field } from 'type-graphql'
 import { BaseModel } from './BaseModel'
-
 import { Ref } from './scalars'
 import { User } from './User'
 
 // Not using @ObjectType() because we prefer to expose the Contact object rather than this Connection
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
+
 export class Connection extends BaseModel({
   prefix: 'cnxn',
 }) {

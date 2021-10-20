@@ -1,12 +1,10 @@
-import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
-
-import User from './User'
-import CardVersion from './CardVersion'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
+import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
+import CardVersion from './CardVersion'
 import { Ref } from './scalars'
+import User from './User'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType({
   description: 'Represents a single business card',
 })

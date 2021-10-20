@@ -1,14 +1,13 @@
-import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
+import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
+import { SheetState } from 'src/util/enums'
+import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
 import { Card } from './Card'
 import { CardVersion } from './CardVersion'
-import { Ref } from './scalars'
-import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import Order from './Order'
-import { SheetState } from 'src/util/enums'
+import { Ref } from './scalars'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType({
   description: 'Represents a single sheet from supplier that contains 25 cards',
 })

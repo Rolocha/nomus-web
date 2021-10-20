@@ -1,11 +1,4 @@
-import {
-  DocumentType,
-  getModelForClass,
-  modelOptions,
-  pre,
-  prop,
-  ReturnModelType,
-} from '@typegoose/typegoose'
+import { DocumentType, getModelForClass, pre, prop, ReturnModelType } from '@typegoose/typegoose'
 import { WhatIsIt } from '@typegoose/typegoose/lib/internal/constants'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
@@ -64,7 +57,6 @@ export interface UserCreatePayload {
   next()
 })
 // @ts-ignore
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 @ObjectType()
 export class User extends BaseModel({
   prefix: 'user',
