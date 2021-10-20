@@ -292,7 +292,9 @@ describe('AuthManager', () => {
       const activeTokenExists = await am.ensureActiveToken(true)
 
       expect(logOutAndClearDataSpy).toHaveBeenCalled()
-      expect(window.location.replace).toHaveBeenCalledWith('/login')
+      expect(window.location.replace).toHaveBeenCalledWith(
+        expect.stringMatching(/^\/login\?redirect_url=/),
+      )
       expect(refreshToken).toHaveBeenCalled()
       expect(activeTokenExists).toBe(false)
     })
@@ -329,7 +331,9 @@ describe('AuthManager', () => {
       const activeTokenExists = await am.ensureActiveToken(true)
 
       expect(logOutAndClearDataSpy).toHaveBeenCalled()
-      expect(window.location.replace).toHaveBeenCalledWith('/login')
+      expect(window.location.replace).toHaveBeenCalledWith(
+        expect.stringMatching(/^\/login\?redirect_url=/),
+      )
       expect(refreshToken).toHaveBeenCalled()
       expect(activeTokenExists).toBe(false)
     })
