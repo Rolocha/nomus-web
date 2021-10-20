@@ -11,6 +11,7 @@ export interface OrderPrice {
 
 export interface Order {
   id: string
+  shortId: string
   cardVersion: CardVersion
   price: OrderPrice | null
   quantity: number

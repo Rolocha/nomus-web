@@ -28,6 +28,7 @@ export default () => {
       query UCPOrdersSectionQuery {
         userOrders {
           id
+          shortId
           cardVersion {
             frontImageUrl
             backImageUrl
@@ -66,7 +67,9 @@ export default () => {
     .filter((order) => order.state === OrderState.Fulfilled)
     .sort((a, b) => b.createdAt - a.createdAt)
 
-  const selectedOrder = userOrders.find((order) => order.id === params.orderId)
+  const selectedOrder = userOrders.find(
+    (order) => order.id === params.orderId || order.shortId === params.orderId,
+  )
 
   if (params.orderId && selectedOrder == null) {
     return <Redirect to="/dashboard/orders" />
@@ -129,13 +132,15 @@ export default () => {
           onClose={() => history.push('/dashboard/orders')}
           anchorStyle="right"
         >
-          {selectedOrder && <OrderDetailView order={selectedOrder} />}
+          {selectedOrder && <OrderDetailView orderId={selectedOrder.id} />}
         </Modal>
       )}
 
       {/* Mobile-only selected order "page" */}
       {!isDesktopLayout && selectedOrder && (
-        <Box>{selectedOrder && <OrderDetailView order={selectedOrder} />}</Box>
+        <Box>
+          {selectedOrder && <OrderDetailView orderId={selectedOrder.id} />}
+        </Box>
       )}
     </Box>
   )
