@@ -99,8 +99,9 @@ export class AuthManager<
       return false
     }
 
+    const tokenExpired = this.tokenHasExpired(authData)
     // We have auth data, now check if it is non-expired
-    if (!forceRefresh && !this.tokenHasExpired(authData)) {
+    if (!tokenExpired && !forceRefresh) {
       return true
     }
 

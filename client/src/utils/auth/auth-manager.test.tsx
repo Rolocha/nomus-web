@@ -7,6 +7,7 @@ import {
   BaseAuthData,
   AuthResponse,
 } from './auth-manager'
+import { DateTime } from 'luxon'
 
 enum Role {
   User = 'user',
@@ -36,15 +37,12 @@ interface AuthData extends BaseAuthData {
 
 const AUTH_DATA_KEY = 'AUTH_DATA'
 
-const makeExpTimeInSeconds = (secondsFromNow: number) =>
-  (Date.now() + secondsFromNow * 1000) / 1000
-
 const makeMockAuthResponse = ({
   tokenExp,
   roles,
 }: Partial<AuthData> = {}): AuthResponse<AuthData> => ({
   data: {
-    tokenExp: tokenExp ?? makeExpTimeInSeconds(15 * 60), // in 15 minutes
+    tokenExp: tokenExp ?? DateTime.now().plus({ minutes: 15 }).toSeconds(),
     roles: roles ?? [Role.User],
   },
 })
@@ -220,7 +218,7 @@ describe('AuthManager', () => {
     it('returns true after invoking a refresh if auth data exists and is about to expire', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
       const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
-        tokenExp: makeExpTimeInSeconds(9),
+        tokenExp: DateTime.now().plus({ seconds: 9 }).toSeconds(),
       })
       localStorage.setItem(
         AUTH_DATA_KEY,
@@ -243,7 +241,7 @@ describe('AuthManager', () => {
     it('returns false after invoking a refresh if auth data exists and is about to expire but refresh failed', async () => {
       // expires in 9 seconds (just below the 10s expiration headstart we use below)
       const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
-        tokenExp: makeExpTimeInSeconds(9),
+        tokenExp: DateTime.now().plus({ seconds: 9 }).toSeconds(),
       })
       localStorage.setItem(
         AUTH_DATA_KEY,
@@ -258,6 +256,43 @@ describe('AuthManager', () => {
       })
 
       const activeTokenExists = await am.ensureActiveToken()
+      expect(refreshToken).toHaveBeenCalled()
+      expect(activeTokenExists).toBe(false)
+    })
+
+    it('if refresh fails with invalid-refresht-token, logs the user out and redirects to /login', async () => {
+      // expires in 9 seconds (just below the 10s expiration headstart we use below)
+      const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
+        tokenExp: DateTime.now().plus({ days: 10 }).toSeconds(),
+      })
+      localStorage.setItem(
+        AUTH_DATA_KEY,
+        JSON.stringify(mockAuthResponseThatExpiresSoon.data),
+      )
+
+      const refreshToken = jest.fn().mockResolvedValue({
+        error: {
+          code: 'invalid-refresh-token',
+        },
+      })
+      const am = makeTestManager({
+        logIn: jest.fn(),
+        refreshToken,
+        expirationHeadstart: '10s',
+      })
+
+      const logOutAndClearDataSpy = jest.spyOn(am, 'logOutAndClearData')
+      // @ts-ignore
+      delete window.location
+      // @ts-ignore
+      window.location = {
+        replace: jest.fn(),
+      }
+
+      const activeTokenExists = await am.ensureActiveToken(true)
+
+      expect(logOutAndClearDataSpy).toHaveBeenCalled()
+      expect(window.location.replace).toHaveBeenCalledWith('/login')
       expect(refreshToken).toHaveBeenCalled()
       expect(activeTokenExists).toBe(false)
     })
