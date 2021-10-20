@@ -280,8 +280,7 @@ export default () => {
 
       <Box gridArea="cards">
         {data.user.defaultCardVersion &&
-        (data.user.defaultCardVersion.frontImageUrl ||
-          data.user.defaultCardVersion.backImageUrl) ? (
+        data.user.defaultCardVersion.frontImageUrl ? (
           <Box
             width={{ base: '50%', [bp]: '100%' }}
             mb={{ base: 0, [bp]: 2 }}

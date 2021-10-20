@@ -4,7 +4,7 @@ import Image from 'src/components/Image'
 import { useImageOrientation } from 'src/utils/image'
 
 interface Props {
-  frontImageUrl?: string | null
+  frontImageUrl: string
   backImageUrl?: string | null
 }
 
@@ -30,7 +30,6 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
       {frontImageUrl && (
         <Image
           zIndex={2}
-          // maxHeight="100%"
           position="relative"
           width={
             { horizontal: '90%', vertical: '50%', unknown: '50%' }[
