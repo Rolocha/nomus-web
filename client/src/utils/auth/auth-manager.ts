@@ -7,16 +7,19 @@ export interface BaseAuthData {
   tokenExp: number
 }
 
-type ErrorCode =
+type SignUpErrorCode = 'invalid-email' | 'non-unique-email'
+
+type RefreshErrorCode =
   | 'invalid-refresh-token'
   | 'missing-refresh-token'
   | 'missing-user-id'
   | 'no-user-with-that-id'
 
+type AuthErrorCode = SignUpErrorCode | RefreshErrorCode
 export interface AuthResponse<Data> {
   data?: Data
   error?: {
-    code: ErrorCode
+    code: AuthErrorCode
   }
 }
 
