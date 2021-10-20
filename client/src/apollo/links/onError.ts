@@ -13,9 +13,10 @@ export default onError(
     if (graphQLErrors) {
       graphQLErrors.forEach((error) => {
         const { message, locations, path } = error
-        Sentry.captureException(error)
-        console.log(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+        Sentry.captureException(
+          new Error(
+            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+          ),
         )
       })
     }
@@ -40,7 +41,11 @@ export default onError(
                 complete: observer.complete.bind(observer),
               })
             } else {
-              Sentry.captureException(new Error('Token refresh failed'))
+              Sentry.captureException(
+                new Error(
+                  'No active access token even after calling ensureActiveToken',
+                ),
+              )
             }
           })
           .catch((err) => {
