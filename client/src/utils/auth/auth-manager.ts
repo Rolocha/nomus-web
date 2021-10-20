@@ -7,13 +7,18 @@ export interface BaseAuthData {
   tokenExp: number
 }
 
-type SignUpErrorCode = 'invalid-email' | 'non-unique-email'
+const SIGN_UP_ERROR_CODES = ['invalid-email', 'non-unique-email'] as const
 
-type RefreshErrorCode =
-  | 'invalid-refresh-token'
-  | 'missing-refresh-token'
-  | 'missing-user-id'
-  | 'no-user-with-that-id'
+type SignUpErrorCode = keyof typeof SIGN_UP_ERROR_CODES
+
+const REFRESH_ERROR_CODES = [
+  'invalid-refresh-token',
+  'missing-refresh-token',
+  'missing-user-id',
+  'no-user-with-that-id',
+] as const
+
+type RefreshErrorCode = keyof typeof REFRESH_ERROR_CODES
 
 type AuthErrorCode = SignUpErrorCode | RefreshErrorCode
 export interface AuthResponse<Data> {
@@ -183,8 +188,12 @@ export class AuthManager<
     try {
       const response = await this.refreshToken(authData)
       if (response.error) {
-        if (response.error.code === 'invalid-refresh-token') {
-          // It looks like the refresh token expired, the user will need
+        if (
+          ((REFRESH_ERROR_CODES as unknown) as AuthErrorCode[]).includes(
+            response.error.code,
+          )
+        ) {
+          // It looks like the refresh token expired or is otherwise incorrect, the user will need
           // to log in again. Let's clear their auth data and redirect them to
           // the login page
           await this.logOutAndClearData()
@@ -192,7 +201,9 @@ export class AuthManager<
         } else {
           Sentry.captureException(
             new Error(
-              `Token refresh failed with an unexpected error code: ${response.error.code}`,
+              `Token refresh failed with an unexpected error code: ${String(
+                response.error?.code,
+              )}`,
             ),
           )
         }

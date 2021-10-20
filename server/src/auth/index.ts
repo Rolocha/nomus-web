@@ -1,18 +1,17 @@
 import * as express from 'express'
 import jwt from 'jsonwebtoken'
-
-import { RefreshToken, User } from 'src/models'
-import { getUserFromToken } from './util'
 import {
-  ACCESS_TOKEN_LIFESPAN,
   ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_LIFESPAN,
+  ACCESS_TOKEN_LIFESPAN,
   MINIMUM_PASSWORD_STRENGTH,
   REFRESH_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_LIFESPAN,
 } from 'src/config'
-import { TokenBody } from './types'
+import { RefreshToken, User } from 'src/models'
 import { Role } from 'src/util/enums'
 import zxcvbn from 'zxcvbn'
+import { TokenBody } from './types'
+import { getUserFromToken } from './util'
 
 const authRouter = express.Router()
 
@@ -168,14 +167,14 @@ const refreshToken = async (req: express.Request, res: express.Response<AuthResp
   const userId = req.body.id
 
   if (userId == null) {
-    return res.status(401).end({
+    return res.status(401).json({
       error: {
         code: 'missing-user-id',
       },
     })
   }
   if (refreshToken == null || refreshToken.trim() === '') {
-    return res.status(401).end({
+    return res.status(401).json({
       error: {
         code: 'missing-refresh-token',
       },
@@ -184,7 +183,7 @@ const refreshToken = async (req: express.Request, res: express.Response<AuthResp
 
   const user = await User.mongo.findById(userId)
   if (user == null) {
-    return res.status(401).end({
+    return res.status(401).json({
       error: {
         code: 'no-user-with-that-id',
         message: `No user found for the userId ${userId}`,

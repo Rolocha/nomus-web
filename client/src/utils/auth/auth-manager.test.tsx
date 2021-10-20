@@ -296,5 +296,42 @@ describe('AuthManager', () => {
       expect(refreshToken).toHaveBeenCalled()
       expect(activeTokenExists).toBe(false)
     })
+
+    it('if refresh fails with missing-refresh-token, logs the user out and redirects to /login', async () => {
+      // expires in 9 seconds (just below the 10s expiration headstart we use below)
+      const mockAuthResponseThatExpiresSoon = makeMockAuthResponse({
+        tokenExp: DateTime.now().plus({ days: 10 }).toSeconds(),
+      })
+      localStorage.setItem(
+        AUTH_DATA_KEY,
+        JSON.stringify(mockAuthResponseThatExpiresSoon.data),
+      )
+
+      const refreshToken = jest.fn().mockResolvedValue({
+        error: {
+          code: 'missing-refresh-token',
+        },
+      })
+      const am = makeTestManager({
+        logIn: jest.fn(),
+        refreshToken,
+        expirationHeadstart: '10s',
+      })
+
+      const logOutAndClearDataSpy = jest.spyOn(am, 'logOutAndClearData')
+      // @ts-ignore
+      delete window.location
+      // @ts-ignore
+      window.location = {
+        replace: jest.fn(),
+      }
+
+      const activeTokenExists = await am.ensureActiveToken(true)
+
+      expect(logOutAndClearDataSpy).toHaveBeenCalled()
+      expect(window.location.replace).toHaveBeenCalledWith('/login')
+      expect(refreshToken).toHaveBeenCalled()
+      expect(activeTokenExists).toBe(false)
+    })
   })
 })
