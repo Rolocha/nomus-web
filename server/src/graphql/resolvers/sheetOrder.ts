@@ -29,6 +29,12 @@ class SheetOrderResolver {
   }
 
   @Authorized(Role.Admin)
+  @Query(() => [SheetOrder])
+  async sheetOrders(): Promise<DocumentType<SheetOrder>[]> {
+    return await SheetOrder.mongo.find()
+  }
+
+  @Authorized(Role.Admin)
   @Mutation(() => SheetOrder, {
     description:
       'Creates a new SheetOrder, along with the requisite underlying Sheet and Card objects',
