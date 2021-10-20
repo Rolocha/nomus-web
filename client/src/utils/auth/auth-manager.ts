@@ -1,5 +1,5 @@
 // Heavily inspired by https://github.com/obabichev/react-token-auth
-
+import * as Sentry from '@sentry/react'
 import { useEffect, useState } from 'react'
 import ms from 'ms'
 
@@ -7,10 +7,16 @@ export interface BaseAuthData {
   tokenExp: number
 }
 
+type ErrorCode =
+  | 'invalid-refresh-token'
+  | 'missing-refresh-token'
+  | 'missing-user-id'
+  | 'no-user-with-that-id'
+
 export interface AuthResponse<Data> {
   data?: Data
   error?: {
-    code: string
+    code: ErrorCode
   }
 }
 
@@ -172,6 +178,22 @@ export class AuthManager<
   private async _refreshToken(authData: AuthData): Promise<boolean> {
     try {
       const response = await this.refreshToken(authData)
+      if (response.error) {
+        if (response.error.code === 'invalid-refresh-token') {
+          // It looks like the refresh token expired, the user will need
+          // to log in again. Let's clear their auth data and redirect them to
+          // the login page
+          await this.logOutAndClearData()
+          window.location.replace('/login')
+        } else {
+          Sentry.captureException(
+            new Error(
+              `Token refresh failed with an unexpected error code: ${response.error.code}`,
+            ),
+          )
+        }
+      }
+
       if (response.data) {
         this.updateAuthData(response.data)
         return true
