@@ -7,6 +7,7 @@ import { UCPProfileSectionQuery } from 'src/apollo/types/UCPProfileSectionQuery'
 import { UpdateNomusProFeatureSet } from 'src/apollo/types/UpdateNomusProFeatureSet'
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
+import BusinessCardFan from 'src/components/BusinessCardFan'
 import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditableImage from 'src/components/EditableImage'
@@ -279,15 +280,13 @@ export default () => {
 
       <Box gridArea="cards">
         {data.user.defaultCardVersion &&
-        (data.user.defaultCardVersion.frontImageUrl ||
-          data.user.defaultCardVersion.backImageUrl) ? (
+        data.user.defaultCardVersion.frontImageUrl ? (
           <Box
             width={{ base: '50%', [bp]: '100%' }}
             mb={{ base: 0, [bp]: 2 }}
             mr={{ base: 2, [bp]: 0 }}
           >
-            <BusinessCardImage
-              width="100%"
+            <BusinessCardFan
               frontImageUrl={data.user.defaultCardVersion.frontImageUrl}
               backImageUrl={data.user.defaultCardVersion.backImageUrl}
             />

@@ -21,13 +21,12 @@ import * as Text from 'src/components/Text'
 import LoadingPage from 'src/pages/LoadingPage'
 import publicContactQuery from 'src/queries/publicContact'
 import { colors } from 'src/styles'
-import { mq } from 'src/styles/breakpoints'
+import { mq, useBreakpoint } from 'src/styles/breakpoints'
 import { useAuth } from 'src/utils/auth'
 import {
   getCurrentDateForDateInput,
   getFormattedFullDateFromDateInputString,
 } from 'src/utils/date'
-import { getImageDimensions, ImageDimensions } from 'src/utils/image'
 import { formatName } from 'src/utils/name'
 import FourOhFourPage from './FourOhFourPage'
 
@@ -46,9 +45,7 @@ const ContactInfoPage = () => {
   const meetingPlaceRef = React.useRef<HTMLInputElement | null>(null)
   const tagsRef = React.useRef<HTMLInputElement | null>(null)
   const notesRef = React.useRef<HTMLTextAreaElement | null>(null)
-  const [businessCardDimensions, setBusinessCardDimensions] = React.useState<
-    ImageDimensions | 'determining' | null
-  >(null)
+  const isDesktop = useBreakpoint('lg')
 
   const openNotesModal = React.useCallback(() => {
     setIsNotesModalOpen(true)
@@ -115,27 +112,6 @@ const ContactInfoPage = () => {
     },
     [loggedIn, username],
   )
-
-  React.useEffect(() => {
-    if (publicContact?.cardFrontImageUrl && businessCardDimensions == null) {
-      setBusinessCardDimensions('determining')
-      getImageDimensions(publicContact?.cardFrontImageUrl).then(
-        setBusinessCardDimensions,
-      )
-    }
-  }, [publicContact, businessCardDimensions])
-
-  const cardOrientation = React.useMemo(() => {
-    if (
-      businessCardDimensions == null ||
-      businessCardDimensions === 'determining'
-    ) {
-      return 'unknown'
-    }
-    return businessCardDimensions.height > businessCardDimensions.width
-      ? 'vertical'
-      : 'horizontal'
-  }, [businessCardDimensions])
 
   // If there's no username in the route, this is an invalid route, redirect to the landing page
   if (username == null) {
@@ -228,32 +204,9 @@ const ContactInfoPage = () => {
               <ProfilePicture
                 name={contact.name}
                 profilePicUrl={contact.profilePicUrl}
+                // Small business card overlaid on corner of image for mobile view
+                cardImage={isDesktop ? null : contact.cardFrontImageUrl}
               />
-              {/* Small business card overlaid on corner of image for mobile view */}
-              {contact.cardFrontImageUrl && (
-                <Image
-                  display={{ base: 'block', [bp]: 'none' }}
-                  position="absolute"
-                  {...{
-                    vertical: {
-                      width: '25%',
-                      bottom: 0,
-                      right: 0,
-                      transform: 'rotateZ(15deg)',
-                    },
-                    horizontal: {
-                      width: '50%',
-                      bottom: '-5%',
-                      right: '-5%',
-                      transform: 'rotateZ(-15deg)',
-                    },
-                    unknown: {},
-                  }[cardOrientation]}
-                  src={contact.cardFrontImageUrl}
-                  boxShadow="businessCard"
-                  alt={`front of ${formatName(contact.name)}'s Nomus card`}
-                />
-              )}
             </Box>
 
             <Box

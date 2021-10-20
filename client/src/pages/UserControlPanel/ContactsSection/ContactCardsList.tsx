@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import * as React from 'react'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
+import BusinessCardFan from 'src/components/BusinessCardFan'
 import Link from 'src/components/Link'
 import ProfilePicture from 'src/components/ProfilePicture'
 import * as Text from 'src/components/Text'
@@ -190,20 +190,23 @@ const ContactCardsList = ({
                           flexDirection="row"
                           alignItems="center"
                           width="100%"
-                          boxShadow={viewMode === 'grid' ? 0 : undefined}
                         >
                           {
                             {
                               grid: (
                                 <Box position="relative">
-                                  <BusinessCardImage
-                                    frontImageUrl={
-                                      contact.cardFrontImageUrl ?? undefined
-                                    }
-                                    placeholder={!contact.cardFrontImageUrl}
-                                    height="125px"
-                                  />
+                                  {contact.cardFrontImageUrl && (
+                                    <Box width="180px">
+                                      <BusinessCardFan
+                                        frontImageUrl={
+                                          contact.cardFrontImageUrl
+                                        }
+                                        backImageUrl={contact.cardBackImageUrl}
+                                      />
+                                    </Box>
+                                  )}
                                   <Box
+                                    zIndex={2}
                                     position="absolute"
                                     bottom="-5px"
                                     right="-5px"

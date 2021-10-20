@@ -1,50 +1,38 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import { getImageDimensions, ImageDimensions } from 'src/utils/image'
+import { useImageOrientation } from 'src/utils/image'
 
 interface Props {
   frontImageUrl: string
-  backImageUrl: string
+  backImageUrl?: string | null
 }
 
 const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
-  const [businessCardDimensions, setBusinessCardDimensions] = React.useState<
-    ImageDimensions | 'determining' | null
-  >(null)
-  React.useEffect(() => {
-    if (businessCardDimensions == null) {
-      setBusinessCardDimensions('determining')
-      getImageDimensions(frontImageUrl).then(setBusinessCardDimensions)
-    }
-  }, [frontImageUrl, businessCardDimensions])
-
-  const cardOrientation = React.useMemo(() => {
-    if (
-      businessCardDimensions == null ||
-      businessCardDimensions === 'determining'
-    ) {
-      return 'unknown'
-    }
-    return businessCardDimensions.height > businessCardDimensions.width
-      ? 'vertical'
-      : 'horizontal'
-  }, [businessCardDimensions])
+  const cardOrientation = useImageOrientation(frontImageUrl ?? null)
 
   return (
     <Box
       position="relative"
+      height="100%"
       visibility={cardOrientation === 'unknown' ? 'hidden' : 'visible'}
-      pt={
-        { vertical: '10%', horizontal: '21%', unknown: '0%' }[cardOrientation]
-      }
+      {...{
+        vertical: {
+          pt: '10%',
+          mb: '5%',
+        },
+        horizontal: {
+          pt: '43%',
+        },
+        unknown: {},
+      }[cardOrientation]}
     >
       {frontImageUrl && (
         <Image
           zIndex={2}
           position="relative"
           width={
-            { horizontal: '80%', vertical: '50%', unknown: '50%' }[
+            { horizontal: '90%', vertical: '50%', unknown: '50%' }[
               cardOrientation
             ]
           }
@@ -57,17 +45,19 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
         <Image
           zIndex={1}
           position="absolute"
-          transform="rotateZ(-12.67deg)"
+          maxHeight="100%"
           {...{
             vertical: {
+              transform: 'rotateZ(-12.67deg)',
               width: '50%',
               bottom: '5%',
               right: '35%',
             },
             horizontal: {
-              width: '80%',
-              right: '15%',
-              bottom: '18%',
+              transform: 'rotateZ(-8deg)',
+              width: '90%',
+              right: '6%',
+              bottom: '34%',
             },
             unknown: {},
           }[cardOrientation]}
