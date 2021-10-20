@@ -77,7 +77,7 @@ class Order extends BaseModel({
 
   // Quantity of cards in the order
   @prop({ required: false })
-  @Field({ nullable: false })
+  @Field({ nullable: true })
   quantity: number
 
   @prop({ _id: false, required: false })

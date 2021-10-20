@@ -14,7 +14,7 @@ export interface Order {
   shortId: string
   cardVersion: CardVersion
   price: OrderPrice | null
-  quantity: number
+  quantity: number | null
   state: OrderState
   createdAt: Date
   trackingNumber: string | null
