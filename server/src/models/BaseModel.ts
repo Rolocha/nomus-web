@@ -13,29 +13,40 @@ export interface BaseModelArgs {
   prefix: string
 }
 
+const prefixesUsed = []
+
 export type DeletedObjectResult = Result<undefined, 'id-not-found' | 'delete-error'>
 
 export const BaseModel = ({ prefix }: BaseModelArgs) => {
+  if (prefixesUsed.includes(prefix)) {
+    throw new Error(
+      `Looks like you specified the same ID prefix (${prefix}) for 2 separate models. Please use unique prefixes.`
+    )
+  }
+
+  prefixesUsed.push(prefix)
+
   @modelOptions({
     schemaOptions: {
       // @ts-ignore Bad types from typegoose here falsely require a boolean
       _id: String,
+      timestamps: true,
+      usePushEach: true,
     },
   })
   @ObjectType()
   class BaseModel {
     static mongo: ReturnModelType<typeof BaseModel>
-
     static prefix = prefix
 
     // Use this static method to create an `{prefix}_*` id string in cases
     // where you need an ID before you create the object itself. This may
     // be necessary in cases of circular dependencies, e.g. you're creating
-    // an order where you want to set 
+    // an order where you want to set
     //   order.paymentIntent = 'pi_*'
     // but while you're creating the paymentIntent with Stripe, you want to pass
     //   paymentIntent.metadata = orderId
-    // 
+    //
     // ⚠️ Note that this method only creates an ID string, it does NOT create
     // the object itself!
     static createId(): string {
@@ -55,6 +66,12 @@ export const BaseModel = ({ prefix }: BaseModelArgs) => {
     set id(id: string) {
       this._id = id
     }
+
+    @Field()
+    createdAt: Date
+
+    @Field()
+    updatedAt: Date
 
     public static async delete(id: string): Promise<DeletedObjectResult> {
       const model = await this.mongo.findById(id)

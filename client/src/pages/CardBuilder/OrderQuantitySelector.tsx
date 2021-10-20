@@ -27,7 +27,7 @@ const OrderQuantitySelector = ({ quantity, onChange }: Props) => {
             body: `I'd like to put in a large order!\n(Put Details of your order here)`.trim(),
           })}
         >
-          <Text.Body2 color="inherit">
+          <Text.Body2 color="inherit" mt={2}>
             Need more than 100? Let us know.
           </Text.Body2>
         </Link>

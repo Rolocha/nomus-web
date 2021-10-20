@@ -6,7 +6,7 @@ import {
   UCPCardsSectionQuery_cardVersionsStats as UCPCardsSectionQueryCardVersionsStats,
 } from 'src/apollo/types/UCPCardsSectionQuery'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
+import BusinessCardFan from 'src/components/BusinessCardFan'
 import Button from 'src/components/Button'
 import Image from 'src/components/Image'
 import Link from 'src/components/Link'
@@ -152,11 +152,15 @@ export default () => {
               flexDirection="column"
             >
               <Box display="inline-block" width="100%">
-                <BusinessCardImage
-                  frontImageUrl={defaultCardVersion?.frontImageUrl || ''}
-                  backImageUrl={defaultCardVersion?.backImageUrl || ''}
-                  width="100%"
-                />
+                <Box>
+                  {defaultCardVersion.frontImageUrl &&
+                    defaultCardVersion.backImageUrl && (
+                      <BusinessCardFan
+                        frontImageUrl={defaultCardVersion.frontImageUrl}
+                        backImageUrl={defaultCardVersion.backImageUrl}
+                      />
+                    )}
+                </Box>
                 <Box
                   display="flex"
                   flexDirection="row"
@@ -244,17 +248,13 @@ export default () => {
                   py={2}
                   px={2}
                 >
-                  {cv.frontImageUrl || cv.backImageUrl ? (
-                    <BusinessCardImage
-                      frontImageUrl={cv.frontImageUrl}
-                      backImageUrl={cv.backImageUrl}
-                      width={{ base: '60vw', [bp]: '300px' }}
-                    />
-                  ) : (
-                    <BusinessCardImage
-                      placeholder
-                      width={{ base: '60vw', [bp]: '300px' }}
-                    />
+                  {cv.frontImageUrl && cv.backImageUrl && (
+                    <Box width="250px" height="250px" p="8px">
+                      <BusinessCardFan
+                        frontImageUrl={cv.frontImageUrl}
+                        backImageUrl={cv.backImageUrl}
+                      />
+                    </Box>
                   )}
                   {cardVersionStatsById[cv.id] && (
                     <Text.Body3>
@@ -279,15 +279,6 @@ export default () => {
                         padding="9.5px 6px"
                       >
                         Reorder card
-                      </Link>
-                    </Box>
-                    <Box px={1} display="flex" justifyContent="stretch">
-                      <Link
-                        buttonStyle="secondary"
-                        to={sendModifyEmail(cv.id)}
-                        padding="9.5px 6px"
-                      >
-                        Modify card
                       </Link>
                     </Box>
                     <Box px={1}>

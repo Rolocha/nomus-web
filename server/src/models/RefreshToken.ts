@@ -1,14 +1,12 @@
-import crypto from 'crypto'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
-import { prop, modelOptions, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
-import { ObjectType, Field } from 'type-graphql'
-
-import { User } from './User'
-import { Ref } from './scalars'
+import crypto from 'crypto'
 import { REFRESH_TOKEN_LIFESPAN } from 'src/config'
+import { Field, ObjectType } from 'type-graphql'
 import { BaseModel } from './BaseModel'
+import { Ref } from './scalars'
+import { User } from './User'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 @ObjectType()
 export class RefreshToken extends BaseModel({
   prefix: 'reftok',

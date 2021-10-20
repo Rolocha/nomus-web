@@ -1,18 +1,11 @@
-import {
-  getModelForClass,
-  modelOptions,
-  prop,
-  ReturnModelType,
-  DocumentType,
-} from '@typegoose/typegoose'
-import crypto from 'crypto'
+import { DocumentType, getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import { PASSWORD_RESET_TOKEN_LIFESPAN } from 'src/config'
 import { BaseModel } from './BaseModel'
 import { Ref } from './scalars'
 import { User } from './User'
 
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true } })
 export class PasswordResetToken extends BaseModel({
   prefix: 'pwrst',
 }) {

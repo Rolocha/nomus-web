@@ -27,6 +27,7 @@ export interface UCPOrdersSectionQuery_userOrders_price {
 export interface UCPOrdersSectionQuery_userOrders {
   __typename: 'Order'
   id: string
+  shortId: string
   cardVersion: UCPOrdersSectionQuery_userOrders_cardVersion
   price: UCPOrdersSectionQuery_userOrders_price | null
   quantity: number

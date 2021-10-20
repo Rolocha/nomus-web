@@ -167,13 +167,29 @@ const refreshToken = async (req: express.Request, res: express.Response<AuthResp
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME]
   const userId = req.body.id
 
-  if (userId == null || refreshToken == null || refreshToken.trim() === '') {
-    return res.status(401).end()
+  if (userId == null) {
+    return res.status(401).end({
+      error: {
+        code: 'missing-user-id',
+      },
+    })
+  }
+  if (refreshToken == null || refreshToken.trim() === '') {
+    return res.status(401).end({
+      error: {
+        code: 'missing-refresh-token',
+      },
+    })
   }
 
   const user = await User.mongo.findById(userId)
   if (user == null) {
-    return res.status(401).end()
+    return res.status(401).end({
+      error: {
+        code: 'no-user-with-that-id',
+        message: `No user found for the userId ${userId}`,
+      },
+    })
   }
 
   // Check if the specified refresh token exists and belongs to this user

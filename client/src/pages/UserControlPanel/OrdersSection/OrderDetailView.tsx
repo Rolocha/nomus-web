@@ -1,25 +1,67 @@
+import * as Sentry from '@sentry/react'
+import { DateTime } from 'luxon'
 import * as React from 'react'
-import { gql, useMutation } from 'src/apollo'
+import { gql, useMutation, useQuery } from 'src/apollo'
 import { OrderState } from 'src/apollo/types/globalTypes'
 import Box from 'src/components/Box'
+import BusinessCardFan from 'src/components/BusinessCardFan'
 import Button from 'src/components/Button'
 import CopyableText from 'src/components/CopyableText'
-import Image from 'src/components/Image'
+import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
+import LoadingPage from 'src/pages/LoadingPage'
 import { colors } from 'src/styles'
-import { Order } from 'src/types/order'
 import { getFormattedFullDate } from 'src/utils/date'
 import { formatDollarAmount } from 'src/utils/money'
 import { getUserFacingOrderState } from 'src/utils/order'
 
 interface Props {
-  order: Order
+  orderId: string
 }
 
-const bp = 'md'
+export default ({ orderId }: Props) => {
+  const { data, loading, error } = useQuery(
+    gql`
+      query OrderDetailViewQuery($orderId: String!) {
+        order(orderId: $orderId) {
+          id
+          shortId
+          createdAt
+          state
+          shippingName
+          shippingAddress {
+            line1
+            line2
+            city
+            state
+            postalCode
+          }
+          cardVersion {
+            frontImageUrl
+            backImageUrl
+          }
+          quantity
+          price {
+            subtotal
+            tax
+            shipping
+            total
+          }
+          user {
+            email
+            name {
+              first
+            }
+          }
+        }
+      }
+    `,
+    {
+      variables: { orderId },
+    },
+  )
 
-export default ({ order }: Props) => {
   const [cancelOrder, { loading: orderCancelLoading }] = useMutation(gql`
     mutation CancelOrderMutation($orderId: String!) {
       transitionOrderState(orderId: $orderId, futureState: ${OrderState.Canceled}) {
@@ -43,70 +85,116 @@ export default ({ order }: Props) => {
     }
   }
 
+  if (loading) {
+    return <LoadingPage />
+  }
+
+  if (data == null || error) {
+    Sentry.captureException(error)
+    return <Box>Uh oh, something went wrong on our end!</Box>
+  }
+
+  const order = data.order
+
   return (
     <Box>
       <Text.H4>Your {getFormattedFullDate(order.createdAt)} order</Text.H4>
       <Text.Body3 color={colors.africanElephant}>
-        <CopyableText copyText={order.id}>{order.id}</CopyableText>
+        <Box as="span" color={colors.midnightGray}>
+          ID:
+        </Box>{' '}
+        <CopyableText copyText={order.shortId}>{order.shortId}</CopyableText>
       </Text.Body3>
-      <Box
-        pt={2}
-        display="grid"
-        gridTemplateColumns={{ base: '1fr', [bp]: '1fr 1fr' }}
-        gridGap="16px"
-      >
-        {order.cardVersion.frontImageUrl && (
-          <Image
-            src={order.cardVersion.frontImageUrl}
-            alt={`front of business card from order ${order.id}`}
-            boxShadow="businessCard"
-          />
-        )}
-        {order.cardVersion.backImageUrl && (
-          <Image
-            src={order.cardVersion.backImageUrl}
-            alt={`back of business card from order ${order.id}`}
-            boxShadow="businessCard"
-          />
-        )}
-      </Box>
-      <Text.H5 mt={4} mb={3}>
-        Order summary
-      </Text.H5>
       <Box
         display="grid"
         gridTemplateColumns="3fr 3fr"
-        gridRowGap={3}
-        gridTemplateAreas={{
-          base: `
-        "details details" 
-        "pricing pricing"`,
-          [bp]: `
-        "details pricing"
-        `,
-        }}
+        gridGap="16px"
+        gridTemplateAreas={`
+          "cards details"
+          "pricing pricing" 
+        `}
       >
+        <Box
+          gridArea="cards"
+          display="flex"
+          flexDirection="column"
+          alignItems="flex-start"
+          justifyContent="center"
+        >
+          <BusinessCardFan
+            frontImageUrl={order.cardVersion.frontImageUrl}
+            backImageUrl={order.cardVersion.backImageUrl}
+          />
+          <Link
+            mt="16px"
+            ml="auto"
+            // TODO: Redesign /cards so that it's possible to link to a specific card version
+            // This won't really be a problem until users have many (like 5+) card versions
+            to="/dashboard/cards"
+          >
+            <Button variant="tertiary" rightIcon={<Icon of="arrowRight" />}>
+              View in card library
+            </Button>
+          </Link>
+        </Box>
         <Box
           gridArea="details"
           display="grid"
-          gridTemplateColumns="3fr 3fr"
+          gridTemplateColumns="1fr"
+          gridTemplateRows="repeat(4, 0fr)"
           gridRowGap={3}
-          gridTemplateAreas={`"status status" "orderDate quantity"`}
+          gridTemplateAreas={`
+            "status" 
+            "quantity"
+            "orderDate"
+            "deliveryEta"
+            "shippingAddress"
+          `}
         >
           <Box gridArea="status">
             <Text.Label>Status</Text.Label>
             <Text.Body2>{getUserFacingOrderState(order.state)}</Text.Body2>
           </Box>
-          <Box gridArea="orderDate">
-            <Text.Label>Date Ordered</Text.Label>
-            <Text.Body2>{getFormattedFullDate(order.createdAt)}</Text.Body2>
-          </Box>
           <Box gridArea="quantity">
             <Text.Label>Quantity</Text.Label>
             <Text.Body2>{`${order.quantity} cards`}</Text.Body2>
           </Box>
+          <Box gridArea="orderDate">
+            <Text.Label>Ordered On</Text.Label>
+            <Text.Body2>
+              {DateTime.fromMillis(order.createdAt).toLocaleString(
+                DateTime.DATE_FULL,
+              )}
+            </Text.Body2>
+          </Box>
+          <Box gridArea="deliveryEta">
+            <Text.Label>Delivery ETA</Text.Label>
+            <Text.Body2>
+              {DateTime.fromMillis(order.createdAt)
+                .plus({ days: 21 })
+                .toLocaleString(DateTime.DATE_FULL)}
+            </Text.Body2>
+          </Box>
+          <Box gridArea="shippingAddress">
+            <Text.Label>Shipping Address</Text.Label>
+            <Text.Body2>{`${order.shippingName}`}</Text.Body2>
+            {order.shippingAddress ? (
+              <Box>
+                <Text.Body2>{order.shippingAddress.line1}</Text.Body2>
+                {order.shippingAddress.line2 && (
+                  <Text.Body2>{order.shippingAddress.line1}</Text.Body2>
+                )}
+                <Text.Body2>
+                  {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
+                  {order.shippingAddress.postalCode}
+                </Text.Body2>
+              </Box>
+            ) : (
+              '—'
+            )}
+          </Box>
         </Box>
-        <Box gridArea="pricing">
+        <Box gridArea="pricing" placeSelf="end stretch">
           <Box
             boxShadow="workingWindow"
             borderRadius="lg"

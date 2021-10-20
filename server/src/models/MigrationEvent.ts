@@ -1,8 +1,7 @@
-import { getModelForClass, modelOptions, prop, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose'
 import { BaseModel } from './BaseModel'
 
 // @ts-ignore
-@modelOptions({ schemaOptions: { timestamps: true, usePushEach: true, _id: String } })
 export class MigrationEvent extends BaseModel({
   prefix: 'migrev',
 }) {

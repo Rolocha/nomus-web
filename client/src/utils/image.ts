@@ -1,3 +1,5 @@
+import React from 'react'
+
 export interface ImageDimensions {
   width: number
   height: number
@@ -16,6 +18,36 @@ export const getImageDimensions = async (
       })
     })
   })
+}
+
+type UseImageDimensionsResult = ImageDimensions | 'determining' | null
+
+export const useImageDimensions = (imageUrl: string | null) => {
+  const [imageDimensions, setImageDimensions] = React.useState<
+    UseImageDimensionsResult
+  >(null)
+
+  React.useEffect(() => {
+    if (imageDimensions == null && imageUrl) {
+      setImageDimensions('determining')
+      getImageDimensions(imageUrl).then(setImageDimensions)
+    }
+  }, [imageUrl, imageDimensions])
+
+  return imageDimensions
+}
+
+export const useImageOrientation = (imageUrl: string | null) => {
+  const imageDimensions = useImageDimensions(imageUrl)
+  const imageOrientation = React.useMemo(() => {
+    if (imageDimensions === 'determining' || imageDimensions == null) {
+      return 'unknown'
+    }
+    return imageDimensions.height > imageDimensions.width
+      ? 'vertical'
+      : 'horizontal'
+  }, [imageDimensions])
+  return imageOrientation
 }
 
 export const dataURItoBlob = (dataURI: string) => {

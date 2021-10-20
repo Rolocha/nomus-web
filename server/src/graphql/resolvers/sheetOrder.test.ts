@@ -1,6 +1,7 @@
 import { Card, Sheet, SheetOrder } from 'src/models'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
+import { doNTimes } from 'src/util/array'
 import { Role, SheetState } from 'src/util/enums'
 import { createMockUser } from 'src/__mocks__/models/User'
 
@@ -11,6 +12,29 @@ beforeAll(async () => {
 afterAll(async () => {
   await cleanUpDB()
 })
+
+const createSheetOrder = async (numSheets, user): Promise<SheetOrder> => {
+  const creationResponse = await execQuery({
+    source: `
+      mutation CreateSheetOrderMutation($numSheets: Float!, $numCardsInSheet: Float) {
+        createSheetOrder(numSheets: $numSheets, numCardsInSheet: $numCardsInSheet) {
+          id
+          orderPayload
+          sheets {
+              id
+          }
+        }
+      }
+    `,
+    variableValues: {
+      numSheets: numSheets,
+    },
+    contextUser: user,
+  })
+
+  expect(creationResponse.errors).toBeUndefined()
+  return creationResponse.data.createSheetOrder
+}
 
 describe('SheetOrderResolver', () => {
   afterEach(async () => {
@@ -56,28 +80,6 @@ describe('SheetOrderResolver', () => {
   })
 
   describe('transitionSheetOrderState', () => {
-    const createSheetOrder = async (numSheets, user): Promise<SheetOrder> => {
-      const creationResponse = await execQuery({
-        source: `
-          mutation CreateSheetOrderMutation($numSheets: Float!, $numCardsInSheet: Float) {
-            createSheetOrder(numSheets: $numSheets, numCardsInSheet: $numCardsInSheet) {
-              id
-              orderPayload
-              sheets {
-                  id
-              }
-            }
-          }
-        `,
-        variableValues: {
-          numSheets: numSheets,
-        },
-        contextUser: user,
-      })
-
-      expect(creationResponse.errors).toBeUndefined()
-      return creationResponse.data.createSheetOrder
-    }
     it('updates the state of all sheets in the order to Received', async () => {
       const adminUser = await createMockUser({ roles: [Role.User, Role.Admin] })
       const numSheets = 5
@@ -143,6 +145,33 @@ describe('SheetOrderResolver', () => {
       const sheetsInOrderB = (await SheetOrder.mongo.findById(sheetOrderB.id).populate('sheets'))
         .sheets as Sheet[]
       expect(sheetsInOrderB.every((s) => s.state === SheetState.Created)).toBe(true)
+    })
+  })
+
+  describe('sheetOrders', () => {
+    it('grabs all sheet orders', async () => {
+      const adminUser = await createMockUser({ roles: [Role.User, Role.Admin] })
+      const numSheets = 2
+      const numOrders = 3
+
+      await Promise.all(doNTimes(numOrders, () => createSheetOrder(numSheets, adminUser)))
+
+      const res = await execQuery({
+        source: `
+          query GetSheetOrdersQuery {
+            sheetOrders {
+              id
+              sheets {
+                  id
+              }
+            }
+          }
+        `,
+        contextUser: adminUser,
+      })
+
+      expect(res.data?.sheetOrders.length).toBe(numOrders)
+      expect(res.data?.sheetOrders[0].sheets.length).toBe(numSheets)
     })
   })
 })
