@@ -29,7 +29,7 @@ class SheetOrderResolver {
   }
 
   @Authorized(Role.Admin)
-  @Query(() => [SheetOrder], { nullable: true })
+  @Query(() => [SheetOrder])
   async sheetOrders(): Promise<DocumentType<SheetOrder>[]> {
     return await SheetOrder.mongo.find()
   }
