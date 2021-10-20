@@ -52,7 +52,7 @@ export interface OrderDetailViewQuery_order {
   shippingName: string | null
   shippingAddress: OrderDetailViewQuery_order_shippingAddress | null
   cardVersion: OrderDetailViewQuery_order_cardVersion
-  quantity: number
+  quantity: number | null
   price: OrderDetailViewQuery_order_price | null
   user: OrderDetailViewQuery_order_user | null
 }
