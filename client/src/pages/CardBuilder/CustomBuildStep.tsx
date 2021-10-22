@@ -158,7 +158,7 @@ const CustomBuildStep = ({
         </Box>
       )}
 
-      <Box gridArea="controls" overflowY="scroll" pt={4}>
+      <Box gridArea="controls" pt={4}>
         <Box>
           <Text.SectionSubheader mb={2}>
             Upload front design

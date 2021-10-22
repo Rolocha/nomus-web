@@ -117,12 +117,7 @@ export default () => {
   const fallbackRedirect = <Redirect to="/dashboard/contacts/glance" />
 
   return (
-    <Box
-      p={{ base: '24px', md: '48px' }}
-      overflowY="scroll"
-      height="100%"
-      width="100%"
-    >
+    <Box p={{ base: '24px', md: '48px' }} height="100%" width="100%">
       <Box mb={3} position="relative" zIndex={1}>
         <ContactsViewMenuBar
           selectedContactSortOption={contactSortOption}
