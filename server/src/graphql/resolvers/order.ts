@@ -17,6 +17,7 @@ import { User } from 'src/models/User'
 import { performTransaction } from 'src/util/db'
 import {
   CardSpecBaseType,
+  HIDDEN_ORDER_LIST_STATES,
   OrderCreatedBy,
   OrderEventTrigger,
   OrderState,
@@ -321,8 +322,11 @@ class OrderResolver {
     const requestedUserId = userId ?? requesterUserId
 
     const orders = await Order.mongo.find({ user: requestedUserId }).populate('cardVersion')
+    const userVisibleOrders = orders.filter(
+      (order) => !HIDDEN_ORDER_LIST_STATES.includes(order.state)
+    )
 
-    return orders
+    return userVisibleOrders
   }
 
   // No @Authorized() decorator - we want a logged-out client to be able to

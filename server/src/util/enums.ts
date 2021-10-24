@@ -26,6 +26,11 @@ export enum OrderState {
 
 export const INITIAL_ORDER_STATE = OrderState.Initialized
 
+// Orders shouldn't show up in the result of the `userOrders` resolver
+// if they are in one of these states because it means they have only partially
+// been completed in Card Builder
+export const HIDDEN_ORDER_LIST_STATES = [OrderState.Initialized, OrderState.Captured]
+
 registerEnumType(OrderState, {
   name: 'OrderState',
   description: 'Current State in Order Tracking State Machine',
