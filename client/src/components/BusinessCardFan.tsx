@@ -1,15 +1,23 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
+import businessCardFallback from 'src/images/business-card-fallback.svg'
 import { useImageOrientation } from 'src/utils/image'
 
 interface Props {
-  frontImageUrl: string
+  frontImageUrl?: string | null
   backImageUrl?: string | null
+  showPlaceholderIfMissing?: boolean
 }
 
-const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
-  const cardOrientation = useImageOrientation(frontImageUrl ?? null)
+const BusinessCardFan = ({
+  frontImageUrl,
+  backImageUrl,
+  showPlaceholderIfMissing,
+}: Props) => {
+  const showPlaceholder = !frontImageUrl && !backImageUrl
+  const frontImageOrientation = useImageOrientation(frontImageUrl ?? null)
+  const cardOrientation = showPlaceholder ? 'horizontal' : frontImageOrientation
 
   return (
     <Box
@@ -27,7 +35,7 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
         unknown: {},
       }[cardOrientation]}
     >
-      {frontImageUrl && (
+      {
         <Image
           zIndex={2}
           position="relative"
@@ -37,11 +45,11 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
             ]
           }
           ml="auto"
-          src={frontImageUrl}
+          src={frontImageUrl ?? businessCardFallback}
           boxShadow="businessCard"
         />
-      )}
-      {backImageUrl && (
+      }
+      {
         <Image
           zIndex={1}
           position="absolute"
@@ -61,10 +69,10 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
             },
             unknown: {},
           }[cardOrientation]}
-          src={backImageUrl}
+          src={backImageUrl ?? businessCardFallback}
           boxShadow="businessCard"
         />
-      )}
+      }
     </Box>
   )
 }
