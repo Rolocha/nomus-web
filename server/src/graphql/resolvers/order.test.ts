@@ -8,6 +8,7 @@ import {
   INITIAL_ORDER_STATE,
   OrderEventTrigger,
   OrderState,
+  VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
 import { Result } from 'src/util/error'
 import * as fileUtil from 'src/util/file'
@@ -517,12 +518,8 @@ describe('OrderResolver', () => {
 
       // Orders belonging to the user but that they shouldn't be able to see
       await Promise.all(HIDDEN_ORDER_LIST_STATES.map((state) => createMockOrder({ user, state })))
-
-      const nonHiddenStates = (Object.keys(OrderState) as OrderState[]).filter(
-        (state) => !HIDDEN_ORDER_LIST_STATES.includes(state)
-      )
       const ordersToShow = await Promise.all(
-        nonHiddenStates.map((state) => createMockOrder({ user, state }))
+        VISIBLE_ORDER_LIST_STATES.map((state) => createMockOrder({ user, state }))
       )
       const response = await execQuery({
         source: `
@@ -539,27 +536,8 @@ describe('OrderResolver', () => {
       const expectedOrderIds = ordersToShow.map((o) => o.id).sort()
       expect(responseOrderIds).toEqual(expectedOrderIds)
     })
-
-    it('fetches all users orders for an admin', async () => {
-      const user = await createMockUser()
-      const order1 = await createMockOrder({ user: user })
-      const order2 = await createMockOrder({ user: user })
-      const response = await execQuery({
-        source: `
-          query OrdersTestQuery($userId: String!) {
-            userOrders(userId: $userId) {
-              id
-            }
-          }
-          `,
-        variableValues: {
-          userId: user.id,
-        },
-        asAdmin: true,
-      })
-      expect(response.data?.userOrders).toEqual([{ id: order1.id }, { id: order2.id }])
-    })
   })
+
   describe('updateOrder', () => {
     it('updates an order', async () => {
       const user = await createMockUser()
