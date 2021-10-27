@@ -299,7 +299,7 @@ export default () => {
             alignItems="stretch"
             justifyContent="flex-start"
           >
-            <BusinessCardImage width="100%" placeholder />
+            <BusinessCardFan />
             <Box mt={2} flexGrow={0}>
               <Link buttonStyle="secondary" to="/shop">
                 Get a Nomus card

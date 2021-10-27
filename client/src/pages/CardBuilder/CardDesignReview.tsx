@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
-import BusinessCardImage from 'src/components/BusinessCardImage'
+import Image from 'src/components/Image'
 import * as Text from 'src/components/Text'
 import { CardMetadata } from 'src/pages/CardBuilder/UnifiedReviewStep'
 import { CardBuilderState } from './card-builder-state'
@@ -62,12 +62,12 @@ const CardDesignReview = ({
     >
       {cardImages?.front && (
         <Box gridArea="frontCard">
-          <BusinessCardImage width="100%" frontImageUrl={cardImages.front} />
+          <Image width="100%" src={cardImages.front} boxShadow="businessCard" />
         </Box>
       )}
       {cardImages?.back && (
         <Box gridArea="backCard">
-          <BusinessCardImage width="100%" backImageUrl={cardImages.back} />
+          <Image width="100%" src={cardImages.back} boxShadow="businessCard" />
         </Box>
       )}
 
