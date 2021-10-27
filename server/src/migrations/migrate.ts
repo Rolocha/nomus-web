@@ -1,13 +1,10 @@
+// This import must come first since it sets up the env vars
+import './setup-migration-engine'
+
 import path from 'path'
 import fs from 'fs'
 import { Migrator } from './base-migration'
 import * as db from 'src/db'
-import dotenv from 'dotenv'
-
-const pathToEnv = path.resolve(__dirname, '../../../.env')
-dotenv.config({
-  path: pathToEnv,
-})
 
 const migrationName = process.argv[2]
 
