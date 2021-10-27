@@ -8,7 +8,6 @@ import { UpdateNomusProFeatureSet } from 'src/apollo/types/UpdateNomusProFeature
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardFan from 'src/components/BusinessCardFan'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditableImage from 'src/components/EditableImage'
 import * as Form from 'src/components/Form'
