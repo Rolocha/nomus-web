@@ -23,11 +23,8 @@ export const Primary = () => {
         frontImageUrl="https://nomus-assets.s3.amazonaws.com/card-versions/cardv_60ae1754821500001c8f7683/front"
         backImageUrl="https://nomus-assets.s3.amazonaws.com/card-versions/cardv_60ae1754821500001c8f7683/back"
       />
-      <BusinessCardFan
-        frontImageUrl={null}
-        backImageUrl={null}
-        showPlaceholderIfMissing
-      />
+      {/* Null images should result in rendering placeholder image */}
+      <BusinessCardFan frontImageUrl={null} backImageUrl={null} />
     </Box>
   )
 }

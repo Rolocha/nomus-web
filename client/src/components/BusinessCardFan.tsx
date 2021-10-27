@@ -7,14 +7,9 @@ import { useImageOrientation } from 'src/utils/image'
 interface Props {
   frontImageUrl?: string | null
   backImageUrl?: string | null
-  showPlaceholderIfMissing?: boolean
 }
 
-const BusinessCardFan = ({
-  frontImageUrl,
-  backImageUrl,
-  showPlaceholderIfMissing,
-}: Props) => {
+const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
   const showPlaceholder = !frontImageUrl && !backImageUrl
   const frontImageOrientation = useImageOrientation(frontImageUrl ?? null)
   const cardOrientation = showPlaceholder ? 'horizontal' : frontImageOrientation

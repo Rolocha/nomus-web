@@ -197,7 +197,6 @@ const ContactCardsList = ({
                                 <Box position="relative">
                                   <Box width="180px">
                                     <BusinessCardFan
-                                      showPlaceholderIfMissing
                                       frontImageUrl={contact.cardFrontImageUrl}
                                       backImageUrl={contact.cardBackImageUrl}
                                     />
