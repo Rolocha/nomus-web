@@ -344,8 +344,7 @@ const ContactInfoPage = () => {
                   modalOpener={openNotesModal}
                   fieldRef={meetingPlaceRef}
                 >
-                  This is your time to shine. Tell us all about what makes you,
-                  you.
+                  Jot down where you met {contact.name.first}.
                 </Form.FieldPrompt>
               )}
             </Box>
@@ -373,7 +372,7 @@ const ContactInfoPage = () => {
                   modalOpener={openNotesModal}
                   fieldRef={tagsRef}
                 >
-                  Add tags to make organizing and searching easier
+                  Add tags to make organizing and searching easier.
                 </Form.FieldPrompt>
               )}
             </Box>
@@ -389,8 +388,8 @@ const ContactInfoPage = () => {
                   modalOpener={openNotesModal}
                   fieldRef={notesRef}
                 >
-                  Add your own notes to this contact. Do they have cool glasses?
-                  Like the same sports team?
+                  Add your own notes about {contact.name.first}. Do they have
+                  cool glasses? Like the same sports team?
                 </Form.FieldPrompt>
               )}
             </Box>
