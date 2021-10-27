@@ -26,8 +26,12 @@ export const createMigration = ({ name, up, down }: MigrationArgs): Migrator => 
         throw new Error('You cannot run the same migration twice')
       }
 
-      const mongoClient = new MongoClient(MONGO_DB_URI)
+      const mongoClient = new MongoClient(MONGO_DB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      })
       await mongoClient.connect()
+      // Change this to nomus-db when doing a prod migration
       const db = mongoClient.db('nomus-dev')
 
       await up({ mongoClient, db })
