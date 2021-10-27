@@ -21,6 +21,7 @@ import {
   OrderEventTrigger,
   OrderState,
   Role,
+  VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
 import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
@@ -40,7 +41,6 @@ import {
   Root,
   UnauthorizedError,
 } from 'type-graphql'
-import { AdminOnlyArgs } from '../auth'
 
 @InputType({
   description: 'Input to generate new Order object, regardless of what type of card base was used',
@@ -311,18 +311,16 @@ class OrderResolver {
 
   // Get all orders for a User
   @Authorized(Role.User)
-  @AdminOnlyArgs('userId')
   @Query(() => [Order], { nullable: true })
-  async userOrders(
-    @Arg('userId', { nullable: true }) userId: string | null,
-    @Ctx() context: IApolloContext
-  ): Promise<Order[]> {
-    const requesterUserId = context.user._id
-    const requestedUserId = userId ?? requesterUserId
-
-    const orders = await Order.mongo.find({ user: requestedUserId }).populate('cardVersion')
-
-    return orders
+  async userOrders(@Ctx() context: IApolloContext): Promise<Order[]> {
+    return Order.mongo
+      .find({
+        user: context.user._id,
+        state: {
+          $in: VISIBLE_ORDER_LIST_STATES,
+        },
+      })
+      .populate('cardVersion')
   }
 
   // No @Authorized() decorator - we want a logged-out client to be able to

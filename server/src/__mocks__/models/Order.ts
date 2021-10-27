@@ -20,7 +20,6 @@ export const createMockOrder = async (override: Partial<Order> = {}) => {
     },
     state: override.state ?? INITIAL_ORDER_STATE,
     trackingNumber: override.trackingNumber ?? '0000000000000',
-    shortId: override.shortId ?? 'SJC123',
     shippingAddress: {
       line1: 'Rausch St.',
       line2: '404',
