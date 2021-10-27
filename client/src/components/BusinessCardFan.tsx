@@ -1,7 +1,8 @@
 import * as React from 'react'
 import Box from 'src/components/Box'
 import Image from 'src/components/Image'
-import businessCardFallback from 'src/images/business-card-fallback.svg'
+import businessCardFrontFallback from 'src/images/business-card-front-fallback.svg'
+import businessCardBackFallback from 'src/images/business-card-back-fallback.svg'
 import { useImageOrientation } from 'src/utils/image'
 
 interface Props {
@@ -40,7 +41,7 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
             ]
           }
           ml="auto"
-          src={frontImageUrl ?? businessCardFallback}
+          src={frontImageUrl ?? businessCardFrontFallback}
           boxShadow="businessCard"
         />
       }
@@ -64,7 +65,7 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
             },
             unknown: {},
           }[cardOrientation]}
-          src={backImageUrl ?? businessCardFallback}
+          src={backImageUrl ?? businessCardBackFallback}
           boxShadow="businessCard"
         />
       }
