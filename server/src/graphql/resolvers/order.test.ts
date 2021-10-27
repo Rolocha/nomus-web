@@ -799,6 +799,9 @@ describe('OrderResolver', () => {
       expect(orderDetails.cardVersion.frontImageUrl).toBeNull()
       expect(orderDetails.cardVersion.backImageUrl).toBeNull()
 
+      const updatedUser = await User.mongo.findById(user.id)
+      expect(updatedUser.defaultCardVersion).toBe(orderDetails.cardVersion.id)
+
       expect(sgMail.send).toBeCalledTimes(0)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {
@@ -963,6 +966,63 @@ describe('OrderResolver', () => {
         tax: costSummary.estimatedTaxes,
         total: costSummary.total,
       })
+
+      expect(sgMail.send).toBeCalledTimes(0)
+    })
+
+    it('skips updating user.defaultCardVersion if that parameter is passed', async () => {
+      const user = await createMockUser()
+      const existingCv = await createMockCardVersion({ user: user.id })
+      user.defaultCardVersion = existingCv.id
+      await user.save()
+
+      const payload = {
+        email: user.email,
+        name: {
+          first: user.name.first,
+          middle: user.name.middle,
+          last: user.name.last,
+        },
+        quantity: 100,
+        shippingAddress: {
+          line1: '1600 Pennsylvania Ave.',
+          line2: 'Red Room',
+          city: 'Washington',
+          state: 'DC',
+          postalCode: '20502',
+        },
+        price: {
+          subtotal: 5000,
+          tax: 427,
+          shipping: 0,
+          discount: 100,
+          total: 5327,
+        },
+        paymentIntent: 'pi_1234',
+        skipDefaultCardVersionUpdate: true,
+      }
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                cardVersion {
+                  id
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload,
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder
+
+      const updatedUser = await User.mongo.findById(user.id)
+      expect(updatedUser.defaultCardVersion).toBe(existingCv.id)
+      expect(existingCv.id).not.toBe(orderDetails.cardVersion.id)
 
       expect(sgMail.send).toBeCalledTimes(0)
     })

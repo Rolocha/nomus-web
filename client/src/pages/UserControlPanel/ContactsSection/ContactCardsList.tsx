@@ -195,16 +195,12 @@ const ContactCardsList = ({
                             {
                               grid: (
                                 <Box position="relative">
-                                  {contact.cardFrontImageUrl && (
-                                    <Box width="180px">
-                                      <BusinessCardFan
-                                        frontImageUrl={
-                                          contact.cardFrontImageUrl
-                                        }
-                                        backImageUrl={contact.cardBackImageUrl}
-                                      />
-                                    </Box>
-                                  )}
+                                  <Box width="180px">
+                                    <BusinessCardFan
+                                      frontImageUrl={contact.cardFrontImageUrl}
+                                      backImageUrl={contact.cardBackImageUrl}
+                                    />
+                                  </Box>
                                   <Box
                                     zIndex={2}
                                     position="absolute"

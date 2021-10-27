@@ -1,8 +1,15 @@
+import { MongoClient, Db as MongoClientDb } from 'mongodb'
+import { MONGO_DB_URI } from 'src/config'
 import MigrationEvent from 'src/models/MigrationEvent'
+
+export interface MigrationUpArgs {
+  mongoClient: MongoClient
+  db: MongoClientDb
+}
 
 export interface MigrationArgs {
   name: string
-  up: () => Promise<void>
+  up: (args: MigrationUpArgs) => Promise<void>
   down: () => Promise<void>
 }
 
@@ -19,7 +26,11 @@ export const createMigration = ({ name, up, down }: MigrationArgs): Migrator => 
         throw new Error('You cannot run the same migration twice')
       }
 
-      await up()
+      const mongoClient = new MongoClient(MONGO_DB_URI)
+      await mongoClient.connect()
+      const db = mongoClient.db('nomus-dev')
+
+      await up({ mongoClient, db })
       await MigrationEvent.mongo.create({
         migrationName: name,
       })

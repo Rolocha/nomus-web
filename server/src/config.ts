@@ -9,6 +9,8 @@ export const SENDGRID_TOKEN =
   process.env.NODE_ENV === 'test'
     ? 'SG.whatever-as-long-as-it-starts-with-SG'
     : process.env.SENDGRID_TOKEN
+export const MONGO_DB_URI =
+  process.env.NODE_ENV === 'test' ? process.env.MONGO_URL : process.env.MONGO_DB_URI
 
 // Internal Config (not sourced from env vars)
 export const REFRESH_TOKEN_LIFESPAN = ms('30 days')

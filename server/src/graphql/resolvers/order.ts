@@ -152,6 +152,14 @@ class ManualOrderInput {
 
   @Field({ nullable: true })
   paymentIntent?: string | null
+
+  @Field({
+    nullable: true,
+    defaultValue: false,
+    description:
+      "Whether to skip updating the user's default card version to the one created in this order",
+  })
+  skipDefaultCardVersionUpdate: boolean
 }
 
 @ObjectType()
@@ -571,6 +579,11 @@ class OrderResolver {
       paymentIntent: payload.paymentIntent,
       createdBy: OrderCreatedBy.Manual,
     })
+
+    if (!payload.skipDefaultCardVersionUpdate) {
+      user.defaultCardVersion = cv.id
+      await user.save()
+    }
 
     return order
   }

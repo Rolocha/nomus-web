@@ -8,7 +8,6 @@ import { UpdateNomusProFeatureSet } from 'src/apollo/types/UpdateNomusProFeature
 import { UpdateProfilePictureMutation } from 'src/apollo/types/UpdateProfilePictureMutation'
 import Box from 'src/components/Box'
 import BusinessCardFan from 'src/components/BusinessCardFan'
-import BusinessCardImage from 'src/components/BusinessCardImage'
 import Button from 'src/components/Button'
 import EditableImage from 'src/components/EditableImage'
 import * as Form from 'src/components/Form'
@@ -299,7 +298,7 @@ export default () => {
             alignItems="stretch"
             justifyContent="flex-start"
           >
-            <BusinessCardImage width="100%" placeholder />
+            <BusinessCardFan />
             <Box mt={2} flexGrow={0}>
               <Link buttonStyle="secondary" to="/shop">
                 Get a Nomus card
