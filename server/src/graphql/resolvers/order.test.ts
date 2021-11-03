@@ -1,18 +1,24 @@
+import PrintSpec from 'src/lib/print-spec'
 import { Order, User } from 'src/models'
 import { Address, OrderPrice, PersonName } from 'src/models/subschemas'
 import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { execQuery } from 'src/test-utils/graphql'
-import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from 'src/util/enums'
+import {
+  HIDDEN_ORDER_LIST_STATES,
+  INITIAL_ORDER_STATE,
+  OrderEventTrigger,
+  OrderState,
+  VISIBLE_ORDER_LIST_STATES,
+} from 'src/util/enums'
+import { Result } from 'src/util/error'
+import * as fileUtil from 'src/util/file'
+import { getCostSummary } from 'src/util/pricing'
+import * as S3 from 'src/util/s3'
+import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
-import { getCostSummary } from 'src/util/pricing'
-import * as fileUtil from 'src/util/file'
-import * as S3 from 'src/util/s3'
-import PrintSpec from 'src/lib/print-spec'
 import { mocked } from 'ts-jest/utils'
-import { Result } from 'src/util/error'
 
 jest.setTimeout(30000)
 jest.mock('src/util/file')
@@ -507,10 +513,14 @@ describe('OrderResolver', () => {
   })
 
   describe('userOrders', () => {
-    it('fetches all orders for a user', async () => {
+    it('fetches all user-visible orders for a user', async () => {
       const user = await createMockUser()
-      const order1 = await createMockOrder({ user: user })
-      const order2 = await createMockOrder({ user: user })
+
+      // Orders belonging to the user but that they shouldn't be able to see
+      await Promise.all(HIDDEN_ORDER_LIST_STATES.map((state) => createMockOrder({ user, state })))
+      const ordersToShow = await Promise.all(
+        VISIBLE_ORDER_LIST_STATES.map((state) => createMockOrder({ user, state }))
+      )
       const response = await execQuery({
         source: `
           query OrdersTestQuery {
@@ -521,28 +531,13 @@ describe('OrderResolver', () => {
           `,
         contextUser: user,
       })
-      expect(response.data?.userOrders).toEqual([{ id: order1.id }, { id: order2.id }])
-    })
-    it('fetches all users orders for an admin', async () => {
-      const user = await createMockUser()
-      const order1 = await createMockOrder({ user: user })
-      const order2 = await createMockOrder({ user: user })
-      const response = await execQuery({
-        source: `
-          query OrdersTestQuery($userId: String!) {
-            userOrders(userId: $userId) {
-              id
-            }
-          }
-          `,
-        variableValues: {
-          userId: user.id,
-        },
-        asAdmin: true,
-      })
-      expect(response.data?.userOrders).toEqual([{ id: order1.id }, { id: order2.id }])
+
+      const responseOrderIds = response.data?.userOrders.map((o) => o.id).sort()
+      const expectedOrderIds = ordersToShow.map((o) => o.id).sort()
+      expect(responseOrderIds).toEqual(expectedOrderIds)
     })
   })
+
   describe('updateOrder', () => {
     it('updates an order', async () => {
       const user = await createMockUser()
@@ -804,6 +799,9 @@ describe('OrderResolver', () => {
       expect(orderDetails.cardVersion.frontImageUrl).toBeNull()
       expect(orderDetails.cardVersion.backImageUrl).toBeNull()
 
+      const updatedUser = await User.mongo.findById(user.id)
+      expect(updatedUser.defaultCardVersion).toBe(orderDetails.cardVersion.id)
+
       expect(sgMail.send).toBeCalledTimes(0)
     })
     it('properly creates a manual order for a new user and sends them an update email', async () => {
@@ -968,6 +966,63 @@ describe('OrderResolver', () => {
         tax: costSummary.estimatedTaxes,
         total: costSummary.total,
       })
+
+      expect(sgMail.send).toBeCalledTimes(0)
+    })
+
+    it('skips updating user.defaultCardVersion if that parameter is passed', async () => {
+      const user = await createMockUser()
+      const existingCv = await createMockCardVersion({ user: user.id })
+      user.defaultCardVersion = existingCv.id
+      await user.save()
+
+      const payload = {
+        email: user.email,
+        name: {
+          first: user.name.first,
+          middle: user.name.middle,
+          last: user.name.last,
+        },
+        quantity: 100,
+        shippingAddress: {
+          line1: '1600 Pennsylvania Ave.',
+          line2: 'Red Room',
+          city: 'Washington',
+          state: 'DC',
+          postalCode: '20502',
+        },
+        price: {
+          subtotal: 5000,
+          tax: 427,
+          shipping: 0,
+          discount: 100,
+          total: 5327,
+        },
+        paymentIntent: 'pi_1234',
+        skipDefaultCardVersionUpdate: true,
+      }
+
+      const response = await execQuery({
+        source: `
+            mutation ManualOrder($payload: ManualOrderInput!) {
+              submitManualOrder(payload: $payload) {
+                cardVersion {
+                  id
+                }
+              }
+            }
+          `,
+        variableValues: {
+          payload,
+        },
+        asAdmin: true,
+      })
+
+      const orderDetails = response.data?.submitManualOrder
+
+      const updatedUser = await User.mongo.findById(user.id)
+      expect(updatedUser.defaultCardVersion).toBe(existingCv.id)
+      expect(existingCv.id).not.toBe(orderDetails.cardVersion.id)
 
       expect(sgMail.send).toBeCalledTimes(0)
     })

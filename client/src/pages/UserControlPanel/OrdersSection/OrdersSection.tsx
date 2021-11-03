@@ -76,7 +76,7 @@ export default () => {
   }
 
   return (
-    <Box p={{ base: '24px', md: '48px' }} height="100%" overflowY="scroll">
+    <Box p={{ base: '24px', md: '48px' }} height="100%">
       {userOrders.length === 0 && (
         <Box
           display="grid"

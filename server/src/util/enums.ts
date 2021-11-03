@@ -24,7 +24,17 @@ export enum OrderState {
   Canceled = 'Canceled',
 }
 
+export const ORDER_STATES = Object.keys(OrderState) as OrderState[]
+
 export const INITIAL_ORDER_STATE = OrderState.Initialized
+
+// Orders shouldn't show up in the result of the `userOrders` resolver
+// if they are in one of these states because it means they have only partially
+// been completed in Card Builder
+export const HIDDEN_ORDER_LIST_STATES = [OrderState.Initialized, OrderState.Captured]
+export const VISIBLE_ORDER_LIST_STATES = ORDER_STATES.filter(
+  (s) => !HIDDEN_ORDER_LIST_STATES.includes(s)
+)
 
 registerEnumType(OrderState, {
   name: 'OrderState',

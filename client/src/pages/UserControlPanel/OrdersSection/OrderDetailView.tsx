@@ -177,10 +177,14 @@ export default ({ orderId }: Props) => {
           </Box>
           <Box gridArea="shippingAddress">
             <Text.Label>Shipping Address</Text.Label>
-            <Text.Body2>{`${order.shippingName}`}</Text.Body2>
-            {order.shippingAddress ? (
+            {order.shippingName || order.shippingAddress ? (
               <Box>
-                <Text.Body2>{order.shippingAddress.line1}</Text.Body2>
+                {order.shippingName && (
+                  <Text.Body2>{`${order.shippingName}`}</Text.Body2>
+                )}
+                {order.shippingAddress.line1 && (
+                  <Text.Body2>{order.shippingAddress.line1}</Text.Body2>
+                )}
                 {order.shippingAddress.line2 && (
                   <Text.Body2>{order.shippingAddress.line1}</Text.Body2>
                 )}

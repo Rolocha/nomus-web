@@ -1,10 +1,12 @@
 import mongoose from 'mongoose'
+import { MONGO_DB_URI } from 'src/config'
 
 export const initDB = async () => {
   try {
     // Disconnect from any existing connections (e.g. if you imported {app} from src/app in the test file calling this method)
     await mongoose.disconnect()
-    await mongoose.connect(process.env.MONGO_URL, {
+    await mongoose.connect(MONGO_DB_URI, {
+      dbName: 'nomus-dev',
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,

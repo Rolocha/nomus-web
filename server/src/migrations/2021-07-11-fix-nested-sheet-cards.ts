@@ -1,7 +1,8 @@
 import { MongoClient } from 'mongodb'
+import { MONGO_DB_URI } from 'src/config'
 import { createMigration } from './base-migration'
 
-const client = new MongoClient(process.env.MONGO_DB_URI)
+const client = new MongoClient(MONGO_DB_URI)
 
 export default createMigration({
   name: 'fixNestedSheetCards',
