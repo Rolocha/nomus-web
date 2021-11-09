@@ -18,7 +18,11 @@ import {
 } from 'src/pages/CardBuilder/mutations'
 import { colors } from 'src/styles'
 import templateLibrary from 'src/templates'
-import { dataURItoBlob } from 'src/utils/image'
+import {
+  dataURItoBlob,
+  getImageDimensions,
+  ImageDimensions,
+} from 'src/utils/image'
 
 export const sampleCardBuilderState: CardBuilderState = {
   ...initialStateOptions[CardSpecBaseType.Template],
@@ -161,4 +165,56 @@ export const useSubmitOrder = () => {
   }
 
   return submit
+}
+
+export type CustomImagesValidationResult = {
+  frontSizeCorrect: boolean
+  backSizeCorrect: boolean
+  sizesMatch: boolean
+  frontDimensions: ImageDimensions | null
+  backDimensions: ImageDimensions | null
+}
+
+export const validateCustomImages = async (
+  frontImage?: string,
+  backImage?: string,
+): Promise<CustomImagesValidationResult> => {
+  const frontDimensions = frontImage
+    ? await getImageDimensions(frontImage)
+    : null
+  const backDimensions = backImage ? await getImageDimensions(backImage) : null
+
+  const result: CustomImagesValidationResult = {
+    frontSizeCorrect: false,
+    backSizeCorrect: false,
+    sizesMatch: true,
+    frontDimensions,
+    backDimensions,
+  }
+
+  // If both are present, check that they match first
+  if (frontDimensions && backDimensions) {
+    const mismatched =
+      frontDimensions.height !== backDimensions.height ||
+      frontDimensions.width !== backDimensions.width
+    if (mismatched) {
+      result.sizesMatch = false
+    }
+  }
+
+  const [frontDimensionsOkay, backDimensionsOkay] = [
+    frontDimensions,
+    backDimensions,
+  ].map((dims) => {
+    if (!dims) return true
+    const aspectRatio =
+      Math.max(dims.height, dims.width) / Math.min(dims.height, dims.width)
+    const isAcceptableAspectRatio = aspectRatio > 1.7 && aspectRatio < 1.8
+    return isAcceptableAspectRatio
+  })
+
+  result.frontSizeCorrect = frontDimensionsOkay
+  result.backSizeCorrect = backDimensionsOkay
+
+  return result
 }
