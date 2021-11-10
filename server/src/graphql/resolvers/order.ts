@@ -406,52 +406,26 @@ class OrderResolver {
   ): Promise<SubmitOrderResponse> {
     const user: DocumentType<User> | undefined = context.user
 
-    this.validateBaseSubmitOrderInput(payload)
+    return this.submitCardBuilderOrderCommon(user, payload, async () => {
+      const cardVersion = new CardVersion.mongo({
+        user: user?.id,
+        baseType: CardSpecBaseType.Custom,
+      })
 
-    const cardVersion = new CardVersion.mongo({
-      user: user?.id,
-      baseType: CardSpecBaseType.Custom,
+      const uploadedImageUrls = await this.uploadCardImages(
+        {
+          front: payload.frontImageDataUrl,
+          back: payload.backImageDataUrl,
+        },
+        cardVersion.id
+      )
+      cardVersion.frontImageUrl = uploadedImageUrls.front
+      if (uploadedImageUrls.back) {
+        cardVersion.backImageUrl = uploadedImageUrls.back
+      }
+      await cardVersion.save()
+      return cardVersion
     })
-
-    const uploadedImageUrls = await this.uploadCardImages(
-      {
-        front: payload.frontImageDataUrl,
-        back: payload.backImageDataUrl,
-      },
-      cardVersion.id
-    )
-
-    cardVersion.frontImageUrl = uploadedImageUrls.front
-    if (uploadedImageUrls.back) {
-      cardVersion.backImageUrl = uploadedImageUrls.back
-    }
-
-    await cardVersion.save()
-
-    const order = await this.createOrUpdateCardBuilderOrder({
-      user,
-      cardVersion,
-      payload,
-    })
-
-    await order.updatePrintSpecPDF()
-
-    // Update the user's default card version to the newly created one
-    if (user) {
-      user.defaultCardVersion = cardVersion.id
-      await user.save()
-    }
-
-    // If the User object was just created during this mutation,
-    // set the auth cookies so the user is now logged in
-    if (context.user == null) {
-      await setAuthCookies(user, context.req.res)
-    }
-
-    return {
-      orderId: order.id,
-      checkoutSession: order.checkoutSession,
-    }
   }
 
   // No @Authorized() decorator - we want a logged-out client to be able to
@@ -466,59 +440,41 @@ class OrderResolver {
   ): Promise<SubmitOrderResponse> {
     const user: DocumentType<User> | undefined = context.user
 
-    this.validateBaseSubmitOrderInput(payload)
+    return this.submitCardBuilderOrderCommon(user, payload, async () => {
+      const cardVersion = await CardVersion.mongo.findById(payload.cardVersionId)
+      if (cardVersion == null) {
+        throw new Error(`No card version found with id: ${payload.cardVersionId}`)
+      }
 
-    const cardVersion = await CardVersion.mongo.findById(payload.cardVersionId)
-    if (cardVersion == null) {
-      throw new Error(`No card version found with id: ${payload.cardVersionId}`)
-    }
+      // Update the card version with the customized template details
+      cardVersion.templateId = payload.templateId
+      cardVersion.contactInfo = payload.contactInfo
+      cardVersion.colorScheme = payload.colorScheme
+      cardVersion.qrCodeUrl = payload.qrCodeUrl
 
-    // Update the card version with the customized template details
-    cardVersion.templateId = payload.templateId
-    cardVersion.contactInfo = payload.contactInfo
-    cardVersion.colorScheme = payload.colorScheme
-    cardVersion.qrCodeUrl = payload.qrCodeUrl
+      // Even though the above fields contain all the data necessary to render the card image,
+      // for now we still require images to be rendered on the client side and sent to the backend.
+      // This is because the image generation happens using HTML5 Canvas which isn't supported natively
+      // in Node.
+      //
+      // Down the line, we can & might want to enable server-side card image generation by leveraging
+      // a third-party NPM package that implements the Canvas API in Node, as well as by refactoring the
+      // template rendering logic (in src/client/templates) to be isomorphic for use on both client & server.
+      const uploadedImageUrls = await this.uploadCardImages(
+        {
+          front: payload.frontImageDataUrl,
+          back: payload.backImageDataUrl,
+        },
+        cardVersion.id
+      )
+      cardVersion.frontImageUrl = uploadedImageUrls.front
+      if (uploadedImageUrls.back) {
+        cardVersion.backImageUrl = uploadedImageUrls.back
+      }
+      await cardVersion.save()
 
-    // Even though the above fields contain all the data necessary to render the card image,
-    // for now we still require images to be rendered on the client side and sent to the backend.
-    // This is because the image generation happens using HTML5 Canvas which isn't supported natively
-    // in Node.
-    //
-    // Down the line, we can & might want to enable server-side card image generation by leveraging
-    // a third-party NPM package that implements the Canvas API in Node, as well as by refactoring the
-    // template rendering logic (in src/client/templates) to be isomorphic for use on both client & server.
-    const uploadedImageUrls = await this.uploadCardImages(
-      {
-        front: payload.frontImageDataUrl,
-        back: payload.backImageDataUrl,
-      },
-      cardVersion.id
-    )
-
-    cardVersion.frontImageUrl = uploadedImageUrls.front
-    if (uploadedImageUrls.back) {
-      cardVersion.backImageUrl = uploadedImageUrls.back
-    }
-    await cardVersion.save()
-
-    const order = await this.createOrUpdateCardBuilderOrder({
-      user,
-      cardVersion,
-      payload,
+      return cardVersion
     })
-
-    await order.updatePrintSpecPDF()
-
-    if (user) {
-      // Update the user's default card version to the newly created one
-      user.defaultCardVersion = cardVersion.id
-      await user.save()
-    }
-
-    return {
-      orderId: order.id,
-      checkoutSession: order.checkoutSession,
-    }
   }
 
   @Authorized(Role.Admin)
@@ -591,6 +547,38 @@ class OrderResolver {
   /**
    * Private helpers
    */
+
+  // Handles the base-type-agnostic logic for submitting an order from Card Studio
+  // The `createCardVersion` parameter expects the caller to create a CardVersion,
+  // the process for which _is_ base-type specific
+  private async submitCardBuilderOrderCommon(
+    user: DocumentType<User>,
+    payload: SubmitTemplateOrderInput | SubmitCustomOrderInput,
+    createCardVersion: () => Promise<DocumentType<CardVersion>>
+  ): Promise<SubmitOrderResponse> {
+    this.validateBaseSubmitOrderInput(payload)
+    const cardVersion = await createCardVersion()
+
+    const order = await this.createOrUpdateCardBuilderOrder({
+      user,
+      cardVersion,
+      payload,
+    })
+
+    await order.updatePrintSpecPDF()
+
+    // Update the user's default card version to the newly created one
+    if (user) {
+      user.defaultCardVersion = cardVersion.id
+      await user.save()
+    }
+
+    return {
+      orderId: order.id,
+      checkoutSession: order.checkoutSession,
+    }
+  }
+
   private async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
     if (payload.orderId) {
       const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.orderId })

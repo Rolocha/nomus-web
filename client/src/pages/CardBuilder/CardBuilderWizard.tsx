@@ -21,12 +21,17 @@ import { INITIALIZE_CARD_BUILDER_MUTATION } from 'src/pages/CardBuilder/mutation
 import TemplateBuildStep from 'src/pages/CardBuilder/TemplateBuildStep'
 import TemplateReviewStep from 'src/pages/CardBuilder/TemplateReviewStep'
 import { CardBuilderStep } from 'src/pages/CardBuilder/types'
-import { useSubmitOrder } from 'src/pages/CardBuilder/util'
+import {
+  CustomImagesValidationResult,
+  useSubmitOrder,
+  validateCustomImages,
+} from 'src/pages/CardBuilder/util'
 import breakpoints, { useBreakpoint } from 'src/styles/breakpoints'
 import theme from 'src/styles/theme'
 import templateLibrary from 'src/templates'
 import { getAllOmittedContactFields } from 'src/templates/utils'
 import { useAuth } from 'src/utils/auth'
+
 const ROUTE_REGEX = /\/card-studio\/([^/]*)\/?/
 const VALID_SUBROUTES = ['custom', 'template'] as const
 type ValidSubroute = typeof VALID_SUBROUTES[number]
@@ -52,6 +57,10 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
   const stripe = useStripe()
 
   const [isNotSafeToRedirect, setIsNotSafeToRedirect] = React.useState(true)
+  const [
+    customImagesValidationStatus,
+    setCustomImagesValidationStatus,
+  ] = React.useState<CustomImagesValidationResult | null>(null)
 
   const baseType =
     subrouteParam && isValidSubroute(subrouteParam)
@@ -146,6 +155,17 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [initialize, handleBeforeUnload])
+
+  React.useEffect(() => {
+    validateCustomImages(
+      cardBuilderState.frontDesignFile?.url,
+      cardBuilderState.backDesignFile?.url,
+    ).then(setCustomImagesValidationStatus)
+  }, [
+    cardBuilderState.frontDesignFile,
+    cardBuilderState.backDesignFile,
+    setCustomImagesValidationStatus,
+  ])
 
   const submitOrder = useSubmitOrder()
 
@@ -307,10 +327,11 @@ const CardBuilder = ({ fatalError, setFatalError }: Props) => {
               label="Build"
               isReadyForNextStep={
                 {
-                  // For custom base type, at least the front design file must have been provided
                   [CardSpecBaseType.Custom]:
-                    cardBuilderState.frontDesignFile != null,
-                  // TBD requirements for template
+                    cardBuilderState.frontDesignFile != null &&
+                    customImagesValidationStatus?.backSizeCorrect &&
+                    customImagesValidationStatus.frontSizeCorrect &&
+                    customImagesValidationStatus.sizesMatch,
                   [CardSpecBaseType.Template]:
                     cardBuilderState.templateId != null &&
                     cardBuilderState.templateCustomization != null &&
