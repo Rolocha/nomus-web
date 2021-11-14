@@ -91,7 +91,7 @@ const ShopProductDetailPage = () => {
           </Box>
         </Box>
       </Box>
-      <Footer colorScheme="light" />
+      <Footer colorScheme="ivory" />
     </Box>
   )
 }

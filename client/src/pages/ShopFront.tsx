@@ -206,7 +206,7 @@ const ShopFront = () => {
           </Box>
         </Box>
       </Box>
-      <Footer colorScheme="light" />
+      <Footer colorScheme="ivory" />
     </Box>
   )
 }
