@@ -160,37 +160,43 @@ const ShopFront = () => {
                 const template = templateLibrary[templateId]
 
                 return (
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                  >
-                    <Box width="100%" mb="8px" px="14px" py="25px">
-                      <SampleTemplateCard templateId={templateId} />
+                  <Link to={`/shop/product/template-card-${templateId}`}>
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                    >
+                      <Box width="100%" mb="8px" px="14px" py="25px">
+                        <SampleTemplateCard templateId={templateId} />
+                      </Box>
+                      <Text.Body>{template.name}</Text.Body>
+                      <Text.Body3>from $40.00</Text.Body3>
                     </Box>
-                    <Text.Body>{template.name}</Text.Body>
-                    <Text.Body3>from $40.00</Text.Body3>
-                  </Box>
+                  </Link>
                 )
               })}
             </Box>
 
             <Text.H3 mt="32px">Preserve your brand</Text.H3>
-            <Box my="16px" display="flex" alignItems="center">
-              <Image
-                display={{ base: 'none', [bp]: 'block' }}
-                src={curvyPointerLeftImage}
-                mr="13px"
-              />
-              <Image src={scatteredCardsImage} />
-              <Image
-                display={{ base: 'none', [bp]: 'block' }}
-                src={curvyPointerRightImage}
-                ml="13px"
-              />
-            </Box>
-            <Text.Body>Custom card</Text.Body>
-            <Text.Body3>from $40.00</Text.Body3>
+            <Link to="/shop/product/custom-card">
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Box my="16px" display="flex" alignItems="center">
+                  <Image
+                    display={{ base: 'none', [bp]: 'block' }}
+                    src={curvyPointerLeftImage}
+                    mr="13px"
+                  />
+                  <Image src={scatteredCardsImage} />
+                  <Image
+                    display={{ base: 'none', [bp]: 'block' }}
+                    src={curvyPointerRightImage}
+                    ml="13px"
+                  />
+                </Box>
+                <Text.Body>Custom card</Text.Body>
+                <Text.Body3>from $40.00</Text.Body3>
+              </Box>
+            </Link>
 
             <Text.SectionHeader mt="50px" mb="16px">
               Pricing
