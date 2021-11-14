@@ -1,5 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
+import logoWhite from 'src/images/logo-white.svg'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 const Velia = new CardTemplate({
@@ -51,6 +52,9 @@ const Velia = new CardTemplate({
       placeholder: 'An apple a day keeps the doctor away',
     },
   } as const,
+  graphicSpec: {
+    defaultGraphic: logoWhite,
+  },
   async renderFront(
     this: CardTemplate,
     canvas: HTMLCanvasElement,
@@ -246,13 +250,16 @@ const Velia = new CardTemplate({
     // Render user-provided logo if provided
     if (options.graphic?.url) {
       const logoImg = await this.createImage(options.graphic.url)
-      const imageHeight =
-        (options.graphic.size ?? 1) * this.proportionalize(100)
-      const imageWidth =
-        (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
+      const imageDims = this.fitImageToBounds(logoImg, {
+        maxWidth: this.proportionalize(236),
+        maxHeight: this.proportionalize(112),
+      })
+      const scale = options.graphic.size ?? 1
+      const imageWidth = imageDims.width * scale
+      const imageHeight = imageDims.height * scale
 
       const imageY =
-        (this.proportionalize(this.height) -
+        (this.proportionalizedHeight -
           this.proportionalize(ACCENT_BAR_SIZE) -
           imageHeight) /
         2
