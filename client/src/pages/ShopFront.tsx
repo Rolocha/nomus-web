@@ -5,9 +5,14 @@ import Image from 'src/components/Image'
 import Link from 'src/components/Link'
 import Navbar from 'src/components/Navbar'
 import PricingTiers from 'src/components/PricingTiers'
+import SampleTemplateCard from 'src/components/SampleTemplateCard'
 import * as Text from 'src/components/Text'
 import cardCustomBg from 'src/images/card-custom-promo-bg.png'
 import cardTemplateBg from 'src/images/card-template-promo-bg.png'
+import curvyPointerLeftImage from 'src/images/curvy-pointer-left.svg'
+import curvyPointerRightImage from 'src/images/curvy-pointer-right.svg'
+import scatteredCardsImage from 'src/images/scattered-cards.svg'
+import templateLibrary, { templateNames } from 'src/templates'
 
 const bp = 'lg'
 
@@ -34,7 +39,7 @@ const ShopFront = () => {
             alignItems="center"
           >
             <Text.PageHeader textAlign="center" mt={3} mb={1}>
-              Design your Nomus card
+              Shop Nomus cards
             </Text.PageHeader>
             <Text.Body textAlign="center" mb={2} maxWidth="80%">
               Whichever you choose, your cards will have a Nomus tap-to-share
@@ -130,15 +135,62 @@ const ShopFront = () => {
                     buttonSize="big"
                     to="/card-studio/custom"
                   >
-                    Upload your design
+                    Create a custom card
                   </Link>
                 </Box>
               </Box>
 
               <Text.Body2 textAlign="center" gridArea="secondNote">
-                Design and upload your own card and we'll take care of the rest.
+                Design your own card and upload it to get it printed with an NFC
+                chip inside.
               </Text.Body2>
             </Box>
+
+            <Text.H3 mt="64px">Shop templates</Text.H3>
+            <Box
+              display="grid"
+              gridTemplateColumns={{
+                base: 'repeat(2, 1fr)',
+                [bp]: 'repeat(4, 1fr)',
+              }}
+              width="100%"
+              gridGap="16px"
+            >
+              {templateNames.map((templateId) => {
+                const template = templateLibrary[templateId]
+
+                return (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                  >
+                    <Box width="100%" mb="8px" px="14px" py="25px">
+                      <SampleTemplateCard templateId={templateId} />
+                    </Box>
+                    <Text.Body>{template.name}</Text.Body>
+                    <Text.Body3>from $40.00</Text.Body3>
+                  </Box>
+                )
+              })}
+            </Box>
+
+            <Text.H3 mt="32px">Preserve your brand</Text.H3>
+            <Box my="16px" display="flex" alignItems="center">
+              <Image
+                display={{ base: 'none', [bp]: 'block' }}
+                src={curvyPointerLeftImage}
+                mr="13px"
+              />
+              <Image src={scatteredCardsImage} />
+              <Image
+                display={{ base: 'none', [bp]: 'block' }}
+                src={curvyPointerRightImage}
+                ml="13px"
+              />
+            </Box>
+            <Text.Body>Custom card</Text.Body>
+            <Text.Body3>from $40.00</Text.Body3>
 
             <Text.SectionHeader mt="50px" mb="16px">
               Pricing
