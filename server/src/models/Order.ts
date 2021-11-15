@@ -92,7 +92,12 @@ class Order extends BaseModel({
   // Tracking Number for USPS
   @prop({ required: false })
   @Field({ nullable: true })
-  trackingNumber: string
+  trackingNumber?: string
+
+  // Object ID for the Shippo Transaction object, if one exists
+  // See https://goshippo.com/docs/reference/js#transactions
+  @prop({ required: false })
+  shippoTransactionId?: string
 
   // Stripe PaymentIntent id; may be 1 Intent: n orders
   // ex: One invoice from customer for 12 orders
