@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 
 import * as db from 'src/db'
+import { setUpSentry } from 'src/util/sentry'
 import authRouter, { authMiddleware } from 'src/auth'
 import { server as gqlServer } from 'src/graphql'
 import { cardRouter } from './api/cardRouter'
@@ -16,6 +17,7 @@ import { sendgridRouter } from './api/sendgrid'
 import { stripeWebhooksRouter } from './api/stripehooks'
 
 db.init()
+setUpSentry()
 
 const cookieMiddleware = cookieParser()
 export const app = express()
