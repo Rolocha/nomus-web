@@ -6,8 +6,11 @@ import FileUploadButton from 'src/components/FileUploadButton'
 import Icon from 'src/components/Icon'
 import Link from 'src/components/Link'
 import * as Text from 'src/components/Text'
+import {
+  CustomImagesValidationResult,
+  validateCustomImages,
+} from 'src/pages/CardBuilder/util'
 import { FileItem } from 'src/types/files'
-import { getImageDimensions, ImageDimensions } from 'src/utils/image'
 import { CardBuilderAction, CardBuilderState } from './card-builder-state'
 import CardBuilderPreview from './CardBuilderPreview'
 import CardWithGuides from './CardWithGuides'
@@ -95,39 +98,23 @@ const CustomBuildStep = ({
     updateCardBuilderState({
       frontDesignFile: file,
     })
-    if (file == null) {
-      setDimensionMismatch(false)
-    }
   }
   const setBackDesignFile = (file: FileItem | null) => {
     updateCardBuilderState({
       backDesignFile: file,
     })
-    if (file == null) {
-      setDimensionMismatch(false)
-    }
   }
 
-  const [dimensionMismatch, setDimensionMismatch] = React.useState(false)
-  const [dimensions, setDimensions] = React.useState<ImageDimensions | null>(
-    null,
-  )
+  const [
+    customImagesValidationResult,
+    setCustomImagesValidationResult,
+  ] = React.useState<CustomImagesValidationResult | null>(null)
 
   React.useEffect(() => {
-    const compareDimensions = async () => {
-      if (frontDesignFile?.url && backDesignFile?.url) {
-        const frontDims = await getImageDimensions(frontDesignFile.url)
-        const backDims = await getImageDimensions(backDesignFile.url)
-        const mismatched =
-          frontDims.height !== backDims.height ||
-          frontDims.width !== backDims.width
-        setDimensionMismatch(mismatched)
-        setDimensions(frontDims)
-      }
-    }
-
-    compareDimensions()
-  }, [frontDesignFile, backDesignFile])
+    validateCustomImages(frontDesignFile?.url, backDesignFile?.url).then(
+      setCustomImagesValidationResult,
+    )
+  }, [frontDesignFile, backDesignFile, setCustomImagesValidationResult])
 
   return (
     <Box
@@ -148,15 +135,40 @@ const CustomBuildStep = ({
       gridGap={3}
       gridColumnGap={3}
     >
-      {dimensionMismatch && (
-        <Box gridArea="notification" pt={2} mb={4} overflow="visible">
-          <Banner
-            type="danger"
-            title="Your card's front and back images have different dimensions!"
-            description="We strongly recommend using front and back images with the same dimensions to ensure your card looks great when printed."
-          />
-        </Box>
-      )}
+      <Box
+        gridArea="notification"
+        pt={2}
+        mb={4}
+        overflow="visible"
+        display="grid"
+        gridTemplateColumns="1fr"
+        gridRowGap="8px"
+      >
+        {customImagesValidationResult &&
+          !customImagesValidationResult.sizesMatch && (
+            <Banner
+              type="danger"
+              title="Your card's front and back images have different dimensions!"
+              description="Please use front and back images with the same dimensions."
+            />
+          )}
+        {customImagesValidationResult &&
+          !customImagesValidationResult.frontSizeCorrect && (
+            <Banner
+              type="danger"
+              title="Your front image has incorrect image dimensions."
+              description="Upload a front image that has a 3.5 x 2 aspect ratio instead."
+            />
+          )}
+        {customImagesValidationResult &&
+          !customImagesValidationResult.backSizeCorrect && (
+            <Banner
+              type="danger"
+              title="Your back image has incorrect image dimensions."
+              description="Please upload a back image that has a  3.5 x 2 aspect ratio instead."
+            />
+          )}
+      </Box>
 
       <Box gridArea="controls" pt={4}>
         <Box>
@@ -232,8 +244,9 @@ const CustomBuildStep = ({
       >
         <CardBuilderPreview
           cardOrientation={
-            dimensions
-              ? dimensions.height > dimensions.width
+            customImagesValidationResult?.frontDimensions
+              ? customImagesValidationResult.frontDimensions.height >
+                customImagesValidationResult.frontDimensions.width
                 ? 'vertical'
                 : 'horizontal'
               : 'vertical'

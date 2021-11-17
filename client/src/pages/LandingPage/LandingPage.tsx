@@ -10,10 +10,6 @@ import Navbar from 'src/components/Navbar'
 import * as Text from 'src/components/Text'
 import cardCustomBg from 'src/images/card-custom-promo-bg.png'
 import contactRollImage from 'src/images/contact-roll.gif'
-import anshulImage from 'src/images/crew/anshul.png'
-import bibekImage from 'src/images/crew/bibek.png'
-import cindyImage from 'src/images/crew/cindy.png'
-import hanadImage from 'src/images/crew/hanad.png'
 import dividerWave1 from 'src/images/divider-wave-1.svg'
 import dividerWave2 from 'src/images/divider-wave-2.svg'
 import dividerWave3 from 'src/images/divider-wave-3.svg'
@@ -32,7 +28,6 @@ import yourDashboardMobile from 'src/images/your-dashboard-mobile.png'
 import { colors } from 'src/styles'
 import { CardTemplateRenderOptions } from 'src/templates/base'
 // Landing-page specific imports
-import CrewMemberCell from './CrewMemberCell'
 import MiniCardBuilder from './MiniCardBuilder'
 import PromiseItem from './PromiseItem'
 
@@ -499,81 +494,6 @@ const LandingPage = () => {
               boxShadow="businessCard"
             />
           </Box>
-        </Box>
-      </Box>
-
-      {/* Meet the crew */}
-      <Box
-        container
-        pt={{ base: '64px', lg: '80px' }}
-        display="grid"
-        gridTemplateColumns={{ base: '1fr', lg: '9fr 3fr' }}
-        gridRowGap={{ base: '16px', lg: '24px' }}
-        gridTemplateAreas={{
-          base: `
-          "title"
-          "description"
-          "crew"
-          "button"
-        `,
-          lg: `
-          "title title"
-          "description button"
-          "crew crew"
-        `,
-        }}
-      >
-        <Text.H1 gridArea="title" color={colors.nomusBlue} fontWeight="300">
-          Meet the crew
-        </Text.H1>
-        <Text.Body gridArea="description">
-          Four young dreamers (so far!) who want to ease the lives of working
-          professionals and better connect the world.
-        </Text.Body>
-        <Box
-          gridArea="button"
-          display="grid"
-          placeContent={{ base: 'stretch', lg: 'start' }}
-        >
-          <Link to="/about">
-            <Button
-              width="100%"
-              variant="golden"
-              size="big"
-              rightIcon={<Icon of="arrowRight" />}
-            >
-              About Nom(us)
-            </Button>
-          </Link>
-        </Box>
-        <Box
-          gridArea="crew"
-          display="grid"
-          gridTemplateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }}
-          gridTemplateRows={{ base: 'repeat(2, 1fr)', lg: '1fr' }}
-          p="16px"
-          gridGap="32px"
-        >
-          <CrewMemberCell
-            name="Anshul Aggarwal"
-            title="Chief Executive Officer"
-            imageSrc={anshulImage}
-          />
-          <CrewMemberCell
-            name="Hanad Musa"
-            title="Chief Operations Officer"
-            imageSrc={hanadImage}
-          />
-          <CrewMemberCell
-            name="Cindy Cheung"
-            title="Chief Design Officer"
-            imageSrc={cindyImage}
-          />
-          <CrewMemberCell
-            name="Bibek Ghimire"
-            title="Chief Technology Officer"
-            imageSrc={bibekImage}
-          />
         </Box>
       </Box>
 

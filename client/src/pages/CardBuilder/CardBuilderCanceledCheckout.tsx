@@ -13,6 +13,9 @@ import LoadingPage from 'src/pages/LoadingPage'
 const CardBuilderCanceledCheckout = () => {
   const history = useHistory<CardBuilderLocationState>()
   const { orderId } = useParams<{ orderId?: string | undefined }>()
+
+  const [rebuildStarted, setRebuildStarted] = React.useState(false)
+
   const { data: existingOrderData, ...loadExistingOrderQuery } = useQuery<
     LoadExistingCardBuilderOrder
   >(LOAD_EXISTING_CARD_BUILDER_ORDER, {
@@ -23,11 +26,8 @@ const CardBuilderCanceledCheckout = () => {
     errorPolicy: 'all',
   })
 
-  const initialize = React.useCallback(async () => {
-    if (!loadExistingOrderQuery.called || loadExistingOrderQuery.loading) {
-      return null
-    }
-
+  const rebuildState = React.useCallback(async () => {
+    setRebuildStarted(true)
     const existingOrder = existingOrderData?.order
     if (!existingOrder) {
       return history.push('/shop')
@@ -44,13 +44,13 @@ const CardBuilderCanceledCheckout = () => {
         cardBuilderState: cardBuilderStateFromBefore,
       },
     )
-  }, [loadExistingOrderQuery, history, existingOrderData])
+  }, [history, existingOrderData, setRebuildStarted])
 
   React.useEffect(() => {
-    if (!loadExistingOrderQuery.called) {
-      initialize()
+    if (loadExistingOrderQuery.called && existingOrderData && !rebuildStarted) {
+      rebuildState()
     }
-  }, [loadExistingOrderQuery, initialize])
+  }, [rebuildStarted, loadExistingOrderQuery, existingOrderData, rebuildState])
 
   return <LoadingPage fullscreen />
 }
