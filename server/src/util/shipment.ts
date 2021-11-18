@@ -7,10 +7,10 @@ const shippo = shippoConstructor(SHIPPO_TOKEN)
 /* eslint-disable camelcase */
 const ADDRESS_FROM = {
   name: 'Nomus, Inc.',
-  street1: 'TODO',
+  street1: '99 Rausch St',
   city: 'San Francisco',
   state: 'CA',
-  zip: '94117',
+  zip: '94103',
   country: 'US',
 }
 
