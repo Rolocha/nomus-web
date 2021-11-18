@@ -1,5 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
+import logoFull from 'src/images/logo-full.svg'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 const Nicole = new CardTemplate({
@@ -59,6 +60,9 @@ const Nicole = new CardTemplate({
       placeholder: 'An apple a day keeps the doctor away',
     },
   } as const,
+  graphicSpec: {
+    defaultGraphic: logoFull,
+  },
   async renderFront(
     this: CardTemplate,
     canvas: HTMLCanvasElement,
@@ -281,10 +285,15 @@ const Nicole = new CardTemplate({
     // Render user-provided logo if provided
     if (options.graphic?.url) {
       const logoImg = await this.createImage(options.graphic.url)
-      const imageHeight =
-        (options.graphic.size ?? 1) * this.proportionalize(220)
-      const imageWidth =
-        (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
+      const imageDims = this.fitImageToBounds(logoImg, {
+        maxWidth: this.proportionalize(128),
+        maxHeight: this.proportionalize(220),
+      })
+      const scale = options.graphic.size ?? 1
+      const imageWidth = imageDims.width * scale
+      const imageHeight = imageDims.height * scale
+
+      console.log({ imageDims, options })
 
       // y + imageHeight + y + ACCENT_BAR_SIZE = this.usableHeight
       // y = (this.usableHeight - ACCENT_BAR_SIZE - imageHeight) / 2
