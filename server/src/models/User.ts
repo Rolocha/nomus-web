@@ -18,7 +18,7 @@ import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
-import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { SendgridList, SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Field, ObjectType } from 'type-graphql'
 import { URLSearchParams } from 'url'
 import { BaseModel } from './BaseModel'
@@ -327,6 +327,23 @@ export class User extends BaseModel({
         firstName: this.name.first,
       },
     })
+  }
+
+  public async addNewUserToMailContactsList(this: DocumentType<User>): Promise<void> {
+    const options = {
+      method: 'PUT',
+      headers: {
+        authorization: `Bearer ${process.env.SENDGRID_TOKEN}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        // eslint-disable-next-line camelcase
+        list_ids: [SendgridList.CurrentUsers],
+        // eslint-disable-next-line camelcase
+        contacts: [{ email: this.email, first_name: this.name.first, last_name: this.name.last }],
+      }),
+    }
+    await fetch('api.sendgrid.com/v3/marketing/contacts', options)
   }
 
   public async sendPasswordResetEmail(): Promise<void> {

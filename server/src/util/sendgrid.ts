@@ -10,4 +10,8 @@ export enum SendgridTemplate {
   ManualSubmission = 'd-d86031423de4478b987c028ccbec962c',
 }
 
+export enum SendgridList {
+  CurrentUsers = 'bf9292dd-b2b3-4da3-9512-f2e15be3c8a2',
+}
+
 export { sgMail }
