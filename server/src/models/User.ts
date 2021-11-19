@@ -28,6 +28,7 @@ import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
 import { validateEmail, validateUsername, ValidateUsernameResult } from './validation'
+import axios from 'axios'
 
 export interface UserCreatePayload {
   id?: string
@@ -331,19 +332,17 @@ export class User extends BaseModel({
 
   public async addNewUserToMailContactsList(this: DocumentType<User>): Promise<void> {
     const options = {
-      method: 'PUT',
+      // eslint-disable-next-line camelcase
+      list_ids: [SendgridList.CurrentUsers],
+      // eslint-disable-next-line camelcase
+      contacts: [{ email: this.email, first_name: this.name.first, last_name: this.name.last }],
+    }
+    await axios.post('api.sendgrid.com/v3/marketing/contacts', options, {
       headers: {
         authorization: `Bearer ${process.env.SENDGRID_TOKEN}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify({
-        // eslint-disable-next-line camelcase
-        list_ids: [SendgridList.CurrentUsers],
-        // eslint-disable-next-line camelcase
-        contacts: [{ email: this.email, first_name: this.name.first, last_name: this.name.last }],
-      }),
-    }
-    await fetch('api.sendgrid.com/v3/marketing/contacts', options)
+    })
   }
 
   public async sendPasswordResetEmail(): Promise<void> {
