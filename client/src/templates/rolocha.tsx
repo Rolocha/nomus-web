@@ -1,5 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
+import logoFullWhite from 'src/images/logo-full-white.svg'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 const primarySquiggleFrontSVG = ({
@@ -109,6 +110,9 @@ const Rolocha = new CardTemplate({
       placeholder: 'Apple a day!',
     },
   } as const,
+  graphicSpec: {
+    defaultGraphic: logoFullWhite,
+  },
   async renderFront(
     this: CardTemplate,
     canvas: HTMLCanvasElement,
@@ -364,10 +368,14 @@ const Rolocha = new CardTemplate({
     // Render user-provided logo if provided
     if (options.graphic?.url) {
       const logoImg = await this.createImage(options.graphic.url)
-      const imageHeight =
-        (options.graphic.size ?? 1) * this.proportionalize(100)
-      const imageWidth =
-        (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
+      const imageDims = this.fitImageToBounds(logoImg, {
+        maxWidth: this.proportionalize(49),
+        maxHeight: this.proportionalize(49),
+      })
+      const scale = options.graphic.size ?? 1
+      const imageWidth = imageDims.width * scale
+      const imageHeight = imageDims.height * scale
+
       ctx.drawImage(
         logoImg,
         this.proportionalize(45),

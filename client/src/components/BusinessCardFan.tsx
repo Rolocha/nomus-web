@@ -43,6 +43,7 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
           ml="auto"
           src={frontImageUrl ?? businessCardFrontFallback}
           boxShadow="businessCard"
+          draggable="false"
         />
       }
       {
@@ -67,6 +68,7 @@ const BusinessCardFan = ({ frontImageUrl, backImageUrl }: Props) => {
           }[cardOrientation]}
           src={backImageUrl ?? businessCardBackFallback}
           boxShadow="businessCard"
+          draggable="false"
         />
       }
     </Box>

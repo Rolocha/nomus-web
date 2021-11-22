@@ -1,5 +1,6 @@
 import { lighten } from 'polished'
 import { colors } from 'src/styles'
+import logoFullBlack from 'src/images/logo-full-black.svg'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 const KonaTall = new CardTemplate({
@@ -28,6 +29,9 @@ const KonaTall = new CardTemplate({
       placeholder: 'Businessperson',
     },
   } as const,
+  graphicSpec: {
+    defaultGraphic: logoFullBlack,
+  },
   async renderFront(
     this: CardTemplate,
     canvas: HTMLCanvasElement,
@@ -139,10 +143,13 @@ const KonaTall = new CardTemplate({
     // Render user-provided logo if provided
     if (options.graphic?.url) {
       const logoImg = await this.createImage(options.graphic.url)
-      const imageHeight =
-        (options.graphic.size ?? 1) * this.proportionalize(100)
-      const imageWidth =
-        (imageHeight * logoImg.naturalWidth) / logoImg.naturalHeight
+      const imageDims = this.fitImageToBounds(logoImg, {
+        maxWidth: this.proportionalize(120),
+        maxHeight: this.proportionalize(228),
+      })
+      const scale = options.graphic.size ?? 1
+      const imageWidth = imageDims.width * scale
+      const imageHeight = imageDims.height * scale
 
       const imageY = (this.proportionalizedHeight - imageHeight) / 2
       const imageX = (this.proportionalizedWidth - imageWidth) / 2

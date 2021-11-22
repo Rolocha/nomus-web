@@ -29,6 +29,9 @@ export interface CardTemplateDefinition {
   demoImageUrl: string
   colorScheme: Record<string, CustomizableFieldSpec.Color>
   contactInfo: Record<string, CustomizableFieldSpec.ContactInfo>
+  graphicSpec?: {
+    defaultGraphic?: string
+  }
 
   renderFront: (
     canvas: HTMLCanvasElement,
@@ -57,6 +60,7 @@ export default class CardTemplate {
   public demoImageUrl: string
   public contactInfoSpec: CardTemplateDefinition['contactInfo']
   public colorSchemeSpec: CardTemplateDefinition['colorScheme']
+  public graphicSpec: CardTemplateDefinition['graphicSpec']
 
   private _renderFront: CardTemplateDefinition['renderFront']
   private _renderBack: CardTemplateDefinition['renderBack']
@@ -68,6 +72,7 @@ export default class CardTemplate {
     this.demoImageUrl = templateDefinition.demoImageUrl
     this.colorSchemeSpec = templateDefinition.colorScheme
     this.contactInfoSpec = templateDefinition.contactInfo
+    this.graphicSpec = templateDefinition.graphicSpec
     this._renderFront = templateDefinition.renderFront
     this._renderBack = templateDefinition.renderBack
   }
@@ -432,5 +437,25 @@ export default class CardTemplate {
     })
     const qrImg = await this.createImage(qrDataUrl)
     ctx.drawImage(qrImg, x, y, width, height)
+  }
+
+  protected fitImageToBounds(
+    image: HTMLImageElement,
+    {
+      maxWidth,
+      maxHeight,
+    }: {
+      maxWidth: number
+      maxHeight: number
+    },
+  ) {
+    const heightExcess = image.naturalHeight / maxHeight
+    const widthExcess = image.naturalWidth / maxWidth
+
+    const reductionFactor = Math.max(heightExcess, widthExcess)
+    return {
+      width: image.naturalWidth / reductionFactor,
+      height: image.naturalHeight / reductionFactor,
+    }
   }
 }

@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'
+
 // Inspired by https://khalilstemmler.com/articles/enterprise-typescript-nodejs/handling-errors-result-class/
 
 type extractError<Type> = Type extends Result<infer T, infer E> ? E : never // eslint-disable-line
@@ -21,6 +23,9 @@ export class Result<T, E extends string> {
 
     this.isSuccess = isSuccess
     this.error = error ? new NamedError(error) : undefined
+    if (this.error) {
+      Sentry.captureException(this.error)
+    }
     this._value = value
 
     Object.freeze(this)
