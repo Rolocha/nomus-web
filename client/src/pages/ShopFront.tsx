@@ -151,7 +151,8 @@ const ShopFront = () => {
               display="grid"
               gridTemplateColumns={{
                 base: 'repeat(2, 1fr)',
-                [bp]: 'repeat(4, 1fr)',
+                md: 'repeat(3, 1fr)',
+                lg: 'repeat(4, 1fr)',
               }}
               width="100%"
               gridGap="16px"
@@ -185,12 +186,14 @@ const ShopFront = () => {
                     display={{ base: 'none', [bp]: 'block' }}
                     src={curvyPointerLeftImage}
                     mr="13px"
+                    minWidth="0"
                   />
                   <Image src={scatteredCardsImage} />
                   <Image
                     display={{ base: 'none', [bp]: 'block' }}
                     src={curvyPointerRightImage}
                     ml="13px"
+                    minWidth="0"
                   />
                 </Box>
                 <Text.Body>Custom card</Text.Body>
