@@ -7,6 +7,12 @@ const Velia = new CardTemplate({
   name: 'Velia',
   width: 264,
   height: 154,
+  description: [
+    <>
+      The Velia is what you think of when you think about a classic business
+      card. Customize the colors to your heart's content!
+    </>,
+  ],
   demoImageUrl:
     'https://nomus-assets.s3.amazonaws.com/site-assets/templates/velia.svg',
   colorScheme: {

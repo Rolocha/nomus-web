@@ -50,7 +50,7 @@ export const products: Array<ProductDetails> = [
         url: `/card-studio/template?templateId=${template.name}`,
       },
       price: 'from $40.00',
-      description: [<>The {template.name} template is cool.</>],
+      description: template.description,
       preview: <SampleTemplateCard templateId={templateId} />,
     }
   }),

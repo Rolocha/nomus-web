@@ -5,6 +5,12 @@ import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
 
 const Nicole = new CardTemplate({
   name: 'Nicole',
+  description: [
+    <>
+      The Nicole is simple and professional while providing lots of information
+      for awesome networking!
+    </>,
+  ],
   width: 154,
   height: 264,
   demoImageUrl:

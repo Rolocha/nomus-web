@@ -2,9 +2,20 @@ import { lighten } from 'polished'
 import { colors } from 'src/styles'
 import logoFullBlack from 'src/images/logo-full-black.svg'
 import CardTemplate, { CardTemplateRenderOptions } from 'src/templates/base'
+import Link from 'src/components/Link'
 
 const KonaTall = new CardTemplate({
   name: 'Kona Tall',
+  description: [
+    <>
+      Don't want information overload? The Kona is perfect for someone who wants
+      to keep networking simple and to-the-point.
+    </>,
+    <>
+      If horizontal cards are more your style, check out Kona Tall's sibling,{' '}
+      <Link to="/shop/product/template-card-konawide">Kona Wide</Link>.
+    </>,
+  ],
   width: 154,
   height: 264,
   demoImageUrl:

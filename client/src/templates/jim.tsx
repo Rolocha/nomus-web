@@ -23,6 +23,12 @@ const backTriangleSVG = ({ color = colors.viridianGreen }: { color: string }) =>
 
 const Jim = new CardTemplate({
   name: 'Jim',
+  description: [
+    <>
+      The Jim is practical with just a tiny pop of color. All the while, it
+      provides all the information you might need to network like a pro!
+    </>,
+  ],
   width: 264,
   height: 154,
   demoImageUrl:

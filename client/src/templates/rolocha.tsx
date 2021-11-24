@@ -52,6 +52,12 @@ const rectangleBackSVG = ({ color = colors.nomusBlue }: { color: string }) =>
 
 const Rolocha = new CardTemplate({
   name: 'Rolocha',
+  description: [
+    <>
+      Colorful and eye-catching, the Rolocha is perfect for someone who wants to
+      add a little bit of ~spice~ to their networking.
+    </>,
+  ],
   width: 154,
   height: 264,
   demoImageUrl:
