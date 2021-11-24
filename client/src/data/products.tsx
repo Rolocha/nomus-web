@@ -1,6 +1,8 @@
 import * as React from 'react'
+import Image from 'src/components/Image'
 import SampleTemplateCard from 'src/components/SampleTemplateCard'
 import templateLibrary, { templateNames } from 'src/templates'
+import customCardProductPreview from 'src/images/custom-card-product-preview.gif'
 
 export enum ProductCategory {
   TemplateCard,
@@ -32,11 +34,11 @@ export const products: Array<ProductDetails> = [
     description: [
       <>
         Have a business card design you've already been using? Hop into the
-        custom Card Studio with the button above to upload your designs.
+        Custom Card Studio to build a Nomus card with a look all your own.
       </>,
-      <>Your design + Nomus's tap-to-share technology = unstoppable.</>,
+      <>Your brand + Nomus's tap-to-share technology = unstoppable.</>,
     ],
-    preview: <>TODO: Preview image</>,
+    preview: <Image src={customCardProductPreview} />,
   },
   // Dynamically generated product item for each of the template cards
   ...templateNames.map((templateId) => {
