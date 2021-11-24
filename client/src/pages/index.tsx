@@ -20,6 +20,7 @@ import LoadingPage from 'src/pages/LoadingPage'
 import LoginPage from 'src/pages/LoginPage'
 import ResetPassword from 'src/pages/ResetPassword'
 import ShopFront from 'src/pages/ShopFront'
+import ShopProductDetailPage from 'src/pages/ShopProductDetailPage'
 import UserControlPanel from 'src/pages/UserControlPanel'
 import { ensureActiveToken, Role } from 'src/utils/auth'
 import AboutPage from 'src/pages/AboutPage'
@@ -151,6 +152,11 @@ export const routes: Array<RouteType> = [
   {
     path: '/shop',
     Component: ShopFront,
+    exact: true,
+  },
+  {
+    path: '/shop/product/:productId',
+    Component: ShopProductDetailPage,
   },
   // Card studio routes
   {

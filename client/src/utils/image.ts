@@ -23,12 +23,18 @@ export const getImageDimensions = async (
 type UseImageDimensionsResult = ImageDimensions | 'determining' | null
 
 export const useImageDimensions = (imageUrl: string | null) => {
+  const lastImageUrl = React.useRef<string | null>(null)
   const [imageDimensions, setImageDimensions] = React.useState<
     UseImageDimensionsResult
   >(null)
 
   React.useEffect(() => {
-    if (imageDimensions == null && imageUrl) {
+    if (
+      imageUrl &&
+      imageUrl !== lastImageUrl.current &&
+      imageDimensions !== 'determining'
+    ) {
+      lastImageUrl.current = imageUrl
       setImageDimensions('determining')
       getImageDimensions(imageUrl).then(setImageDimensions)
     }
