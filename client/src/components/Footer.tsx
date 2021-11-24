@@ -15,7 +15,7 @@ interface FormData {
 }
 
 interface Props {
-  colorScheme?: 'light' | 'dark'
+  colorScheme?: 'light' | 'ivory' | 'dark'
 }
 
 const bp = 'lg'
@@ -44,6 +44,11 @@ const Footer = ({ colorScheme = 'dark' }: Props) => {
   const colorPalette = {
     light: {
       background: colors.white,
+      accent: colors.nomusBlue,
+      basicText: colors.midnightGray,
+    },
+    ivory: {
+      background: colors.ivory,
       accent: colors.nomusBlue,
       basicText: colors.midnightGray,
     },

@@ -24,6 +24,7 @@ export type CardTemplateRenderOptions = {
 
 export interface CardTemplateDefinition {
   name: string
+  description: React.ReactNode[]
   width: number
   height: number
   demoImageUrl: string
@@ -61,12 +62,14 @@ export default class CardTemplate {
   public contactInfoSpec: CardTemplateDefinition['contactInfo']
   public colorSchemeSpec: CardTemplateDefinition['colorScheme']
   public graphicSpec: CardTemplateDefinition['graphicSpec']
+  public description: CardTemplateDefinition['description']
 
   private _renderFront: CardTemplateDefinition['renderFront']
   private _renderBack: CardTemplateDefinition['renderBack']
 
   constructor(templateDefinition: CardTemplateDefinition) {
     this.name = templateDefinition.name
+    this.description = templateDefinition.description
     this.width = templateDefinition.width
     this.height = templateDefinition.height
     this.demoImageUrl = templateDefinition.demoImageUrl
