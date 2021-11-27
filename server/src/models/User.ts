@@ -18,7 +18,7 @@ import { getCurrentDateForDateInput } from 'src/util/date'
 import { Role } from 'src/util/enums'
 import { ErrorsOf, EventualResult, Result } from 'src/util/error'
 import * as S3 from 'src/util/s3'
-import { SendgridList, SendgridTemplate, sgMail } from 'src/util/sendgrid'
+import { addUserToMailContactsList, SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { Field, ObjectType } from 'type-graphql'
 import { URLSearchParams } from 'url'
 import { BaseModel } from './BaseModel'
@@ -28,7 +28,6 @@ import RefreshToken from './RefreshToken'
 import { Ref } from './scalars'
 import { PersonName, UserCheckpoints } from './subschemas'
 import { validateEmail, validateUsername, ValidateUsernameResult } from './validation'
-import axios from 'axios'
 
 export interface UserCreatePayload {
   id?: string
@@ -331,18 +330,7 @@ export class User extends BaseModel({
   }
 
   public async addNewUserToMailContactsList(this: DocumentType<User>): Promise<void> {
-    const options = {
-      // eslint-disable-next-line camelcase
-      list_ids: [SendgridList.CurrentUsers],
-      // eslint-disable-next-line camelcase
-      contacts: [{ email: this.email, first_name: this.name.first, last_name: this.name.last }],
-    }
-    await axios.post('api.sendgrid.com/v3/marketing/contacts', options, {
-      headers: {
-        authorization: `Bearer ${process.env.SENDGRID_TOKEN}`,
-        'content-type': 'application/json',
-      },
-    })
+    await addUserToMailContactsList(this)
   }
 
   public async sendPasswordResetEmail(): Promise<void> {
