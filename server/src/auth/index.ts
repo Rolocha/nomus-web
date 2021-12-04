@@ -129,6 +129,7 @@ authRouter.post('/signup', async (req, res: express.Response<AuthResponse>) => {
 
     // Send the verification email, but don't await as it's not the end of the world if it fails, user can request again
     user.sendVerificationEmail()
+    user.addNewUserToMailContactsList()
   } catch (err) {
     // Check for trying to create an account that already exists
     if (err.code === 11000) {

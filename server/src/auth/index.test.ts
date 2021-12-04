@@ -8,6 +8,7 @@ import { Result } from 'src/util/error'
 import { sgMail } from 'src/util/sendgrid'
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from 'src/config'
 import { createMockRefreshToken } from 'src/__mocks__/models/RefreshToken'
+import axios from 'axios'
 
 // NOTE: No need to initDB in this test bc the src/app import initializes it
 afterAll(async () => {
@@ -103,6 +104,7 @@ describe('POST /signup', () => {
 
   beforeEach(() => {
     jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+    jest.spyOn(axios, 'post').mockResolvedValue({} as any)
   })
 
   it('creates a new user with the provided registration info', async () => {
