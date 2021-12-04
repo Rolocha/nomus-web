@@ -17,6 +17,7 @@ import anshul from './anshul-headshot.svg'
 import cindy from './cindy-headshot.svg'
 import bibek from './bibek-headshot.svg'
 import hanad from './hanad-headshot.svg'
+import julie from './julie-headshot.svg'
 import Card from 'src/components/Card'
 import { cardSet } from 'src/copy/cardSet'
 import threePhones from './three-phones.svg'
@@ -392,11 +393,11 @@ const AboutPage = () => {
         <Box
           display="grid"
           gridTemplateAreas={{
-            base: 'repeat(4, 1fr) / 1fr',
-            [bp]: '1fr / 1fr 1fr 1fr 1fr',
+            base: 'repeat(5, 1fr) / 1fr',
+            [bp]: '1fr / 1fr 1fr 1fr 1fr 1fr',
           }}
           pt="16px"
-          gridColumnGap={{ base: 2, [bp]: 3 }}
+          gridColumnGap={{ base: 2, [bp]: 8 }}
           mb={{ base: '54px', [bp]: '80px' }}
         >
           <Box
@@ -405,7 +406,6 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '1 / 1 / 2 / 2', [bp]: '1 / 1 / 2 / 2' }}
-            mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.Body fontWeight={500}>Anshul Aggarwal</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
@@ -428,7 +428,6 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '2 / 1 / 3 / 2', [bp]: '1 / 2 / 2 / 3' }}
-            mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.Body fontWeight={500}>Cindy Cheung</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
@@ -451,7 +450,6 @@ const AboutPage = () => {
             alignItems="center"
             mb={{ base: '24px', [bp]: '0px' }}
             gridArea={{ base: '3 / 1 / 4 / 2', [bp]: '1 / 3 / 2 / 4' }}
-            mr={{ base: '0px', [bp]: '42px' }}
           >
             <Text.Body fontWeight={500}>Bibek Ghimire</Text.Body>
             <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
@@ -487,6 +485,27 @@ const AboutPage = () => {
             <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
               King of crosswords and planning “get-togethers” that are probably
               too popular for their own good.
+            </Text.Body2>
+          </Box>
+
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mb={{ base: '24px', [bp]: '0px' }}
+            gridArea={{ base: '5 / 1 / 6 / 2', [bp]: '1 / 5 / 2 / 6' }}
+          >
+            <Text.Body fontWeight={500}>Julie Silverman</Text.Body>
+            <Text.Body mb={{ base: '8px', [bp]: '16px' }}>
+              Chief Marketing Officer
+            </Text.Body>
+            <Image
+              src={julie}
+              mb={{ base: '6px', [bp]: '8px' }}
+              px={{ base: '0px', [bp]: '8px' }}
+            />
+            <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
+              Certified meme queen with a relevant link for any situation
             </Text.Body2>
           </Box>
         </Box>
