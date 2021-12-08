@@ -505,7 +505,7 @@ const AboutPage = () => {
               px={{ base: '0px', [bp]: '8px' }}
             />
             <Text.Body2 textAlign="center" px={{ base: '19px', [bp]: '0px' }}>
-              Certified meme queen with a relevant link for any situation
+              Certified meme queen with a relevant link for any situation.
             </Text.Body2>
           </Box>
         </Box>
