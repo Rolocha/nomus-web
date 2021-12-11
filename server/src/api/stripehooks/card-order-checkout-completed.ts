@@ -1,6 +1,7 @@
 import { Order } from 'src/models'
 import { OrderEventTrigger, OrderState } from 'src/util/enums'
 import { Stripe } from 'stripe'
+import * as Sentry from '@sentry/node'
 
 export default async (event: any) => {
   const checkoutSession = event.data.object as Stripe.Checkout.Session
@@ -35,7 +36,13 @@ export default async (event: any) => {
   }
   await order.save()
 
-  await order.createShippoTransaction()
+  // Make sure to catch errors in Shippo transaction creation
+  // so that the remainder of this handler doesn't get skipped
+  try {
+    await order.createShippoTransaction()
+  } catch (err) {
+    Sentry.captureException(err)
+  }
 
   if (order.state !== OrderState.Captured) {
     console.error(
