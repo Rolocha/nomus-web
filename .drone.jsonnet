@@ -128,9 +128,7 @@ local updateDeployConfig(env, host, when) = {
 // Deployment conditionals
 
 // Uncomment this if we want it to deploy based on the /deploy slack command
-// local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${NOMUS_DEPLOY_BRANCH}" };
-
-local STAGING_DEPLOY_CONDITION = { "branch": ["master"] };
+local STAGING_DEPLOY_CONDITION = { "event": "custom", "branch": "${NOMUS_DEPLOY_BRANCH}" };
 local PRODUCTION_DEPLOY_CONDITION = { "branch": ["production"] };
 local NON_DEPLOY_CONDITION = { 
   "branch": {
