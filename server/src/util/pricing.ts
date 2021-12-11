@@ -9,7 +9,7 @@ export const QUANTITY_TO_PRICE = {
 
 export type CardQuantityOption = keyof typeof QUANTITY_TO_PRICE
 
-export const isValidQuantity = (quantity: number) => {
+export const isValidQuantity = (quantity: number): quantity is CardQuantityOption => {
   return Object.keys(QUANTITY_TO_PRICE).includes(String(quantity))
 }
 

@@ -23,7 +23,7 @@ import {
   VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
 import { formatName } from 'src/util/name'
-import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
+import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
 import { createShippoTransaction } from 'src/util/shipment'
 import { Stripe, stripe } from 'src/util/stripe'
@@ -497,8 +497,11 @@ class OrderResolver {
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
   ): Promise<Order> {
     const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
-    const user = await User.getOrCreateUser(email, name)
+    if (!isValidQuantity(quantity)) {
+      throw new UserInputError('Invalid quantity')
+    }
 
+    const user = await User.getOrCreateUser(email, name)
     const price = payloadPrice ?? this.calculateOrderPrice(quantity, shippingAddress.state)
 
     const cv = await CardVersion.mongo.create({
@@ -512,6 +515,7 @@ class OrderResolver {
     const shippoTransaction = await createShippoTransaction({
       destinationName: formatName(user.name),
       destinationAddress: shippingAddress,
+      cardQuantity: quantity,
       metadata: {
         orderId,
       },
