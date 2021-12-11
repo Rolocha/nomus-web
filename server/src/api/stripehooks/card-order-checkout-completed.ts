@@ -35,6 +35,8 @@ export default async (event: any) => {
   }
   await order.save()
 
+  await order.createShippoTransaction()
+
   if (order.state !== OrderState.Captured) {
     console.error(
       'Received a payment_intent.succeeded webhook for an order that wasn\'t in the "Captured" state'

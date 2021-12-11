@@ -24,18 +24,17 @@ const FROM_ADDRESS = {
   country: 'US',
 }
 
-const buildParcelObject = ({ cardQuantity }: { cardQuantity: CardQuantityOption }) => ({
-  length: 9,
-  width: 7,
-  height: 4,
-  distance_unit: 'in',
-  weight: {
-    25: 4,
-    50: 6,
-    100: 8,
-  }[cardQuantity],
-  mass_unit: 'oz',
-})
+const buildParcelObject = ({ cardQuantity }: { cardQuantity: number }) => {
+  const weight = cardQuantity / 20 + 3
+  return {
+    length: 9,
+    width: 7,
+    height: 4,
+    distance_unit: 'in',
+    weight,
+    mass_unit: 'oz',
+  }
+}
 
 // Query for the object ID for each carrier account by doing a GET
 // request to https://api.goshippo.com/v1/carrier_accounts
@@ -47,7 +46,7 @@ enum CarrierAccount {
 interface ShippoTransactionInput {
   destinationName: string
   destinationAddress: Address
-  cardQuantity: CardQuantityOption
+  cardQuantity: number
   metadata?: any
 }
 
