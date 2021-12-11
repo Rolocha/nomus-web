@@ -2,11 +2,17 @@ import { app } from 'src/app'
 import { Order, User } from 'src/models'
 import { cleanUpDB, dropAllCollections } from 'src/test-utils/db'
 import { OrderState } from 'src/util/enums'
+import { formatName } from 'src/util/name'
 import { getCostSummary } from 'src/util/pricing'
+import * as ShipmentModule from 'src/util/shipment'
 import { stripe } from 'src/util/stripe'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import request from 'supertest'
+import { mocked } from 'ts-jest/utils'
+
+jest.mock('src/util/shipment')
+const mockedShipmentModule = mocked(ShipmentModule)
 
 // NOTE: No need to initDB in this test bc the src/app import initializes it
 afterAll(async () => {
@@ -20,6 +26,15 @@ afterEach(async () => {
 describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
   let requestingUser: User
   let agent: request.SuperAgentTest
+  const mockedShippoTransaction = {
+    trackingNumber: '1234',
+    id: 'id_123',
+    labelUrl: 'label_dot_com',
+  }
+  beforeEach(() => {
+    mockedShipmentModule.createShippoTransaction.mockResolvedValue(mockedShippoTransaction)
+  })
+
   beforeEach(async (done) => {
     // Create a user and log in using an agent that the it() blocks will also use
     // in order to preserve access token cookie
@@ -57,36 +72,38 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
     // actually doing something
     expect(costSummaryInCali.estimatedTaxes).toBeGreaterThan(0)
 
+    const mockEventData = {
+      /* eslint-disable camelcase */
+      object: {
+        mode: 'payment',
+        metadata: {
+          orderId: order.id,
+        },
+        amount_subtotal: costSummaryInCali.subtotal,
+        total_details: {
+          amount_tax: costSummaryInCali.estimatedTaxes,
+          amount_discount: costSummaryInCali.discount,
+        },
+        amount_total: costSummaryInCali.total,
+        shipping: {
+          name: 'Bibek Ghimire',
+          address: {
+            line1: '123 Main St',
+            line2: null,
+            city: 'San Francisco',
+            state: 'CA',
+            postal_code: '94103',
+          },
+        },
+      },
+      /* eslint-enable camelcase */
+    }
+
     await agent
       .post('/api/stripehooks')
       .send({
-        /* eslint-disable camelcase */
         type: 'checkout.session.completed',
-        data: {
-          object: {
-            mode: 'payment',
-            metadata: {
-              orderId: order.id,
-            },
-            amount_subtotal: costSummaryInCali.subtotal,
-            total_details: {
-              amount_tax: costSummaryInCali.estimatedTaxes,
-              amount_discount: costSummaryInCali.discount,
-            },
-            amount_total: costSummaryInCali.total,
-            shipping: {
-              name: 'Bibek Ghimire',
-              address: {
-                line1: '123 Main St',
-                line2: null,
-                city: 'San Francisco',
-                state: 'CA',
-                postal_code: '94103',
-              },
-            },
-          },
-        },
-        /* eslint-enable camelcase */
+        data: mockEventData,
       })
       .set('Accept', 'application/json')
       .expect(200)
@@ -108,5 +125,24 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
       discount: costSummaryInCali.discount,
       total: costSummaryInCali.total,
     })
+    expect(updatedOrder.trackingNumber).toBe(mockedShippoTransaction.trackingNumber)
+    expect(updatedOrder.shippoTransactionId).toBe(mockedShippoTransaction.id)
+    expect(updatedOrder.shippingLabelUrl).toBe(mockedShippoTransaction.labelUrl)
+    expect(mockedShipmentModule.createShippoTransaction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        destinationName: mockEventData.object.shipping.name,
+        destinationAddress: expect.objectContaining({
+          line1: mockEventData.object.shipping.address.line1,
+          line2: mockEventData.object.shipping.address.line2,
+          city: mockEventData.object.shipping.address.city,
+          state: mockEventData.object.shipping.address.state,
+          postalCode: mockEventData.object.shipping.address.postal_code,
+        }),
+        cardQuantity: order.quantity,
+        metadata: expect.objectContaining({
+          orderId: order.id,
+        }),
+      })
+    )
   })
 })

@@ -232,9 +232,8 @@ class Order extends BaseModel({
   }
 
   public async createShippoTransaction(this: DocumentType<Order>) {
-    const user = await User.mongo.findById(this.user)
     const shippoTransaction = await createShippoTransaction({
-      destinationName: formatName(user.name),
+      destinationName: this.shippingName,
       destinationAddress: this.shippingAddress,
       cardQuantity: this.quantity,
       metadata: {
