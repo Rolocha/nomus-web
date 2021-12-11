@@ -32,6 +32,7 @@
     "qrcode": "^1.4.4",
     "reflect-metadata": "^0.1.13",
     "saslprep": "^1.0.3",
+    "shippo": "^1.6.0",
     "stripe": "^8.86.0",
     "type-graphql": "0.18.0-beta.17",
     "uuid-mongodb": "^2.1.3",

@@ -14,11 +14,13 @@ import { Result } from 'src/util/error'
 import * as fileUtil from 'src/util/file'
 import { getCostSummary } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
+import * as ShipmentModule from 'src/util/shipment'
 import { SendgridTemplate, sgMail } from 'src/util/sendgrid'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { createMockUser } from 'src/__mocks__/models/User'
 import { mocked } from 'ts-jest/utils'
+import { formatName } from 'src/util/name'
 
 jest.setTimeout(30000)
 jest.mock('src/util/file')
@@ -27,6 +29,8 @@ jest.mock('src/lib/print-spec')
 const mockedPrintSpec = mocked(PrintSpec)
 jest.mock('src/util/s3')
 const mockedS3Module = mocked(S3)
+jest.mock('src/util/shipment')
+const mockedShipmentModule = mocked(ShipmentModule)
 
 beforeAll(async () => {
   await initDB()
@@ -690,8 +694,14 @@ describe('OrderResolver', () => {
   })
   describe('submitManualOrder', () => {
     let sgMailSendSpy = null
+    const mockedShippoTransaction = {
+      trackingNumber: '1234',
+      id: 'id_123',
+      labelUrl: 'label_dot_com',
+    }
     beforeEach(() => {
       sgMailSendSpy = jest.spyOn(sgMail, 'send').mockResolvedValue({} as any) // don't really care about response since we don't use it right now
+      mockedShipmentModule.createShippoTransaction.mockResolvedValue(mockedShippoTransaction)
     })
 
     afterEach(() => {
@@ -781,7 +791,6 @@ describe('OrderResolver', () => {
       const orderDetails = response.data?.submitManualOrder
 
       expect(orderDetails.id).not.toBeNull()
-      expect(orderDetails.trackingNumber).toBeNull()
       expect(orderDetails.shortId).not.toBeNull()
       expect(orderDetails.quantity).toBe(quantity)
       expect(orderDetails.shippingName).toBe(user.fullName)
@@ -859,6 +868,7 @@ describe('OrderResolver', () => {
                 }
                 state
                 trackingNumber
+                shippingLabelUrl
                 paymentIntent
                 shortId
                 shippingName
@@ -885,11 +895,11 @@ describe('OrderResolver', () => {
       })
 
       const orderDetails = response.data?.submitManualOrder
+      const internalOrderObject = await Order.mongo.findById(orderDetails.id)
 
       const user = (await User.mongo.findOne({ email: userEmail })) as User
 
       expect(orderDetails.id).not.toBeNull()
-      expect(orderDetails.trackingNumber).toBeNull()
       expect(orderDetails.shortId).not.toBeNull()
       expect(orderDetails.quantity).toBe(quantity)
       expect(orderDetails.shippingName).toBe(
@@ -898,6 +908,20 @@ describe('OrderResolver', () => {
       expect(orderDetails.shippingAddress).toMatchObject(shippingAddress)
       expect(orderDetails.price).toMatchObject(price)
       expect(orderDetails.state).toBe(OrderState.Actionable)
+
+      // Assert shipment-related things
+      expect(orderDetails.trackingNumber).toBe(mockedShippoTransaction.trackingNumber)
+      expect(internalOrderObject.shippoTransactionId).toBe(mockedShippoTransaction.id)
+      expect(orderDetails.shippingLabelUrl).toBe(mockedShippoTransaction.labelUrl)
+      expect(mockedShipmentModule.createShippoTransaction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          destinationName: formatName(user.name),
+          destinationAddress: shippingAddress,
+          metadata: {
+            orderId: orderDetails.id,
+          },
+        })
+      )
 
       expect(orderDetails.user.id).toBe(user.id)
       expect(orderDetails.user.email).toBe(user.email)

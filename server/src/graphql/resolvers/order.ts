@@ -1,7 +1,6 @@
 import { DocumentType } from '@typegoose/typegoose'
 import { GraphQLUpload, UserInputError } from 'apollo-server-express'
 import { FileUpload } from 'graphql-upload'
-import { setAuthCookies } from 'src/auth'
 import { BASE_URL, DEPLOY_ENV } from 'src/config'
 import { IApolloContext } from 'src/graphql/types'
 import { CardVersion, Order } from 'src/models'
@@ -23,8 +22,10 @@ import {
   Role,
   VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
-import { getCostSummary, QUANTITY_TO_PRICE } from 'src/util/pricing'
+import { formatName } from 'src/util/name'
+import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
+import { createShippoTransaction } from 'src/util/shipment'
 import { Stripe, stripe } from 'src/util/stripe'
 import { getTemplateName } from 'src/util/templates'
 import {
@@ -496,35 +497,32 @@ class OrderResolver {
     @Arg('payload', { nullable: false }) payload: ManualOrderInput
   ): Promise<Order> {
     const { email, name, price: payloadPrice, quantity, shippingAddress } = payload
-    const user = await User.getOrCreateUser(email, name)
-
-    let price: OrderPrice
-    if (!payloadPrice) {
-      const costSummary = getCostSummary(quantity, shippingAddress.state)
-      if (costSummary == null) {
-        throw new Error(
-          'Failed to calculate pricing, likely due to an unsupported quantity being used'
-        )
-      }
-      price = {
-        subtotal: costSummary.subtotal,
-        shipping: costSummary.shipping,
-        // We don't know the cost of tax yet since that requires knowing the shipping address
-        // We'll update this (and total) once Stripe checkout completes, in server/src/api/stripehooks.ts
-        tax: costSummary.estimatedTaxes,
-        discount: costSummary.discount,
-        total: costSummary.total,
-      }
-    } else {
-      price = payloadPrice
+    if (!isValidQuantity(quantity)) {
+      throw new UserInputError('Invalid quantity')
     }
+
+    const user = await User.getOrCreateUser(email, name)
+    const price = payloadPrice ?? this.calculateOrderPrice(quantity, shippingAddress.state)
 
     const cv = await CardVersion.mongo.create({
       user: user.id,
       baseType: CardSpecBaseType.Custom,
     })
 
+    const orderId = Order.mongo.createId()
+
+    // Create a shipping label/transaction via Shippo
+    const shippoTransaction = await createShippoTransaction({
+      destinationName: formatName(user.name),
+      destinationAddress: shippingAddress,
+      cardQuantity: quantity,
+      metadata: {
+        orderId,
+      },
+    })
+
     const order = await Order.mongo.create({
+      _id: orderId,
       user: user.id,
       cardVersion: cv.id,
       state: OrderState.Actionable,
@@ -534,6 +532,10 @@ class OrderResolver {
       shippingName: user.fullName,
       paymentIntent: payload.paymentIntent,
       createdBy: OrderCreatedBy.Manual,
+      // Data from Shippo
+      trackingNumber: shippoTransaction.trackingNumber,
+      shippoTransactionId: shippoTransaction.id,
+      shippingLabelUrl: shippoTransaction.labelUrl,
     })
 
     if (!payload.skipDefaultCardVersionUpdate) {
@@ -554,23 +556,49 @@ class OrderResolver {
   private async submitCardBuilderOrderCommon(
     user: DocumentType<User>,
     payload: SubmitTemplateOrderInput | SubmitCustomOrderInput,
-    createCardVersion: () => Promise<DocumentType<CardVersion>>
+    createCardVersion: () => Promise<DocumentType<CardVersion>>,
+    shippingState?: string
   ): Promise<SubmitOrderResponse> {
-    this.validateBaseSubmitOrderInput(payload)
+    await this.validateCardBuilderOrderCommon(payload)
+    const { orderId, quantity } = payload
     const cardVersion = await createCardVersion()
 
-    const order = await this.createOrUpdateCardBuilderOrder({
-      user,
-      cardVersion,
-      payload,
-    })
+    const price = this.calculateOrderPrice(quantity, shippingState)
 
+    // Update the Order corresponding to the payload orderId if it exists
+    // Else create a new Order with those details
+    const order = await Order.mongo.findOneAndUpdate(
+      {
+        _id: orderId ?? Order.mongo.createId(),
+      },
+      {
+        user: user?.id,
+        cardVersion: cardVersion.id,
+        quantity,
+        price,
+        createdBy: OrderCreatedBy.CardBuilder,
+      },
+      {
+        upsert: true,
+      }
+    )
+
+    await order.transition(OrderState.Captured)
     await order.updatePrintSpecPDF()
 
-    // Update the user's default card version to the newly created one
     if (user) {
+      // Update the user's default card version to the newly created one
       user.defaultCardVersion = cardVersion.id
       await user.save()
+
+      // Create a new Stripe Checkout session regardless of whether a previous one
+      // existed since some details may have changed in this submission
+      // Note that the client is responsible for making sure that a `user` is present (i.e.
+      // user is logged in) before we're able to create/redirect to a Stripe Checkout session
+      const checkoutSession = await this.createCheckoutSession(order, cardVersion, user)
+      order.checkoutSession = checkoutSession.id
+      order.paymentIntent = checkoutSession.payment_intent as string
+      await order.save()
     }
 
     return {
@@ -579,7 +607,7 @@ class OrderResolver {
     }
   }
 
-  private async validateBaseSubmitOrderInput(payload: BaseSubmitOrderInput) {
+  private async validateCardBuilderOrderCommon(payload: BaseSubmitOrderInput) {
     if (payload.orderId) {
       const isValidPreviousOrder = await Order.mongo.exists({ _id: payload.orderId })
       if (!isValidPreviousOrder) {
@@ -688,24 +716,14 @@ class OrderResolver {
     return imageUrls
   }
 
-  private async createOrUpdateCardBuilderOrder({
-    user,
-    cardVersion,
-    payload,
-  }: {
-    user?: DocumentType<User> | null
-    cardVersion: DocumentType<CardVersion>
-    payload: SubmitTemplateOrderInput | SubmitCustomOrderInput
-  }): Promise<DocumentType<Order>> {
-    const { quantity } = payload
-
-    const costSummary = getCostSummary(quantity)
+  private calculateOrderPrice(quantity: number, state?: string): OrderPrice {
+    const costSummary = getCostSummary(quantity, state)
     if (costSummary == null) {
       throw new Error(
         'Failed to calculate pricing, likely due to an unsupported quantity being used'
       )
     }
-    const price: OrderPrice = {
+    return {
       subtotal: costSummary.subtotal,
       shipping: costSummary.shipping,
       // We don't know the cost of tax yet since that requires knowing the shipping address
@@ -714,46 +732,6 @@ class OrderResolver {
       discount: costSummary.discount,
       total: costSummary.total,
     }
-
-    let order: DocumentType<Order> | null = null
-    // Check if the payload includes the id of a previous Order object
-    if (payload.orderId) {
-      // If so, use that Order (with updates applied) rather than creating a new one
-      order = await Order.mongo.findOne({ _id: payload.orderId })
-
-      if (!order) {
-        throw new Error('Paylod specified a previous order but that order could not be found')
-      }
-
-      order.quantity = quantity
-      order.price = price
-      order.cardVersion = cardVersion.id
-      order.user = user?.id
-    } else {
-      // No previous order existed; create a new one
-      order = await Order.mongo.create({
-        user: user?.id,
-        cardVersion: cardVersion.id,
-        quantity,
-        price,
-        createdBy: OrderCreatedBy.CardBuilder,
-      })
-    }
-
-    order.transition(OrderState.Captured)
-
-    // Only if we know the user already (i.e. submitter of order is logged in), create a Stripe Checkout
-    // session -- otherwise, we'll redirect them to login/register first
-    if (user) {
-      // Create a new Stripe Checkout session regardless of whether a previous one
-      // existed since some details may have changed in this submission
-      const checkoutSession = await this.createCheckoutSession(order, cardVersion, user)
-      order.checkoutSession = checkoutSession.id
-      order.paymentIntent = checkoutSession.payment_intent as string
-    }
-
-    await order.save()
-    return order
   }
 }
 export default OrderResolver
