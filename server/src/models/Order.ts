@@ -13,7 +13,7 @@ import { downloadUrlToFile } from 'src/util/file'
 import { formatName } from 'src/util/name'
 import * as S3 from 'src/util/s3'
 import { createShippoTransaction } from 'src/util/shipment'
-import { postNewOrder, SlackChannel } from 'src/util/slack'
+import { postNewOrder } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
 import { INITIAL_ORDER_STATE, OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
@@ -173,7 +173,7 @@ class Order extends BaseModel({
       }
       if (DEPLOY_ENV === 'production') {
         try {
-          await postNewOrder(SlackChannel.Orders, this)
+          await postNewOrder(this)
         } catch (e) {
           console.error(e)
         }
