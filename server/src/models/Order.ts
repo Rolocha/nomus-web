@@ -10,7 +10,6 @@ import { DEPLOY_ENV } from 'src/config'
 import PrintSpec from 'src/lib/print-spec'
 import { EventualResult, Result } from 'src/util/error'
 import { downloadUrlToFile } from 'src/util/file'
-import { formatName } from 'src/util/name'
 import * as S3 from 'src/util/s3'
 import { createShippoTransaction } from 'src/util/shipment'
 import { postNewOrder } from 'src/util/slack'
@@ -266,6 +265,20 @@ class Order extends BaseModel({
 
     await this.save()
     return this
+  }
+
+  public async sendShippedEmailIfNeeded(this: DocumentType<Order>, data: { eta: string }) {
+    if (this.notifiedShipped) return
+    // TODO
+    this.notifiedShipped = true
+    return this.save()
+  }
+
+  public async sendDeliveredEmailIfNeeded(this: DocumentType<Order>) {
+    if (this.notifiedDelivered) return
+    // TODO
+    this.notifiedDelivered = true
+    return this.save()
   }
 }
 
