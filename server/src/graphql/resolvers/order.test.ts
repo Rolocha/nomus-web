@@ -913,15 +913,6 @@ describe('OrderResolver', () => {
       expect(orderDetails.trackingNumber).toBe(mockedShippoTransaction.trackingNumber)
       expect(internalOrderObject.shippoTransactionId).toBe(mockedShippoTransaction.id)
       expect(orderDetails.shippingLabelUrl).toBe(mockedShippoTransaction.labelUrl)
-      expect(mockedShipmentModule.createShippoTransaction).toHaveBeenCalledWith(
-        expect.objectContaining({
-          destinationName: formatName(user.name),
-          destinationAddress: shippingAddress,
-          metadata: {
-            orderId: orderDetails.id,
-          },
-        })
-      )
 
       expect(orderDetails.user.id).toBe(user.id)
       expect(orderDetails.user.email).toBe(user.email)

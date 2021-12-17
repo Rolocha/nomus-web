@@ -22,10 +22,8 @@ import {
   Role,
   VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
-import { formatName } from 'src/util/name'
 import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
-import { createShippoTransaction } from 'src/util/shipment'
 import { Stripe, stripe } from 'src/util/stripe'
 import { getTemplateName } from 'src/util/templates'
 import {

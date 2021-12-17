@@ -63,6 +63,9 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
         discount: costSummary.discount,
         total: costSummary.total,
       },
+      shippingLabelUrl: undefined,
+      shippoTransactionId: undefined,
+      trackingNumber: undefined,
     })
 
     // Pretend the updated price data we'll get from Stripe
@@ -128,21 +131,5 @@ describe('CardOrderCheckoutCompleted Stripe webhook handler', () => {
     expect(updatedOrder.trackingNumber).toBe(mockedShippoTransaction.trackingNumber)
     expect(updatedOrder.shippoTransactionId).toBe(mockedShippoTransaction.id)
     expect(updatedOrder.shippingLabelUrl).toBe(mockedShippoTransaction.labelUrl)
-    expect(mockedShipmentModule.createShippoTransaction).toHaveBeenCalledWith(
-      expect.objectContaining({
-        destinationName: mockEventData.object.shipping.name,
-        destinationAddress: expect.objectContaining({
-          line1: mockEventData.object.shipping.address.line1,
-          line2: mockEventData.object.shipping.address.line2,
-          city: mockEventData.object.shipping.address.city,
-          state: mockEventData.object.shipping.address.state,
-          postalCode: mockEventData.object.shipping.address.postal_code,
-        }),
-        cardQuantity: order.quantity,
-        metadata: expect.objectContaining({
-          orderId: order.id,
-        }),
-      })
-    )
   })
 })
