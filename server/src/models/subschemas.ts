@@ -162,3 +162,20 @@ export class TemplateColorScheme {
   @Field({ nullable: true })
   accent4: string | null
 }
+
+// A subset of fields available on https://goshippo.com/docs/reference#tracks
+export class ShippoTrackingStatus {
+  @prop({ required: true })
+  status: string
+
+  @prop({ required: false })
+  substatus: string
+
+  @prop({ required: false })
+  statusDate: Date
+
+  @prop({ required: false })
+  actionRequired: string | null
+
+  // Note: `location` is also available but we don't save/care about it for now
+}

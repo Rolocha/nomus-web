@@ -20,9 +20,8 @@ import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
 import { Ref } from './scalars'
-import { Address, OrderPrice } from './subschemas'
+import { Address, OrderPrice, ShippoTrackingStatus } from './subschemas'
 import { User } from './User'
-
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
@@ -96,10 +95,24 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber?: string
 
+  // Last tracking state received from Shippo
+  @prop({ required: false })
+  lastShippoTrackingStatus?: ShippoTrackingStatus
+
+  // ISO-formatted date string representing when the courier expects to deliver the order
+  @prop({ required: false })
+  shipmentEta?: string
+
   // Object ID for the Shippo Transaction object, if one exists
   // See https://goshippo.com/docs/reference/js#transactions
   @prop({ required: false })
   shippoTransactionId?: string
+
+  @prop({ required: false, default: false })
+  notifiedShipped: boolean
+
+  @prop({ required: false, default: false })
+  notifiedDelivered: boolean
 
   // Stripe PaymentIntent id; may be 1 Intent: n orders
   // ex: One invoice from customer for 12 orders
