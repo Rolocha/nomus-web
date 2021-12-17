@@ -22,10 +22,8 @@ import {
   Role,
   VISIBLE_ORDER_LIST_STATES,
 } from 'src/util/enums'
-import { formatName } from 'src/util/name'
 import { getCostSummary, isValidQuantity, QUANTITY_TO_PRICE } from 'src/util/pricing'
 import * as S3 from 'src/util/s3'
-import { createShippoTransaction } from 'src/util/shipment'
 import { Stripe, stripe } from 'src/util/stripe'
 import { getTemplateName } from 'src/util/templates'
 import {
@@ -509,20 +507,7 @@ class OrderResolver {
       baseType: CardSpecBaseType.Custom,
     })
 
-    const orderId = Order.mongo.createId()
-
-    // Create a shipping label/transaction via Shippo
-    const shippoTransaction = await createShippoTransaction({
-      destinationName: formatName(user.name),
-      destinationAddress: shippingAddress,
-      cardQuantity: quantity,
-      metadata: {
-        orderId,
-      },
-    })
-
     const order = await Order.mongo.create({
-      _id: orderId,
       user: user.id,
       cardVersion: cv.id,
       state: OrderState.Actionable,
@@ -532,11 +517,9 @@ class OrderResolver {
       shippingName: user.fullName,
       paymentIntent: payload.paymentIntent,
       createdBy: OrderCreatedBy.Manual,
-      // Data from Shippo
-      trackingNumber: shippoTransaction.trackingNumber,
-      shippoTransactionId: shippoTransaction.id,
-      shippingLabelUrl: shippoTransaction.labelUrl,
     })
+
+    await order.createShippoTransaction()
 
     if (!payload.skipDefaultCardVersionUpdate) {
       user.defaultCardVersion = cv.id

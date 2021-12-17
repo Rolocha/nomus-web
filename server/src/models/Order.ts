@@ -10,7 +10,9 @@ import { DEPLOY_ENV } from 'src/config'
 import PrintSpec from 'src/lib/print-spec'
 import { EventualResult, Result } from 'src/util/error'
 import { downloadUrlToFile } from 'src/util/file'
+import { formatName } from 'src/util/name'
 import * as S3 from 'src/util/s3'
+import { createShippoTransaction } from 'src/util/shipment'
 import { postNewOrder, SlackChannel } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
 import { INITIAL_ORDER_STATE, OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
@@ -227,6 +229,30 @@ class Order extends BaseModel({
 
     this.printSpecUrl = S3.getObjectUrl(printSpecUploadResult.value)
     return this.save()
+  }
+
+  public async createShippoTransaction(this: DocumentType<Order>): Promise<DocumentType<Order>> {
+    if (this.shippingLabelUrl || this.trackingNumber || this.shippoTransactionId) {
+      throw new Error(
+        'Trying to create a Shippo transaction for an order that already has an associated shipment'
+      )
+    }
+
+    const shippoTransaction = await createShippoTransaction({
+      destinationName: this.shippingName,
+      destinationAddress: this.shippingAddress,
+      cardQuantity: this.quantity,
+      metadata: {
+        orderId: this.id,
+      },
+    })
+
+    this.trackingNumber = shippoTransaction.trackingNumber
+    this.shippoTransactionId = shippoTransaction.id
+    this.shippingLabelUrl = shippoTransaction.labelUrl
+
+    await this.save()
+    return this
   }
 }
 
