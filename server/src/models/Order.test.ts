@@ -2,6 +2,7 @@ import { cleanUpDB, dropAllCollections, initDB } from 'src/test-utils/db'
 import { INITIAL_ORDER_STATE, OrderEventTrigger, OrderState } from 'src/util/enums'
 import * as fileUtil from 'src/util/file'
 import * as S3 from 'src/util/s3'
+import * as Shipment from 'src/util/shipment'
 import { createMockCardVersion } from 'src/__mocks__/models/CardVersion'
 import { createMockOrder } from 'src/__mocks__/models/Order'
 import { mocked } from 'ts-jest/utils'
@@ -16,6 +17,8 @@ jest.mock('src/lib/print-spec')
 const mockedPrintSpec = mocked(PrintSpec)
 jest.mock('src/util/s3')
 const mockedS3Module = mocked(S3)
+jest.mock('src/util/shipment')
+const mockedShipmentModule = mocked(Shipment)
 
 beforeAll(async () => {
   await initDB()
@@ -215,6 +218,46 @@ describe('Order model', () => {
 
       const updatedOrder = await Order.mongo.findOne({ _id: order.id })
       expect(updatedOrder.printSpecUrl).toBe(S3.getObjectUrl(s3Key))
+    })
+  })
+
+  describe('createShippoTransaction', () => {
+    it('calls the createShippoTransaction util then updates the Order', async () => {
+      let order = await createMockOrder({
+        shippoTransactionId: undefined,
+        trackingNumber: undefined,
+        shippingLabelUrl: undefined,
+      })
+      const mockShippoTransactionData = {
+        id: 'shippo-transaction-id',
+        trackingNumber: '1234',
+        labelUrl: 'https://usps.com/tracking-number-or-whatever',
+      }
+      jest
+        .spyOn(mockedShipmentModule, 'createShippoTransaction')
+        .mockResolvedValue(mockShippoTransactionData)
+      order = await order.createShippoTransaction()
+
+      expect(order.shippoTransactionId).toBe(mockShippoTransactionData.id)
+      expect(order.trackingNumber).toBe(mockShippoTransactionData.trackingNumber)
+      expect(order.shippingLabelUrl).toBe(mockShippoTransactionData.labelUrl)
+    })
+
+    it('throws an error if the order already has shipping data set', async () => {
+      const shippingDataFields = ['shippingLabelUrl', 'trackingNumber', 'shippingLabelUrl']
+      for (const field of shippingDataFields) {
+        const override = {
+          shippoTransactionId: undefined,
+          trackingNumber: undefined,
+          shippingLabelUrl: undefined,
+        }
+        override[field] = 'some-value'
+        const order = await createMockOrder(override)
+        debugger
+        expect(order.createShippoTransaction()).rejects.toThrow(
+          'Trying to create a Shippo transaction for an order that already has an associated shipment'
+        )
+      }
     })
   })
 })
