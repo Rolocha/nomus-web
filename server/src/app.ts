@@ -15,6 +15,7 @@ import { cardRouter } from './api/cardRouter'
 import { contactRouter } from './api/contact'
 import { sendgridRouter } from './api/sendgrid'
 import { stripeWebhooksRouter } from './api/stripehooks'
+import { shippoWebhooksRouter } from 'src/api/shippohooks'
 
 db.init()
 setUpSentry()
@@ -37,5 +38,6 @@ gqlServer.applyMiddleware({ app, path: '/graphql' })
 app.use('/api/sendgrid', cookieMiddleware, bodyParser.json(), sendgridRouter)
 app.use('/api/contact', cookieMiddleware, bodyParser.json(), contactRouter)
 app.use('/api/stripehooks', stripeWebhooksRouter)
+app.use('/api/shippohooks', shippoWebhooksRouter)
 
 app.use('/d', cookieMiddleware, bodyParser.json(), cardRouter)
