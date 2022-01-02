@@ -26,7 +26,6 @@ const determineShippohookScenario = (message: any): ShippohookScenario | null =>
 
 shippoWebhooksRouter.post('/', express.json(), async (req, res) => {
   let message = req.body
-  console.log({ message })
   const ShippohookScenario = determineShippohookScenario(message)
   if (ShippohookScenario == null) {
     console.log(

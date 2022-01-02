@@ -34,6 +34,7 @@ export default async (message: any) => {
   // - RETURNED: The package is en route to be returned to the sender, or has been returned successfully.
   // - FAILURE: The carrier indicated that there has been an issue with the delivery. This can happen for various reasons and depends on the carrier. This status does not indicate a technical, but a delivery issue.
   // - UNKNOWN: The package has not been found via the carrier’s tracking system.
+  // See https://goshippo.com/docs/tracking/#event-definitions for more details
   if (trackingStatus.status === 'TRANSIT') {
     await order.sendShippedEmailIfNeeded({
       eta: shipmentEta,
