@@ -10,19 +10,17 @@ import { DEPLOY_ENV } from 'src/config'
 import PrintSpec from 'src/lib/print-spec'
 import { EventualResult, Result } from 'src/util/error'
 import { downloadUrlToFile } from 'src/util/file'
-import { formatName } from 'src/util/name'
 import * as S3 from 'src/util/s3'
 import { createShippoTransaction } from 'src/util/shipment'
-import { postNewOrder, SlackChannel } from 'src/util/slack'
+import { postNewOrder } from 'src/util/slack'
 import { Field, ObjectType } from 'type-graphql'
 import { INITIAL_ORDER_STATE, OrderCreatedBy, OrderEventTrigger, OrderState } from '../util/enums'
 import { BaseModel } from './BaseModel'
 import { CardVersion } from './CardVersion'
 import OrderEvent from './OrderEvent'
 import { Ref } from './scalars'
-import { Address, OrderPrice } from './subschemas'
+import { Address, OrderPrice, ShippoTrackingStatus } from './subschemas'
 import { User } from './User'
-
 // Mapping of current possible state transitions according to our Order Flow State Machine
 // https://www.notion.so/nomus/Order-Flow-State-Machine-e44affeb35764cc488ac771fa9e28851
 const ALLOWED_STATE_TRANSITIONS: Record<OrderState, Array<OrderState>> = {
@@ -96,10 +94,24 @@ class Order extends BaseModel({
   @Field({ nullable: true })
   trackingNumber?: string
 
+  // Last tracking state received from Shippo
+  @prop({ required: false })
+  lastShippoTrackingStatus?: ShippoTrackingStatus
+
+  // ISO-formatted date string representing when the courier expects to deliver the order
+  @prop({ required: false })
+  shipmentEta?: string
+
   // Object ID for the Shippo Transaction object, if one exists
   // See https://goshippo.com/docs/reference/js#transactions
   @prop({ required: false })
   shippoTransactionId?: string
+
+  @prop({ required: false, default: false })
+  notifiedShipped: boolean
+
+  @prop({ required: false, default: false })
+  notifiedDelivered: boolean
 
   // Stripe PaymentIntent id; may be 1 Intent: n orders
   // ex: One invoice from customer for 12 orders
@@ -173,7 +185,7 @@ class Order extends BaseModel({
       }
       if (DEPLOY_ENV === 'production') {
         try {
-          await postNewOrder(SlackChannel.Orders, this)
+          await postNewOrder(this)
         } catch (e) {
           console.error(e)
         }
@@ -253,6 +265,20 @@ class Order extends BaseModel({
 
     await this.save()
     return this
+  }
+
+  public async sendShippedEmailIfNeeded(this: DocumentType<Order>, data: { eta: string }) {
+    if (this.notifiedShipped) return
+    // TODO
+    this.notifiedShipped = true
+    return this.save()
+  }
+
+  public async sendDeliveredEmailIfNeeded(this: DocumentType<Order>) {
+    if (this.notifiedDelivered) return
+    // TODO
+    this.notifiedDelivered = true
+    return this.save()
   }
 }
 
